@@ -25,6 +25,8 @@ namespace SSDTLifecycleExtension
     /// </remarks>
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [Guid(SSDTLifecycleExtensionPackage.PackageGuidString)]
+    [ProvideMenuResource("Menus.ctmenu", 1)]
+    [ProvideToolWindow(typeof(SSDTLifecycleExtension.Windows.VersionHistoryWindow))]
     public sealed class SSDTLifecycleExtensionPackage : AsyncPackage
     {
         /// <summary>
@@ -46,6 +48,7 @@ namespace SSDTLifecycleExtension
             // When initialized asynchronously, the current thread may be a background thread at this point.
             // Do any initialization that requires the UI thread after switching to the UI thread.
             await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+            await SSDTLifecycleExtension.Windows.VersionHistoryWindowCommand.InitializeAsync(this);
         }
 
         #endregion
