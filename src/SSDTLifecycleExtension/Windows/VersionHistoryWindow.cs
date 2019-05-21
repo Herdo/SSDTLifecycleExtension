@@ -8,9 +8,9 @@
     {
         public VersionHistoryWindow() : base(null)
         {
-            this.Caption = "VersionHistoryWindow";
+            Caption = "VersionHistoryWindow";
 
-            this.Content = new VersionHistoryWindowControl();
+            Content = new VersionHistoryWindowControl();
         }
     }
 }

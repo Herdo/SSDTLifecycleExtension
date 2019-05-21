@@ -8,7 +8,7 @@
     {
         public ConfigurationWindowControl()
         {
-            this.InitializeComponent();
+            InitializeComponent();
         }
 
         [SuppressMessage("Microsoft.Globalization", "CA1300:SpecifyMessageBoxOptions", Justification = "Sample code")]
@@ -16,7 +16,7 @@
         private void button1_Click(object sender, RoutedEventArgs e)
         {
             MessageBox.Show(
-                string.Format(System.Globalization.CultureInfo.CurrentUICulture, "Invoked '{0}'", this.ToString()),
+                string.Format(System.Globalization.CultureInfo.CurrentUICulture, "Invoked '{0}'", ToString()),
                 "ConfigurationWindow");
         }
     }

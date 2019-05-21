@@ -38,7 +38,7 @@
             commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
 
             var menuCommandID = new CommandID(CommandSet, CommandId);
-            var menuItem = new MenuCommand(this.Execute, menuCommandID);
+            var menuItem = new MenuCommand(Execute, menuCommandID);
             commandService.AddCommand(menuItem);
         }
 
@@ -58,7 +58,7 @@
         {
             get
             {
-                return this.package;
+                return package;
             }
         }
 
@@ -83,15 +83,15 @@
         /// <param name="e">The event args.</param>
         private void Execute(object sender, EventArgs e)
         {
-            this.package.JoinableTaskFactory.RunAsync(async delegate
+            package.JoinableTaskFactory.RunAsync(async delegate
             {
-                ToolWindowPane window = await this.package.ShowToolWindowAsync(typeof(ScriptCreationWindow), 0, true, this.package.DisposalToken);
+                ToolWindowPane window = await package.ShowToolWindowAsync(typeof(ScriptCreationWindow), 0, true, package.DisposalToken);
                 if ((null == window) || (null == window.Frame))
                 {
                     throw new NotSupportedException("Cannot create tool window");
                 }
 
-                await this.package.JoinableTaskFactory.SwitchToMainThreadAsync();
+                await package.JoinableTaskFactory.SwitchToMainThreadAsync();
                 IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
                 Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
             });

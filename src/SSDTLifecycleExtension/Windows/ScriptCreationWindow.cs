@@ -8,9 +8,9 @@
     {
         public ScriptCreationWindow() : base(null)
         {
-            this.Caption = "ScriptCreationWindow";
+            Caption = "ScriptCreationWindow";
 
-            this.Content = new ScriptCreationWindowControl();
+            Content = new ScriptCreationWindowControl();
         }
     }
 }

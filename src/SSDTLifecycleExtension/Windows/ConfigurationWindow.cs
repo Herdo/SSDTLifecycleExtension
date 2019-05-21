@@ -8,9 +8,9 @@
     {
         public ConfigurationWindow() : base(null)
         {
-            this.Caption = "ConfigurationWindow";
+            Caption = "ConfigurationWindow";
 
-            this.Content = new ConfigurationWindowControl();
+            Content = new ConfigurationWindowControl();
         }
     }
 }
