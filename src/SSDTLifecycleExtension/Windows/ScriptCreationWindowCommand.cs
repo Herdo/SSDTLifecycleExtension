@@ -1,14 +1,11 @@
-﻿using System;
-using System.ComponentModel.Design;
-using System.Globalization;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
-using Task = System.Threading.Tasks.Task;
-
-namespace SSDTLifecycleExtension.Windows
+﻿namespace SSDTLifecycleExtension.Windows
 {
+    using System;
+    using System.ComponentModel.Design;
+    using Microsoft.VisualStudio.Shell;
+    using Microsoft.VisualStudio.Shell.Interop;
+    using Task = System.Threading.Tasks.Task;
+
     /// <summary>
     /// Command handler
     /// </summary>
