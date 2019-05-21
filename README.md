@@ -1,2 +1,2 @@
-# SSDTExtension
-SQL Server Data Tools Extension for Visual Studio
+# SSDT Lifecycle Extension
+SQL Server Data Tools Lifecycle Extension for Visual Studio
