@@ -27,6 +27,7 @@ namespace SSDTLifecycleExtension
     [Guid(SSDTLifecycleExtensionPackage.PackageGuidString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideToolWindow(typeof(SSDTLifecycleExtension.Windows.VersionHistoryWindow))]
+    [ProvideToolWindow(typeof(SSDTLifecycleExtension.Windows.ConfigurationWindow))]
     public sealed class SSDTLifecycleExtensionPackage : AsyncPackage
     {
         /// <summary>
@@ -49,6 +50,7 @@ namespace SSDTLifecycleExtension
             // Do any initialization that requires the UI thread after switching to the UI thread.
             await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
             await SSDTLifecycleExtension.Windows.VersionHistoryWindowCommand.InitializeAsync(this);
+            await SSDTLifecycleExtension.Windows.ConfigurationWindowCommand.InitializeAsync(this);
         }
 
         #endregion

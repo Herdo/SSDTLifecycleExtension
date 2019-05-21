@@ -47,6 +47,11 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SSDTLifecycleExtensionPackage.cs" />
+    <Compile Include="Windows\ConfigurationWindow.cs" />
+    <Compile Include="Windows\ConfigurationWindowCommand.cs" />
+    <Compile Include="Windows\ConfigurationWindowControl.xaml.cs">
+      <DependentUpon>ConfigurationWindowControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\VersionHistoryWindow.cs" />
     <Compile Include="Windows\VersionHistoryWindowCommand.cs" />
     <Compile Include="Windows\VersionHistoryWindowControl.xaml.cs">
@@ -76,12 +81,17 @@
     <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="16.1.3121" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Windows\ConfigurationWindowControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Windows\VersionHistoryWindowControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Windows\Resources\ConfigurationWindowCommand.png" />
     <Content Include="Windows\Resources\VersionHistoryWindowCommand.png" />
     <VSCTCompile Include="Windows\SSDTLifecycleExtensionPackage.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
