@@ -52,6 +52,11 @@
     <Compile Include="Windows\ConfigurationWindowControl.xaml.cs">
       <DependentUpon>ConfigurationWindowControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Windows\ScriptCreationWindow.cs" />
+    <Compile Include="Windows\ScriptCreationWindowCommand.cs" />
+    <Compile Include="Windows\ScriptCreationWindowControl.xaml.cs">
+      <DependentUpon>ScriptCreationWindowControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\VersionHistoryWindow.cs" />
     <Compile Include="Windows\VersionHistoryWindowCommand.cs" />
     <Compile Include="Windows\VersionHistoryWindowControl.xaml.cs">
@@ -85,6 +90,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Windows\ScriptCreationWindowControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Windows\VersionHistoryWindowControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -92,6 +101,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Windows\Resources\ConfigurationWindowCommand.png" />
+    <Content Include="Windows\Resources\ScriptCreationWindowCommand.png" />
     <Content Include="Windows\Resources\VersionHistoryWindowCommand.png" />
     <VSCTCompile Include="Windows\SSDTLifecycleExtensionPackage.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>

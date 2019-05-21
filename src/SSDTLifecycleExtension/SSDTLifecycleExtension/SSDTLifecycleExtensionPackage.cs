@@ -28,6 +28,7 @@ namespace SSDTLifecycleExtension
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideToolWindow(typeof(SSDTLifecycleExtension.Windows.VersionHistoryWindow))]
     [ProvideToolWindow(typeof(SSDTLifecycleExtension.Windows.ConfigurationWindow))]
+    [ProvideToolWindow(typeof(SSDTLifecycleExtension.Windows.ScriptCreationWindow))]
     public sealed class SSDTLifecycleExtensionPackage : AsyncPackage
     {
         /// <summary>
@@ -51,6 +52,7 @@ namespace SSDTLifecycleExtension
             await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
             await SSDTLifecycleExtension.Windows.VersionHistoryWindowCommand.InitializeAsync(this);
             await SSDTLifecycleExtension.Windows.ConfigurationWindowCommand.InitializeAsync(this);
+            await SSDTLifecycleExtension.Windows.ScriptCreationWindowCommand.InitializeAsync(this);
         }
 
         #endregion

@@ -56,6 +56,13 @@
           <ButtonText>ConfigurationWindow</ButtonText>
         </Strings>
       </Button>
+      <Button guid="guidSSDTLifecycleExtensionPackageCmdSet" id="cmdidScriptCreationWindowCommand" priority="0x0100" type="Button">
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1" />
+        <Icon guid="guidImages2" id="bmpPic1" />
+        <Strings>
+          <ButtonText>ScriptCreationWindow</ButtonText>
+        </Strings>
+      </Button>
     </Buttons>
 
     <!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
@@ -67,6 +74,7 @@
             must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
       <Bitmap guid="guidImages" href="Resources\VersionHistoryWindowCommand.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
       <Bitmap guid="guidImages1" href="Resources\ConfigurationWindowCommand.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
+      <Bitmap guid="guidImages2" href="Resources\ScriptCreationWindowCommand.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
     </Bitmaps>
   </Commands>
 
@@ -78,6 +86,7 @@
     <GuidSymbol name="guidSSDTLifecycleExtensionPackageCmdSet" value="{4f406ea0-8c3f-4554-bde2-390ab6c0dcd1}">
       <IDSymbol name="VersionHistoryWindowCommandId" value="0x0100" />
       <IDSymbol value="257" name="cmdidConfigurationWindowCommand" />
+      <IDSymbol value="258" name="cmdidScriptCreationWindowCommand" />
     </GuidSymbol>
 
     <GuidSymbol name="guidImages" value="{ef8267d5-30dd-44bb-ad40-6533490f6640}">
@@ -90,6 +99,15 @@
     </GuidSymbol>
   
     <GuidSymbol value="{95adc00e-821b-453c-89d7-a742a8241d22}" name="guidImages1">
+      <IDSymbol name="bmpPic1" value="1" />
+      <IDSymbol name="bmpPic2" value="2" />
+      <IDSymbol name="bmpPicSearch" value="3" />
+      <IDSymbol name="bmpPicX" value="4" />
+      <IDSymbol name="bmpPicArrows" value="5" />
+      <IDSymbol name="bmpPicStrikethrough" value="6" />
+    </GuidSymbol>
+  
+    <GuidSymbol value="{ba7c6984-f149-411e-8891-5632307304d1}" name="guidImages2">
       <IDSymbol name="bmpPic1" value="1" />
       <IDSymbol name="bmpPic2" value="2" />
       <IDSymbol name="bmpPicSearch" value="3" />
