@@ -32,7 +32,7 @@
     </Groups>
 
     <Menus>
-      <Menu guid="guidSSDTLifecycleExtensionPackageCmdSet" id="cmdidSSDTLifecycleExtensionProjectMenu" priority="0x0150" type="Menu">
+      <Menu guid="guidSSDTLifecycleExtensionPackageCmdSet" id="cmdidSSDTLifecycleExtensionProjectMenu" priority="0x0100" type="Menu">
         <Parent guid="guidSSDTLifecycleExtensionPackageCmdSet" id="cmdidSSDTLifecycleExtensionProjectMenuGroup"/>
         <Strings>
           <CommandName>SSDT Lifecycle Extension</CommandName>
@@ -76,14 +76,14 @@
 
     <!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
     <Bitmaps>
-      <Bitmap guid="guidImages1" href="Resources\ScriptCreationWindowCommand.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
-      <Bitmap guid="guidImages2" href="Resources\VersionHistoryWindowCommand.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
-      <Bitmap guid="guidImages3" href="Resources\ConfigurationWindowCommand.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
+      <Bitmap guid="guidImages1" href="Resources\ScriptCreationWindowCommand.png" usedList="bmpPic1" />
+      <Bitmap guid="guidImages2" href="Resources\VersionHistoryWindowCommand.png" usedList="bmpPic1" />
+      <Bitmap guid="guidImages3" href="Resources\ConfigurationWindowCommand.png" usedList="bmpPic1" />
     </Bitmaps>
   </Commands>
 
   <CommandPlacements>
-    <CommandPlacement guid="guidSSDTLifecycleExtensionPackageCmdSet" id="cmdidSSDTLifecycleExtensionProjectMenuGroup" priority="0x0150">
+    <CommandPlacement guid="guidSSDTLifecycleExtensionPackageCmdSet" id="cmdidSSDTLifecycleExtensionProjectMenuGroup" priority="0x0100">
       <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_PROJNODE"/>
     </CommandPlacement>
   </CommandPlacements>
@@ -109,29 +109,14 @@
 
     <GuidSymbol value="{ef8267d5-30dd-44bb-ad40-6533490f6640}" name="guidImages1">
       <IDSymbol name="bmpPic1" value="1" />
-      <IDSymbol name="bmpPic2" value="2" />
-      <IDSymbol name="bmpPicSearch" value="3" />
-      <IDSymbol name="bmpPicX" value="4" />
-      <IDSymbol name="bmpPicArrows" value="5" />
-      <IDSymbol name="bmpPicStrikethrough" value="6" />
     </GuidSymbol>
   
     <GuidSymbol value="{95adc00e-821b-453c-89d7-a742a8241d22}" name="guidImages2">
       <IDSymbol name="bmpPic1" value="1" />
-      <IDSymbol name="bmpPic2" value="2" />
-      <IDSymbol name="bmpPicSearch" value="3" />
-      <IDSymbol name="bmpPicX" value="4" />
-      <IDSymbol name="bmpPicArrows" value="5" />
-      <IDSymbol name="bmpPicStrikethrough" value="6" />
     </GuidSymbol>
   
     <GuidSymbol value="{ba7c6984-f149-411e-8891-5632307304d1}" name="guidImages3">
       <IDSymbol name="bmpPic1" value="1" />
-      <IDSymbol name="bmpPic2" value="2" />
-      <IDSymbol name="bmpPicSearch" value="3" />
-      <IDSymbol name="bmpPicX" value="4" />
-      <IDSymbol name="bmpPicArrows" value="5" />
-      <IDSymbol name="bmpPicStrikethrough" value="6" />
     </GuidSymbol>
   </Symbols>
 </CommandTable>
