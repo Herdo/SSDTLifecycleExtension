@@ -15,7 +15,7 @@
         /// <summary>
         /// Command ID.
         /// </summary>
-        public const int CommandId = 257;
+        public const int CommandId = 0x0903;
 
         /// <summary>
         /// Command menu group (command set GUID).

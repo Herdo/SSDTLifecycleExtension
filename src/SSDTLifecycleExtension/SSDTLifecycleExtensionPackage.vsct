@@ -11,40 +11,82 @@
       This section uses a Guid to identify the package that provides the command defined inside it. -->
   <Commands package="guidSSDTLifecycleExtensionPackage">
 
+    <Groups>
+      <!-- Top-level group -->
+      <Group guid="guidSSDTLifecycleExtensionPackageCmdSet" id="cmdidSSDTLifecycleExtensionProjectMenuGroup" priority="0x0150">
+        <Parent guid="guidSSDTLifecycleExtensionPackageCmdSet" id="IDM_VS_CTXT_PROJNODE"/>
+      </Group>
+
+      <!-- Sub-level groups -->
+      <Group guid="guidSSDTLifecycleExtensionPackageCmdSet" id="cmdidSSDTLifecycleExtensionProjectMenuScriptCreationGroup" priority="0x0100">
+        <Parent guid="guidSSDTLifecycleExtensionPackageCmdSet" id="cmdidSSDTLifecycleExtensionProjectMenu"/>
+      </Group>
+
+      <Group guid="guidSSDTLifecycleExtensionPackageCmdSet" id="cmdidSSDTLifecycleExtensionProjectMenuVersionHistoryGroup" priority="0x0200">
+        <Parent guid="guidSSDTLifecycleExtensionPackageCmdSet" id="cmdidSSDTLifecycleExtensionProjectMenu"/>
+      </Group>
+
+      <Group guid="guidSSDTLifecycleExtensionPackageCmdSet" id="cmdidSSDTLifecycleExtensionProjectMenuConfigurationGroup" priority="0x0300">
+        <Parent guid="guidSSDTLifecycleExtensionPackageCmdSet" id="cmdidSSDTLifecycleExtensionProjectMenu"/>
+      </Group>
+    </Groups>
+
+    <Menus>
+      <Menu guid="guidSSDTLifecycleExtensionPackageCmdSet" id="cmdidSSDTLifecycleExtensionProjectMenu" priority="0x0150" type="Menu">
+        <Parent guid="guidSSDTLifecycleExtensionPackageCmdSet" id="cmdidSSDTLifecycleExtensionProjectMenuGroup"/>
+        <Strings>
+          <CommandName>SSDT Lifecycle Extension</CommandName>
+          <ButtonText>SSDT Lifecycle Extension</ButtonText>
+        </Strings>
+      </Menu>
+    </Menus>
+
     <!--Buttons section. -->
     <!--This section defines the elements the user can interact with, like a menu command or a button
         or combo box in a toolbar. -->
     <Buttons>
-      <Button guid="guidSSDTLifecycleExtensionPackageCmdSet" id="VersionHistoryWindowCommandId" priority="0x0100" type="Button">
-        <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1" />
-        <Icon guid="guidImages" id="bmpPic1" />
+      <Button guid="guidSSDTLifecycleExtensionPackageCmdSet" id="cmdidScriptCreationWindowCommand" priority="0x0100" type="Button">
+        <Parent guid="guidSSDTLifecycleExtensionPackageCmdSet" id="cmdidSSDTLifecycleExtensionProjectMenuScriptCreationGroup" />
+        <Icon guid="guidImages1" id="bmpPic1" />
+        <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
-          <ButtonText>VersionHistoryWindow</ButtonText>
+          <CommandName>cmdidScriptCreationWindowCommand</CommandName>
+          <ButtonText>Start Script Creation...</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="guidSSDTLifecycleExtensionPackageCmdSet" id="cmdidVersionHistoryWindowCommand" priority="0x0100" type="Button">
+        <Parent guid="guidSSDTLifecycleExtensionPackageCmdSet" id="cmdidSSDTLifecycleExtensionProjectMenuVersionHistoryGroup" />
+        <Icon guid="guidImages2" id="bmpPic1" />
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <CommandName>cmdidVersionHistoryWindowCommand</CommandName>
+          <ButtonText>View Version History...</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidSSDTLifecycleExtensionPackageCmdSet" id="cmdidConfigurationWindowCommand" priority="0x0100" type="Button">
-        <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1" />
-        <Icon guid="guidImages1" id="bmpPic1" />
+        <Parent guid="guidSSDTLifecycleExtensionPackageCmdSet" id="cmdidSSDTLifecycleExtensionProjectMenuConfigurationGroup" />
+        <Icon guid="guidImages3" id="bmpPic1" />
+        <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
-          <ButtonText>ConfigurationWindow</ButtonText>
-        </Strings>
-      </Button>
-      <Button guid="guidSSDTLifecycleExtensionPackageCmdSet" id="cmdidScriptCreationWindowCommand" priority="0x0100" type="Button">
-        <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1" />
-        <Icon guid="guidImages2" id="bmpPic1" />
-        <Strings>
-          <ButtonText>ScriptCreationWindow</ButtonText>
+          <CommandName>cmdidConfigurationWindowCommand</CommandName>
+          <ButtonText>Configuration...</ButtonText>
         </Strings>
       </Button>
     </Buttons>
 
     <!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
     <Bitmaps>
-      <Bitmap guid="guidImages" href="Resources\VersionHistoryWindowCommand.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
-      <Bitmap guid="guidImages1" href="Resources\ConfigurationWindowCommand.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
-      <Bitmap guid="guidImages2" href="Resources\ScriptCreationWindowCommand.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
+      <Bitmap guid="guidImages1" href="Resources\ScriptCreationWindowCommand.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
+      <Bitmap guid="guidImages2" href="Resources\VersionHistoryWindowCommand.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
+      <Bitmap guid="guidImages3" href="Resources\ConfigurationWindowCommand.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
     </Bitmaps>
   </Commands>
+
+  <CommandPlacements>
+    <CommandPlacement guid="guidSSDTLifecycleExtensionPackageCmdSet" id="cmdidSSDTLifecycleExtensionProjectMenuGroup" priority="0x0150">
+      <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_PROJNODE"/>
+    </CommandPlacement>
+  </CommandPlacements>
 
   <Symbols>
     <!-- This is the package guid. -->
@@ -52,12 +94,20 @@
 
     <!-- This is the guid used to group the menu commands together -->
     <GuidSymbol name="guidSSDTLifecycleExtensionPackageCmdSet" value="{4f406ea0-8c3f-4554-bde2-390ab6c0dcd1}">
-      <IDSymbol name="VersionHistoryWindowCommandId" value="0x0100" />
-      <IDSymbol value="257" name="cmdidConfigurationWindowCommand" />
-      <IDSymbol value="258" name="cmdidScriptCreationWindowCommand" />
+      <!-- Menus -->
+      <IDSymbol name="cmdidSSDTLifecycleExtensionProjectMenu" value="0x0001"/>
+      <!-- Groups -->
+      <IDSymbol name="cmdidSSDTLifecycleExtensionProjectMenuGroup" value="0x0100"/>
+      <IDSymbol name="cmdidSSDTLifecycleExtensionProjectMenuScriptCreationGroup" value="0x0101"/>
+      <IDSymbol name="cmdidSSDTLifecycleExtensionProjectMenuVersionHistoryGroup" value="0x0102"/>
+      <IDSymbol name="cmdidSSDTLifecycleExtensionProjectMenuConfigurationGroup" value="0x0103"/>
+      <!-- Commands -->
+      <IDSymbol name="cmdidScriptCreationWindowCommand" value="0x0901"/>
+      <IDSymbol name="cmdidVersionHistoryWindowCommand" value="0x0902" />
+      <IDSymbol name="cmdidConfigurationWindowCommand" value="0x0903"/>
     </GuidSymbol>
 
-    <GuidSymbol name="guidImages" value="{ef8267d5-30dd-44bb-ad40-6533490f6640}">
+    <GuidSymbol value="{ef8267d5-30dd-44bb-ad40-6533490f6640}" name="guidImages1">
       <IDSymbol name="bmpPic1" value="1" />
       <IDSymbol name="bmpPic2" value="2" />
       <IDSymbol name="bmpPicSearch" value="3" />
@@ -66,7 +116,7 @@
       <IDSymbol name="bmpPicStrikethrough" value="6" />
     </GuidSymbol>
   
-    <GuidSymbol value="{95adc00e-821b-453c-89d7-a742a8241d22}" name="guidImages1">
+    <GuidSymbol value="{95adc00e-821b-453c-89d7-a742a8241d22}" name="guidImages2">
       <IDSymbol name="bmpPic1" value="1" />
       <IDSymbol name="bmpPic2" value="2" />
       <IDSymbol name="bmpPicSearch" value="3" />
@@ -75,7 +125,7 @@
       <IDSymbol name="bmpPicStrikethrough" value="6" />
     </GuidSymbol>
   
-    <GuidSymbol value="{ba7c6984-f149-411e-8891-5632307304d1}" name="guidImages2">
+    <GuidSymbol value="{ba7c6984-f149-411e-8891-5632307304d1}" name="guidImages3">
       <IDSymbol name="bmpPic1" value="1" />
       <IDSymbol name="bmpPic2" value="2" />
       <IDSymbol name="bmpPicSearch" value="3" />
