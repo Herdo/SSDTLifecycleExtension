@@ -48,6 +48,7 @@
       <Button guid="guidSSDTLifecycleExtensionPackageCmdSet" id="cmdidScriptCreationWindowCommand" priority="0x0100" type="Button">
         <Parent guid="guidSSDTLifecycleExtensionPackageCmdSet" id="cmdidSSDTLifecycleExtensionProjectMenuScriptCreationGroup" />
         <Icon guid="guidImages1" id="bmpPic1" />
+        <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>cmdidScriptCreationWindowCommand</CommandName>
@@ -57,6 +58,7 @@
       <Button guid="guidSSDTLifecycleExtensionPackageCmdSet" id="cmdidVersionHistoryWindowCommand" priority="0x0100" type="Button">
         <Parent guid="guidSSDTLifecycleExtensionPackageCmdSet" id="cmdidSSDTLifecycleExtensionProjectMenuVersionHistoryGroup" />
         <Icon guid="guidImages2" id="bmpPic1" />
+        <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>cmdidVersionHistoryWindowCommand</CommandName>
@@ -66,6 +68,7 @@
       <Button guid="guidSSDTLifecycleExtensionPackageCmdSet" id="cmdidConfigurationWindowCommand" priority="0x0100" type="Button">
         <Parent guid="guidSSDTLifecycleExtensionPackageCmdSet" id="cmdidSSDTLifecycleExtensionProjectMenuConfigurationGroup" />
         <Icon guid="guidImages3" id="bmpPic1" />
+        <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>cmdidConfigurationWindowCommand</CommandName>

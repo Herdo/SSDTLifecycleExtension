@@ -20,12 +20,12 @@
         /// <summary>
         /// Command menu group (command set GUID).
         /// </summary>
-        public static readonly Guid CommandSet = new Guid("4f406ea0-8c3f-4554-bde2-390ab6c0dcd1");
+        public static readonly Guid CommandSet = SSDTLifecycleExtensionPackageCommandSet.CommandSetGuid;
 
         /// <summary>
         /// VS Package that provides this command, not null.
         /// </summary>
-        private readonly AsyncPackage package;
+        private readonly SSDTLifecycleExtensionPackage _package;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VersionHistoryWindowCommand"/> class.
@@ -33,13 +33,14 @@
         /// </summary>
         /// <param name="package">Owner package, not null.</param>
         /// <param name="commandService">Command service to add command to, not null.</param>
-        private VersionHistoryWindowCommand(AsyncPackage package, OleMenuCommandService commandService)
+        private VersionHistoryWindowCommand(SSDTLifecycleExtensionPackage package, OleMenuCommandService commandService)
         {
-            this.package = package ?? throw new ArgumentNullException(nameof(package));
+            _package = package ?? throw new ArgumentNullException(nameof(package));
             commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
 
-            var menuCommandID = new CommandID(CommandSet, CommandId);
-            var menuItem = new MenuCommand(Execute, menuCommandID);
+            var menuCommandId = new CommandID(CommandSet, CommandId);
+            var menuItem = new OleMenuCommand(Execute, menuCommandId);
+            menuItem.BeforeQueryStatus += _package.MenuItemOnBeforeQueryStatus;
             commandService.AddCommand(menuItem);
         }
 
@@ -55,19 +56,13 @@
         /// <summary>
         /// Gets the service provider from the owner package.
         /// </summary>
-        private Microsoft.VisualStudio.Shell.IAsyncServiceProvider ServiceProvider
-        {
-            get
-            {
-                return package;
-            }
-        }
+        private Microsoft.VisualStudio.Shell.IAsyncServiceProvider ServiceProvider => _package;
 
         /// <summary>
         /// Initializes the singleton instance of the command.
         /// </summary>
         /// <param name="package">Owner package, not null.</param>
-        public static async Task InitializeAsync(AsyncPackage package)
+        public static async Task InitializeAsync(SSDTLifecycleExtensionPackage package)
         {
             // Switch to the main thread - the call to AddCommand in VersionHistoryWindowCommand's constructor requires
             // the UI thread.
@@ -84,15 +79,15 @@
         /// <param name="e">The event args.</param>
         private void Execute(object sender, EventArgs e)
         {
-            package.JoinableTaskFactory.RunAsync(async delegate
+            _package.JoinableTaskFactory.RunAsync(async delegate
             {
-                ToolWindowPane window = await package.ShowToolWindowAsync(typeof(VersionHistoryWindow), 0, true, package.DisposalToken);
+                ToolWindowPane window = await _package.ShowToolWindowAsync(typeof(VersionHistoryWindow), 0, true, _package.DisposalToken);
                 if ((null == window) || (null == window.Frame))
                 {
                     throw new NotSupportedException("Cannot create tool window");
                 }
 
-                await package.JoinableTaskFactory.SwitchToMainThreadAsync();
+                await _package.JoinableTaskFactory.SwitchToMainThreadAsync();
                 IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
                 Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
             });
