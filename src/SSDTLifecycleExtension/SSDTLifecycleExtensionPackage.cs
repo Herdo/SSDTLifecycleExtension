@@ -4,6 +4,7 @@
     using System.Runtime.InteropServices;
     using System.Threading;
     using System.Threading.Tasks;
+    using Commands;
     using Microsoft.VisualStudio.Shell;
     using Unity;
     using Task = System.Threading.Tasks.Task;
@@ -38,9 +39,9 @@
             _container = BuildUnityContainer();
 
             // Initialize commands
-            await Windows.VersionHistoryWindowCommand.InitializeAsync(this);
-            await Windows.ConfigurationWindowCommand.InitializeAsync(this);
-            await Windows.ScriptCreationWindowCommand.InitializeAsync(this);
+            await VersionHistoryWindowCommand.InitializeAsync(this);
+            await ConfigurationWindowCommand.InitializeAsync(this);
+            await ScriptCreationWindowCommand.InitializeAsync(this);
         }
 
         protected override object GetService(Type serviceType)

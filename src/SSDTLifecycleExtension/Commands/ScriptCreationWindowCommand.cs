@@ -1,7 +1,8 @@
-﻿namespace SSDTLifecycleExtension.Windows
+﻿namespace SSDTLifecycleExtension.Commands
 {
     using System;
     using System.ComponentModel.Design;
+    using Windows;
     using Microsoft.VisualStudio.Shell;
     using Microsoft.VisualStudio.Shell.Interop;
     using Task = System.Threading.Tasks.Task;
@@ -9,12 +10,12 @@
     /// <summary>
     /// Command handler
     /// </summary>
-    internal sealed class ConfigurationWindowCommand
+    internal sealed class ScriptCreationWindowCommand
     {
         /// <summary>
         /// Command ID.
         /// </summary>
-        public const int CommandId = 257;
+        public const int CommandId = 258;
 
         /// <summary>
         /// Command menu group (command set GUID).
@@ -27,12 +28,12 @@
         private readonly AsyncPackage package;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConfigurationWindowCommand"/> class.
+        /// Initializes a new instance of the <see cref="ScriptCreationWindowCommand"/> class.
         /// Adds our command handlers for menu (commands must exist in the command table file)
         /// </summary>
         /// <param name="package">Owner package, not null.</param>
         /// <param name="commandService">Command service to add command to, not null.</param>
-        private ConfigurationWindowCommand(AsyncPackage package, OleMenuCommandService commandService)
+        private ScriptCreationWindowCommand(AsyncPackage package, OleMenuCommandService commandService)
         {
             this.package = package ?? throw new ArgumentNullException(nameof(package));
             commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
@@ -45,7 +46,7 @@
         /// <summary>
         /// Gets the instance of the command.
         /// </summary>
-        public static ConfigurationWindowCommand Instance
+        public static ScriptCreationWindowCommand Instance
         {
             get;
             private set;
@@ -68,12 +69,12 @@
         /// <param name="package">Owner package, not null.</param>
         public static async Task InitializeAsync(AsyncPackage package)
         {
-            // Switch to the main thread - the call to AddCommand in ConfigurationWindowCommand's constructor requires
+            // Switch to the main thread - the call to AddCommand in ScriptCreationWindowCommand's constructor requires
             // the UI thread.
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(package.DisposalToken);
 
             OleMenuCommandService commandService = await package.GetServiceAsync((typeof(IMenuCommandService))) as OleMenuCommandService;
-            Instance = new ConfigurationWindowCommand(package, commandService);
+            Instance = new ScriptCreationWindowCommand(package, commandService);
         }
 
         /// <summary>
@@ -85,7 +86,7 @@
         {
             package.JoinableTaskFactory.RunAsync(async delegate
             {
-                ToolWindowPane window = await package.ShowToolWindowAsync(typeof(ConfigurationWindow), 0, true, package.DisposalToken);
+                ToolWindowPane window = await package.ShowToolWindowAsync(typeof(ScriptCreationWindow), 0, true, package.DisposalToken);
                 if ((null == window) || (null == window.Frame))
                 {
                     throw new NotSupportedException("Cannot create tool window");

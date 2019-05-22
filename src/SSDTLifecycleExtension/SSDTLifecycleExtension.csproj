@@ -53,17 +53,17 @@
     <Compile Include="ViewModels\VersionHistoryViewModel.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />
     <Compile Include="Windows\ConfigurationWindow.cs" />
-    <Compile Include="Windows\ConfigurationWindowCommand.cs" />
+    <Compile Include="Commands\ConfigurationWindowCommand.cs" />
     <Compile Include="Windows\ConfigurationWindowControl.xaml.cs">
       <DependentUpon>ConfigurationWindowControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\ScriptCreationWindow.cs" />
-    <Compile Include="Windows\ScriptCreationWindowCommand.cs" />
+    <Compile Include="Commands\ScriptCreationWindowCommand.cs" />
     <Compile Include="Windows\ScriptCreationWindowControl.xaml.cs">
       <DependentUpon>ScriptCreationWindowControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\VersionHistoryWindow.cs" />
-    <Compile Include="Windows\VersionHistoryWindowCommand.cs" />
+    <Compile Include="Commands\VersionHistoryWindowCommand.cs" />
     <Compile Include="Windows\VersionHistoryWindowControl.xaml.cs">
       <DependentUpon>VersionHistoryWindowControl.xaml</DependentUpon>
     </Compile>
