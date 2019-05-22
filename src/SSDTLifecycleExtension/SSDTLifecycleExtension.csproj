@@ -89,6 +89,9 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.SDK" Version="16.0.200" ExcludeAssets="runtime" />
     <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="16.1.3121" />
+    <PackageReference Include="Unity">
+      <Version>5.10.3</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <Page Include="Windows\ConfigurationWindowControl.xaml">
