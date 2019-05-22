@@ -111,7 +111,7 @@
     <Content Include="Windows\Resources\ConfigurationWindowCommand.png" />
     <Content Include="Windows\Resources\ScriptCreationWindowCommand.png" />
     <Content Include="Windows\Resources\VersionHistoryWindowCommand.png" />
-    <VSCTCompile Include="Windows\SSDTLifecycleExtensionPackage.vsct">
+    <VSCTCompile Include="SSDTLifecycleExtensionPackage.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
     </VSCTCompile>
   </ItemGroup>
