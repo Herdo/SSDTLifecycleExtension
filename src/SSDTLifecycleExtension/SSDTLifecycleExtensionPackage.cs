@@ -15,9 +15,9 @@
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [Guid(PackageGuidString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    [ProvideToolWindow(typeof(Windows.VersionHistoryWindow))]
-    [ProvideToolWindow(typeof(Windows.ConfigurationWindow))]
-    [ProvideToolWindow(typeof(Windows.ScriptCreationWindow))]
+    [ProvideToolWindow(typeof(Windows.VersionHistoryWindow), Transient = true, Style = VsDockStyle.Tabbed, MultiInstances = false)]
+    [ProvideToolWindow(typeof(Windows.ConfigurationWindow), Transient = true, Style = VsDockStyle.Tabbed, MultiInstances = false)]
+    [ProvideToolWindow(typeof(Windows.ScriptCreationWindow), Transient = true, Style = VsDockStyle.Tabbed, MultiInstances = false)]
     [ProvideAutoLoad(VSConstants.UICONTEXT.SolutionExistsAndFullyLoaded_string, PackageAutoLoadFlags.BackgroundLoad)]
     public sealed class SSDTLifecycleExtensionPackage : AsyncPackage
     {
@@ -99,6 +99,17 @@
                 return;
 
             command.Visible = project.Kind == "{00d1a9c2-b5f0-4af3-8072-f6c62b433612}"; // *.sqlproj
+        }
+
+        internal string GetSelectedProjectName()
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            if (_dte2.SelectedItems.Count != 1)
+                return null;
+
+            var project = _dte2.SelectedItems.Item(1).Project;
+            return project?.Name;
         }
     }
 }

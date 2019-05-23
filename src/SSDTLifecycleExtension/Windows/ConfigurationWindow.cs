@@ -8,9 +8,15 @@
     {
         public ConfigurationWindow() : base(null)
         {
-            Caption = "ConfigurationWindow";
-
+            SetCaption(null);
             Content = new ConfigurationWindowControl();
+        }
+
+        internal void SetCaption(string projectName)
+        {
+            Caption = projectName == null
+                          ? "Configuration"
+                          : $"Configuration: {projectName}";
         }
     }
 }

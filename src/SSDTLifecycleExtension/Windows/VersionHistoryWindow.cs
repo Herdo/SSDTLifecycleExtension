@@ -8,9 +8,15 @@
     {
         public VersionHistoryWindow() : base(null)
         {
-            Caption = "VersionHistoryWindow";
-
+            SetCaption(null);
             Content = new VersionHistoryWindowControl();
+        }
+
+        internal void SetCaption(string projectName)
+        {
+            Caption = projectName == null
+                          ? "Version History"
+                          : $"Version History: {projectName}";
         }
     }
 }

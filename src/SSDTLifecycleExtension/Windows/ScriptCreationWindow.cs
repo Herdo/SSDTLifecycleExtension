@@ -8,9 +8,15 @@
     {
         public ScriptCreationWindow() : base(null)
         {
-            Caption = "ScriptCreationWindow";
-
+            SetCaption(null);
             Content = new ScriptCreationWindowControl();
+        }
+
+        internal void SetCaption(string projectName)
+        {
+            Caption = projectName == null
+                          ? "Script Creation"
+                          : $"Script Creation: {projectName}";
         }
     }
 }

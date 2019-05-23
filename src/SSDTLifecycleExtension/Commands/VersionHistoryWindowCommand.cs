@@ -81,14 +81,16 @@
         {
             _package.JoinableTaskFactory.RunAsync(async delegate
             {
-                ToolWindowPane window = await _package.ShowToolWindowAsync(typeof(VersionHistoryWindow), 0, true, _package.DisposalToken);
-                if ((null == window) || (null == window.Frame))
+                if (!(await _package.ShowToolWindowAsync(typeof(VersionHistoryWindow), 0, true, _package.DisposalToken) is VersionHistoryWindow window)
+                    || window.Frame == null)
                 {
                     throw new NotSupportedException("Cannot create tool window");
                 }
 
                 await _package.JoinableTaskFactory.SwitchToMainThreadAsync();
-                IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
+                var fileName = _package.GetSelectedProjectName();
+                if (fileName != null) window.SetCaption(fileName);
+                var windowFrame = (IVsWindowFrame)window.Frame;
                 Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
             });
         }
