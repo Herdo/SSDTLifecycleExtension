@@ -1,19 +1,18 @@
 ﻿namespace SSDTLifecycleExtension
 {
     using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Runtime.InteropServices;
     using System.Threading;
-    using System.Threading.Tasks;
-    using Windows;
     using Commands;
+    using DataAccess;
     using EnvDTE;
     using EnvDTE80;
     using Microsoft.VisualStudio;
     using Microsoft.VisualStudio.Shell;
+    using Services;
     using Unity;
     using Unity.Lifetime;
+    using Unity.Resolution;
     using ViewModels;
     using Task = System.Threading.Tasks.Task;
 
@@ -38,7 +37,13 @@
                 // ViewModels
                .RegisterType<ScriptCreationViewModel>()
                .RegisterType<VersionHistoryViewModel>()
-               .RegisterType<ConfigurationViewModel>();
+               .RegisterType<ConfigurationViewModel>()
+                
+                // Services
+               .RegisterSingleton<IConfigurationService, ConfigurationService>()
+                
+                // Data Access
+               .RegisterSingleton<IFileSystemAccess, FileSystemAccess>();
 
             return container;
         }
@@ -109,6 +114,8 @@
 
         internal TViewModel GetViewModel<TViewModel>(Project project) where TViewModel : IViewModel
         {
+            if (project == null)
+                throw new ArgumentNullException(nameof(project));
             ThreadHelper.ThrowIfNotOnUIThread();
 
             // Check for an existing view model registered with the project.
@@ -116,7 +123,7 @@
                 return _container.Resolve<TViewModel>(project.UniqueName);
 
             // Create a new view model and register it with the project.
-            var newViewModel = _container.Resolve<TViewModel>();
+            var newViewModel = _container.Resolve<TViewModel>(new ParameterOverride("project", project));
             _container.RegisterInstance(typeof(TViewModel), project.UniqueName, newViewModel, new ContainerControlledLifetimeManager());
             return newViewModel;
         }

@@ -96,6 +96,7 @@
                 if (window.Content is IView windowContent)
                 {
                     var viewModel = _package.GetViewModel<ConfigurationViewModel>(project);
+                    await viewModel.InitializeAsync();
                     windowContent.SetDataContext(viewModel);
                 }
                 // Show the frame
