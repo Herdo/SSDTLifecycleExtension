@@ -4,7 +4,7 @@
     using System.Runtime.CompilerServices;
     using Annotations;
 
-    public abstract class ViewModelBase : INotifyPropertyChanged
+    public abstract class ViewModelBase : IViewModel
     {
         public event PropertyChangedEventHandler PropertyChanged;
 

@@ -50,6 +50,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SSDTLifecycleExtensionPackage.cs" />
     <Compile Include="ViewModels\ConfigurationViewModel.cs" />
+    <Compile Include="ViewModels\IViewModel.cs" />
     <Compile Include="ViewModels\ScriptCreationViewModel.cs" />
     <Compile Include="ViewModels\VersionHistoryViewModel.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />
@@ -58,6 +59,7 @@
     <Compile Include="Windows\ConfigurationWindowControl.xaml.cs">
       <DependentUpon>ConfigurationWindowControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Windows\IView.cs" />
     <Compile Include="Windows\ScriptCreationWindow.cs" />
     <Compile Include="Commands\ScriptCreationWindowCommand.cs" />
     <Compile Include="Windows\ScriptCreationWindowControl.xaml.cs">

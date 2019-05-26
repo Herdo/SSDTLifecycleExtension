@@ -2,9 +2,9 @@
 {
     using System.Diagnostics.CodeAnalysis;
     using System.Windows;
-    using System.Windows.Controls;
+    using ViewModels;
 
-    public partial class ScriptCreationWindowControl : UserControl
+    public partial class ScriptCreationWindowControl : IView
     {
         public ScriptCreationWindowControl()
         {
@@ -18,6 +18,11 @@
             MessageBox.Show(
                 string.Format(System.Globalization.CultureInfo.CurrentUICulture, "Invoked '{0}'", ToString()),
                 "ScriptCreationWindow");
+        }
+
+        void IView.SetDataContext(IViewModel viewModel)
+        {
+            DataContext = viewModel;
         }
     }
 }

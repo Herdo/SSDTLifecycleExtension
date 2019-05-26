@@ -2,9 +2,9 @@
 {
     using System.Diagnostics.CodeAnalysis;
     using System.Windows;
-    using System.Windows.Controls;
+    using ViewModels;
 
-    public partial class ConfigurationWindowControl : UserControl
+    public partial class ConfigurationWindowControl : IView
     {
         public ConfigurationWindowControl()
         {
@@ -18,6 +18,11 @@
             MessageBox.Show(
                 string.Format(System.Globalization.CultureInfo.CurrentUICulture, "Invoked '{0}'", ToString()),
                 "ConfigurationWindow");
+        }
+
+        void IView.SetDataContext(IViewModel viewModel)
+        {
+            DataContext = viewModel;
         }
     }
 }

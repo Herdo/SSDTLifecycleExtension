@@ -5,6 +5,7 @@
     using Windows;
     using Microsoft.VisualStudio.Shell;
     using Microsoft.VisualStudio.Shell.Interop;
+    using ViewModels;
     using Task = System.Threading.Tasks.Task;
 
     /// <summary>
@@ -88,8 +89,16 @@
                 }
 
                 await _package.JoinableTaskFactory.SwitchToMainThreadAsync();
-                var fileName = _package.GetSelectedProjectName();
-                if (fileName != null) window.SetCaption(fileName);
+                // Set caption
+                var project = _package.GetSelectedProject();
+                if (project?.Name != null) window.SetCaption(project.Name);
+                // Set data context
+                if (window.Content is IView windowContent)
+                {
+                    var viewModel = _package.GetViewModel<VersionHistoryViewModel>(project);
+                    windowContent.SetDataContext(viewModel);
+                }
+                // Show the frame
                 var windowFrame = (IVsWindowFrame)window.Frame;
                 Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
             });

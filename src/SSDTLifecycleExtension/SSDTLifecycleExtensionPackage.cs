@@ -1,15 +1,20 @@
 ﻿namespace SSDTLifecycleExtension
 {
     using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Runtime.InteropServices;
     using System.Threading;
     using System.Threading.Tasks;
+    using Windows;
     using Commands;
     using EnvDTE;
     using EnvDTE80;
     using Microsoft.VisualStudio;
     using Microsoft.VisualStudio.Shell;
     using Unity;
+    using Unity.Lifetime;
+    using ViewModels;
     using Task = System.Threading.Tasks.Task;
 
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
@@ -28,7 +33,13 @@
 
         private static IUnityContainer BuildUnityContainer()
         {
-            var container = new UnityContainer();
+            var container = new UnityContainer()
+
+                // ViewModels
+               .RegisterType<ScriptCreationViewModel>()
+               .RegisterType<VersionHistoryViewModel>()
+               .RegisterType<ConfigurationViewModel>();
+
             return container;
         }
 
@@ -51,21 +62,6 @@
             await VersionHistoryWindowCommand.InitializeAsync(this);
             await ConfigurationWindowCommand.InitializeAsync(this);
             await ScriptCreationWindowCommand.InitializeAsync(this);
-        }
-
-        protected override object GetService(Type serviceType)
-        {
-            if (_container?.IsRegistered(serviceType) ?? false)
-                return _container.Resolve(serviceType);
-
-            return base.GetService(serviceType);
-        }
-
-        protected override async Task<object> InitializeToolWindowAsync(Type toolWindowType,
-                                                                        int id,
-                                                                        CancellationToken cancellationToken)
-        {
-            return await GetServiceAsync(toolWindowType);
         }
 
         protected override void Dispose(bool disposing)
@@ -101,15 +97,28 @@
             command.Visible = project.Kind == "{00d1a9c2-b5f0-4af3-8072-f6c62b433612}"; // *.sqlproj
         }
 
-        internal string GetSelectedProjectName()
+        internal Project GetSelectedProject()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
             if (_dte2.SelectedItems.Count != 1)
                 return null;
 
-            var project = _dte2.SelectedItems.Item(1).Project;
-            return project?.Name;
+            return _dte2.SelectedItems.Item(1).Project;
+        }
+
+        internal TViewModel GetViewModel<TViewModel>(Project project) where TViewModel : IViewModel
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            // Check for an existing view model registered with the project.
+            if (_container.IsRegistered(typeof(TViewModel), project.UniqueName))
+                return _container.Resolve<TViewModel>(project.UniqueName);
+
+            // Create a new view model and register it with the project.
+            var newViewModel = _container.Resolve<TViewModel>();
+            _container.RegisterInstance(typeof(TViewModel), project.UniqueName, newViewModel, new ContainerControlledLifetimeManager());
+            return newViewModel;
         }
     }
 }
