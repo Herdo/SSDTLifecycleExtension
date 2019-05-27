@@ -9,5 +9,8 @@
 
         Task WriteFileAsync([NotNull] string targetPath,
                             [NotNull] string content);
+
+        string BrowseForFile([NotNull] string extension,
+                             [NotNull] string filter);
     }
 }

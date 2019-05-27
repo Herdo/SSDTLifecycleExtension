@@ -4,6 +4,7 @@
     using System.IO;
     using System.Threading.Tasks;
     using Annotations;
+    using Microsoft.Win32;
 
     [UsedImplicitly]
     public class FileSystemAccess : IFileSystemAccess
@@ -44,6 +45,26 @@
             using (var stream = new FileStream(targetPath, FileMode.OpenOrCreate))
                 using (var writer = new StreamWriter(stream))
                     await writer.WriteAsync(content);
+        }
+
+        string IFileSystemAccess.BrowseForFile(string extension, string filter)
+        {
+            if (extension == null)
+                throw new ArgumentNullException(nameof(extension));
+            if (filter == null)
+                throw new ArgumentNullException(nameof(filter));
+
+            var ofd = new OpenFileDialog
+            {
+                CheckFileExists = true,
+                CheckPathExists = true,
+                DefaultExt = extension,
+                Multiselect = false,
+                ValidateNames = true,
+                Filter = filter
+            };
+            var result = ofd.ShowDialog();
+            return result == true ? ofd.FileName : null;
         }
     }
 }

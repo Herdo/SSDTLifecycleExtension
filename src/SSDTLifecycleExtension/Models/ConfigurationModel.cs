@@ -1,11 +1,19 @@
 ﻿namespace SSDTLifecycleExtension.Models
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
     using System.ComponentModel;
+    using System.Linq;
     using System.Runtime.CompilerServices;
     using Annotations;
 
-    public class ConfigurationModel : INotifyPropertyChanged
+    public class ConfigurationModel : INotifyPropertyChanged, INotifyDataErrorInfo
     {
+        private const string _SQL_PACKAGE_SPECIAL_KEYWORD = "{DEFAULT_LATEST_VERSION}";
+
+        private readonly Dictionary<string, ICollection<string>> _validationErrors;
+
         private string _artifactsPath;
         private string _sqlPackagePath;
         private string _versionPattern;
@@ -44,6 +52,8 @@
                 if (value == _sqlPackagePath) return;
                 _sqlPackagePath = value;
                 OnPropertyChanged();
+                ValidateSqlPackagePath(_sqlPackagePath);
+                OnErrorsChanged();
             }
         }
 
@@ -175,6 +185,14 @@
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="ConfigurationModel"/> class.
+        /// </summary>
+        public ConfigurationModel()
+        {
+            _validationErrors = new Dictionary<string, ICollection<string>>();
+        }
+
+        /// <summary>
         /// Gets the default configuration.
         /// </summary>
         /// <returns>A new <see cref="ConfigurationModel"/> instance.</returns>
@@ -182,7 +200,7 @@
             new ConfigurationModel
             {
                 ArtifactsPath = "_Deployment",
-                SqlPackagePath = "{DEFAULT_LATEST_VERSION}",
+                SqlPackagePath = _SQL_PACKAGE_SPECIAL_KEYWORD,
                 VersionPattern = "{MAJOR}.{MINOR}.{PATCH}",
                 PublishProfilePath = null,
                 BuildBeforeScriptCreation = true,
@@ -194,12 +212,56 @@
                 CustomFooter = null
             };
 
+        private void ValidateSqlPackagePath(string value, [CallerMemberName] string propertyName = null)
+        {
+            if (propertyName == null)
+                throw new ArgumentNullException(nameof(propertyName));
+
+            var errors = new List<string>();
+
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                errors.Add("Path cannot be empty.");
+            }
+            else
+            {
+                const string execName = "SqlPackage.exe";
+                if (value != _SQL_PACKAGE_SPECIAL_KEYWORD && !value.EndsWith(execName))
+                {
+                    errors.Add($"Executable must be '{execName}' or the special keyword.");
+                }
+            }
+
+            if (errors.Any())
+                _validationErrors[propertyName] = errors;
+            else
+                _validationErrors.Remove(propertyName);
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public IEnumerable GetErrors(string propertyName)
+        {
+            if (string.IsNullOrWhiteSpace(propertyName))
+                return null;
+            return _validationErrors.TryGetValue(propertyName, out var errors)
+                       ? errors
+                       : null;
+        }
+
+        public bool HasErrors => _validationErrors.Count > 0;
+
+        public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
+
+        protected virtual void OnErrorsChanged([CallerMemberName] string propertyName = null)
+        {
+            ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
         }
     }
 }

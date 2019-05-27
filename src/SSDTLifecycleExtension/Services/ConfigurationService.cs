@@ -63,12 +63,19 @@
             await _fileSystemAccess.WriteFileAsync(targetPath, serialized);
 
             // Add configuration to the project, if it hasn't been added before.
-            var items = project.ProjectItems.OfType<ProjectItem>().Select(m =>
+            var properties = project.ProjectItems.OfType<ProjectItem>().SingleOrDefault(m =>
             {
                 ThreadHelper.ThrowIfNotOnUIThread();
-                return m.Name;
-            }).ToArray();
-            if (items.All(m => m != _CONFIGURATION_FILE_NAME)) project.ProjectItems.AddFromFile(targetPath);
+                return m.Name == _PROPERTIES_DIRECTORY;
+            });
+            if (properties == null)
+                return;
+
+            if (properties.ProjectItems.OfType<ProjectItem>().All(m =>
+            {
+                ThreadHelper.ThrowIfNotOnUIThread();
+                return m.Name != _CONFIGURATION_FILE_NAME;
+            })) properties.ProjectItems.AddFromFile(targetPath);
         }
     }
 }
