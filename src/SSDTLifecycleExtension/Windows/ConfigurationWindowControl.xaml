@@ -13,22 +13,45 @@
              d:DataContext="{d:DesignInstance viewModels:ConfigurationViewModel,IsDesignTimeCreatable=False}">
 
     <UserControl.Resources>
+        <Style x:Key="ErrorTemplate" TargetType="Control">
+            <Setter Property="Validation.ErrorTemplate">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <StackPanel>
+                            <AdornedElementPlaceholder/>
+                            <ItemsControl ItemsSource="{Binding}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding ErrorContent}" Foreground="Red"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
         <Style TargetType="GroupBox" x:Key="SettingsGroupStyle">
             <Setter Property="Padding" Value="5"/>
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Setter Property="BorderBrush" Value="Black"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
         </Style>
         <Style TargetType="TextBlock" x:Key="ConfigurationDescriptionTextBlockStyle">
             <Setter Property="Width" Value="250"/>
             <Setter Property="Margin" Value="5, 5, 10, 15"/>
         </Style>
-        <Style TargetType="TextBox" x:Key="DefaultTextTextBoxStyle">
+        <Style TargetType="TextBlock" x:Key="IndentedConfigurationDescriptionTextBlockStyle" BasedOn="{StaticResource ConfigurationDescriptionTextBlockStyle}">
+            <Setter Property="Width" Value="240"/>
+            <Setter Property="Margin" Value="15, 5, 10, 15"/>
+        </Style>
+        <Style TargetType="TextBox" x:Key="DefaultTextTextBoxStyle" BasedOn="{StaticResource ErrorTemplate}">
             <Setter Property="AcceptsReturn" Value="False"/>
             <Setter Property="Margin" Value="0,5,0,0"/>
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Setter Property="VerticalAlignment" Value="Top"/>
         </Style>
-        <Style TargetType="TextBox" x:Key="CustomTextTextBoxStyle">
+        <Style TargetType="TextBox" x:Key="CustomTextTextBoxStyle" BasedOn="{StaticResource ErrorTemplate}">
             <Setter Property="AcceptsReturn" Value="True"/>
             <Setter Property="Height" Value="150"/>
             <Setter Property="Margin" Value="0,5,0,0"/>
@@ -46,35 +69,37 @@
             <RowDefinition Height="10"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="10"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
 
         <!-- Content -->
-        <StackPanel Grid.Row="0"
-                    Grid.Column="0">
-            <!-- Paths and Patterns -->
-            <GroupBox Style="{StaticResource SettingsGroupStyle}"
-                      Header="Paths and Patterns">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
+        <ScrollViewer Grid.Row="0"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0">
+                <!-- Paths -->
+                <GroupBox Style="{StaticResource SettingsGroupStyle}"
+                      Header="Paths">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
 
-                    <!-- Artifacts path -->
-                    <TextBlock Grid.Row="0"
+                        <!-- Artifacts path -->
+                        <TextBlock Grid.Row="0"
                                Grid.Column="0"
                                Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
-                        <Run Text="Artifacts Path"
+                        <Run Text="Artifacts path"
                              FontWeight="Bold"/>
                         <LineBreak/>
                         <Run Text="The path where the artifacts (DACPACs,"
@@ -86,17 +111,17 @@
                         <LineBreak/>
                         <Run Text="Relative path to the *.sqlproj file."
                              FontStyle="Italic"/>
-                    </TextBlock>
-                    <TextBox Grid.Row="0"
+                        </TextBlock>
+                        <TextBox Grid.Row="0"
                              Grid.Column="1"
                              Style="{StaticResource DefaultTextTextBoxStyle}"
                              Text="{Binding Model.ArtifactsPath, Mode=TwoWay}"/>
 
-                    <!-- SqlPackage.exe path -->
-                    <TextBlock Grid.Row="1"
+                        <!-- SqlPackage.exe path -->
+                        <TextBlock Grid.Row="1"
                                Grid.Column="0"
                                Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
-                        <Run Text="SqlPackage.exe Path"
+                        <Run Text="SqlPackage.exe path"
                              FontWeight="Bold"/>
                         <LineBreak/>
                         <Run Text="The path where the SqlPackage.exe"
@@ -120,50 +145,177 @@
                         <LineBreak/>
                         <Run Text="is found."
                              FontStyle="Italic"/>
-                    </TextBlock>
-                    <Grid Grid.Row="1"
-                          Grid.Column="1"
-                          HorizontalAlignment="Stretch"
-                          Margin="0,5,0,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBox Grid.Column="0"
-                                 x:Name="SqlPackagePathTextBox"
-                                 Style="{StaticResource DefaultTextTextBoxStyle}"
-                                 Margin="0,0,5,0"
-                                 Text="{Binding Model.SqlPackagePath, Mode=TwoWay, ValidatesOnDataErrors=True}">
-                            <Validation.ErrorTemplate>
-                                <ControlTemplate>
-                                    <StackPanel>
-                                        <!-- Placeholder for the TextBox itself -->
-                                        <AdornedElementPlaceholder x:Name="textBox"/>
-                                        <ItemsControl ItemsSource="{Binding}">
-                                            <ItemsControl.ItemTemplate>
-                                                <DataTemplate>
-                                                    <TextBlock Text="{Binding ErrorContent}" Foreground="Red"/>
-                                                </DataTemplate>
-                                            </ItemsControl.ItemTemplate>
-                                        </ItemsControl>
-                                    </StackPanel>
-                                </ControlTemplate>
-                            </Validation.ErrorTemplate>
-                        </TextBox>
-                        <Button Grid.Column="1"
-                                Command="{Binding BrowseSqlPackageCommand}"
+                        </TextBlock>
+                        <Grid Grid.Row="1"
+                              Grid.Column="1"
+                              HorizontalAlignment="Stretch"
+                              Margin="0,5,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0"
+                                     x:Name="SqlPackagePathTextBox"
+                                     Style="{StaticResource DefaultTextTextBoxStyle}"
+                                     Margin="0,0,5,0"
+                                     Text="{Binding Model.SqlPackagePath, Mode=TwoWay, ValidatesOnDataErrors=True}"/>
+                            <Button Grid.Column="1"
+                                    Command="{Binding BrowseSqlPackageCommand}"
+                                    VerticalAlignment="Top"
+                                    Height="{Binding ElementName=SqlPackagePathTextBox, Path=ActualHeight}"
+                                    Padding="5,0"
+                                    Content="..."
+                                    ToolTip="Browse..."/>
+                        </Grid>
+
+                        <!-- Publish profile  path -->
+                        <TextBlock Grid.Row="2"
+                                   Grid.Column="0"
+                                   Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
+                            <Run Text="Publish profile path"
+                                 FontWeight="Bold"/>
+                            <LineBreak/>
+                            <Run Text="The path to the publish profile"
+                                 FontStyle="Italic"/>
+                            <LineBreak/>
+                            <Run Text="used for script creation."
+                                 FontStyle="Italic"/>
+                            <LineBreak/>
+                            <LineBreak/>
+                            <Run Text="Relative path to the *.sqlproj file."
+                                 FontStyle="Italic"/>
+                        </TextBlock>
+                        <Grid Grid.Row="2"
+                              Grid.Column="1"
+                              HorizontalAlignment="Stretch"
+                              Margin="0,5,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0"
+                                     x:Name="PublishProfilePathTextBox"
+                                     Style="{StaticResource DefaultTextTextBoxStyle}"
+                                     Margin="0,0,5,0"
+                                     Text="{Binding Model.PublishProfilePath, Mode=TwoWay, ValidatesOnDataErrors=True}"/>
+                            <Button Grid.Column="1"
+                                Command="{Binding BrowsePublishProfileCommand}"
                                 VerticalAlignment="Top"
-                                Height="{Binding ElementName=SqlPackagePathTextBox, Path=ActualHeight}"
+                                Height="{Binding ElementName=PublishProfilePathTextBox, Path=ActualHeight}"
                                 Padding="5,0"
                                 Content="..."
                                 ToolTip="Browse..."/>
+                        </Grid>
                     </Grid>
+                </GroupBox>
+                <!-- Script creation options -->
+                <GroupBox Style="{StaticResource SettingsGroupStyle}"
+                      Header="Script Creation Options">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
 
-                    <!-- Version pattern -->
-                    <TextBlock Grid.Row="2"
+                        <!-- Build before script creation -->
+                        <TextBlock Grid.Row="0"
                                Grid.Column="0"
                                Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
-                        <Run Text="Version Pattern"
+                        <Run Text="Build before script creation"
+                             FontWeight="Bold"/>
+                        </TextBlock>
+
+                        <!-- Create documentation with script creation -->
+                        <TextBlock Grid.Row="1"
+                               Grid.Column="0"
+                               Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
+                        <Run Text="Create documentation"
+                             FontWeight="Bold"/>
+                        </TextBlock>
+
+                        <!-- Comment out sub-section -->
+                        <TextBlock Grid.Row="2"
+                               Grid.Column="0"
+                               Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
+                        <Run Text="Comment out..."
+                             FontWeight="Bold"/>
+                        </TextBlock>
+                        <!-- Comment out referenced project refactorings -->
+                        <TextBlock Grid.Row="3"
+                               Grid.Column="0"
+                               Style="{StaticResource IndentedConfigurationDescriptionTextBlockStyle}">
+                        <Run Text="referenced project refactorings"
+                             FontWeight="Bold"/>
+                        </TextBlock>
+
+                        <!-- Comment out unnamed default constraint drops -->
+                        <TextBlock Grid.Row="4"
+                               Grid.Column="0"
+                               Style="{StaticResource IndentedConfigurationDescriptionTextBlockStyle}">
+                        <Run Text="unnamed default constraint drops"
+                             FontWeight="Bold"/>
+                        </TextBlock>
+
+                        <!-- Replacing sub-section -->
+                        <TextBlock Grid.Row="5"
+                               Grid.Column="0"
+                               Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
+                        <Run Text="Replace..."
+                             FontWeight="Bold"/>
+                        </TextBlock>
+                        <!-- Replace unnamed default constraint drops -->
+                        <TextBlock Grid.Row="6"
+                               Grid.Column="0"
+                               Style="{StaticResource IndentedConfigurationDescriptionTextBlockStyle}">
+                        <Run Text="unnamed default constraint drops"
+                             FontWeight="Bold"/>
+                        <LineBreak/>
+                        <Run Text="Replaces unnamed default"
+                             FontStyle="Italic"/>
+                        <LineBreak/>
+                        <Run Text="constraint drops with dynamic"
+                             FontStyle="Italic"/>
+                        <LineBreak/>
+                        <Run Text="drop statements, that will"
+                             FontStyle="Italic"/>
+                        <LineBreak/>
+                        <Run Text="determine the actual default"
+                             FontStyle="Italic"/>
+                        <LineBreak/>
+                        <Run Text="constraint name when executing."
+                             FontStyle="Italic"/>
+                        </TextBlock>
+                    </Grid>
+                </GroupBox>
+            </StackPanel>
+            <StackPanel Grid.Column="2">
+                <!-- Version Management -->
+                <GroupBox Style="{StaticResource SettingsGroupStyle}"
+                      Header="Version Management">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Version pattern -->
+                        <TextBlock Grid.Row="0"
+                               Grid.Column="0"
+                               Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
+                        <Run Text="Version pattern"
                              FontWeight="Bold"/>
                         <LineBreak/>
                         <Run Text="The version pattern used during"
@@ -187,48 +339,50 @@
                         <LineBreak/>
                         <Run Text="{}{BUILD}"
                              FontStyle="Italic"/>
-                    </TextBlock>
+                        </TextBlock>
 
-                    <!-- Artifacts path -->
-                    <TextBlock Grid.Row="3"
+                        <!-- Suggest version when finalizing -->
+                        <TextBlock Grid.Row="1"
                                Grid.Column="0"
                                Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
-                        <Run Text="Publish Profile Path"
+                        <Run Text="Suggest version when finalizing"
                              FontWeight="Bold"/>
                         <LineBreak/>
-                        <Run Text="The path to the publish profile"
+                        <Run Text="When finalizing a database version,"
                              FontStyle="Italic"/>
                         <LineBreak/>
-                        <Run Text="used for script creation."
+                        <Run Text="a new version will be suggested"
                              FontStyle="Italic"/>
                         <LineBreak/>
-                        <LineBreak/>
-                        <Run Text="Relative path to the *.sqlproj file."
+                        <Run Text="based on the changes between"
                              FontStyle="Italic"/>
-                    </TextBlock>
-                </Grid>
-            </GroupBox>
-        </StackPanel>
-        <StackPanel Grid.Row="0"
-                    Grid.Column="2">
-            <!-- Custom Texts -->
-            <GroupBox Style="{StaticResource SettingsGroupStyle}"
+                        <LineBreak/>
+                        <Run Text="the previous and the current"
+                             FontStyle="Italic"/>
+                        <LineBreak/>
+                        <Run Text="version."
+                             FontStyle="Italic"/>
+                        </TextBlock>
+                    </Grid>
+                </GroupBox>
+                <!-- Custom Texts -->
+                <GroupBox Style="{StaticResource SettingsGroupStyle}"
                       Header="Custom Texts">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
 
-                    <!-- Custom Header -->
-                    <TextBlock Grid.Row="0"
+                        <!-- Custom Header -->
+                        <TextBlock Grid.Row="0"
                                Grid.Column="0"
                                Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
-                        <Run Text="Custom Header"
+                        <Run Text="Custom header"
                              FontWeight="Bold"/>
                         <LineBreak/>
                         <Run Text="The custom header will be placed above"
@@ -240,17 +394,17 @@
                         <LineBreak/>
                         <Run Text="Leave blank to not use the custom header."
                              FontStyle="Italic"/>
-                    </TextBlock>
-                    <TextBox Grid.Row="0"
+                        </TextBlock>
+                        <TextBox Grid.Row="0"
                              Grid.Column="1"
                              Style="{StaticResource CustomTextTextBoxStyle}"
                              Text="{Binding Model.CustomHeader, Mode=TwoWay}"/>
 
-                    <!-- Custom Footer -->
-                    <TextBlock Grid.Row="1"
+                        <!-- Custom Footer -->
+                        <TextBlock Grid.Row="1"
                                Grid.Column="0"
                                Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
-                        <Run Text="Custom Footer"
+                        <Run Text="Custom footer"
                              FontWeight="Bold"/>
                         <LineBreak/>
                         <Run Text="The custom footer will be placed beneath"
@@ -262,18 +416,19 @@
                         <LineBreak/>
                         <Run Text="Leave blank to not use the custom footer."
                              FontStyle="Italic"/>
-                    </TextBlock>
-                    <TextBox Grid.Row="1"
+                        </TextBlock>
+                        <TextBox Grid.Row="1"
                              Grid.Column="1"
                              Style="{StaticResource CustomTextTextBoxStyle}"
                              Text="{Binding Model.CustomFooter, Mode=TwoWay}"/>
-                </Grid>
-            </GroupBox>
-        </StackPanel>
+                    </Grid>
+                </GroupBox>
+            </StackPanel>
+        </Grid>
+        </ScrollViewer>
 
         <!-- Actions -->
         <StackPanel Grid.Row="2"
-                    Grid.Column="2"
                     Orientation="Horizontal"
                     HorizontalAlignment="Right">
             <Button Command="{Binding ResetConfigurationToDefaultCommand}"

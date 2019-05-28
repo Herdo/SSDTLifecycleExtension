@@ -16,13 +16,13 @@
 
         private string _artifactsPath;
         private string _sqlPackagePath;
-        private string _versionPattern;
         private string _publishProfilePath;
         private bool _buildBeforeScriptCreation;
         private bool _createDocumentationWithScriptCreation;
         private bool _commentOutReferencedProjectRefactorings;
         private bool _commentOutUnnamedDefaultConstraintDrops;
         private bool _replaceUnnamedDefaultConstraintDrops;
+        private string _versionPattern;
         private string _customHeader;
         private string _customFooter;
 
@@ -54,20 +54,6 @@
                 OnPropertyChanged();
                 ValidateSqlPackagePath(_sqlPackagePath);
                 OnErrorsChanged();
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the version pattern.
-        /// </summary>
-        public string VersionPattern
-        {
-            get => _versionPattern;
-            set
-            {
-                if (value == _versionPattern) return;
-                _versionPattern = value;
-                OnPropertyChanged();
             }
         }
 
@@ -157,6 +143,20 @@
         }
 
         /// <summary>
+        /// Gets or sets the version pattern.
+        /// </summary>
+        public string VersionPattern
+        {
+            get => _versionPattern;
+            set
+            {
+                if (value == _versionPattern) return;
+                _versionPattern = value;
+                OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
         /// Gets or sets a custom header, that will be added at the beginning of the created script.
         /// </summary>
         public string CustomHeader
@@ -201,13 +201,13 @@
             {
                 ArtifactsPath = "_Deployment",
                 SqlPackagePath = _SQL_PACKAGE_SPECIAL_KEYWORD,
-                VersionPattern = "{MAJOR}.{MINOR}.{PATCH}",
                 PublishProfilePath = null,
                 BuildBeforeScriptCreation = true,
                 CreateDocumentationWithScriptCreation = true,
                 CommentOutReferencedProjectRefactorings = false,
                 CommentOutUnnamedDefaultConstraintDrops = false,
                 ReplaceUnnamedDefaultConstraintDrops = false,
+                VersionPattern = "{MAJOR}.{MINOR}.{PATCH}",
                 CustomHeader = null,
                 CustomFooter = null
             };
