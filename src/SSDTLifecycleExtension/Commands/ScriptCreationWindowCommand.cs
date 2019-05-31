@@ -3,44 +3,38 @@
     using System;
     using System.ComponentModel.Design;
     using Windows;
+    using Annotations;
+    using DataAccess;
     using Microsoft.VisualStudio.Shell;
     using Microsoft.VisualStudio.Shell.Interop;
+    using Services;
     using ViewModels;
 
-    /// <summary>
-    /// Command handler
-    /// </summary>
+    [UsedImplicitly]
     internal sealed class ScriptCreationWindowCommand
     {
-        /// <summary>
-        /// Command ID.
-        /// </summary>
+        // ReSharper disable once MemberCanBePrivate.Global
         public const int CommandId = 0x0901;
 
-        /// <summary>
-        /// Command menu group (command set GUID).
-        /// </summary>
-        public static readonly Guid CommandSet = SSDTLifecycleExtensionPackageCommandSet.CommandSetGuid;
+        // ReSharper disable once MemberCanBePrivate.Global
+        public static readonly Guid CommandSet = new Guid(SSDTLifecycleExtension.Constants.CommandSetGuid);
 
-        /// <summary>
-        /// VS Package that provides this command, not null.
-        /// </summary>
         private readonly SSDTLifecycleExtensionPackage _package;
+        private readonly IVisualStudioAccess _visualStudioAccess;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ScriptCreationWindowCommand"/> class.
-        /// Adds our command handlers for menu (commands must exist in the command table file)
-        /// </summary>
-        /// <param name="package">Owner package, not null.</param>
-        /// <param name="commandService">Command service to add command to, not null.</param>
-        public ScriptCreationWindowCommand(SSDTLifecycleExtensionPackage package, OleMenuCommandService commandService)
+        public ScriptCreationWindowCommand(SSDTLifecycleExtensionPackage package,
+                                           OleMenuCommandService commandService,
+                                           ICommandAvailabilityService commandAvailabilityService,
+                                           IVisualStudioAccess visualStudioAccess)
         {
             _package = package ?? throw new ArgumentNullException(nameof(package));
-            commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
+            if (commandService == null) throw new ArgumentNullException(nameof(commandService));
+            if (commandAvailabilityService == null) throw new ArgumentNullException(nameof(commandAvailabilityService));
+            _visualStudioAccess = visualStudioAccess ?? throw new ArgumentNullException(nameof(visualStudioAccess));
 
             var menuCommandId = new CommandID(CommandSet, CommandId);
             var menuItem = new OleMenuCommand(Execute, menuCommandId);
-            menuItem.BeforeQueryStatus += _package.MenuItemOnBeforeQueryStatus;
+            menuItem.BeforeQueryStatus += commandAvailabilityService.HandleCommandAvailability;
             commandService.AddCommand(menuItem);
         }
 
@@ -80,7 +74,7 @@
 
                 await _package.JoinableTaskFactory.SwitchToMainThreadAsync();
                 // Set caption
-                var project = _package.GetSelectedProject();
+                var project = _visualStudioAccess.GetSelectedProject();
                 if (project?.Name != null) window.SetCaption(project.Name);
                 // Set data context
                 if (window.Content is IView windowContent)

@@ -40,11 +40,10 @@
             VSConstants.UICONTEXT.SolutionHasSingleProject_string,
             VSConstants.UICONTEXT.SolutionHasMultipleProjects_string,
             VSConstants.UICONTEXT.SolutionExistsAndFullyLoaded_string,
-            "ActiveProjectFlavor:" + _SQL_PROJECT_KIND_GUID
+            "ActiveProjectFlavor:" + Constants.SqlProjectKindGuid
         })]
     public sealed class SSDTLifecycleExtensionPackage : AsyncPackage
     {
-        private const string _SQL_PROJECT_KIND_GUID = "00d1a9c2-b5f0-4af3-8072-f6c62b433612"; // *.sqlproj
 
         public const string SqlProjectContextGuid = "b5759c1b-ffdd-48bd-ae82-61317eeb3a75";
 
@@ -73,9 +72,11 @@
                 
                 // Services
                .RegisterSingleton<IConfigurationService, ConfigurationService>()
+               .RegisterSingleton<ICommandAvailabilityService, CommandAvailabilityService>()
                 
                 // Data Access
-               .RegisterSingleton<IFileSystemAccess, FileSystemAccess>();
+               .RegisterSingleton<IFileSystemAccess, FileSystemAccess>()
+               .RegisterInstance<IVisualStudioAccess>(new VisualStudioAccess(_dte2), new ContainerControlledLifetimeManager());
 
             return container;
         }
@@ -115,34 +116,6 @@
         }
 
         #endregion
-
-        internal void MenuItemOnBeforeQueryStatus(object sender,
-                                                  EventArgs e)
-        {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
-            if (!(sender is OleMenuCommand command))
-                return;
-            
-            if (_dte2.SelectedItems.Count != 1)
-                return;
-
-            var project = _dte2.SelectedItems.Item(1).Project;
-            if (project == null)
-                return;
-
-            command.Visible = project.Kind == $"{{{_SQL_PROJECT_KIND_GUID}}}";
-        }
-
-        internal Project GetSelectedProject()
-        {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
-            if (_dte2.SelectedItems.Count != 1)
-                return null;
-
-            return _dte2.SelectedItems.Item(1).Project;
-        }
 
         internal TViewModel GetViewModel<TViewModel>(Project project) where TViewModel : IViewModel
         {
