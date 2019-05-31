@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Runtime.CompilerServices;
 
     public class ConfigurationModel : BaseModel
@@ -47,8 +46,7 @@
                 if (value == _sqlPackagePath) return;
                 _sqlPackagePath = value;
                 OnPropertyChanged();
-                ValidateSqlPackagePath(_sqlPackagePath);
-                OnErrorsChanged();
+                SetValidationErrors(ValidateSqlPackagePath(_sqlPackagePath));
             }
         }
 
@@ -199,7 +197,7 @@
                 CustomFooter = null
             };
 
-        private void ValidateSqlPackagePath(string value, [CallerMemberName] string propertyName = null)
+        private List<string> ValidateSqlPackagePath(string value, [CallerMemberName] string propertyName = null)
         {
             if (propertyName == null)
                 throw new ArgumentNullException(nameof(propertyName));
@@ -219,10 +217,7 @@
                 }
             }
 
-            if (errors.Any())
-                ValidationErrors[propertyName] = errors;
-            else
-                ValidationErrors.Remove(propertyName);
+            return errors;
         }
     }
 }

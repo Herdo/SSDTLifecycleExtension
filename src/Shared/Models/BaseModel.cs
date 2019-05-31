@@ -10,7 +10,7 @@
     {
         #region Fields
 
-        protected readonly Dictionary<string, ICollection<string>> ValidationErrors;
+        private readonly Dictionary<string, ICollection<string>> _validationErrors;
 
         #endregion
 
@@ -18,7 +18,7 @@
 
         protected BaseModel()
         {
-            ValidationErrors = new Dictionary<string, ICollection<string>>();
+            _validationErrors = new Dictionary<string, ICollection<string>>();
         }
 
         #endregion
@@ -41,16 +41,29 @@
         {
             if (string.IsNullOrWhiteSpace(propertyName))
                 return null;
-            return ValidationErrors.TryGetValue(propertyName, out var errors)
+            return _validationErrors.TryGetValue(propertyName, out var errors)
                        ? errors
                        : null;
         }
 
-        public bool HasErrors => ValidationErrors.Count > 0;
+        public bool HasErrors => _validationErrors.Count > 0;
 
         public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
 
-        protected void OnErrorsChanged([CallerMemberName] string propertyName = null)
+        protected void SetValidationErrors(ICollection<string> validationErrors,
+                                           [CallerMemberName] string propertyName = null)
+        {
+            if (propertyName == null)
+                throw new ArgumentNullException(nameof(propertyName));
+
+            if (validationErrors == null || validationErrors.Count == 0)
+                _validationErrors.Remove(propertyName);
+            else
+                _validationErrors[propertyName] = validationErrors;
+            OnErrorsChanged(propertyName);
+        }
+
+        private void OnErrorsChanged(string propertyName)
         {
             ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
         }
