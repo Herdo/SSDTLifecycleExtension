@@ -41,9 +41,11 @@
 
             var sourcePath = GetConfigurationPath(project);
             var serialized = await _fileSystemAccess.ReadFileAsync(sourcePath);
-            return serialized == null
-                       ? ConfigurationModel.GetDefault()
-                       : JsonConvert.DeserializeObject<ConfigurationModel>(serialized);
+            var deserialized = serialized == null
+                                   ? ConfigurationModel.GetDefault()
+                                   : JsonConvert.DeserializeObject<ConfigurationModel>(serialized);
+            deserialized.ValidateAll();
+            return deserialized;
         }
 
         async Task IConfigurationService.SaveConfigurationAsync(Project project,

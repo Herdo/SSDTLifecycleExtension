@@ -206,6 +206,14 @@
                 CustomFooter = null
             };
 
+        public void ValidateAll()
+        {
+            SetValidationErrors(ValidateArtifactsPath(ArtifactsPath, nameof(ArtifactsPath)), nameof(ArtifactsPath));
+            SetValidationErrors(ValidateSqlPackagePath(SqlPackagePath, nameof(SqlPackagePath)), nameof(SqlPackagePath));
+            SetValidationErrors(ValidatePublishProfilePath(PublishProfilePath, nameof(PublishProfilePath)), nameof(PublishProfilePath));
+            SetValidationErrors(ValidateVersionPattern(VersionPattern, nameof(VersionPattern)), nameof(VersionPattern));
+        }
+
         private List<string> ValidateArtifactsPath(string value, [CallerMemberName] string propertyName = null)
         {
             if (propertyName == null)
