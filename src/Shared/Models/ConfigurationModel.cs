@@ -239,10 +239,25 @@
             }
             else
             {
+                if (value == _SQL_PACKAGE_SPECIAL_KEYWORD)
+                    return errors;
+
                 const string execName = "SqlPackage.exe";
-                if (value != _SQL_PACKAGE_SPECIAL_KEYWORD && !value.EndsWith(execName))
+                if (!value.EndsWith(execName))
                 {
                     errors.Add($"Executable must be '{execName}' or the special keyword.");
+                }
+                else
+                {
+                    try
+                    {
+                        if (!Path.IsPathRooted(value))
+                            errors.Add("Path must be an absolute path.");
+                    }
+                    catch (ArgumentException)
+                    {
+                        errors.Add("Path contains invalid characters.");
+                    }
                 }
             }
 
