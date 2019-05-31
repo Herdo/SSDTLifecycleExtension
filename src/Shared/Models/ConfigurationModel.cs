@@ -2,6 +2,8 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
     using System.Runtime.CompilerServices;
 
     public class ConfigurationModel : BaseModel
@@ -36,6 +38,7 @@
                 if (value == _artifactsPath) return;
                 _artifactsPath = value;
                 OnPropertyChanged();
+                SetValidationErrors(ValidateArtifactsPath(_artifactsPath));
             }
         }
 
@@ -201,6 +204,27 @@
                 CustomHeader = null,
                 CustomFooter = null
             };
+
+        private List<string> ValidateArtifactsPath(string value, [CallerMemberName] string propertyName = null)
+        {
+            if (propertyName == null)
+                throw new ArgumentNullException(nameof(propertyName));
+
+            var errors = new List<string>();
+
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                errors.Add("Path cannot be empty.");
+            }
+            else
+            {
+                var invalidPathChars = Path.GetInvalidPathChars();
+                if (value.Any(m => invalidPathChars.Contains(m)))
+                    errors.Add("Path contains invalid characters.");
+            }
+
+            return errors;
+        }
 
         private List<string> ValidateSqlPackagePath(string value, [CallerMemberName] string propertyName = null)
         {
