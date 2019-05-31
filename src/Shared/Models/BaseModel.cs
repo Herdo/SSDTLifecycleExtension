@@ -50,6 +50,12 @@
 
         public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
 
+        /// <summary>
+        /// Sets the <paramref name="validationErrors"/> for the <paramref name="propertyName"/>.
+        /// </summary>
+        /// <param name="validationErrors">The list of validation errors.</param>
+        /// <param name="propertyName">The name of the property to set the <paramref name="validationErrors"/> for.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="propertyName"/> is <b>null</b>.</exception>
         protected void SetValidationErrors(ICollection<string> validationErrors,
                                            [CallerMemberName] string propertyName = null)
         {
