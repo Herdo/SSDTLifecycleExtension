@@ -42,7 +42,7 @@
             if (!di.Exists) di.Create();
 
             // Write the file.
-            using (var stream = new FileStream(targetPath, FileMode.OpenOrCreate))
+            using (var stream = new FileStream(targetPath, FileMode.Create))
                 using (var writer = new StreamWriter(stream))
                     await writer.WriteAsync(content);
         }
