@@ -48,7 +48,6 @@
       <Button guid="guidSSDTLifecycleExtensionPackageCmdSet" id="cmdidScriptCreationWindowCommand" priority="0x0100" type="Button">
         <Parent guid="guidSSDTLifecycleExtensionPackageCmdSet" id="cmdidSSDTLifecycleExtensionProjectMenuScriptCreationGroup" />
         <Icon guid="guidImages1" id="bmpPic1" />
-        <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>cmdidScriptCreationWindowCommand</CommandName>
@@ -58,7 +57,6 @@
       <Button guid="guidSSDTLifecycleExtensionPackageCmdSet" id="cmdidVersionHistoryWindowCommand" priority="0x0100" type="Button">
         <Parent guid="guidSSDTLifecycleExtensionPackageCmdSet" id="cmdidSSDTLifecycleExtensionProjectMenuVersionHistoryGroup" />
         <Icon guid="guidImages2" id="bmpPic1" />
-        <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>cmdidVersionHistoryWindowCommand</CommandName>
@@ -68,7 +66,6 @@
       <Button guid="guidSSDTLifecycleExtensionPackageCmdSet" id="cmdidConfigurationWindowCommand" priority="0x0100" type="Button">
         <Parent guid="guidSSDTLifecycleExtensionPackageCmdSet" id="cmdidSSDTLifecycleExtensionProjectMenuConfigurationGroup" />
         <Icon guid="guidImages3" id="bmpPic1" />
-        <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>cmdidConfigurationWindowCommand</CommandName>
@@ -91,9 +88,18 @@
     </CommandPlacement>
   </CommandPlacements>
 
+  <VisibilityConstraints>
+    <VisibilityItem guid="guidSSDTLifecycleExtensionPackageCmdSet" id="cmdidScriptCreationWindowCommand" context="SqlProjectContextGuid"/>
+    <VisibilityItem guid="guidSSDTLifecycleExtensionPackageCmdSet" id="cmdidVersionHistoryWindowCommand" context="SqlProjectContextGuid"/>
+    <VisibilityItem guid="guidSSDTLifecycleExtensionPackageCmdSet" id="cmdidConfigurationWindowCommand" context="SqlProjectContextGuid"/>
+  </VisibilityConstraints>
+
   <Symbols>
     <!-- This is the package guid. -->
     <GuidSymbol name="guidSSDTLifecycleExtensionPackage" value="{757ac7eb-a0da-4387-9fa2-675e78561cde}" />
+
+    <!-- This is the guid for auto-loading -->
+    <GuidSymbol name="SqlProjectContextGuid" value="{b5759c1b-ffdd-48bd-ae82-61317eeb3a75}" />
 
     <!-- This is the guid used to group the menu commands together -->
     <GuidSymbol name="guidSSDTLifecycleExtensionPackageCmdSet" value="{4f406ea0-8c3f-4554-bde2-390ab6c0dcd1}">

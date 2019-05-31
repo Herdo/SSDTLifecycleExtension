@@ -22,9 +22,28 @@
     [ProvideToolWindow(typeof(Windows.VersionHistoryWindow), Transient = true, Style = VsDockStyle.Tabbed, MultiInstances = false)]
     [ProvideToolWindow(typeof(Windows.ConfigurationWindow), Transient = true, Style = VsDockStyle.Tabbed, MultiInstances = false)]
     [ProvideToolWindow(typeof(Windows.ScriptCreationWindow), Transient = true, Style = VsDockStyle.Tabbed, MultiInstances = false)]
-    [ProvideAutoLoad(VSConstants.UICONTEXT.SolutionExistsAndFullyLoaded_string, PackageAutoLoadFlags.BackgroundLoad)]
+    [ProvideAutoLoad(SqlProjectContextGuid, PackageAutoLoadFlags.BackgroundLoad)]
+    [ProvideUIContextRule(SqlProjectContextGuid,
+        name: "SqlProject auto load",
+        expression: "(SingleProject | MultipleProjects) & SolutionReady & SqlProject",
+        termNames: new[]
+        {
+            "SingleProject",
+            "MultipleProjects",
+            "SolutionReady",
+            "SqlProject"
+        },
+        termValues: new[]
+        {
+            VSConstants.UICONTEXT.SolutionHasSingleProject_string,
+            VSConstants.UICONTEXT.SolutionHasMultipleProjects_string,
+            VSConstants.UICONTEXT.SolutionExistsAndFullyLoaded_string,
+            "ActiveProjectFlavor:00d1a9c2-b5f0-4af3-8072-f6c62b433612" // *.sqlproj
+        })]
     public sealed class SSDTLifecycleExtensionPackage : AsyncPackage
     {
+        public const string SqlProjectContextGuid = "b5759c1b-ffdd-48bd-ae82-61317eeb3a75";
+
         public const string PackageGuidString = "757ac7eb-a0da-4387-9fa2-675e78561cde";
 
         private IUnityContainer _container;
