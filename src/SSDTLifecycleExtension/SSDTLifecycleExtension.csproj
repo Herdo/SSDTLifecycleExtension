@@ -128,9 +128,6 @@
     <Content Include="LICENSE.txt">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="Resources\ConfigurationWindowCommand.png" />
-    <Content Include="Resources\ScriptCreationWindowCommand.png" />
-    <Content Include="Resources\VersionHistoryWindowCommand.png" />
     <VSCTCompile Include="SSDTLifecycleExtensionPackage.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
     </VSCTCompile>
