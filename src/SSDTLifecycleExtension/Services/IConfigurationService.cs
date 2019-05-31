@@ -3,7 +3,7 @@
     using System.Threading.Tasks;
     using Annotations;
     using EnvDTE;
-    using Models;
+    using Shared.Models;
 
     public interface IConfigurationService
     {

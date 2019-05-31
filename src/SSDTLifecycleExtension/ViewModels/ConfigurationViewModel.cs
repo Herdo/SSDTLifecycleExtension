@@ -6,8 +6,8 @@
     using DataAccess;
     using EnvDTE;
     using Microsoft.VisualStudio.PlatformUI;
-    using Models;
     using Services;
+    using Shared.Models;
 
     [UsedImplicitly]
     public class ConfigurationViewModel : ViewModelBase

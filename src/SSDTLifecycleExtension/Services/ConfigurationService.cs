@@ -8,8 +8,8 @@
     using DataAccess;
     using EnvDTE;
     using Microsoft.VisualStudio.Shell;
-    using Models;
     using Newtonsoft.Json;
+    using Shared.Models;
     using Task = System.Threading.Tasks.Task;
 
     [UsedImplicitly]

@@ -1,19 +1,14 @@
-﻿namespace SSDTLifecycleExtension.Models
+﻿namespace SSDTLifecycleExtension.Shared.Models
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
-    using System.ComponentModel;
     using System.Linq;
     using System.Runtime.CompilerServices;
-    using Annotations;
 
-    public class ConfigurationModel : INotifyPropertyChanged, INotifyDataErrorInfo
+    public class ConfigurationModel : BaseModel
     {
         private const string _SQL_PACKAGE_SPECIAL_KEYWORD = "{DEFAULT_LATEST_VERSION}";
-
-        private readonly Dictionary<string, ICollection<string>> _validationErrors;
-
+        
         private string _artifactsPath;
         private string _sqlPackagePath;
         private string _publishProfilePath;
@@ -185,14 +180,6 @@
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConfigurationModel"/> class.
-        /// </summary>
-        public ConfigurationModel()
-        {
-            _validationErrors = new Dictionary<string, ICollection<string>>();
-        }
-
-        /// <summary>
         /// Gets the default configuration.
         /// </summary>
         /// <returns>A new <see cref="ConfigurationModel"/> instance.</returns>
@@ -233,35 +220,9 @@
             }
 
             if (errors.Any())
-                _validationErrors[propertyName] = errors;
+                ValidationErrors[propertyName] = errors;
             else
-                _validationErrors.Remove(propertyName);
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        public IEnumerable GetErrors(string propertyName)
-        {
-            if (string.IsNullOrWhiteSpace(propertyName))
-                return null;
-            return _validationErrors.TryGetValue(propertyName, out var errors)
-                       ? errors
-                       : null;
-        }
-
-        public bool HasErrors => _validationErrors.Count > 0;
-
-        public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
-
-        protected virtual void OnErrorsChanged([CallerMemberName] string propertyName = null)
-        {
-            ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
+                ValidationErrors.Remove(propertyName);
         }
     }
 }
