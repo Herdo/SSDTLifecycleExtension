@@ -1,8 +1,10 @@
 ﻿namespace SSDTLifecycleExtension
 {
     using System;
+    using System.ComponentModel.Design;
     using System.Runtime.InteropServices;
     using System.Threading;
+    using System.Threading.Tasks;
     using Commands;
     using DataAccess;
     using EnvDTE;
@@ -38,10 +40,12 @@
             VSConstants.UICONTEXT.SolutionHasSingleProject_string,
             VSConstants.UICONTEXT.SolutionHasMultipleProjects_string,
             VSConstants.UICONTEXT.SolutionExistsAndFullyLoaded_string,
-            "ActiveProjectFlavor:00d1a9c2-b5f0-4af3-8072-f6c62b433612" // *.sqlproj
+            "ActiveProjectFlavor:" + _SQL_PROJECT_KIND_GUID
         })]
     public sealed class SSDTLifecycleExtensionPackage : AsyncPackage
     {
+        private const string _SQL_PROJECT_KIND_GUID = "00d1a9c2-b5f0-4af3-8072-f6c62b433612"; // *.sqlproj
+
         public const string SqlProjectContextGuid = "b5759c1b-ffdd-48bd-ae82-61317eeb3a75";
 
         public const string PackageGuidString = "757ac7eb-a0da-4387-9fa2-675e78561cde";
@@ -49,10 +53,19 @@
         private IUnityContainer _container;
         private DTE2 _dte2;
 
-        private static IUnityContainer BuildUnityContainer()
+        private async Task<IUnityContainer> BuildUnityContainerAsync(CancellationToken cancellationToken)
         {
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+
+            if (!(await GetServiceAsync(typeof(IMenuCommandService)) is OleMenuCommandService commandService))
+                throw new InvalidOperationException($"Cannot initialize {nameof(SSDTLifecycleExtensionPackage)} without the {nameof(OleMenuCommandService)}.");
+
             var container = new UnityContainer()
 
+                // Visual Studio dependencies
+               .RegisterInstance(this, new ContainerControlledLifetimeManager()) // The package
+               .RegisterInstance(commandService, new ContainerControlledLifetimeManager()) // The command service
+               
                 // ViewModels
                .RegisterType<ScriptCreationViewModel>()
                .RegisterType<VersionHistoryViewModel>()
@@ -80,12 +93,12 @@
             _dte2 = dte2;
 
             // Initialize Unity Container
-            _container = BuildUnityContainer();
+            _container = await BuildUnityContainerAsync(cancellationToken);
 
             // Initialize commands
-            await VersionHistoryWindowCommand.InitializeAsync(this);
-            await ConfigurationWindowCommand.InitializeAsync(this);
-            await ScriptCreationWindowCommand.InitializeAsync(this);
+            ScriptCreationWindowCommand.Initialize(_container.Resolve<ScriptCreationWindowCommand>());
+            VersionHistoryWindowCommand.Initialize(_container.Resolve<VersionHistoryWindowCommand>());
+            ConfigurationWindowCommand.Initialize(_container.Resolve<ConfigurationWindowCommand>());
         }
 
         protected override void Dispose(bool disposing)
@@ -118,7 +131,7 @@
             if (project == null)
                 return;
 
-            command.Visible = project.Kind == "{00d1a9c2-b5f0-4af3-8072-f6c62b433612}"; // *.sqlproj
+            command.Visible = project.Kind == $"{{{_SQL_PROJECT_KIND_GUID}}}";
         }
 
         internal Project GetSelectedProject()

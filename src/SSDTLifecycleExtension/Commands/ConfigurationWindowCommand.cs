@@ -34,7 +34,7 @@
         /// </summary>
         /// <param name="package">Owner package, not null.</param>
         /// <param name="commandService">Command service to add command to, not null.</param>
-        private ConfigurationWindowCommand(SSDTLifecycleExtensionPackage package, OleMenuCommandService commandService)
+        public ConfigurationWindowCommand(SSDTLifecycleExtensionPackage package, OleMenuCommandService commandService)
         {
             _package = package ?? throw new ArgumentNullException(nameof(package));
             commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
@@ -59,18 +59,9 @@
         /// </summary>
         private Microsoft.VisualStudio.Shell.IAsyncServiceProvider ServiceProvider => _package;
 
-        /// <summary>
-        /// Initializes the singleton instance of the command.
-        /// </summary>
-        /// <param name="package">Owner package, not null.</param>
-        public static async Task InitializeAsync(SSDTLifecycleExtensionPackage package)
+        public static void Initialize(ConfigurationWindowCommand instance)
         {
-            // Switch to the main thread - the call to AddCommand in ConfigurationWindowCommand's constructor requires
-            // the UI thread.
-            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(package.DisposalToken);
-
-            var commandService = await package.GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService;
-            Instance = new ConfigurationWindowCommand(package, commandService);
+            Instance = instance;
         }
 
         /// <summary>
