@@ -113,14 +113,14 @@
                              FontStyle="Italic"/>
                         </TextBlock>
                         <TextBox Grid.Row="0"
-                             Grid.Column="1"
-                             Style="{StaticResource DefaultTextTextBoxStyle}"
-                             Text="{Binding Model.ArtifactsPath, Mode=TwoWay}"/>
+                                 Grid.Column="1"
+                                 Style="{StaticResource DefaultTextTextBoxStyle}"
+                                 Text="{Binding Model.ArtifactsPath, Mode=TwoWay}"/>
 
                         <!-- SqlPackage.exe path -->
                         <TextBlock Grid.Row="1"
-                               Grid.Column="0"
-                               Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
+                                   Grid.Column="0"
+                                   Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
                         <Run Text="SqlPackage.exe path"
                              FontWeight="Bold"/>
                         <LineBreak/>
@@ -199,18 +199,18 @@
                                      Margin="0,0,5,0"
                                      Text="{Binding Model.PublishProfilePath, Mode=TwoWay, ValidatesOnDataErrors=True}"/>
                             <Button Grid.Column="1"
-                                Command="{Binding BrowsePublishProfileCommand}"
-                                VerticalAlignment="Top"
-                                Height="{Binding ElementName=PublishProfilePathTextBox, Path=ActualHeight}"
-                                Padding="5,0"
-                                Content="..."
-                                ToolTip="Browse..."/>
+                                    Command="{Binding BrowsePublishProfileCommand}"
+                                    VerticalAlignment="Top"
+                                    Height="{Binding ElementName=PublishProfilePathTextBox, Path=ActualHeight}"
+                                    Padding="5,0"
+                                    Content="..."
+                                    ToolTip="Browse..."/>
                         </Grid>
                     </Grid>
                 </GroupBox>
                 <!-- Script creation options -->
                 <GroupBox Style="{StaticResource SettingsGroupStyle}"
-                      Header="Script Creation Options">
+                        Header="Script Creation Options">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -228,54 +228,54 @@
 
                         <!-- Build before script creation -->
                         <TextBlock Grid.Row="0"
-                               Grid.Column="0"
-                               Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
+                                   Grid.Column="0"
+                                   Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
                         <Run Text="Build before script creation"
                              FontWeight="Bold"/>
                         </TextBlock>
 
                         <!-- Create documentation with script creation -->
                         <TextBlock Grid.Row="1"
-                               Grid.Column="0"
-                               Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
+                                   Grid.Column="0"
+                                   Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
                         <Run Text="Create documentation"
                              FontWeight="Bold"/>
                         </TextBlock>
 
                         <!-- Comment out sub-section -->
                         <TextBlock Grid.Row="2"
-                               Grid.Column="0"
-                               Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
+                                   Grid.Column="0"
+                                   Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
                         <Run Text="Comment out..."
                              FontWeight="Bold"/>
                         </TextBlock>
                         <!-- Comment out referenced project refactorings -->
                         <TextBlock Grid.Row="3"
-                               Grid.Column="0"
-                               Style="{StaticResource IndentedConfigurationDescriptionTextBlockStyle}">
+                                   Grid.Column="0"
+                                   Style="{StaticResource IndentedConfigurationDescriptionTextBlockStyle}">
                         <Run Text="referenced project refactorings"
                              FontWeight="Bold"/>
                         </TextBlock>
 
                         <!-- Comment out unnamed default constraint drops -->
                         <TextBlock Grid.Row="4"
-                               Grid.Column="0"
-                               Style="{StaticResource IndentedConfigurationDescriptionTextBlockStyle}">
+                                   Grid.Column="0"
+                                   Style="{StaticResource IndentedConfigurationDescriptionTextBlockStyle}">
                         <Run Text="unnamed default constraint drops"
                              FontWeight="Bold"/>
                         </TextBlock>
 
                         <!-- Replacing sub-section -->
                         <TextBlock Grid.Row="5"
-                               Grid.Column="0"
-                               Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
+                                   Grid.Column="0"
+                                   Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
                         <Run Text="Replace..."
                              FontWeight="Bold"/>
                         </TextBlock>
                         <!-- Replace unnamed default constraint drops -->
                         <TextBlock Grid.Row="6"
-                               Grid.Column="0"
-                               Style="{StaticResource IndentedConfigurationDescriptionTextBlockStyle}">
+                                   Grid.Column="0"
+                                   Style="{StaticResource IndentedConfigurationDescriptionTextBlockStyle}">
                         <Run Text="unnamed default constraint drops"
                              FontWeight="Bold"/>
                         <LineBreak/>
@@ -300,7 +300,7 @@
             <StackPanel Grid.Column="2">
                 <!-- Version Management -->
                 <GroupBox Style="{StaticResource SettingsGroupStyle}"
-                      Header="Version Management">
+                        Header="Version Management">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -347,8 +347,8 @@
 
                             <!-- Suggest version when finalizing -->
                         <TextBlock Grid.Row="1"
-                               Grid.Column="0"
-                               Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
+                                   Grid.Column="0"
+                                   Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
                         <Run Text="Suggest version when finalizing"
                              FontWeight="Bold"/>
                         <LineBreak/>
@@ -371,7 +371,7 @@
                 </GroupBox>
                 <!-- Custom Texts -->
                 <GroupBox Style="{StaticResource SettingsGroupStyle}"
-                      Header="Custom Texts">
+                          Header="Custom Texts">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -384,8 +384,8 @@
 
                         <!-- Custom Header -->
                         <TextBlock Grid.Row="0"
-                               Grid.Column="0"
-                               Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
+                                   Grid.Column="0"
+                                   Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
                         <Run Text="Custom header"
                              FontWeight="Bold"/>
                         <LineBreak/>
@@ -400,14 +400,14 @@
                              FontStyle="Italic"/>
                         </TextBlock>
                         <TextBox Grid.Row="0"
-                             Grid.Column="1"
-                             Style="{StaticResource CustomTextTextBoxStyle}"
-                             Text="{Binding Model.CustomHeader, Mode=TwoWay}"/>
+                                 Grid.Column="1"
+                                 Style="{StaticResource CustomTextTextBoxStyle}"
+                                 Text="{Binding Model.CustomHeader, Mode=TwoWay}"/>
 
                         <!-- Custom Footer -->
                         <TextBlock Grid.Row="1"
-                               Grid.Column="0"
-                               Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
+                                   Grid.Column="0"
+                                   Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
                         <Run Text="Custom footer"
                              FontWeight="Bold"/>
                         <LineBreak/>
@@ -422,9 +422,9 @@
                              FontStyle="Italic"/>
                         </TextBlock>
                         <TextBox Grid.Row="1"
-                             Grid.Column="1"
-                             Style="{StaticResource CustomTextTextBoxStyle}"
-                             Text="{Binding Model.CustomFooter, Mode=TwoWay}"/>
+                                 Grid.Column="1"
+                                 Style="{StaticResource CustomTextTextBoxStyle}"
+                                 Text="{Binding Model.CustomFooter, Mode=TwoWay}"/>
                     </Grid>
                 </GroupBox>
             </StackPanel>
