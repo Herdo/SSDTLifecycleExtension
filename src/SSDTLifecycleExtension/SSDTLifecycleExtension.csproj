@@ -121,6 +121,13 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Icon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="LICENSE.txt">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="Resources\ConfigurationWindowCommand.png" />
     <Content Include="Resources\ScriptCreationWindowCommand.png" />
     <Content Include="Resources\VersionHistoryWindowCommand.png" />
