@@ -69,6 +69,7 @@
                 if (value == _publishProfilePath) return;
                 _publishProfilePath = value;
                 OnPropertyChanged();
+                SetValidationErrors(ValidatePublishProfilePath(_publishProfilePath));
             }
         }
 
@@ -259,6 +260,27 @@
                         errors.Add("Path contains invalid characters.");
                     }
                 }
+            }
+
+            return errors;
+        }
+
+        private List<string> ValidatePublishProfilePath(string value, [CallerMemberName] string propertyName = null)
+        {
+            if (propertyName == null)
+                throw new ArgumentNullException(nameof(propertyName));
+
+            var errors = new List<string>();
+
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                errors.Add("Path cannot be empty.");
+            }
+            else
+            {
+                const string publishProfileExtension = ".publish.xml";
+                if (!value.EndsWith(publishProfileExtension) || value.Length == publishProfileExtension.Length)
+                    errors.Add($"Profile file name must end with *{publishProfileExtension}.");
             }
 
             return errors;
