@@ -7,6 +7,10 @@
     public class ConfigurationModel : BaseModel
     {
         private const string _SQL_PACKAGE_SPECIAL_KEYWORD = "{DEFAULT_LATEST_VERSION}";
+        private const string _MAJOR_VERSION_SPECIAL_KEYWORD = "{MAJOR}";
+        private const string _MINOR_VERSION_SPECIAL_KEYWORD = "{MINOR}";
+        private const string _PATCH_VERSION_SPECIAL_KEYWORD = "{PATCH}";
+        private const string _REVISION_VERSION_SPECIAL_KEYWORD = "{REVISION}";
         
         private string _artifactsPath;
         private string _sqlPackagePath;
@@ -146,6 +150,7 @@
                 if (value == _versionPattern) return;
                 _versionPattern = value;
                 OnPropertyChanged();
+                SetValidationErrors(ValidateVersionPattern(_versionPattern));
             }
         }
 
@@ -215,6 +220,59 @@
                 {
                     errors.Add($"Executable must be '{execName}' or the special keyword.");
                 }
+            }
+
+            return errors;
+        }
+
+        private List<string> ValidateVersionPattern(string value, [CallerMemberName] string propertyName = null)
+        {
+            if (propertyName == null)
+                throw new ArgumentNullException(nameof(propertyName));
+
+            var errors = new List<string>();
+
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                errors.Add("Pattern cannot be empty.");
+            }
+            else
+            {
+                var split = value.Split(new []{'.'}, StringSplitOptions.None);
+                if (split.Length > 4) errors.Add("Pattern contains too many parts.");
+                for (var i = 0; i < split.Length; i++)
+                {
+                    var isMajor = i == 0;
+                    var isMinor = i == 1;
+                    var isPatch = i == 2;
+                    var isRevision = i == 3;
+
+                    if (int.TryParse(split[i], out var number))
+                    {
+                        if (number >= 0) continue;
+
+                        if (isMajor)
+                            errors.Add("Major number cannot be negative.");
+                        else if (isMinor)
+                            errors.Add("Minor number cannot be negative.");
+                        else if (isPatch)
+                            errors.Add("Patch number cannot be negative.");
+                        else if (isRevision)
+                            errors.Add("Revision number cannot be negative.");
+                    }
+                    else
+                    {
+                        if (isMajor && split[i] != _MAJOR_VERSION_SPECIAL_KEYWORD)
+                            errors.Add("Invalid special keyword for major number.");
+                        else if (isMinor && split[i] != _MINOR_VERSION_SPECIAL_KEYWORD)
+                            errors.Add("Invalid special keyword for minor number.");
+                        else if (isPatch && split[i] != _PATCH_VERSION_SPECIAL_KEYWORD)
+                            errors.Add("Invalid special keyword for patch number.");
+                        else if (isRevision && split[i] != _REVISION_VERSION_SPECIAL_KEYWORD)
+                            errors.Add("Invalid special keyword for revision number.");
+                    }
+                }
+
             }
 
             return errors;

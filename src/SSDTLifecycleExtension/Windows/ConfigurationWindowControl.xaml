@@ -313,8 +313,8 @@
 
                         <!-- Version pattern -->
                         <TextBlock Grid.Row="0"
-                               Grid.Column="0"
-                               Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
+                                   Grid.Column="0"
+                                   Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
                         <Run Text="Version pattern"
                              FontWeight="Bold"/>
                         <LineBreak/>
@@ -337,11 +337,15 @@
                         <Run Text="{}{PATCH}"
                              FontStyle="Italic"/>
                         <LineBreak/>
-                        <Run Text="{}{BUILD}"
+                        <Run Text="{}{REVISION}"
                              FontStyle="Italic"/>
                         </TextBlock>
+                        <TextBox Grid.Row="0"
+                                 Grid.Column="1"
+                                 Style="{StaticResource DefaultTextTextBoxStyle}"
+                                 Text="{Binding Model.VersionPattern, Mode=TwoWay}"/>
 
-                        <!-- Suggest version when finalizing -->
+                            <!-- Suggest version when finalizing -->
                         <TextBlock Grid.Row="1"
                                Grid.Column="0"
                                Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
