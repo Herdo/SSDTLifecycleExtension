@@ -55,7 +55,9 @@
         private void ResetConfigurationToDefault_Executed(object obj)
         {
             Model = ConfigurationModel.GetDefault();
-            SaveConfigurationCommand.Execute(null);
+            Model.ValidateAll();
+            if (SaveConfigurationCommand.CanExecute(null))
+                SaveConfigurationCommand.Execute(null);
         }
 
         private bool SaveConfiguration_CanExecute(object obj)
