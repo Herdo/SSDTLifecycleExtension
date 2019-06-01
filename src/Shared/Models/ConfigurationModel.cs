@@ -227,9 +227,15 @@
             }
             else
             {
-                var invalidPathChars = Path.GetInvalidPathChars();
-                if (value.Any(m => invalidPathChars.Contains(m)))
+                try
+                {
+                    if (Path.IsPathRooted(value))
+                        errors.Add("Path must be a relative path.");
+                }
+                catch (ArgumentException)
+                {
                     errors.Add("Path contains invalid characters.");
+                }
             }
 
             return errors;
@@ -289,6 +295,16 @@
                 const string publishProfileExtension = ".publish.xml";
                 if (!value.EndsWith(publishProfileExtension) || value.Length == publishProfileExtension.Length)
                     errors.Add($"Profile file name must end with *{publishProfileExtension}.");
+
+                try
+                {
+                    if (Path.IsPathRooted(value))
+                        errors.Add("Path must be a relative path.");
+                }
+                catch (ArgumentException)
+                {
+                    errors.Add("Path contains invalid characters.");
+                }
             }
 
             return errors;
