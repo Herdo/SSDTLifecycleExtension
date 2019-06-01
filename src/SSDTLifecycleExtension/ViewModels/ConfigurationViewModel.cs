@@ -1,13 +1,15 @@
 ﻿namespace SSDTLifecycleExtension.ViewModels
 {
-    using System.Threading.Tasks;
+    using System;
     using System.Windows.Input;
     using Annotations;
     using DataAccess;
     using EnvDTE;
     using Microsoft.VisualStudio.PlatformUI;
+    using Microsoft.VisualStudio.Shell;
     using Services;
     using Shared.Models;
+    using Task = System.Threading.Tasks.Task;
 
     [UsedImplicitly]
     public class ConfigurationViewModel : ViewModelBase
@@ -56,8 +58,15 @@
 
         private void BrowsePublishProfile_Executed(object obj)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             var browsedPath = _fileSystemAccess.BrowseForFile(".publish.xml", "Publish profile (*.publish.xml)|*.publish.xml");
-            if (browsedPath != null) Model.PublishProfilePath = browsedPath;
+            if (browsedPath != null)
+            {
+                var projectPath = new Uri(_project.FullName, UriKind.Absolute);
+                var profilePath = new Uri(browsedPath, UriKind.Absolute);
+                var relativePath = projectPath.MakeRelativeUri(profilePath).ToString();
+                Model.PublishProfilePath = relativePath;
+            }
         }
 
         private void ResetConfigurationToDefault_Executed(object obj)
