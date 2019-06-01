@@ -348,7 +348,6 @@
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
@@ -388,29 +387,6 @@
                                      Grid.Column="1"
                                      Style="{StaticResource DefaultTextTextBoxStyle}"
                                      Text="{Binding Model.VersionPattern, Mode=TwoWay}"/>
-
-                            <!-- Suggest version when finalizing -->
-                            <TextBlock Grid.Row="1"
-                                       Grid.Column="0"
-                                       Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
-                                <Run Text="Suggest version when finalizing"
-                                     FontWeight="Bold"/>
-                                <LineBreak/>
-                                <Run Text="When finalizing a database version,"
-                                     FontStyle="Italic"/>
-                                <LineBreak/>
-                                <Run Text="a new version will be suggested"
-                                     FontStyle="Italic"/>
-                                <LineBreak/>
-                                <Run Text="based on the changes between"
-                                     FontStyle="Italic"/>
-                                <LineBreak/>
-                                <Run Text="the previous and the current"
-                                     FontStyle="Italic"/>
-                                <LineBreak/>
-                                <Run Text="version."
-                                     FontStyle="Italic"/>
-                            </TextBlock>
                         </Grid>
                     </GroupBox>
                     <!-- Custom Texts -->
