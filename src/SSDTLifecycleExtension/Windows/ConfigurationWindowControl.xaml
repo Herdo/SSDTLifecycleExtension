@@ -13,7 +13,7 @@
              d:DataContext="{d:DesignInstance viewModels:ConfigurationViewModel,IsDesignTimeCreatable=False}">
 
     <UserControl.Resources>
-        <Style x:Key="ErrorTemplate" TargetType="Control">
+        <Style x:Key="VerticalErrorTemplate" TargetType="Control">
             <Setter Property="Validation.ErrorTemplate">
                 <Setter.Value>
                     <ControlTemplate>
@@ -23,6 +23,26 @@
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <TextBlock Text="{Binding ErrorContent}" Foreground="Red"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="HorizontalErrorTemplate" TargetType="Control">
+            <Setter Property="Validation.ErrorTemplate">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <AdornedElementPlaceholder/>
+                            <ItemsControl ItemsSource="{Binding}"
+                                          Margin="5,0,0,0">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding ErrorContent}"
+                                                   Foreground="Red"/>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
@@ -41,13 +61,15 @@
             <Setter Property="Width" Value="250"/>
             <Setter Property="Margin" Value="5, 5, 10, 15"/>
         </Style>
-        <Style TargetType="CheckBox" x:Key="ConfigurationCheckBoxStyle">
+        <Style TargetType="CheckBox" x:Key="ConfigurationCheckBoxStyle" BasedOn="{StaticResource HorizontalErrorTemplate}">
             <Setter Property="Margin" Value="0,5,0,0"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
         </Style>
         <SolidColorBrush x:Key="TextBox.Static.Border" Color="#FFABAdB3"/>
         <SolidColorBrush x:Key="TextBox.MouseOver.Border" Color="#FF7EB4EA"/>
         <SolidColorBrush x:Key="TextBox.Focus.Border" Color="#FF569DE5"/>
-        <Style TargetType="TextBox" x:Key="DefaultTextTextBoxStyle" BasedOn="{StaticResource ErrorTemplate}">
+        <Style TargetType="TextBox" x:Key="DefaultTextTextBoxStyle" BasedOn="{StaticResource VerticalErrorTemplate}">
             <Setter Property="AcceptsReturn" Value="False"/>
             <Setter Property="Margin" Value="0,5,0,0"/>
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
@@ -328,19 +350,16 @@
                                 <Run Text="Replace unnamed default constraint drops"
                                      FontWeight="Bold"/>
                                 <LineBreak/>
-                                <Run Text="Replaces unnamed default"
+                                <Run Text="Replaces unnamed default constraint drops"
                                      FontStyle="Italic"/>
                                 <LineBreak/>
-                                <Run Text="constraint drops with dynamic"
+                                <Run Text="with dynamic drop statements, that will"
                                      FontStyle="Italic"/>
                                 <LineBreak/>
-                                <Run Text="drop statements, that will"
+                                <Run Text="determine the actual default constraint"
                                      FontStyle="Italic"/>
                                 <LineBreak/>
-                                <Run Text="determine the actual default"
-                                     FontStyle="Italic"/>
-                                <LineBreak/>
-                                <Run Text="constraint name when executing."
+                                <Run Text="name when executing."
                                      FontStyle="Italic"/>
                             </TextBlock>
                             <CheckBox Grid.Row="4"

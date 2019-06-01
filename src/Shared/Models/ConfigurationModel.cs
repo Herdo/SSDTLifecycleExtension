@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
     using System.Runtime.CompilerServices;
 
     public class ConfigurationModel : BaseModel
@@ -126,6 +125,8 @@
                 if (value == _commentOutUnnamedDefaultConstraintDrops) return;
                 _commentOutUnnamedDefaultConstraintDrops = value;
                 OnPropertyChanged();
+                SetValidationErrors(ValidateCommentOutUnnamedDefaultConstraintDrops(value));
+                SetValidationErrors(ValidateReplaceUnnamedDefaultConstraintDrops(ReplaceUnnamedDefaultConstraintDrops, nameof(ReplaceUnnamedDefaultConstraintDrops)), nameof(ReplaceUnnamedDefaultConstraintDrops));
             }
         }
 
@@ -140,6 +141,8 @@
                 if (value == _replaceUnnamedDefaultConstraintDrops) return;
                 _replaceUnnamedDefaultConstraintDrops = value;
                 OnPropertyChanged();
+                SetValidationErrors(ValidateReplaceUnnamedDefaultConstraintDrops(value));
+                SetValidationErrors(ValidateCommentOutUnnamedDefaultConstraintDrops(CommentOutUnnamedDefaultConstraintDrops, nameof(CommentOutUnnamedDefaultConstraintDrops)), nameof(CommentOutUnnamedDefaultConstraintDrops));
             }
         }
 
@@ -211,6 +214,8 @@
             SetValidationErrors(ValidateArtifactsPath(ArtifactsPath, nameof(ArtifactsPath)), nameof(ArtifactsPath));
             SetValidationErrors(ValidateSqlPackagePath(SqlPackagePath, nameof(SqlPackagePath)), nameof(SqlPackagePath));
             SetValidationErrors(ValidatePublishProfilePath(PublishProfilePath, nameof(PublishProfilePath)), nameof(PublishProfilePath));
+            SetValidationErrors(ValidateCommentOutUnnamedDefaultConstraintDrops(CommentOutUnnamedDefaultConstraintDrops, nameof(CommentOutUnnamedDefaultConstraintDrops)), nameof(CommentOutUnnamedDefaultConstraintDrops));
+            SetValidationErrors(ValidateReplaceUnnamedDefaultConstraintDrops(ReplaceUnnamedDefaultConstraintDrops, nameof(ReplaceUnnamedDefaultConstraintDrops)), nameof(ReplaceUnnamedDefaultConstraintDrops));
             SetValidationErrors(ValidateVersionPattern(VersionPattern, nameof(VersionPattern)), nameof(VersionPattern));
         }
 
@@ -306,6 +311,32 @@
                     errors.Add("Path contains invalid characters.");
                 }
             }
+
+            return errors;
+        }
+
+        private List<string> ValidateCommentOutUnnamedDefaultConstraintDrops(bool value, [CallerMemberName] string propertyName = null)
+        {
+            if (propertyName == null)
+                throw new ArgumentNullException(nameof(propertyName));
+
+            var errors = new List<string>();
+
+            if (value && ReplaceUnnamedDefaultConstraintDrops)
+                errors.Add("Behavior for unnamed default constraint drops is ambiguous.");
+
+            return errors;
+        }
+
+        private List<string> ValidateReplaceUnnamedDefaultConstraintDrops(bool value, [CallerMemberName] string propertyName = null)
+        {
+            if (propertyName == null)
+                throw new ArgumentNullException(nameof(propertyName));
+
+            var errors = new List<string>();
+
+            if (value && CommentOutUnnamedDefaultConstraintDrops)
+                errors.Add("Behavior for unnamed default constraint drops is ambiguous.");
 
             return errors;
         }
