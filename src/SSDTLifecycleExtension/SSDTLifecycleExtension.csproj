@@ -50,12 +50,15 @@
     <Compile Include="DataAccess\IFileSystemAccess.cs" />
     <Compile Include="DataAccess\IVisualStudioAccess.cs" />
     <Compile Include="DataAccess\VisualStudioAccess.cs" />
+    <Compile Include="Events\ProjectConfigurationChangedEventArgs.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\CommandAvailabilityService.cs" />
     <Compile Include="Services\ConfigurationService.cs" />
     <Compile Include="Services\ICommandAvailabilityService.cs" />
     <Compile Include="Services\IConfigurationService.cs" />
+    <Compile Include="Services\IScriptCreationService.cs" />
+    <Compile Include="Services\ScriptCreationService.cs" />
     <Compile Include="SSDTLifecycleExtensionPackage.cs" />
     <Compile Include="ViewModels\ConfigurationViewModel.cs" />
     <Compile Include="ViewModels\IViewModel.cs" />

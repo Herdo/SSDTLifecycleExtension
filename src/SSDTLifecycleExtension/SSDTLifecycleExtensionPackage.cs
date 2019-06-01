@@ -73,10 +73,11 @@
                 // Services
                .RegisterSingleton<IConfigurationService, ConfigurationService>()
                .RegisterSingleton<ICommandAvailabilityService, CommandAvailabilityService>()
+               .RegisterSingleton<IScriptCreationService, ScriptCreationService>()
                 
                 // Data Access
                .RegisterSingleton<IFileSystemAccess, FileSystemAccess>()
-               .RegisterInstance<IVisualStudioAccess>(new VisualStudioAccess(_dte2), new ContainerControlledLifetimeManager());
+               .RegisterInstance<IVisualStudioAccess>(new VisualStudioAccess(_dte2, this), new ContainerControlledLifetimeManager());
 
             return container;
         }

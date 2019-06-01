@@ -7,6 +7,7 @@
     using Annotations;
     using DataAccess;
     using EnvDTE;
+    using Events;
     using Microsoft.VisualStudio.Shell;
     using Newtonsoft.Json;
     using Shared.Models;
@@ -31,6 +32,8 @@
             var directory = Path.GetDirectoryName(project.FullName);
             return Path.Combine(directory ?? throw new InvalidOperationException("Cannot find configuration file. Directory is <null>."), _PROPERTIES_DIRECTORY, _CONFIGURATION_FILE_NAME);
         }
+
+        public event EventHandler<ProjectConfigurationChangedEventArgs> ConfigurationChanged;
 
         async Task<ConfigurationModel> IConfigurationService.GetConfigurationOrDefaultAsync(Project project)
         {
@@ -63,6 +66,9 @@
 
             // Save configuration physically.
             await _fileSystemAccess.WriteFileAsync(targetPath, serialized);
+
+            // Notify about changes
+            ConfigurationChanged?.Invoke(this, new ProjectConfigurationChangedEventArgs(project));
 
             // Add configuration to the project, if it hasn't been added before.
             var properties = project.ProjectItems.OfType<ProjectItem>().SingleOrDefault(m =>

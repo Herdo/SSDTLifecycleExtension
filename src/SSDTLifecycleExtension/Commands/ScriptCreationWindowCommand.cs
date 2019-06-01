@@ -80,6 +80,7 @@
                 if (window.Content is IView windowContent)
                 {
                     var viewModel = _package.GetViewModel<ScriptCreationViewModel>(project);
+                    await viewModel.InitializeAsync();
                     windowContent.SetDataContext(viewModel);
                 }
                 // Show the frame
