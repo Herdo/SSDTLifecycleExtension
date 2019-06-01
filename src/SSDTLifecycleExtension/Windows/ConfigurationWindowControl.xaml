@@ -41,9 +41,8 @@
             <Setter Property="Width" Value="250"/>
             <Setter Property="Margin" Value="5, 5, 10, 15"/>
         </Style>
-        <Style TargetType="TextBlock" x:Key="IndentedConfigurationDescriptionTextBlockStyle" BasedOn="{StaticResource ConfigurationDescriptionTextBlockStyle}">
-            <Setter Property="Width" Value="240"/>
-            <Setter Property="Margin" Value="15, 5, 10, 15"/>
+        <Style TargetType="CheckBox" x:Key="ConfigurationCheckBoxStyle">
+            <Setter Property="Margin" Value="0,5,0,0"/>
         </Style>
         <SolidColorBrush x:Key="TextBox.Static.Border" Color="#FFABAdB3"/>
         <SolidColorBrush x:Key="TextBox.MouseOver.Border" Color="#FF7EB4EA"/>
@@ -262,8 +261,6 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
@@ -277,6 +274,10 @@
                                 <Run Text="Build before script creation"
                                      FontWeight="Bold"/>
                             </TextBlock>
+                            <CheckBox Grid.Row="0"
+                                      Grid.Column="1"
+                                      Style="{StaticResource ConfigurationCheckBoxStyle}"
+                                      IsChecked="{Binding Model.BuildBeforeScriptCreation, Mode=TwoWay}"/>
 
                             <!-- Create documentation with script creation -->
                             <TextBlock Grid.Row="1"
@@ -285,42 +286,46 @@
                                 <Run Text="Create documentation"
                                      FontWeight="Bold"/>
                             </TextBlock>
+                            <CheckBox Grid.Row="1"
+                                      Grid.Column="1"
+                                      Style="{StaticResource ConfigurationCheckBoxStyle}"
+                                      IsChecked="{Binding Model.CreateDocumentationWithScriptCreation, Mode=TwoWay}"/>
 
-                            <!-- Comment out sub-section -->
+                            <!-- Comment out referenced project refactorings -->
                             <TextBlock Grid.Row="2"
                                        Grid.Column="0"
                                        Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
-                                <Run Text="Comment out..."
+                                <Run Text="Comment out referenced project"
+                                     FontWeight="Bold"/>
+                                <LineBreak/>
+                                <Run Text="refactorings"
                                      FontWeight="Bold"/>
                             </TextBlock>
-                            <!-- Comment out referenced project refactorings -->
-                            <TextBlock Grid.Row="3"
-                                       Grid.Column="0"
-                                       Style="{StaticResource IndentedConfigurationDescriptionTextBlockStyle}">
-                                <Run Text="referenced project refactorings"
-                                     FontWeight="Bold"/>
-                            </TextBlock>
+                            <CheckBox Grid.Row="2"
+                                      Grid.Column="1"
+                                      Style="{StaticResource ConfigurationCheckBoxStyle}"
+                                      IsChecked="{Binding Model.CommentOutReferencedProjectRefactorings, Mode=TwoWay}"/>
 
                             <!-- Comment out unnamed default constraint drops -->
-                            <TextBlock Grid.Row="4"
-                                       Grid.Column="0"
-                                       Style="{StaticResource IndentedConfigurationDescriptionTextBlockStyle}">
-                                <Run Text="unnamed default constraint drops"
-                                     FontWeight="Bold"/>
-                            </TextBlock>
-
-                            <!-- Replacing sub-section -->
-                            <TextBlock Grid.Row="5"
+                            <TextBlock Grid.Row="3"
                                        Grid.Column="0"
                                        Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
-                                <Run Text="Replace..."
+                                <Run Text="Comment out unnamed default constraint"
+                                     FontWeight="Bold"/>
+                                <LineBreak/>
+                                <Run Text="drops"
                                      FontWeight="Bold"/>
                             </TextBlock>
+                            <CheckBox Grid.Row="3"
+                                      Grid.Column="1"
+                                      Style="{StaticResource ConfigurationCheckBoxStyle}"
+                                      IsChecked="{Binding Model.CommentOutUnnamedDefaultConstraintDrops, Mode=TwoWay}"/>
+
                             <!-- Replace unnamed default constraint drops -->
-                            <TextBlock Grid.Row="6"
+                            <TextBlock Grid.Row="4"
                                        Grid.Column="0"
-                                       Style="{StaticResource IndentedConfigurationDescriptionTextBlockStyle}">
-                                <Run Text="unnamed default constraint drops"
+                                       Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
+                                <Run Text="Replace unnamed default constraint drops"
                                      FontWeight="Bold"/>
                                 <LineBreak/>
                                 <Run Text="Replaces unnamed default"
@@ -338,6 +343,10 @@
                                 <Run Text="constraint name when executing."
                                      FontStyle="Italic"/>
                             </TextBlock>
+                            <CheckBox Grid.Row="4"
+                                      Grid.Column="1"
+                                      Style="{StaticResource ConfigurationCheckBoxStyle}"
+                                      IsChecked="{Binding Model.ReplaceUnnamedDefaultConstraintDrops, Mode=TwoWay}"/>
                         </Grid>
                     </GroupBox>
                 </StackPanel>
