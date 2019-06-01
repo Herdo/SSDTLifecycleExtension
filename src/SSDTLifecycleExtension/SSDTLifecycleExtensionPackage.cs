@@ -21,9 +21,9 @@
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [Guid(PackageGuidString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
+    [ProvideToolWindow(typeof(Windows.ScriptCreationWindow), Transient = true, Style = VsDockStyle.Tabbed, MultiInstances = false)]
     [ProvideToolWindow(typeof(Windows.VersionHistoryWindow), Transient = true, Style = VsDockStyle.Tabbed, MultiInstances = false)]
     [ProvideToolWindow(typeof(Windows.ConfigurationWindow), Transient = true, Style = VsDockStyle.Tabbed, MultiInstances = false)]
-    [ProvideToolWindow(typeof(Windows.ScriptCreationWindow), Transient = true, Style = VsDockStyle.Tabbed, MultiInstances = false)]
     [ProvideAutoLoad(SqlProjectContextGuid, PackageAutoLoadFlags.BackgroundLoad)]
     [ProvideUIContextRule(SqlProjectContextGuid,
         name: "SqlProject auto load",
@@ -74,6 +74,8 @@
                .RegisterSingleton<IConfigurationService, ConfigurationService>()
                .RegisterSingleton<ICommandAvailabilityService, CommandAvailabilityService>()
                .RegisterSingleton<IScriptCreationService, ScriptCreationService>()
+               .RegisterSingleton<IVersionService, VersionService>()
+               .RegisterSingleton<ISqlProjectService, SqlProjectService>()
                 
                 // Data Access
                .RegisterSingleton<IFileSystemAccess, FileSystemAccess>()

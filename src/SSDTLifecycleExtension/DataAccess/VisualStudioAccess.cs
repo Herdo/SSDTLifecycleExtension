@@ -1,6 +1,7 @@
 ﻿namespace SSDTLifecycleExtension.DataAccess
 {
     using System;
+    using System.Linq;
     using Annotations;
     using EnvDTE;
     using EnvDTE80;
@@ -79,6 +80,19 @@
             var outputPane = await GetOrCreateSSDTOutputPaneAsync();
             outputPane.OutputString(message);
             outputPane.OutputString(Environment.NewLine);
+        }
+
+        void IVisualStudioAccess.BuildProject(Project project)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            if (project == null)
+                throw new ArgumentNullException(nameof(project));
+
+            var sb = _dte2.Solution.SolutionBuild;
+            sb.BuildProject("Release",
+                            project.FullName,
+                            true);
         }
     }
 }

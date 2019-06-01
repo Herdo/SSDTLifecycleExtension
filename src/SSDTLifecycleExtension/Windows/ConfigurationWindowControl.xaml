@@ -405,7 +405,7 @@
                                 <Run Text="{}{MINOR}"
                                      FontStyle="Italic"/>
                                 <LineBreak/>
-                                <Run Text="{}{PATCH}"
+                                <Run Text="{}{BUILD}"
                                      FontStyle="Italic"/>
                                 <LineBreak/>
                                 <Run Text="{}{REVISION}"

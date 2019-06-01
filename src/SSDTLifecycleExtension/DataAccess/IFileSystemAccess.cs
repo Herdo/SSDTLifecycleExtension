@@ -1,5 +1,7 @@
 ﻿namespace SSDTLifecycleExtension.DataAccess
 {
+    using System;
+    using System.Threading;
     using System.Threading.Tasks;
     using Annotations;
 
@@ -12,5 +14,23 @@
 
         string BrowseForFile([NotNull] string extension,
                              [NotNull] string filter);
+
+        string[] SearchForFiles(Environment.SpecialFolder rootFolder,
+                                [NotNull] string subFolder,
+                                [NotNull] string searchPattern);
+
+        bool CheckIfFileExists([NotNull] string filePath);
+
+        string EnsureDirectoryExists([NotNull] string path);
+
+        Task StartProcessAndWaitAsync([NotNull] string fileName,
+                                      [NotNull] string arguments,
+                                      [CanBeNull] Func<string, Task> outputDataHandler,
+                                      [CanBeNull] Func<string, Task> errorDataHandler,
+                                      CancellationToken cancellationToken);
+
+        void CopyFiles(string sourceDirectory,
+                       string targetDirectory,
+                       string searchPattern);
     }
 }

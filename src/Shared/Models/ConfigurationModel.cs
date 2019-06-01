@@ -7,11 +7,11 @@
 
     public class ConfigurationModel : BaseModel
     {
-        private const string _SQL_PACKAGE_SPECIAL_KEYWORD = "{DEFAULT_LATEST_VERSION}";
-        private const string _MAJOR_VERSION_SPECIAL_KEYWORD = "{MAJOR}";
-        private const string _MINOR_VERSION_SPECIAL_KEYWORD = "{MINOR}";
-        private const string _PATCH_VERSION_SPECIAL_KEYWORD = "{PATCH}";
-        private const string _REVISION_VERSION_SPECIAL_KEYWORD = "{REVISION}";
+        public const string SqlPackageSpecialKeyword = "{DEFAULT_LATEST_VERSION}";
+        public const string MajorVersionSpecialKeyword = "{MAJOR}";
+        public const string MinorVersionSpecialKeyword = "{MINOR}";
+        public const string BuildVersionSpecialKeyword = "{BUILD}";
+        public const string RevisionVersionSpecialKeyword = "{REVISION}";
         
         private string _artifactsPath;
         private string _sqlPackagePath;
@@ -197,14 +197,14 @@
             new ConfigurationModel
             {
                 ArtifactsPath = "_Deployment",
-                SqlPackagePath = _SQL_PACKAGE_SPECIAL_KEYWORD,
+                SqlPackagePath = SqlPackageSpecialKeyword,
                 PublishProfilePath = null,
                 BuildBeforeScriptCreation = true,
                 CreateDocumentationWithScriptCreation = true,
                 CommentOutReferencedProjectRefactorings = false,
                 CommentOutUnnamedDefaultConstraintDrops = false,
                 ReplaceUnnamedDefaultConstraintDrops = false,
-                VersionPattern = "{MAJOR}.{MINOR}.{PATCH}",
+                VersionPattern = "{MAJOR}.{MINOR}.{BUILD}",
                 CustomHeader = null,
                 CustomFooter = null
             };
@@ -259,7 +259,7 @@
             }
             else
             {
-                if (value == _SQL_PACKAGE_SPECIAL_KEYWORD)
+                if (value == SqlPackageSpecialKeyword)
                     return errors;
 
                 const string execName = "SqlPackage.exe";
@@ -378,13 +378,13 @@
                     }
                     else
                     {
-                        if (isMajor && split[i] != _MAJOR_VERSION_SPECIAL_KEYWORD)
+                        if (isMajor && split[i] != MajorVersionSpecialKeyword)
                             errors.Add("Invalid special keyword for major number.");
-                        else if (isMinor && split[i] != _MINOR_VERSION_SPECIAL_KEYWORD)
+                        else if (isMinor && split[i] != MinorVersionSpecialKeyword)
                             errors.Add("Invalid special keyword for minor number.");
-                        else if (isPatch && split[i] != _PATCH_VERSION_SPECIAL_KEYWORD)
+                        else if (isPatch && split[i] != BuildVersionSpecialKeyword)
                             errors.Add("Invalid special keyword for patch number.");
-                        else if (isRevision && split[i] != _REVISION_VERSION_SPECIAL_KEYWORD)
+                        else if (isRevision && split[i] != RevisionVersionSpecialKeyword)
                             errors.Add("Invalid special keyword for revision number.");
                     }
                 }

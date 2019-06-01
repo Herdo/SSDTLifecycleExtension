@@ -11,5 +11,7 @@
         Task ClearSSDTLifecycleOutputAsync();
 
         Task WriteLineToSSDTLifecycleOutputAsync([NotNull] string message);
+
+        void BuildProject([NotNull] Project project);
     }
 }

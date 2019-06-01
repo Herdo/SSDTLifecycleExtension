@@ -1,6 +1,7 @@
 ﻿namespace SSDTLifecycleExtension.ViewModels
 {
     using System;
+    using System.Threading;
     using System.Threading.Tasks;
     using System.Windows.Input;
     using Annotations;
@@ -36,7 +37,7 @@
 
         private async void StartCreation_Executed()
         {
-            await _scriptCreationService.CreateAsync(_project, _configuration, Version.Parse("0.0.0.0"), null);
+            await _scriptCreationService.CreateAsync(_project, _configuration, Version.Parse("0.0.0.0"), null, CancellationToken.None);
         }
 
         public async Task InitializeAsync()
