@@ -30,6 +30,7 @@
         }
 
         public ICommand BrowseSqlPackageCommand { get; }
+        public ICommand BrowsePublishProfileCommand { get; }
         public ICommand ResetConfigurationToDefaultCommand { get; }
         public ICommand SaveConfigurationCommand { get; }
 
@@ -42,6 +43,7 @@
             _fileSystemAccess = fileSystemAccess;
 
             BrowseSqlPackageCommand = new DelegateCommand(BrowseSqlPackage_Executed);
+            BrowsePublishProfileCommand = new DelegateCommand(BrowsePublishProfile_Executed);
             ResetConfigurationToDefaultCommand = new DelegateCommand(ResetConfigurationToDefault_Executed);
             SaveConfigurationCommand = new DelegateCommand(SaveConfiguration_Executed, SaveConfiguration_CanExecute);
         }
@@ -50,6 +52,12 @@
         {
             var browsedPath = _fileSystemAccess.BrowseForFile(".exe", "Executable file (*.exe)|*.exe");
             if (browsedPath != null) Model.SqlPackagePath = browsedPath;
+        }
+
+        private void BrowsePublishProfile_Executed(object obj)
+        {
+            var browsedPath = _fileSystemAccess.BrowseForFile(".publish.xml", "Publish profile (*.publish.xml)|*.publish.xml");
+            if (browsedPath != null) Model.PublishProfilePath = browsedPath;
         }
 
         private void ResetConfigurationToDefault_Executed(object obj)
