@@ -23,11 +23,11 @@
 
         string EnsureDirectoryExists([NotNull] string path);
 
-        Task StartProcessAndWaitAsync([NotNull] string fileName,
-                                      [NotNull] string arguments,
-                                      [CanBeNull] Func<string, Task> outputDataHandler,
-                                      [CanBeNull] Func<string, Task> errorDataHandler,
-                                      CancellationToken cancellationToken);
+        Task<string> StartProcessAndWaitAsync([NotNull] string fileName,
+                                              [NotNull] string arguments,
+                                              [CanBeNull] Func<string, Task> outputDataHandler,
+                                              [CanBeNull] Func<string, Task> errorDataHandler,
+                                              CancellationToken cancellationToken);
 
         string CopyFiles([NotNull] string sourceDirectory,
                          [NotNull] string targetDirectory,

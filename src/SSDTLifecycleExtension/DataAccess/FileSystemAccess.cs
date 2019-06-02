@@ -110,12 +110,17 @@
             }
         }
 
-        async Task IFileSystemAccess.StartProcessAndWaitAsync(string fileName,
-                                                              string arguments,
-                                                              Func<string, Task> outputDataHandler,
-                                                              Func<string, Task> errorDataHandler,
-                                                              CancellationToken cancellationToken)
+        async Task<string> IFileSystemAccess.StartProcessAndWaitAsync(string fileName,
+                                                                      string arguments,
+                                                                      Func<string, Task> outputDataHandler,
+                                                                      Func<string, Task> errorDataHandler,
+                                                                      CancellationToken cancellationToken)
         {
+            if (string.IsNullOrWhiteSpace(fileName))
+                throw new ArgumentException("Value cannot be null or white space.", nameof(fileName));
+            if (string.IsNullOrWhiteSpace(arguments))
+                throw new ArgumentException("Value cannot be null or white space.", nameof(arguments));
+
             var psi = new ProcessStartInfo(fileName, arguments)
             {
                 UseShellExecute = false,
@@ -133,12 +138,20 @@
             if (errorDataHandler != null)
                 p.ErrorDataReceived += async (sender,
                                               args) => await errorDataHandler.Invoke(args.Data);
-            p.Start();
-            if (outputDataHandler != null)
-                p.BeginOutputReadLine();
-            if (errorDataHandler != null)
-                p.BeginErrorReadLine();
-            await p.WaitForExitAsync(cancellationToken);
+            try
+            {
+                p.Start();
+                if (outputDataHandler != null)
+                    p.BeginOutputReadLine();
+                if (errorDataHandler != null)
+                    p.BeginErrorReadLine();
+                await p.WaitForExitAsync(cancellationToken);
+                return null;
+            }
+            catch (Exception e)
+            {
+                return e.Message;
+            }
         }
 
         string IFileSystemAccess.CopyFiles(string sourceDirectory,

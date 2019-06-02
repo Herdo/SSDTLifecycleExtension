@@ -166,23 +166,27 @@ namespace SSDTLifecycleExtension.Services
             if (variables.CreateDocumentation)
                 sqlPackageArguments.Append($"/DeployReportPath:\"{variables.DeployReportPath}\" ");
             var hasErrors = false;
-            await _fileSystemAccess.StartProcessAndWaitAsync(sqlPackagePath,
-                                                             sqlPackageArguments.ToString(),
-                                                             async s =>
-                                                             {
-                                                                 if (!string.IsNullOrWhiteSpace(s))
-                                                                    await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync($"SqlPackage.exe INFO: {s}");
-                                                             },
-                                                             async s =>
-                                                             {
-                                                                 if (!string.IsNullOrWhiteSpace(s))
-                                                                 {
-                                                                     hasErrors = true;
-                                                                     await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync($"SqlPackage.exe ERROR: {s}");
-                                                                 }
-                                                             },
-                                                             cancellationToken);
-            return !hasErrors;
+            var processStartError = await _fileSystemAccess.StartProcessAndWaitAsync(sqlPackagePath,
+                                                                                     sqlPackageArguments.ToString(),
+                                                                                     async s =>
+                                                                                     {
+                                                                                         if (!string.IsNullOrWhiteSpace(s))
+                                                                                             await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync($"SqlPackage.exe INFO: {s}");
+                                                                                     },
+                                                                                     async s =>
+                                                                                     {
+                                                                                         if (!string.IsNullOrWhiteSpace(s))
+                                                                                         {
+                                                                                             hasErrors = true;
+                                                                                             await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync($"SqlPackage.exe ERROR: {s}");
+                                                                                         }
+                                                                                     },
+                                                                                     cancellationToken);
+            if (processStartError == null)
+                return !hasErrors;
+
+            await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync($"ERROR: Failed to start the SqlPackage.exe process: {processStartError}");
+            return false;
         }
 
         bool IScriptCreationService.IsCreating => _isCreating;
