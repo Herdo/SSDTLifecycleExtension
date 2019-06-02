@@ -92,10 +92,16 @@ namespace SSDTLifecycleExtension.Services
 
             await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync("Searching latest SqlPackage.exe ...");
             var sqlPackageExecutables = _fileSystemAccess.SearchForFiles(Environment.SpecialFolder.ProgramFilesX86, "Microsoft SQL Server", "SqlPackage.exe");
-            if (sqlPackageExecutables.Length > 0)
-                return sqlPackageExecutables.OrderByDescending(m => m).First();
+            if (sqlPackageExecutables.Error != null)
+            {
+                await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync($"ERROR: Failed to find any SqlPackage.exe: {sqlPackageExecutables.Error}");
+                return null;
+            }
 
-            await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync("Failed to find latest SqlPackage.exe. Please specify an absolute path to the SqlPackage.exe to use.");
+            if (sqlPackageExecutables.Result.Length > 0)
+                return sqlPackageExecutables.Result.OrderByDescending(m => m).First();
+
+            await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync("ERROR: Failed to find latest SqlPackage.exe. Please specify an absolute path to the SqlPackage.exe to use.");
             return null;
         }
 
@@ -105,19 +111,19 @@ namespace SSDTLifecycleExtension.Services
             await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync("Verifying variables ...");
             if (!_fileSystemAccess.CheckIfFileExists(variables.ProjectPath))
             {
-                await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync("Failed to find project file.");
+                await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync("ERROR: Failed to find project file.");
                 return false;
             }
 
             if (!_fileSystemAccess.CheckIfFileExists(variables.ProfilePath))
             {
-                await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync("Failed to find publish profile.");
+                await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync("ERROR: Failed to find publish profile.");
                 return false;
             }
 
             if (!_fileSystemAccess.CheckIfFileExists(sqlPackagePath))
             {
-                await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync("Failed to find SqlPackage.exe.");
+                await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync("ERROR: Failed to find SqlPackage.exe.");
                 return false;
             }
 
@@ -255,7 +261,7 @@ namespace SSDTLifecycleExtension.Services
                 if (!success)
                 {
                     sw.Stop();
-                    await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync($"Script creation aborted after {sw.ElapsedMilliseconds / 1000} seconds.");
+                    await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync($"ERROR: Script creation aborted after {sw.ElapsedMilliseconds / 1000} seconds.");
                     return;
                 }
 
@@ -275,7 +281,7 @@ namespace SSDTLifecycleExtension.Services
             {
                 try
                 {
-                    await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync($"Script creation failed: {e.Message}");
+                    await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync($"ERROR: Script creation failed: {e.Message}");
                 }
                 catch
                 { }

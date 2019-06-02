@@ -15,9 +15,9 @@
         string BrowseForFile([NotNull] string extension,
                              [NotNull] string filter);
 
-        string[] SearchForFiles(Environment.SpecialFolder rootFolder,
-                                [NotNull] string subFolder,
-                                [NotNull] string searchPattern);
+        (string[] Result, string Error) SearchForFiles(Environment.SpecialFolder rootFolder,
+                                                       [NotNull] string subFolder,
+                                                       [NotNull] string searchPattern);
 
         bool CheckIfFileExists([NotNull] string filePath);
 

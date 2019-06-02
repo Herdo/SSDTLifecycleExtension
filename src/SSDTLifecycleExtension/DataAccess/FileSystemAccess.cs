@@ -71,18 +71,25 @@
             return result == true ? ofd.FileName : null;
         }
 
-        string[] IFileSystemAccess.SearchForFiles(Environment.SpecialFolder rootFolder,
-                                                  string subFolder,
-                                                  string searchPattern)
+        (string[] Result, string Error) IFileSystemAccess.SearchForFiles(Environment.SpecialFolder rootFolder,
+                                                                         string subFolder,
+                                                                         string searchPattern)
         {
             if (string.IsNullOrWhiteSpace(subFolder))
                 throw new ArgumentException("Value cannot be null or white space.", nameof(subFolder));
             if (string.IsNullOrWhiteSpace(searchPattern))
                 throw new ArgumentException("Value cannot be null or white space.", nameof(searchPattern));
 
-            var sd = Environment.GetFolderPath(rootFolder);
-            var searchRoot = Path.Combine(sd, subFolder);
-            return Directory.GetFiles(searchRoot, searchPattern, SearchOption.AllDirectories);
+            try
+            {
+                var sd = Environment.GetFolderPath(rootFolder);
+                var searchRoot = Path.Combine(sd, subFolder);
+                return (Directory.GetFiles(searchRoot, searchPattern, SearchOption.AllDirectories), null);
+            }
+            catch (Exception e)
+            {
+                return (null, e.Message);
+            }
         }
 
         bool IFileSystemAccess.CheckIfFileExists(string filePath)
