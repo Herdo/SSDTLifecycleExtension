@@ -284,7 +284,9 @@ namespace SSDTLifecycleExtension.Services
                     await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync($"ERROR: Script creation failed: {e.Message}");
                 }
                 catch
-                { }
+                {
+                    // ignored
+                }
             }
             finally
             {
