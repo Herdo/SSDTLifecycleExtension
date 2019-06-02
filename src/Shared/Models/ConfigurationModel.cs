@@ -219,6 +219,26 @@
             SetValidationErrors(ValidateVersionPattern(VersionPattern, nameof(VersionPattern)), nameof(VersionPattern));
         }
 
+        public ConfigurationModel Copy()
+        {
+            var copy = new ConfigurationModel
+            {
+                ArtifactsPath = ArtifactsPath,
+                SqlPackagePath = SqlPackagePath,
+                PublishProfilePath = PublishProfilePath,
+                BuildBeforeScriptCreation = BuildBeforeScriptCreation,
+                CreateDocumentationWithScriptCreation = CreateDocumentationWithScriptCreation,
+                CommentOutReferencedProjectRefactorings = CommentOutReferencedProjectRefactorings,
+                CommentOutUnnamedDefaultConstraintDrops = CommentOutUnnamedDefaultConstraintDrops,
+                ReplaceUnnamedDefaultConstraintDrops = ReplaceUnnamedDefaultConstraintDrops,
+                VersionPattern = VersionPattern,
+                CustomHeader = CustomHeader,
+                CustomFooter = CustomFooter
+            };
+            copy.ValidateAll();
+            return copy;
+        }
+
         private List<string> ValidateArtifactsPath(string value, [CallerMemberName] string propertyName = null)
         {
             if (propertyName == null)

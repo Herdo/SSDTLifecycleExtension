@@ -1,6 +1,7 @@
 ﻿namespace SSDTLifecycleExtension.ViewModels
 {
     using System;
+    using System.ComponentModel;
     using System.Windows.Input;
     using Annotations;
     using DataAccess;
@@ -19,7 +20,9 @@
         private readonly IFileSystemAccess _fileSystemAccess;
         private readonly IScriptCreationService _scriptCreationService;
 
+        private ConfigurationModel _lastSavedModel;
         private ConfigurationModel _model;
+        private bool _isModelDirty;
 
         public ConfigurationModel Model
         {
@@ -27,8 +30,24 @@
             set
             {
                 if (Equals(value, _model)) return;
+                if (_model != null)
+                    _model.PropertyChanged -= Model_PropertyChanged;
                 _model = value;
+                if (_model != null)
+                    _model.PropertyChanged += Model_PropertyChanged;
                 OnPropertyChanged();
+                CheckIfModelIsDirty();
+            }
+        }
+
+        private bool IsModelDirty
+        {
+            get => _isModelDirty;
+            set
+            {
+                if (value == _isModelDirty) return;
+                _isModelDirty = value;
+                SaveConfigurationCommand.RaiseCanExecuteChanged();
             }
         }
 
@@ -83,22 +102,60 @@
         {
             return Model != null
                 && !Model.HasErrors
+                && IsModelDirty
                 && !_scriptCreationService.IsCreating;
         }
 
         private async void SaveConfiguration_Executed(object obj)
         {
-            await _configurationService.SaveConfigurationAsync(_project, Model);
+            var copy = Model.Copy();
+            await _configurationService.SaveConfigurationAsync(_project, copy);
+            _lastSavedModel = copy;
+            CheckIfModelIsDirty();
+        }
+
+        private void CheckIfModelIsDirty()
+        {
+            if (Model == null)
+            {
+                IsModelDirty = false;
+                return;
+            }
+
+            if (Model != null && _lastSavedModel == null)
+            {
+                IsModelDirty = true;
+                return;
+            }
+
+            // Check by properties
+            IsModelDirty = Model.ArtifactsPath != _lastSavedModel.ArtifactsPath
+                           || Model.SqlPackagePath != _lastSavedModel.SqlPackagePath
+                           || Model.PublishProfilePath != _lastSavedModel.PublishProfilePath
+                           || Model.BuildBeforeScriptCreation != _lastSavedModel.BuildBeforeScriptCreation
+                           || Model.CreateDocumentationWithScriptCreation != _lastSavedModel.CreateDocumentationWithScriptCreation
+                           || Model.CommentOutReferencedProjectRefactorings != _lastSavedModel.CommentOutReferencedProjectRefactorings
+                           || Model.CommentOutUnnamedDefaultConstraintDrops != _lastSavedModel.CommentOutUnnamedDefaultConstraintDrops
+                           || Model.ReplaceUnnamedDefaultConstraintDrops != _lastSavedModel.ReplaceUnnamedDefaultConstraintDrops
+                           || Model.VersionPattern != _lastSavedModel.VersionPattern
+                           || Model.CustomHeader != _lastSavedModel.CustomHeader
+                           || Model.CustomFooter != _lastSavedModel.CustomFooter;
         }
 
         public async Task InitializeAsync()
         {
-            Model = await _configurationService.GetConfigurationOrDefaultAsync(_project);
+            _lastSavedModel = await _configurationService.GetConfigurationOrDefaultAsync(_project);
+            Model = _lastSavedModel.Copy();
         }
 
         private void ScriptCreationService_IsCreatingChanged(object sender, EventArgs e)
         {
             SaveConfigurationCommand.RaiseCanExecuteChanged();
+        }
+
+        private void Model_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            CheckIfModelIsDirty();
         }
     }
 }
