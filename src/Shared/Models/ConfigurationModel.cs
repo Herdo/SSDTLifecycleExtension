@@ -360,7 +360,7 @@
                 {
                     var isMajor = i == 0;
                     var isMinor = i == 1;
-                    var isPatch = i == 2;
+                    var isBuild = i == 2;
                     var isRevision = i == 3;
 
                     if (int.TryParse(split[i], out var number))
@@ -371,8 +371,8 @@
                             errors.Add("Major number cannot be negative.");
                         else if (isMinor)
                             errors.Add("Minor number cannot be negative.");
-                        else if (isPatch)
-                            errors.Add("Patch number cannot be negative.");
+                        else if (isBuild)
+                            errors.Add("Build number cannot be negative.");
                         else if (isRevision)
                             errors.Add("Revision number cannot be negative.");
                     }
@@ -382,8 +382,8 @@
                             errors.Add("Invalid special keyword for major number.");
                         else if (isMinor && split[i] != MinorVersionSpecialKeyword)
                             errors.Add("Invalid special keyword for minor number.");
-                        else if (isPatch && split[i] != BuildVersionSpecialKeyword)
-                            errors.Add("Invalid special keyword for patch number.");
+                        else if (isBuild && split[i] != BuildVersionSpecialKeyword)
+                            errors.Add("Invalid special keyword for build number.");
                         else if (isRevision && split[i] != RevisionVersionSpecialKeyword)
                             errors.Add("Invalid special keyword for revision number.");
                     }
