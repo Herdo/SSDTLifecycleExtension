@@ -13,5 +13,9 @@
         Task WriteLineToSSDTLifecycleOutputAsync([NotNull] string message);
 
         void BuildProject([NotNull] Project project);
+
+        Task StartLongRunningTaskIndicatorAsync();
+
+        Task StopLongRunningTaskIndicatorAsync();
     }
 }

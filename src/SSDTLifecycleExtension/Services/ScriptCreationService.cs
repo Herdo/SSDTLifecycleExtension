@@ -228,6 +228,7 @@ namespace SSDTLifecycleExtension.Services
             IsCreating = true;
             try
             {
+                await _visualStudioAccess.StartLongRunningTaskIndicatorAsync();
                 await _visualStudioAccess.ClearSSDTLifecycleOutputAsync();
                 await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync("Initializing script creation ...");
                 var sw = new Stopwatch();
@@ -306,6 +307,15 @@ namespace SSDTLifecycleExtension.Services
             }
             finally
             {
+                try
+                {
+                    await _visualStudioAccess.StopLongRunningTaskIndicatorAsync();
+                }
+                catch
+                {
+                    // ignored
+                }
+
                 IsCreating = false;
             }
         }

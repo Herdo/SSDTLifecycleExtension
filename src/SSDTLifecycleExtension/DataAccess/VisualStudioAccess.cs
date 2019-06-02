@@ -1,7 +1,6 @@
 ﻿namespace SSDTLifecycleExtension.DataAccess
 {
     using System;
-    using System.Linq;
     using Annotations;
     using EnvDTE;
     using EnvDTE80;
@@ -93,6 +92,34 @@
             sb.BuildProject("Release",
                             project.UniqueName,
                             true);
+        }
+
+        async Task IVisualStudioAccess.StartLongRunningTaskIndicatorAsync()
+        {
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+            if (!(await _package.GetServiceAsync(typeof(SVsStatusbar)) is IVsStatusbar statusBar))
+                throw new InvalidOperationException($"Cannot get {nameof(IVsStatusbar)}.");
+
+            // Use the standard Visual Studio icon for building.
+            object icon = (short)Microsoft.VisualStudio.Shell.Interop.Constants.SBAI_Deploy;
+
+            // Display the icon in the Animation region.
+            statusBar.Animation(1, ref icon);
+        }
+
+        async Task IVisualStudioAccess.StopLongRunningTaskIndicatorAsync()
+        {
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+            if (!(await _package.GetServiceAsync(typeof(SVsStatusbar)) is IVsStatusbar statusBar))
+                throw new InvalidOperationException($"Cannot get {nameof(IVsStatusbar)}.");
+
+            // Use the standard Visual Studio icon for building.
+            object icon = (short)Microsoft.VisualStudio.Shell.Interop.Constants.SBAI_Deploy;
+
+            // Stop the animation.
+            statusBar.Animation(0, ref icon);
         }
     }
 }
