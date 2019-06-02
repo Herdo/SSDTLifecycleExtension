@@ -91,7 +91,7 @@
 
             var sb = _dte2.Solution.SolutionBuild;
             sb.BuildProject("Release",
-                            project.FullName,
+                            project.UniqueName,
                             true);
         }
     }
