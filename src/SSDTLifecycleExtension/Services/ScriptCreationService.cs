@@ -195,7 +195,20 @@ namespace SSDTLifecycleExtension.Services
             return false;
         }
 
-        bool IScriptCreationService.IsCreating => _isCreating;
+        public event EventHandler IsCreatingChanged;
+
+        private bool IsCreating
+        {
+            get => _isCreating;
+            set
+            {
+                if (value == _isCreating) return;
+                _isCreating = value;
+                IsCreatingChanged?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        bool IScriptCreationService.IsCreating => IsCreating;
 
         async Task IScriptCreationService.CreateAsync(Project project,
                                                       ConfigurationModel configuration,
@@ -209,10 +222,10 @@ namespace SSDTLifecycleExtension.Services
                 throw new ArgumentNullException(nameof(configuration));
             if (previousVersion == null)
                 throw new ArgumentNullException(nameof(previousVersion));
-            if (_isCreating)
+            if (IsCreating)
                 throw new InvalidOperationException($"Service is already running a {nameof(IScriptCreationService.CreateAsync)} task.");
 
-            _isCreating = true;
+            IsCreating = true;
             try
             {
                 await _visualStudioAccess.ClearSSDTLifecycleOutputAsync();
@@ -293,7 +306,7 @@ namespace SSDTLifecycleExtension.Services
             }
             finally
             {
-                _isCreating = false;
+                IsCreating = false;
             }
         }
 

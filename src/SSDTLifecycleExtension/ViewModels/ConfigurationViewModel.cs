@@ -17,6 +17,7 @@
         private readonly Project _project;
         private readonly IConfigurationService _configurationService;
         private readonly IFileSystemAccess _fileSystemAccess;
+        private readonly IScriptCreationService _scriptCreationService;
 
         private ConfigurationModel _model;
 
@@ -34,15 +35,18 @@
         public ICommand BrowseSqlPackageCommand { get; }
         public ICommand BrowsePublishProfileCommand { get; }
         public ICommand ResetConfigurationToDefaultCommand { get; }
-        public ICommand SaveConfigurationCommand { get; }
+        public DelegateCommand SaveConfigurationCommand { get; }
 
         public ConfigurationViewModel(Project project,
                                       IConfigurationService configurationService,
-                                      IFileSystemAccess fileSystemAccess)
+                                      IFileSystemAccess fileSystemAccess,
+                                      IScriptCreationService scriptCreationService)
         {
             _project = project;
             _configurationService = configurationService;
             _fileSystemAccess = fileSystemAccess;
+            _scriptCreationService = scriptCreationService;
+            _scriptCreationService.IsCreatingChanged += ScriptCreationService_IsCreatingChanged;
 
             BrowseSqlPackageCommand = new DelegateCommand(BrowseSqlPackage_Executed);
             BrowsePublishProfileCommand = new DelegateCommand(BrowsePublishProfile_Executed);
@@ -73,14 +77,13 @@
         {
             Model = ConfigurationModel.GetDefault();
             Model.ValidateAll();
-            if (SaveConfigurationCommand.CanExecute(null))
-                SaveConfigurationCommand.Execute(null);
         }
 
         private bool SaveConfiguration_CanExecute(object obj)
         {
             return Model != null
-                && !Model.HasErrors;
+                && !Model.HasErrors
+                && !_scriptCreationService.IsCreating;
         }
 
         private async void SaveConfiguration_Executed(object obj)
@@ -91,6 +94,11 @@
         public async Task InitializeAsync()
         {
             Model = await _configurationService.GetConfigurationOrDefaultAsync(_project);
+        }
+
+        private void ScriptCreationService_IsCreatingChanged(object sender, EventArgs e)
+        {
+            SaveConfigurationCommand.RaiseCanExecuteChanged();
         }
     }
 }

@@ -9,6 +9,8 @@
 
     public interface IScriptCreationService
     {
+        event EventHandler IsCreatingChanged;
+
         /// <summary>
         /// Gets whether a <see cref="CreateAsync"/>-<see cref="Task"/> is currently running.
         /// </summary>
