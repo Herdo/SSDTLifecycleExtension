@@ -141,15 +141,31 @@
             await p.WaitForExitAsync(cancellationToken);
         }
 
-        void IFileSystemAccess.CopyFiles(string sourceDirectory,
-                                         string targetDirectory,
-                                         string searchPattern)
+        string IFileSystemAccess.CopyFiles(string sourceDirectory,
+                                           string targetDirectory,
+                                           string searchPattern)
         {
-            var sourceFiles = Directory.GetFiles(sourceDirectory, searchPattern, SearchOption.TopDirectoryOnly);
-            foreach (var sourceFile in sourceFiles)
+            if (string.IsNullOrWhiteSpace(sourceDirectory))
+                throw new ArgumentException("Value cannot be null or white space.", nameof(sourceDirectory));
+            if (string.IsNullOrWhiteSpace(targetDirectory))
+                throw new ArgumentException("Value cannot be null or white space.", nameof(targetDirectory));
+            if (string.IsNullOrWhiteSpace(searchPattern))
+                throw new ArgumentException("Value cannot be null or white space.", nameof(searchPattern));
+
+            try
             {
-                var fi = new FileInfo(sourceFile);
-                fi.CopyTo(Path.Combine(targetDirectory, fi.Name), true);
+                var sourceFiles = Directory.GetFiles(sourceDirectory, searchPattern, SearchOption.TopDirectoryOnly);
+                foreach (var sourceFile in sourceFiles)
+                {
+                    var fi = new FileInfo(sourceFile);
+                    fi.CopyTo(Path.Combine(targetDirectory, fi.Name), true);
+                }
+
+                return null;
+            }
+            catch (Exception e)
+            {
+                return e.Message;
             }
         }
     }

@@ -29,8 +29,8 @@
                                       [CanBeNull] Func<string, Task> errorDataHandler,
                                       CancellationToken cancellationToken);
 
-        void CopyFiles(string sourceDirectory,
-                       string targetDirectory,
-                       string searchPattern);
+        string CopyFiles([NotNull] string sourceDirectory,
+                         [NotNull] string targetDirectory,
+                         [NotNull] string searchPattern);
     }
 }
