@@ -138,17 +138,17 @@ namespace SSDTLifecycleExtension.Services
         {
             await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync("Copying files to target directory ...");
             var directoryCreationError = _fileSystemAccess.EnsureDirectoryExists(variables.SourceDirectory);
-            if (directoryCreationError == null)
+            if (directoryCreationError != null)
             {
-                var copyFilesError = _fileSystemAccess.CopyFiles(variables.BinaryDirectory, variables.SourceDirectory, "*.dacpac");
-                if (copyFilesError == null)
-                    return true;
-
-                await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync($"ERROR: Failed to copy files to the target directory: {copyFilesError}");
+                await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync("ERROR: Failed to ensure the target directory exists.");
                 return false;
             }
 
-            await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync("ERROR: Failed to ensure the target directory exists.");
+            var copyFilesError = _fileSystemAccess.CopyFiles(variables.BinaryDirectory, variables.SourceDirectory, "*.dacpac");
+            if (copyFilesError == null)
+                return true;
+
+            await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync($"ERROR: Failed to copy files to the target directory: {copyFilesError}");
             return false;
         }
 
