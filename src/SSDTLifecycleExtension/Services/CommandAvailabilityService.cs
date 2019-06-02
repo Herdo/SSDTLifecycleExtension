@@ -10,10 +10,13 @@ namespace SSDTLifecycleExtension.Services
     public class CommandAvailabilityService : ICommandAvailabilityService
     {
         private readonly IVisualStudioAccess _visualStudioAccess;
+        private readonly IScriptCreationService _scriptCreationService;
 
-        public CommandAvailabilityService(IVisualStudioAccess visualStudioAccess)
+        public CommandAvailabilityService(IVisualStudioAccess visualStudioAccess,
+                                          IScriptCreationService scriptCreationService)
         {
             _visualStudioAccess = visualStudioAccess;
+            _scriptCreationService = scriptCreationService;
         }
 
         void ICommandAvailabilityService.HandleCommandAvailability(object sender,
@@ -29,6 +32,7 @@ namespace SSDTLifecycleExtension.Services
                 return;
 
             command.Visible = project.Kind == $"{{{Constants.SqlProjectKindGuid}}}";
+            command.Enabled = !_scriptCreationService.IsCreating;
         }
     }
 }
