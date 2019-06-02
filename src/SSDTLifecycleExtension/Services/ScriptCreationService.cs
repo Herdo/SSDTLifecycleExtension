@@ -258,6 +258,9 @@ namespace SSDTLifecycleExtension.Services
                     return;
 
                 var success = await CreateScriptAsync(variables, sqlPackagePath, cancellationToken);
+                // Wait 1 second after creating the script to get any messages from the standard output before continuing with the script creation.
+                await Task.Delay(1000, cancellationToken);
+
                 if (!success)
                 {
                     sw.Stop();
@@ -275,7 +278,7 @@ namespace SSDTLifecycleExtension.Services
                 // No check for the cancellation token after the last action.
                 // Completion
                 sw.Stop();
-                await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync($"Script creation finished after {sw.ElapsedMilliseconds / 1000} seconds.");
+                await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync($"========== Script creation finished after {sw.ElapsedMilliseconds / 1000} seconds. ==========");
             }
             catch (Exception e)
             {
