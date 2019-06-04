@@ -392,6 +392,7 @@
             else
             {
                 var split = value.Split(new []{'.'}, StringSplitOptions.None);
+                if (split.Length < 2) errors.Add("Pattern doesn't contain enough parts.");
                 if (split.Length > 4) errors.Add("Pattern contains too many parts.");
                 for (var i = 0; i < split.Length; i++)
                 {

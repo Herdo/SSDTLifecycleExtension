@@ -17,6 +17,9 @@
                 throw new ArgumentNullException(nameof(versionConfiguration));
 
             var pattern = versionConfiguration.VersionPattern.Split(new[] {'.'}, StringSplitOptions.RemoveEmptyEntries);
+            if (pattern.Length < 2)
+                throw new InvalidOperationException("Version pattern is not long enough. Pattern must at least contain a major and minor number.");
+
             var final = new StringBuilder();
 
             for (var i = 0; i < pattern.Length; i++)

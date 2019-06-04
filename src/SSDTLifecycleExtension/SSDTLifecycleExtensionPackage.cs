@@ -12,6 +12,7 @@
     using Microsoft.VisualStudio;
     using Microsoft.VisualStudio.Shell;
     using Services;
+    using Shared.ScriptModifiers;
     using Unity;
     using Unity.Lifetime;
     using Unity.Resolution;
@@ -79,7 +80,10 @@
                 
                 // Data Access
                .RegisterSingleton<IFileSystemAccess, FileSystemAccess>()
-               .RegisterInstance<IVisualStudioAccess>(new VisualStudioAccess(_dte2, this), new ContainerControlledLifetimeManager());
+               .RegisterInstance<IVisualStudioAccess>(new VisualStudioAccess(_dte2, this), new ContainerControlledLifetimeManager())
+                
+                // Factories
+               .RegisterSingleton<IScriptModifierFactory, ScriptModifierFactory>();
 
             return container;
         }

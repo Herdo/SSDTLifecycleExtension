@@ -5,6 +5,7 @@ using SSDTLifecycleExtension.Shared.Models;
 
 namespace SSDTLifecycleExtension.Services
 {
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
@@ -12,12 +13,15 @@ namespace SSDTLifecycleExtension.Services
     using System.Threading;
     using Annotations;
     using DataAccess;
+    using Shared.ScriptModifiers;
+    using Shared.Variables;
 
     [UsedImplicitly]
     public class ScriptCreationService : IScriptCreationService
     {
         private readonly IVersionService _versionService;
         private readonly ISqlProjectService _sqlProjectService;
+        private readonly IScriptModifierFactory _scriptModifierFactory;
         private readonly IVisualStudioAccess _visualStudioAccess;
         private readonly IFileSystemAccess _fileSystemAccess;
 
@@ -25,11 +29,13 @@ namespace SSDTLifecycleExtension.Services
 
         public ScriptCreationService(IVersionService versionService,
                                      ISqlProjectService sqlProjectService,
+                                     IScriptModifierFactory scriptModifierFactory,
                                      IVisualStudioAccess visualStudioAccess,
                                      IFileSystemAccess fileSystemAccess)
         {
             _versionService = versionService;
             _sqlProjectService = sqlProjectService;
+            _scriptModifierFactory = scriptModifierFactory;
             _visualStudioAccess = visualStudioAccess;
             _fileSystemAccess = fileSystemAccess;
         }
@@ -61,6 +67,10 @@ namespace SSDTLifecycleExtension.Services
             var createLatest = newVersion == null;
             var previousVersionString = _versionService.DetermineFinalVersion(previousVersion, configuration);
             var newVersionString = createLatest ? "latest" : _versionService.DetermineFinalVersion(newVersion, configuration);
+            var finalPreviousVersion = Version.Parse(previousVersionString);
+            var finalNewVersion = createLatest
+                                      ? new Version(finalPreviousVersion.Major + 1, int.MaxValue, int.MaxValue, int.MaxValue)
+                                      : Version.Parse(newVersionString);
 
             // DACPAC paths
             var profilePath = Path.Combine(projectDirectory, configuration.PublishProfilePath);
@@ -74,14 +84,17 @@ namespace SSDTLifecycleExtension.Services
                 ? Path.Combine(newVersionDirectory, $"{pi.SqlTargetName}_{previousVersionString}_{newVersionString}.xml")
                 : null;
 
-            return new ScriptCreationVariables(projectPath,
+            return new ScriptCreationVariables(pi.SqlTargetName,
+                                               projectPath,
                                                binaryDirectory,
                                                profilePath,
                                                newVersionDirectory,
                                                newVersionPath,
                                                previousVersionPath,
                                                outputPath,
-                                               documentationPath);
+                                               documentationPath,
+                                               finalPreviousVersion,
+                                               finalNewVersion);
         }
 
         private async Task<string> DetermineSqlPackagePathAsync(ConfigurationModel configuration)
@@ -195,6 +208,50 @@ namespace SSDTLifecycleExtension.Services
             return false;
         }
 
+        private async Task<bool> ModifyCreatedScriptAsync(ConfigurationModel configuration,
+                                                          ScriptCreationVariables variables,
+                                                          CancellationToken cancellationToken)
+        {
+            var modifiers = GetScriptModifiers(configuration);
+            if (!modifiers.Any())
+                return true;
+
+            var scriptContent = await _fileSystemAccess.ReadFileAsync(variables.DeployScriptPath);
+
+            foreach (var m in modifiers.OrderBy(m => m.Key))
+            {
+                await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync($"Modifying script: {m.Key}");
+
+                scriptContent = m.Value.Modify(scriptContent,
+                                               configuration,
+                                               variables);
+
+                // Cancel if requested
+                if (await ShouldCancelAsync(cancellationToken))
+                    return false;
+            }
+
+            await _fileSystemAccess.WriteFileAsync(variables.DeployScriptPath, scriptContent);
+
+            return true;
+        }
+
+        private IReadOnlyDictionary<ScriptModifier, IScriptModifier> GetScriptModifiers(ConfigurationModel configuration)
+        {
+            var result = new Dictionary<ScriptModifier, IScriptModifier>();
+
+            if (!string.IsNullOrWhiteSpace(configuration.CustomHeader))
+                result[ScriptModifier.AddCustomHeader] = _scriptModifierFactory.CreateScriptModifier(ScriptModifier.AddCustomHeader);
+
+            if (!string.IsNullOrWhiteSpace(configuration.CustomFooter))
+                result[ScriptModifier.AddCustomFooter] = _scriptModifierFactory.CreateScriptModifier(ScriptModifier.AddCustomFooter);
+
+            if (configuration.TrackDacpacVersion)
+                result[ScriptModifier.TrackDacpacVersion] = _scriptModifierFactory.CreateScriptModifier(ScriptModifier.TrackDacpacVersion);
+
+            return result;
+        }
+
         public event EventHandler IsCreatingChanged;
 
         private bool IsCreating
@@ -287,7 +344,8 @@ namespace SSDTLifecycleExtension.Services
                     return;
 
                 // Modify the script
-
+                if (!await ModifyCreatedScriptAsync(configuration, variables, cancellationToken))
+                    return;
 
                 // No check for the cancellation token after the last action.
                 // Completion
@@ -317,39 +375,6 @@ namespace SSDTLifecycleExtension.Services
                 }
 
                 IsCreating = false;
-            }
-        }
-
-        private struct ScriptCreationVariables
-        {
-            public string ProjectPath { get; }
-            public string BinaryDirectory { get; }
-            public string ProfilePath { get; }
-            public string SourceDirectory { get; }
-            public string SourceFile { get; }
-            public string TargetFile { get; }
-            public string DeployScriptPath { get; }
-            public string DeployReportPath { get; }
-            public bool CreateDocumentation { get; }
-
-            public ScriptCreationVariables(string projectPath,
-                                           string binaryDirectory,
-                                           string profilePath,
-                                           string sourceDirectory,
-                                           string sourceFile,
-                                           string targetFile,
-                                           string deployScriptPath,
-                                           string deployReportPath)
-            {
-                ProjectPath = projectPath;
-                BinaryDirectory = binaryDirectory;
-                ProfilePath = profilePath;
-                SourceDirectory = sourceDirectory;
-                SourceFile = sourceFile;
-                TargetFile = targetFile;
-                DeployScriptPath = deployScriptPath;
-                DeployReportPath = deployReportPath;
-                CreateDocumentation = deployReportPath != null;
             }
         }
     }
