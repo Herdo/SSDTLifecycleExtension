@@ -40,8 +40,7 @@ INSERT INTO [dbo].[__DacpacVersion]
 			NULLIF({4}, -1),
 			SYSDATETIME()
 		);
-GO
-";
+GO";
 
         private const string _UPDATE_SCRIPT_TEMPLATE =
 @"
@@ -55,8 +54,7 @@ UPDATE [dv]
    AND [dv].[Minor] = {2}
    AND ISNULL([dv].[Build], -1) = {3}
    AND ISNULL([dv].[Revision], -1) = {4};
-GO
-";
+GO";
 
         string IScriptModifier.Modify(string input,
                                       ConfigurationModel configuration,
@@ -96,7 +94,6 @@ GO
 
             // Update existing entry
             sb.AppendLine(update);
-            sb.AppendLine();
 
             return sb.ToString();
         }
