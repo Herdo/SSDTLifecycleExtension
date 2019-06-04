@@ -22,6 +22,7 @@
         private bool _commentOutUnnamedDefaultConstraintDrops;
         private bool _replaceUnnamedDefaultConstraintDrops;
         private string _versionPattern;
+        private bool _trackDacpacVersion;
         private string _customHeader;
         private string _customFooter;
 
@@ -162,6 +163,20 @@
         }
 
         /// <summary>
+        /// Gets or sets whether the DACPAC version should be tracked in the [dbo].[__DacpacVersion] table.
+        /// </summary>
+        public bool TrackDacpacVersion
+        {
+            get => _trackDacpacVersion;
+            set
+            {
+                if (value == _trackDacpacVersion) return;
+                _trackDacpacVersion = value;
+                OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
         /// Gets or sets a custom header, that will be added at the beginning of the created script.
         /// </summary>
         public string CustomHeader
@@ -205,6 +220,7 @@
                 CommentOutUnnamedDefaultConstraintDrops = false,
                 ReplaceUnnamedDefaultConstraintDrops = false,
                 VersionPattern = "{MAJOR}.{MINOR}.{BUILD}",
+                TrackDacpacVersion = false,
                 CustomHeader = null,
                 CustomFooter = null
             };
@@ -232,6 +248,7 @@
                 CommentOutUnnamedDefaultConstraintDrops = CommentOutUnnamedDefaultConstraintDrops,
                 ReplaceUnnamedDefaultConstraintDrops = ReplaceUnnamedDefaultConstraintDrops,
                 VersionPattern = VersionPattern,
+                TrackDacpacVersion = TrackDacpacVersion,
                 CustomHeader = CustomHeader,
                 CustomFooter = CustomFooter
             };

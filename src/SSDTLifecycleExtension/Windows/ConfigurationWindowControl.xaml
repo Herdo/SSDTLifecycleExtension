@@ -472,6 +472,7 @@
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
@@ -511,6 +512,36 @@
                                      Grid.Column="1"
                                      Style="{StaticResource DefaultTextTextBoxStyle}"
                                      Text="{Binding Model.VersionPattern, Mode=TwoWay}"/>
+
+                            <!-- Track DACPAC version -->
+                            <TextBlock Grid.Row="1"
+                                       Grid.Column="0"
+                                       Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
+                                <Run Text="Track DACPAC version"
+                                     FontWeight="Bold"/>
+                                <LineBreak/>
+                                <Run Text="Tracks the version of this DACPAC in a"
+                                     FontStyle="Italic"/>
+                                <LineBreak/>
+                                <Run Text="central table inside the database itself."
+                                     FontStyle="Italic"/>
+                                <LineBreak/>
+                                <Run Text="This will create the table"
+                                     FontStyle="Italic"/>
+                                <LineBreak/>
+                                <Run Text="[dbo].[__DacpacVersion]"
+                                     FontStyle="Italic"
+                                     Foreground="Navy"/>
+                                <Run Text="if it doesn't exist,"
+                                     FontStyle="Italic"/>
+                                <LineBreak/>
+                                <Run Text="and insert the version number when deploying."
+                                     FontStyle="Italic"/>
+                            </TextBlock>
+                            <CheckBox Grid.Row="1"
+                                      Grid.Column="1"
+                                      Style="{StaticResource ConfigurationCheckBoxStyle}"
+                                      IsChecked="{Binding Model.TrackDacpacVersion, Mode=TwoWay}"/>
                         </Grid>
                     </GroupBox>
                     <!-- Custom Texts -->

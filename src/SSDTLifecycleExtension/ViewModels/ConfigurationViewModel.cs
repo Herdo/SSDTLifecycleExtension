@@ -138,6 +138,7 @@
                            || Model.CommentOutUnnamedDefaultConstraintDrops != _lastSavedModel.CommentOutUnnamedDefaultConstraintDrops
                            || Model.ReplaceUnnamedDefaultConstraintDrops != _lastSavedModel.ReplaceUnnamedDefaultConstraintDrops
                            || Model.VersionPattern != _lastSavedModel.VersionPattern
+                           || Model.TrackDacpacVersion != _lastSavedModel.TrackDacpacVersion
                            || Model.CustomHeader != _lastSavedModel.CustomHeader
                            || Model.CustomFooter != _lastSavedModel.CustomFooter;
         }
