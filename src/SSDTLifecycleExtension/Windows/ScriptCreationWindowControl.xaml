@@ -6,6 +6,8 @@
              xmlns:vsshell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0"
              xmlns:viewModels="clr-namespace:SSDTLifecycleExtension.ViewModels"
              xmlns:converters="clr-namespace:SSDTLifecycleExtension.Converters"
+             xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
+             xmlns:catalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"
              Background="{DynamicResource {x:Static vsshell:VsBrushes.WindowKey}}"
              Foreground="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey}}"
              mc:Ignorable="d"
@@ -22,14 +24,135 @@
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="BorderBrush" Value="Black"/>
         </Style>
+        <Style TargetType="Separator" x:Key="VerticalSeparatorStyle">
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="Width" Value="2"/>
+            <Setter Property="Background" Value="Black"/>
+        </Style>
+        <Style TargetType="TextBlock" x:Key="HeaderTextBlockStyle">
+            <Setter Property="FontSize" Value="14pt"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="TextDecorations" Value="Underline"/>
+            <Setter Property="Margin" Value="0,0,0,5"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+        </Style>
+        <Style TargetType="TextBlock" x:Key="DescriptionTextBlockStyle">
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="TextAlignment" Value="Center"/>
+            <Setter Property="FontStyle" Value="Italic"/>
+        </Style>
+        <Style TargetType="imaging:CrispImage" x:Key="ScaffoldingCrispImageStyle">
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Width" Value="32"/>
+            <Setter Property="Margin" Value="0,15"/>
+        </Style>
+        <Style TargetType="Button" x:Key="ActionButtonStyle">
+            <Setter Property="Margin" Value="0,15"/>
+            <Setter Property="Padding" Value="10, 5"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        </Style>
     </UserControl.Resources>
 
     <Grid>
+        <!-- Scaffolding -->
         <GroupBox Header="Scaffolding"
                   Style="{StaticResource CenteredGroupBoxStyle}"
                   Visibility="{Binding Scaffolding, Converter={StaticResource BoolToVisibilityConverter}}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="15"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="300"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="300"/>
+                </Grid.ColumnDefinitions>
 
+                <!-- Introduction -->
+                <TextBlock Grid.Row="0"
+                           Grid.Column="0"
+                           Grid.ColumnSpan="3"
+                           Style="{StaticResource DescriptionTextBlockStyle}">
+                    <Run Text="There's currently no base version that can be used to create a deployment script."/>
+                    <LineBreak/>
+                    <Run Text="Please scaffold a base version using the options below."/>
+                </TextBlock>
+
+                <!-- Scaffold development -->
+                <StackPanel Grid.Row="2"
+                            Grid.Column="0"
+                            HorizontalAlignment="Center">
+                    <TextBlock Text="Development Version"
+                               Style="{StaticResource HeaderTextBlockStyle}"/>
+                    <imaging:CrispImage Style="{StaticResource ScaffoldingCrispImageStyle}"
+                                        Moniker="{x:Static catalog:KnownMonikers.DatabaseScript}"/>
+                    <TextBlock Style="{StaticResource DescriptionTextBlockStyle}">
+                        <Run Text="The current database project is"/>
+                        <Run Text="empty"
+                             FontWeight="Bold"/>
+                        <Run Text="."/>
+                        <LineBreak/>
+                        <Run Text="Scaffolding will create an empty version"/>
+                        <Run Text="0.0.0.0"
+                             FontWeight="Bold"/>
+                        <LineBreak/>
+                        <Run Text="based on the defined version pattern."/>
+                        <LineBreak/>
+                        <LineBreak/>
+                        <Run Text="Use this scaffolding option if you're"/>
+                        <LineBreak/>
+                        <Run Text="starting with a"/>
+                        <Run Text="blank database project"
+                             FontWeight="Bold"/><Run Text="."/>
+                    </TextBlock>
+                    <Button Style="{StaticResource ActionButtonStyle}"
+                            Content="Scaffold Version 0.0.0.0"/>
+                </StackPanel>
+
+                <!-- Separator -->
+                <GridSplitter Grid.Row="2"
+                              Grid.Column="1"
+                              Background="Black"
+                              Width="1"
+                              IsEnabled="False"/>
+
+                <!-- Scaffold as current production -->
+                <StackPanel Grid.Row="2"
+                            Grid.Column="2"
+                            HorizontalAlignment="Center">
+                    <TextBlock Text="Current Production Version"
+                               Style="{StaticResource HeaderTextBlockStyle}"/>
+                    <imaging:CrispImage Style="{StaticResource ScaffoldingCrispImageStyle}"
+                                        Moniker="{x:Static catalog:KnownMonikers.DatabaseRunning}"/>
+                    <TextBlock Style="{StaticResource DescriptionTextBlockStyle}">
+                        <Run Text="The current database project is"/>
+                        <Run Text="not empty"
+                             FontWeight="Bold"/>
+                        <Run Text="."/>
+                        <LineBreak/>
+                        <Run Text="Scaffolding will create a filled version"/>
+                        <Run Text="1.0.0.0"
+                             FontWeight="Bold"/>
+                        <LineBreak/>
+                        <Run Text="based on the defined version pattern."/>
+                        <LineBreak/>
+                        <LineBreak/>
+                        <Run Text="Use this scaffolding option if you're"/>
+                        <LineBreak/>
+                        <Run Text="starting with a"/>
+                        <Run Text="filled database project"
+                             FontWeight="Bold"/><Run Text="."/>
+                    </TextBlock>
+                    <Button Style="{StaticResource ActionButtonStyle}"
+                            Content="Scaffold Version 1.0.0.0"/>
+                </StackPanel>
+            </Grid>
         </GroupBox>
+
+        <!-- Creation -->
         <GroupBox Header="Creation"
                   Style="{StaticResource CenteredGroupBoxStyle}"
                   Visibility="{Binding Scaffolding, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=invert}">
