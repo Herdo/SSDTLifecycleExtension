@@ -32,5 +32,7 @@
         string CopyFiles([NotNull] string sourceDirectory,
                          [NotNull] string targetDirectory,
                          [NotNull] string searchPattern);
+
+        string[] GetDirectoriesIn([NotNull] string directory);
     }
 }

@@ -188,5 +188,10 @@
                 return e.Message;
             }
         }
+
+        string[] IFileSystemAccess.GetDirectoriesIn(string directory)
+        {
+            return Directory.GetDirectories(directory, "*", SearchOption.TopDirectoryOnly);
+        }
     }
 }
