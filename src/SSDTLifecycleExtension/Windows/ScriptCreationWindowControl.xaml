@@ -15,19 +15,24 @@
 
     <UserControl.Resources>
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <Style TargetType="GroupBox" x:Key="CenteredGroupBoxStyle">
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="BorderBrush" Value="Black"/>
+        </Style>
     </UserControl.Resources>
 
     <Grid>
         <GroupBox Header="Scaffolding"
-                  Visibility="{Binding Scaffolding, Converter={StaticResource BoolToVisibilityConverter}}"
-                  HorizontalAlignment="Stretch"
-                  VerticalAlignment="Stretch">
+                  Style="{StaticResource CenteredGroupBoxStyle}"
+                  Visibility="{Binding Scaffolding, Converter={StaticResource BoolToVisibilityConverter}}">
 
         </GroupBox>
         <GroupBox Header="Creation"
-                  Visibility="{Binding Scaffolding, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=invert}"
-                  HorizontalAlignment="Stretch"
-                  VerticalAlignment="Stretch">
+                  Style="{StaticResource CenteredGroupBoxStyle}"
+                  Visibility="{Binding Scaffolding, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=invert}">
             <Button Content="Start creation"
                     Command="{Binding StartCreationCommand, Mode=OneWay}"
                     HorizontalAlignment="Center"
