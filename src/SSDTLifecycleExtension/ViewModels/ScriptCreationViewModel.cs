@@ -21,6 +21,7 @@
         private readonly Project _project;
         private readonly IConfigurationService _configurationService;
         private readonly IScriptCreationService _scriptCreationService;
+        private readonly IVisualStudioAccess _visualStudioAccess;
         private readonly IFileSystemAccess _fileSystemAccess;
 
         private ConfigurationModel _configuration;
@@ -46,11 +47,13 @@
         public ScriptCreationViewModel(Project project,
                                        IConfigurationService configurationService,
                                        IScriptCreationService scriptCreationService,
+                                       IVisualStudioAccess visualStudioAccess,
                                        IFileSystemAccess fileSystemAccess)
         {
             _project = project;
             _configurationService = configurationService;
             _scriptCreationService = scriptCreationService;
+            _visualStudioAccess = visualStudioAccess;
             _fileSystemAccess = fileSystemAccess;
 
             ExistingVersions = new ObservableCollection<string>();
@@ -70,7 +73,11 @@
             StartCreationCommand.RaiseCanExecuteChanged();
         }
 
-        public async Task InitializeAsync()
+        /// <summary>
+        /// Initializes the view model.
+        /// </summary>
+        /// <returns><b>True</b>, if the initialization was successful, otherwise <b>false</b>.</returns>
+        public async Task<bool> InitializeAsync()
         {
             _configuration = await _configurationService.GetConfigurationOrDefaultAsync(_project);
 
@@ -78,9 +85,21 @@
             var projectPath = _project.FullName;
             var projectDirectory = Path.GetDirectoryName(projectPath);
             if (projectDirectory == null)
-                return;
+            {
+                _visualStudioAccess.ShowModalError($"ERROR: Cannot determine project directory.");
+                return false;
+            }
             var artifactsPath = Path.Combine(projectDirectory, _configuration.ArtifactsPath);
-            var artifactDirectories = _fileSystemAccess.GetDirectoriesIn(artifactsPath);
+            string[] artifactDirectories;
+            try
+            {
+                artifactDirectories = _fileSystemAccess.GetDirectoriesIn(artifactsPath);
+            }
+            catch (Exception e)
+            {
+                _visualStudioAccess.ShowModalError($"ERROR: Failed to open script creation window: {e.Message}");
+                return false;
+            }
             var existingVersions = new List<Version>();
             foreach (var artifactDirectory in artifactDirectories)
             {
@@ -96,6 +115,7 @@
 
             // Evaluate commands
             StartCreationCommand.RaiseCanExecuteChanged();
+            return true;
         }
 
         private async void ConfigurationService_ConfigurationChanged(object sender, ProjectConfigurationChangedEventArgs e)

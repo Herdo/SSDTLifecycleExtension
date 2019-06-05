@@ -191,7 +191,12 @@
 
         string[] IFileSystemAccess.GetDirectoriesIn(string directory)
         {
-            return Directory.GetDirectories(directory, "*", SearchOption.TopDirectoryOnly);
+            if (directory == null)
+                throw new ArgumentNullException(nameof(directory));
+
+            return Directory.Exists(directory)
+                       ? Directory.GetDirectories(directory, "*", SearchOption.TopDirectoryOnly)
+                       : new string[0];
         }
     }
 }

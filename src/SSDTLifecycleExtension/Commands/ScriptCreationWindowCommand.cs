@@ -76,13 +76,18 @@
                 // Set caption
                 var project = _visualStudioAccess.GetSelectedProject();
                 if (project?.Name != null) window.SetCaption(project.Name);
+                var initialized = false;
                 // Set data context
                 if (window.Content is IView windowContent)
                 {
                     var viewModel = _package.GetViewModel<ScriptCreationViewModel>(project);
-                    await viewModel.InitializeAsync();
+                    initialized = await viewModel.InitializeAsync();
                     windowContent.SetDataContext(viewModel);
                 }
+
+                if (!initialized)
+                    return;
+
                 // Show the frame
                 var windowFrame = (IVsWindowFrame)window.Frame;
                 Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());

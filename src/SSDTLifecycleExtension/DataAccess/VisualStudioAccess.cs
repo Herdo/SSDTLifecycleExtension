@@ -1,6 +1,7 @@
 ﻿namespace SSDTLifecycleExtension.DataAccess
 {
     using System;
+    using System.Windows;
     using Annotations;
     using EnvDTE;
     using EnvDTE80;
@@ -79,6 +80,13 @@
             var outputPane = await GetOrCreateSSDTOutputPaneAsync();
             outputPane.OutputString(message);
             outputPane.OutputString(Environment.NewLine);
+        }
+
+        void IVisualStudioAccess.ShowModalError(string error)
+        {
+            if (error == null)
+                throw new ArgumentNullException(nameof(error));
+            MessageBox.Show(error, "SSDT Lifecycle error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
         }
 
         void IVisualStudioAccess.BuildProject(Project project)
