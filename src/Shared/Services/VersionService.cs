@@ -1,10 +1,9 @@
-﻿namespace SSDTLifecycleExtension.Services
+﻿namespace SSDTLifecycleExtension.Shared.Services
 {
     using System;
     using System.Text;
-    using Annotations;
-    using Shared.Contracts.Services;
-    using Shared.Models;
+    using Contracts.Services;
+    using Models;
 
     [UsedImplicitly]
     public class VersionService : IVersionService

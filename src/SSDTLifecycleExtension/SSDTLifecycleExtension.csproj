@@ -51,11 +51,6 @@
     <Compile Include="DataAccess\VisualStudioAccess.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\CommandAvailabilityService.cs" />
-    <Compile Include="Services\ConfigurationService.cs" />
-    <Compile Include="Services\ScriptCreationService.cs" />
-    <Compile Include="Services\SqlProjectService.cs" />
-    <Compile Include="Services\VersionService.cs" />
     <Compile Include="SSDTLifecycleExtensionPackage.cs" />
     <Compile Include="ViewModels\ConfigurationViewModel.cs" />
     <Compile Include="ViewModels\IViewModel.cs" />

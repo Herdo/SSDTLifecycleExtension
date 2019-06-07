@@ -11,12 +11,12 @@
     using EnvDTE80;
     using Microsoft.VisualStudio;
     using Microsoft.VisualStudio.Shell;
-    using Services;
     using Shared.Contracts;
     using Shared.Contracts.DataAccess;
     using Shared.Contracts.Factories;
     using Shared.Contracts.Services;
     using Shared.ScriptModifiers;
+    using Shared.Services;
     using Unity;
     using Unity.Lifetime;
     using Unity.Resolution;

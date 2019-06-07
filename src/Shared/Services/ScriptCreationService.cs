@@ -1,21 +1,19 @@
-﻿using System;
-using System.Threading.Tasks;
-using SSDTLifecycleExtension.Shared.Models;
-
-namespace SSDTLifecycleExtension.Services
+﻿namespace SSDTLifecycleExtension.Shared.Services
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Text;
     using System.Threading;
-    using Annotations;
-    using Shared.Contracts;
-    using Shared.Contracts.DataAccess;
-    using Shared.Contracts.Enums;
-    using Shared.Contracts.Factories;
-    using Shared.Contracts.Services;
+    using System.Threading.Tasks;
+    using Contracts;
+    using Contracts.DataAccess;
+    using Contracts.Enums;
+    using Contracts.Factories;
+    using Contracts.Services;
+    using Models;
 
     [UsedImplicitly]
     public class ScriptCreationService : IScriptCreationService

@@ -5,7 +5,6 @@
     using System.Windows.Input;
     using Annotations;
     using Microsoft.VisualStudio.PlatformUI;
-    using Services;
     using Shared.Contracts;
     using Shared.Contracts.DataAccess;
     using Shared.Contracts.Services;

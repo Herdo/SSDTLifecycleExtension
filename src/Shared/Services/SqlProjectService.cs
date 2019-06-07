@@ -1,12 +1,11 @@
-﻿namespace SSDTLifecycleExtension.Services
+﻿namespace SSDTLifecycleExtension.Shared.Services
 {
     using System;
     using System.Linq;
     using System.Threading.Tasks;
     using System.Xml.Linq;
-    using Annotations;
-    using Shared.Contracts.DataAccess;
-    using Shared.Contracts.Services;
+    using Contracts.DataAccess;
+    using Contracts.Services;
 
     [UsedImplicitly]
     public class SqlProjectService : ISqlProjectService

@@ -1,15 +1,14 @@
-﻿namespace SSDTLifecycleExtension.Services
+﻿namespace SSDTLifecycleExtension.Shared.Services
 {
     using System;
     using System.IO;
     using System.Threading.Tasks;
-    using Annotations;
+    using Contracts;
+    using Contracts.DataAccess;
+    using Contracts.Services;
+    using Events;
+    using Models;
     using Newtonsoft.Json;
-    using Shared.Contracts;
-    using Shared.Contracts.DataAccess;
-    using Shared.Contracts.Services;
-    using Shared.Events;
-    using Shared.Models;
     using Task = System.Threading.Tasks.Task;
 
     [UsedImplicitly]

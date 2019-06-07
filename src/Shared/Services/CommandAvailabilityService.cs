@@ -1,10 +1,9 @@
-﻿using System;
-
-namespace SSDTLifecycleExtension.Services
+﻿namespace SSDTLifecycleExtension.Shared.Services
 {
-    using Annotations;
-    using Shared.Contracts.DataAccess;
-    using Shared.Contracts.Services;
+    using System;
+    using Contracts.DataAccess;
+    using Contracts.Services;
+    using Shared;
 
     [UsedImplicitly]
     public class CommandAvailabilityService : ICommandAvailabilityService
