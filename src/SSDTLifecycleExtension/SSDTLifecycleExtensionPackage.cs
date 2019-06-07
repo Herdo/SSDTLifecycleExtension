@@ -56,8 +56,6 @@
 
         private async Task<IUnityContainer> BuildUnityContainerAsync(CancellationToken cancellationToken)
         {
-            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
-
             if (!(await GetServiceAsync(typeof(IMenuCommandService)) is OleMenuCommandService commandService))
                 throw new InvalidOperationException($"Cannot initialize {nameof(SSDTLifecycleExtensionPackage)} without the {nameof(OleMenuCommandService)}.");
 
@@ -129,7 +127,6 @@
         {
             if (project == null)
                 throw new ArgumentNullException(nameof(project));
-            ThreadHelper.ThrowIfNotOnUIThread();
 
             // Check for an existing view model registered with the project.
             if (_container.IsRegistered(typeof(TViewModel), project.UniqueName))

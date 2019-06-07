@@ -22,8 +22,6 @@ namespace SSDTLifecycleExtension.Services
         void ICommandAvailabilityService.HandleCommandAvailability(object sender,
                                                                    EventArgs e)
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
             if (!(sender is OleMenuCommand command))
                 return;
 

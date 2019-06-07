@@ -27,7 +27,6 @@
 
         private static string GetConfigurationPath(SqlProject project)
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
             var directory = Path.GetDirectoryName(project.FullName);
             return Path.Combine(directory ?? throw new InvalidOperationException("Cannot find configuration file. Directory is <null>."), "Properties", "ssdtlifecycle.json");
         }
@@ -38,9 +37,7 @@
         {
             if (project == null)
                 throw new ArgumentNullException(nameof(project));
-
-            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-
+            
             var sourcePath = GetConfigurationPath(project);
             var serialized = await _fileSystemAccess.ReadFileAsync(sourcePath);
             var deserialized = serialized == null
@@ -57,8 +54,6 @@
                 throw new ArgumentNullException(nameof(project));
             if (model == null)
                 throw new ArgumentNullException(nameof(model));
-
-            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
             var targetPath = GetConfigurationPath(project);
             var serialized = JsonConvert.SerializeObject(model, Formatting.Indented);

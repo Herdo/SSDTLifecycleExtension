@@ -80,7 +80,6 @@
 
         private void BrowsePublishProfile_Executed(object obj)
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
             var browsedPath = _fileSystemAccess.BrowseForFile(".publish.xml", "Publish profile (*.publish.xml)|*.publish.xml");
             if (browsedPath != null)
             {
