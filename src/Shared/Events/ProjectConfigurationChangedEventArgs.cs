@@ -1,8 +1,8 @@
-﻿namespace SSDTLifecycleExtension.Events
+﻿namespace SSDTLifecycleExtension.Shared.Events
 {
     using System;
-    using Annotations;
-    using Shared.Contracts;
+    using Contracts;
+    using Shared;
 
     public class ProjectConfigurationChangedEventArgs : EventArgs
     {

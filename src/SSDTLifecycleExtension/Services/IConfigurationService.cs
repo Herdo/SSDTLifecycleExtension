@@ -3,8 +3,8 @@
     using System;
     using System.Threading.Tasks;
     using Annotations;
-    using Events;
     using Shared.Contracts;
+    using Shared.Events;
     using Shared.Models;
 
     public interface IConfigurationService

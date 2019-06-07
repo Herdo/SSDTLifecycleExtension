@@ -5,9 +5,9 @@
     using System.Threading.Tasks;
     using Annotations;
     using DataAccess;
-    using Events;
     using Newtonsoft.Json;
     using Shared.Contracts;
+    using Shared.Events;
     using Shared.Models;
     using Task = System.Threading.Tasks.Task;
 

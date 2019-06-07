@@ -9,10 +9,10 @@
     using System.Threading.Tasks;
     using Annotations;
     using DataAccess;
-    using Events;
     using Microsoft.VisualStudio.PlatformUI;
     using Services;
     using Shared.Contracts;
+    using Shared.Events;
     using Shared.Models;
 
     [UsedImplicitly]
