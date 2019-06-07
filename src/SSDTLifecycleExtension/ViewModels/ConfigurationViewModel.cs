@@ -7,6 +7,7 @@
     using Microsoft.VisualStudio.PlatformUI;
     using Services;
     using Shared.Contracts;
+    using Shared.Contracts.DataAccess;
     using Shared.Models;
     using Task = System.Threading.Tasks.Task;
 

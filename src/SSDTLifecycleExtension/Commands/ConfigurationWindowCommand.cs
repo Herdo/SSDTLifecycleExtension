@@ -7,7 +7,7 @@
     using Microsoft.VisualStudio.Shell;
     using Microsoft.VisualStudio.Shell.Interop;
     using Services;
-    using Shared.Contracts;
+    using Shared.Contracts.DataAccess;
     using ViewModels;
 
     [UsedImplicitly]

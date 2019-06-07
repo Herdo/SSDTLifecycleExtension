@@ -10,6 +10,7 @@
     using Microsoft.VisualStudio.Shell;
     using Microsoft.VisualStudio.Shell.Interop;
     using Shared.Contracts;
+    using Shared.Contracts.DataAccess;
     using Constants = Constants;
     using Task = System.Threading.Tasks.Task;
 

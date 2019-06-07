@@ -12,6 +12,7 @@ namespace SSDTLifecycleExtension.Services
     using System.Threading;
     using Annotations;
     using Shared.Contracts;
+    using Shared.Contracts.DataAccess;
     using Shared.Contracts.Services;
 
     [UsedImplicitly]

@@ -8,7 +8,7 @@
     using Annotations;
     using Microsoft.VisualStudio.Threading;
     using Microsoft.Win32;
-    using Shared.Contracts;
+    using Shared.Contracts.DataAccess;
 
     [UsedImplicitly]
     public class FileSystemAccess : IFileSystemAccess

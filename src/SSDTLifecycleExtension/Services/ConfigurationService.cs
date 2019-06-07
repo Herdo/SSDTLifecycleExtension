@@ -6,6 +6,7 @@
     using Annotations;
     using Newtonsoft.Json;
     using Shared.Contracts;
+    using Shared.Contracts.DataAccess;
     using Shared.Events;
     using Shared.Models;
     using Task = System.Threading.Tasks.Task;

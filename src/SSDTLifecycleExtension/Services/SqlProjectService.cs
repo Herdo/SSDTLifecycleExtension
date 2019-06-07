@@ -5,7 +5,7 @@
     using System.Threading.Tasks;
     using System.Xml.Linq;
     using Annotations;
-    using Shared.Contracts;
+    using Shared.Contracts.DataAccess;
     using Shared.Contracts.Services;
 
     [UsedImplicitly]

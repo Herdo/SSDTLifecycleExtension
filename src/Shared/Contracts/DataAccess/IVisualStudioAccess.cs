@@ -1,4 +1,4 @@
-﻿namespace SSDTLifecycleExtension.Shared.Contracts
+﻿namespace SSDTLifecycleExtension.Shared.Contracts.DataAccess
 {
     using System.Threading.Tasks;
     using Shared;
