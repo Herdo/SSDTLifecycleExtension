@@ -13,6 +13,7 @@
     using Microsoft.VisualStudio.Shell;
     using Services;
     using Shared.Contracts;
+    using Shared.Contracts.Services;
     using Shared.ScriptModifiers;
     using Unity;
     using Unity.Lifetime;

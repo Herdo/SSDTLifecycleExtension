@@ -5,7 +5,6 @@
     using System.Windows.Input;
     using Annotations;
     using Microsoft.VisualStudio.PlatformUI;
-    using Microsoft.VisualStudio.Shell;
     using Services;
     using Shared.Contracts;
     using Shared.Models;

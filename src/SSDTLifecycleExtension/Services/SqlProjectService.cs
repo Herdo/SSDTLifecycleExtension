@@ -5,8 +5,8 @@
     using System.Threading.Tasks;
     using System.Xml.Linq;
     using Annotations;
-    using DataAccess;
     using Shared.Contracts;
+    using Shared.Contracts.Services;
 
     [UsedImplicitly]
     public class SqlProjectService : ISqlProjectService

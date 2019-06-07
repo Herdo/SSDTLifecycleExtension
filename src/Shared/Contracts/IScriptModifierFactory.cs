@@ -1,7 +1,6 @@
 ﻿namespace SSDTLifecycleExtension.Shared.Contracts
 {
     using System;
-    using ScriptModifiers;
 
     public interface IScriptModifierFactory
     {

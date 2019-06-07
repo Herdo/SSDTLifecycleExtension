@@ -3,7 +3,6 @@
 namespace SSDTLifecycleExtension.Services
 {
     using Annotations;
-    using DataAccess;
     using Microsoft.VisualStudio.Shell;
     using Shared.Contracts;
 

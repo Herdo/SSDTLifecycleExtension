@@ -8,7 +8,6 @@
     using System.Threading;
     using System.Threading.Tasks;
     using Annotations;
-    using DataAccess;
     using Microsoft.VisualStudio.PlatformUI;
     using Services;
     using Shared.Contracts;

@@ -1,4 +1,4 @@
-﻿namespace SSDTLifecycleExtension.Shared.Contracts
+﻿namespace SSDTLifecycleExtension.Shared.Contracts.Services
 {
     using System;
     using Models;

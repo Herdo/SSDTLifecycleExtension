@@ -4,7 +4,6 @@
     using System.ComponentModel.Design;
     using Windows;
     using Annotations;
-    using DataAccess;
     using Microsoft.VisualStudio.Shell;
     using Microsoft.VisualStudio.Shell.Interop;
     using Services;
