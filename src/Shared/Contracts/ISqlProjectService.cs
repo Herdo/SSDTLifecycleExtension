@@ -1,4 +1,4 @@
-﻿namespace SSDTLifecycleExtension.Services
+﻿namespace SSDTLifecycleExtension.Shared.Contracts
 {
     using System.Threading.Tasks;
 

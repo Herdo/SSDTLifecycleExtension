@@ -59,7 +59,6 @@
     <Compile Include="Services\ICommandAvailabilityService.cs" />
     <Compile Include="Services\IConfigurationService.cs" />
     <Compile Include="Services\IScriptCreationService.cs" />
-    <Compile Include="Services\ISqlProjectService.cs" />
     <Compile Include="Services\ScriptCreationService.cs" />
     <Compile Include="Services\SqlProjectService.cs" />
     <Compile Include="Services\VersionService.cs" />

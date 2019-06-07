@@ -6,6 +6,7 @@
     using System.Xml.Linq;
     using Annotations;
     using DataAccess;
+    using Shared.Contracts;
 
     [UsedImplicitly]
     public class SqlProjectService : ISqlProjectService
