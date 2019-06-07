@@ -4,11 +4,11 @@
     using System.ComponentModel;
     using System.Windows.Input;
     using Annotations;
-    using DataAccess;
     using EnvDTE;
     using Microsoft.VisualStudio.PlatformUI;
     using Microsoft.VisualStudio.Shell;
     using Services;
+    using Shared.Contracts;
     using Shared.Models;
     using Task = System.Threading.Tasks.Task;
 

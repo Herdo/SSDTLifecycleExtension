@@ -1,9 +1,9 @@
-﻿namespace SSDTLifecycleExtension.DataAccess
+﻿namespace SSDTLifecycleExtension.Shared.Contracts
 {
     using System;
     using System.Threading;
     using System.Threading.Tasks;
-    using Annotations;
+    using Shared;
 
     public interface IFileSystemAccess
     {

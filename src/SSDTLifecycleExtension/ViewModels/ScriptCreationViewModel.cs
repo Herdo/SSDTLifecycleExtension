@@ -13,6 +13,7 @@
     using Events;
     using Microsoft.VisualStudio.PlatformUI;
     using Services;
+    using Shared.Contracts;
     using Shared.Models;
 
     [UsedImplicitly]

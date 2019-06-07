@@ -48,7 +48,6 @@
     <Compile Include="Constants.cs" />
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="DataAccess\FileSystemAccess.cs" />
-    <Compile Include="DataAccess\IFileSystemAccess.cs" />
     <Compile Include="DataAccess\IVisualStudioAccess.cs" />
     <Compile Include="DataAccess\VisualStudioAccess.cs" />
     <Compile Include="Events\ProjectConfigurationChangedEventArgs.cs" />

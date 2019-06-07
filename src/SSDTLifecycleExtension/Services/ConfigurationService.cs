@@ -5,11 +5,11 @@
     using System.Linq;
     using System.Threading.Tasks;
     using Annotations;
-    using DataAccess;
     using EnvDTE;
     using Events;
     using Microsoft.VisualStudio.Shell;
     using Newtonsoft.Json;
+    using Shared.Contracts;
     using Shared.Models;
     using Task = System.Threading.Tasks.Task;
 
