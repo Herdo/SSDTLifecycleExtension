@@ -13,6 +13,8 @@ namespace SSDTLifecycleExtension.Services
     using Annotations;
     using Shared.Contracts;
     using Shared.Contracts.DataAccess;
+    using Shared.Contracts.Enums;
+    using Shared.Contracts.Factories;
     using Shared.Contracts.Services;
 
     [UsedImplicitly]

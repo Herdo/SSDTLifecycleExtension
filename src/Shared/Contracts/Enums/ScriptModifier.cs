@@ -1,4 +1,4 @@
-﻿namespace SSDTLifecycleExtension.Shared.Contracts
+﻿namespace SSDTLifecycleExtension.Shared.Contracts.Enums
 {
     /// <summary>
     /// Possible script modifiers, as well as their execution order.

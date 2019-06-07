@@ -2,6 +2,8 @@
 {
     using System;
     using Contracts;
+    using Contracts.Enums;
+    using Contracts.Factories;
 
     [UsedImplicitly]
     public class ScriptModifierFactory : IScriptModifierFactory

@@ -4,6 +4,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers
 {
     using System;
     using SSDTLifecycleExtension.Shared.Contracts;
+    using SSDTLifecycleExtension.Shared.Contracts.Enums;
+    using SSDTLifecycleExtension.Shared.Contracts.Factories;
     using SSDTLifecycleExtension.Shared.ScriptModifiers;
 
     [TestFixture]

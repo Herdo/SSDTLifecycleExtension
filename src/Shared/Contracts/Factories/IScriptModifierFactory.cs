@@ -1,6 +1,7 @@
-﻿namespace SSDTLifecycleExtension.Shared.Contracts
+﻿namespace SSDTLifecycleExtension.Shared.Contracts.Factories
 {
     using System;
+    using Enums;
 
     public interface IScriptModifierFactory
     {
