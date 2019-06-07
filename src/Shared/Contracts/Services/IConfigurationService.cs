@@ -1,11 +1,11 @@
-﻿namespace SSDTLifecycleExtension.Services
+﻿namespace SSDTLifecycleExtension.Shared.Contracts.Services
 {
     using System;
     using System.Threading.Tasks;
-    using Annotations;
-    using Shared.Contracts;
-    using Shared.Events;
-    using Shared.Models;
+    using Contracts;
+    using Events;
+    using Models;
+    using Shared;
 
     public interface IConfigurationService
     {
