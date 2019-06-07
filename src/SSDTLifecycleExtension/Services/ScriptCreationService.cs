@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using EnvDTE;
 using SSDTLifecycleExtension.Shared.Models;
 
 namespace SSDTLifecycleExtension.Services
@@ -48,7 +47,7 @@ namespace SSDTLifecycleExtension.Services
             return true;
         }
 
-        private async Task<ScriptCreationVariables> CreateVariablesAsync(Project project,
+        private async Task<ScriptCreationVariables> CreateVariablesAsync(SqlProject project,
                                                                          ConfigurationModel configuration,
                                                                          Version previousVersion,
                                                                          Version newVersion)
@@ -142,7 +141,7 @@ namespace SSDTLifecycleExtension.Services
             return true;
         }
 
-        private async Task BuildAsync(Project project,
+        private async Task BuildAsync(SqlProject project,
                                       ConfigurationModel configuration)
         {
             if (configuration.BuildBeforeScriptCreation)
@@ -266,7 +265,7 @@ namespace SSDTLifecycleExtension.Services
 
         bool IScriptCreationService.IsCreating => IsCreating;
 
-        async Task IScriptCreationService.CreateAsync(Project project,
+        async Task IScriptCreationService.CreateAsync(SqlProject project,
                                                       ConfigurationModel configuration,
                                                       Version previousVersion,
                                                       Version newVersion,

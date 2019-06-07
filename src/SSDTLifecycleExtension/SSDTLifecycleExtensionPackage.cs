@@ -125,7 +125,7 @@
 
         #endregion
 
-        internal TViewModel GetViewModel<TViewModel>(Project project) where TViewModel : IViewModel
+        internal TViewModel GetViewModel<TViewModel>(SqlProject project) where TViewModel : IViewModel
         {
             if (project == null)
                 throw new ArgumentNullException(nameof(project));

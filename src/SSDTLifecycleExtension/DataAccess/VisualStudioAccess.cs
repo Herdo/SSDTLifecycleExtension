@@ -1,12 +1,15 @@
 ﻿namespace SSDTLifecycleExtension.DataAccess
 {
     using System;
+    using System.IO;
+    using System.Linq;
     using System.Windows;
     using Annotations;
     using EnvDTE;
     using EnvDTE80;
     using Microsoft.VisualStudio.Shell;
     using Microsoft.VisualStudio.Shell.Interop;
+    using Shared.Contracts;
     using Constants = Constants;
     using Task = System.Threading.Tasks.Task;
 
@@ -52,14 +55,29 @@
             throw new InvalidOperationException($"Failed to get or create SSDT Lifecycle output pane.");
         }
 
-        Project IVisualStudioAccess.GetSelectedProject()
+        string IVisualStudioAccess.GetSelectedProjectKind()
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            return _dte2.SelectedItems.Count == 1
+                       ? _dte2.SelectedItems.Item(1).Project.Kind
+                       : null;
+        }
+
+        SqlProject IVisualStudioAccess.GetSelectedSqlProject()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
             if (_dte2.SelectedItems.Count != 1)
                 return null;
 
-            return _dte2.SelectedItems.Item(1).Project;
+            var selectedProject = _dte2.SelectedItems.Item(1).Project;
+            if (selectedProject.Kind != Constants.SqlProjectKindGuid)
+                return null;
+
+            return new SqlProject(selectedProject.Name,
+                                  selectedProject.FullName,
+                                  selectedProject.UniqueName);
         }
 
         async Task IVisualStudioAccess.ClearSSDTLifecycleOutputAsync()
@@ -89,7 +107,7 @@
             MessageBox.Show(error, "SSDT Lifecycle error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
         }
 
-        void IVisualStudioAccess.BuildProject(Project project)
+        void IVisualStudioAccess.BuildProject(SqlProject project)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -128,6 +146,37 @@
 
             // Stop the animation.
             statusBar.Animation(0, ref icon);
+        }
+
+        void IVisualStudioAccess.AddItemToProjectProperties(SqlProject project,
+                                                            string targetPath)
+        {
+            if (project == null)
+                throw new ArgumentNullException(nameof(project));
+            if (targetPath == null)
+                throw new ArgumentNullException(nameof(targetPath));
+
+            ThreadHelper.ThrowIfNotOnUIThread();
+            var p = _dte2.Solution.Projects.OfType<Project>().SingleOrDefault(m =>
+            {
+                ThreadHelper.ThrowIfNotOnUIThread();
+                return m.UniqueName == project.UniqueName;
+            });
+
+            var properties = p?.ProjectItems.OfType<ProjectItem>().SingleOrDefault(m =>
+            {
+                ThreadHelper.ThrowIfNotOnUIThread();
+                return m.Name == "Properties";
+            });
+            if (properties == null)
+                return;
+
+            var fileName = Path.GetFileName(targetPath);
+            if (properties.ProjectItems.OfType<ProjectItem>().All(m =>
+            {
+                ThreadHelper.ThrowIfNotOnUIThread();
+                return m.Name != fileName;
+            })) properties.ProjectItems.AddFromFile(targetPath);
         }
     }
 }

@@ -2,13 +2,13 @@
 {
     using System;
     using Annotations;
-    using EnvDTE;
+    using Shared.Contracts;
 
     public class ProjectConfigurationChangedEventArgs : EventArgs
     {
-        public Project Project { get; }
+        public SqlProject Project { get; }
 
-        public ProjectConfigurationChangedEventArgs([NotNull] Project project)
+        public ProjectConfigurationChangedEventArgs([NotNull] SqlProject project)
         {
             Project = project ?? throw new ArgumentNullException(nameof(project));
         }

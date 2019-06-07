@@ -4,7 +4,7 @@
     using System.Threading;
     using System.Threading.Tasks;
     using Annotations;
-    using EnvDTE;
+    using Shared.Contracts;
     using Shared.Models;
 
     public interface IScriptCreationService
@@ -27,7 +27,7 @@
         /// <exception cref="ArgumentNullException"><paramref name="project"/>, <paramref name="configuration"/>, or <paramref name="previousVersion"/> are <b>null</b>.</exception>
         /// <exception cref="InvalidOperationException">A creation us currently running. Check <see cref="IsCreating"/> before calling.</exception>
         /// <returns>An awaitable <see cref="Task"/>.</returns>
-        Task CreateAsync([NotNull] Project project,
+        Task CreateAsync([NotNull] SqlProject project,
                          [NotNull] ConfigurationModel configuration,
                          [NotNull] Version previousVersion,
                          [CanBeNull] Version newVersion,

@@ -4,7 +4,6 @@
     using System.ComponentModel;
     using System.Windows.Input;
     using Annotations;
-    using EnvDTE;
     using Microsoft.VisualStudio.PlatformUI;
     using Microsoft.VisualStudio.Shell;
     using Services;
@@ -15,7 +14,7 @@
     [UsedImplicitly]
     public class ConfigurationViewModel : ViewModelBase
     {
-        private readonly Project _project;
+        private readonly SqlProject _project;
         private readonly IConfigurationService _configurationService;
         private readonly IFileSystemAccess _fileSystemAccess;
         private readonly IScriptCreationService _scriptCreationService;
@@ -56,7 +55,7 @@
         public ICommand ResetConfigurationToDefaultCommand { get; }
         public DelegateCommand SaveConfigurationCommand { get; }
 
-        public ConfigurationViewModel(Project project,
+        public ConfigurationViewModel(SqlProject project,
                                       IConfigurationService configurationService,
                                       IFileSystemAccess fileSystemAccess,
                                       IScriptCreationService scriptCreationService)

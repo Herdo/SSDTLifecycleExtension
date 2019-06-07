@@ -27,11 +27,11 @@ namespace SSDTLifecycleExtension.Services
             if (!(sender is OleMenuCommand command))
                 return;
 
-            var project = _visualStudioAccess.GetSelectedProject();
-            if (project == null)
+            var projectKind = _visualStudioAccess.GetSelectedProjectKind();
+            if (projectKind == null)
                 return;
 
-            command.Visible = project.Kind == $"{{{Constants.SqlProjectKindGuid}}}";
+            command.Visible = projectKind == $"{{{Constants.SqlProjectKindGuid}}}";
             command.Enabled = !_scriptCreationService.IsCreating;
         }
     }

@@ -3,17 +3,17 @@
     using System;
     using System.Threading.Tasks;
     using Annotations;
-    using EnvDTE;
     using Events;
+    using Shared.Contracts;
     using Shared.Models;
 
     public interface IConfigurationService
     {
         event EventHandler<ProjectConfigurationChangedEventArgs> ConfigurationChanged;
 
-        Task<ConfigurationModel> GetConfigurationOrDefaultAsync([NotNull] Project project);
+        Task<ConfigurationModel> GetConfigurationOrDefaultAsync([NotNull] SqlProject project);
 
-        Task SaveConfigurationAsync([NotNull] Project project,
+        Task SaveConfigurationAsync([NotNull] SqlProject project,
                                     [NotNull] ConfigurationModel model);
     }
 }

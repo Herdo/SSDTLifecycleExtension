@@ -74,8 +74,8 @@
 
                 await _package.JoinableTaskFactory.SwitchToMainThreadAsync();
                 // Set caption
-                var project = _visualStudioAccess.GetSelectedProject();
-                if (project?.Name != null) window.SetCaption(project.Name);
+                var project = _visualStudioAccess.GetSelectedSqlProject();
+                if (project != null) window.SetCaption(project.Name);
                 // Set data context
                 if (window.Content is IView windowContent)
                 {

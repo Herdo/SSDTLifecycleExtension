@@ -9,7 +9,6 @@
     using System.Threading.Tasks;
     using Annotations;
     using DataAccess;
-    using EnvDTE;
     using Events;
     using Microsoft.VisualStudio.PlatformUI;
     using Services;
@@ -19,7 +18,7 @@
     [UsedImplicitly]
     public class ScriptCreationViewModel : ViewModelBase
     {
-        private readonly Project _project;
+        private readonly SqlProject _project;
         private readonly IConfigurationService _configurationService;
         private readonly IScriptCreationService _scriptCreationService;
         private readonly IVisualStudioAccess _visualStudioAccess;
@@ -45,7 +44,7 @@
 
         public DelegateCommand StartCreationCommand { get; }
 
-        public ScriptCreationViewModel(Project project,
+        public ScriptCreationViewModel(SqlProject project,
                                        IConfigurationService configurationService,
                                        IScriptCreationService scriptCreationService,
                                        IVisualStudioAccess visualStudioAccess,

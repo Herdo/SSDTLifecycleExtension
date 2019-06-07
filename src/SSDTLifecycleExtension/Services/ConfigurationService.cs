@@ -2,10 +2,9 @@
 {
     using System;
     using System.IO;
-    using System.Linq;
     using System.Threading.Tasks;
     using Annotations;
-    using EnvDTE;
+    using DataAccess;
     using Events;
     using Microsoft.VisualStudio.Shell;
     using Newtonsoft.Json;
@@ -16,26 +15,26 @@
     [UsedImplicitly]
     public class ConfigurationService : IConfigurationService
     {
-        private const string _PROPERTIES_DIRECTORY = "Properties";
-        private const string _CONFIGURATION_FILE_NAME = "ssdtlifecycle.json";
-
         private readonly IFileSystemAccess _fileSystemAccess;
+        private readonly IVisualStudioAccess _visualStudioAccess;
 
-        public ConfigurationService(IFileSystemAccess fileSystemAccess)
+        public ConfigurationService(IFileSystemAccess fileSystemAccess,
+                                    IVisualStudioAccess visualStudioAccess)
         {
             _fileSystemAccess = fileSystemAccess;
+            _visualStudioAccess = visualStudioAccess;
         }
 
-        private static string GetConfigurationPath(Project project)
+        private static string GetConfigurationPath(SqlProject project)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
             var directory = Path.GetDirectoryName(project.FullName);
-            return Path.Combine(directory ?? throw new InvalidOperationException("Cannot find configuration file. Directory is <null>."), _PROPERTIES_DIRECTORY, _CONFIGURATION_FILE_NAME);
+            return Path.Combine(directory ?? throw new InvalidOperationException("Cannot find configuration file. Directory is <null>."), "Properties", "ssdtlifecycle.json");
         }
 
         public event EventHandler<ProjectConfigurationChangedEventArgs> ConfigurationChanged;
 
-        async Task<ConfigurationModel> IConfigurationService.GetConfigurationOrDefaultAsync(Project project)
+        async Task<ConfigurationModel> IConfigurationService.GetConfigurationOrDefaultAsync(SqlProject project)
         {
             if (project == null)
                 throw new ArgumentNullException(nameof(project));
@@ -51,7 +50,7 @@
             return deserialized;
         }
 
-        async Task IConfigurationService.SaveConfigurationAsync(Project project,
+        async Task IConfigurationService.SaveConfigurationAsync(SqlProject project,
                                                                 ConfigurationModel model)
         {
             if (project == null)
@@ -71,19 +70,7 @@
             ConfigurationChanged?.Invoke(this, new ProjectConfigurationChangedEventArgs(project));
 
             // Add configuration to the project, if it hasn't been added before.
-            var properties = project.ProjectItems.OfType<ProjectItem>().SingleOrDefault(m =>
-            {
-                ThreadHelper.ThrowIfNotOnUIThread();
-                return m.Name == _PROPERTIES_DIRECTORY;
-            });
-            if (properties == null)
-                return;
-
-            if (properties.ProjectItems.OfType<ProjectItem>().All(m =>
-            {
-                ThreadHelper.ThrowIfNotOnUIThread();
-                return m.Name != _CONFIGURATION_FILE_NAME;
-            })) properties.ProjectItems.AddFromFile(targetPath);
+            _visualStudioAccess.AddItemToProjectProperties(project, targetPath);
         }
     }
 }
