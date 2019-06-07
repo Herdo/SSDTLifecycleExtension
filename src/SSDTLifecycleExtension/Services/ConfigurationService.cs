@@ -6,7 +6,6 @@
     using Annotations;
     using DataAccess;
     using Events;
-    using Microsoft.VisualStudio.Shell;
     using Newtonsoft.Json;
     using Shared.Contracts;
     using Shared.Models;
