@@ -16,6 +16,9 @@
             if (configuration == null)
                 throw new ArgumentNullException(nameof(configuration));
 
+            if (string.IsNullOrWhiteSpace(configuration.CustomHeader))
+                return input;
+
             var sb = new StringBuilder(configuration.CustomHeader);
             sb.AppendLine();
             sb.Append(input);

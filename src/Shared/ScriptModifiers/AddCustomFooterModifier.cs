@@ -16,6 +16,9 @@
             if (configuration == null)
                 throw new ArgumentNullException(nameof(configuration));
 
+            if (string.IsNullOrWhiteSpace(configuration.CustomFooter))
+                return input;
+
             var sb = new StringBuilder(input);
             sb.AppendLine();
             sb.Append(configuration.CustomFooter);

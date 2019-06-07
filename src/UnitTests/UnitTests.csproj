@@ -43,6 +43,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Shared\ScriptModifiers\AddCustomHeaderModifierTests.cs" />
+    <Compile Include="Shared\ScriptModifiers\AddCustomFooterModifierTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Moq">
