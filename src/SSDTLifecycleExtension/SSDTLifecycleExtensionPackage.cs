@@ -45,7 +45,7 @@
             VSConstants.UICONTEXT.SolutionHasSingleProject_string,
             VSConstants.UICONTEXT.SolutionHasMultipleProjects_string,
             VSConstants.UICONTEXT.SolutionExistsAndFullyLoaded_string,
-            "ActiveProjectFlavor:" + Constants.SqlProjectKindGuid
+            "ActiveProjectFlavor:" + Shared.Constants.SqlProjectKindGuid
         })]
     public sealed class SSDTLifecycleExtensionPackage : AsyncPackage
     {

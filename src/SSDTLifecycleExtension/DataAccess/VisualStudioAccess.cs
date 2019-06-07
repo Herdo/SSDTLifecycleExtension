@@ -73,7 +73,7 @@
                 return null;
 
             var selectedProject = _dte2.SelectedItems.Item(1).Project;
-            if (selectedProject.Kind != Constants.SqlProjectKindGuid)
+            if (selectedProject.Kind != Shared.Constants.SqlProjectKindGuid)
                 return null;
 
             return new SqlProject(selectedProject.Name,

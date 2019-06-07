@@ -26,7 +26,7 @@ namespace SSDTLifecycleExtension.Services
             if (projectKind == null)
                 return;
 
-            setVisible(projectKind == $"{{{Constants.SqlProjectKindGuid}}}");
+            setVisible(projectKind == $"{{{Shared.Constants.SqlProjectKindGuid}}}");
             setEnabled(!_scriptCreationService.IsCreating);
         }
     }
