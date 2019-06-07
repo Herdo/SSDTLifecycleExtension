@@ -1,6 +1,7 @@
 ﻿namespace SSDTLifecycleExtension.Shared.ScriptModifiers
 {
     using System;
+    using Contracts;
 
     [UsedImplicitly]
     public class ScriptModifierFactory : IScriptModifierFactory

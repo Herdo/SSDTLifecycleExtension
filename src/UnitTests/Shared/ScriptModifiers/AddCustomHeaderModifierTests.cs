@@ -3,6 +3,7 @@
 namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers
 {
     using System;
+    using SSDTLifecycleExtension.Shared.Contracts;
     using SSDTLifecycleExtension.Shared.Models;
     using SSDTLifecycleExtension.Shared.ScriptModifiers;
 

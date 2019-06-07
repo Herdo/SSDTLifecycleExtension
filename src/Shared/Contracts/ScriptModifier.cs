@@ -1,4 +1,4 @@
-﻿namespace SSDTLifecycleExtension.Shared.ScriptModifiers
+﻿namespace SSDTLifecycleExtension.Shared.Contracts
 {
     /// <summary>
     /// Possible script modifiers, as well as their execution order.

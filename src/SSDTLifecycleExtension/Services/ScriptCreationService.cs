@@ -13,7 +13,8 @@ namespace SSDTLifecycleExtension.Services
     using System.Threading;
     using Annotations;
     using DataAccess;
-    using Shared.ScriptModifiers;
+    using Shared.Contracts;
+    //using Shared.ScriptModifiers;
     using Shared.Variables;
 
     [UsedImplicitly]

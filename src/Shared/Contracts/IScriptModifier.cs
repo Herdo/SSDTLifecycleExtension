@@ -1,4 +1,4 @@
-﻿namespace SSDTLifecycleExtension.Shared.ScriptModifiers
+﻿namespace SSDTLifecycleExtension.Shared.Contracts
 {
     using System;
     using Models;
