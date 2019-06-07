@@ -1,11 +1,11 @@
-﻿namespace SSDTLifecycleExtension.Services
+﻿namespace SSDTLifecycleExtension.Shared.Contracts.Services
 {
     using System;
     using System.Threading;
     using System.Threading.Tasks;
-    using Annotations;
-    using Shared.Contracts;
-    using Shared.Models;
+    using Contracts;
+    using Models;
+    using Shared;
 
     public interface IScriptCreationService
     {

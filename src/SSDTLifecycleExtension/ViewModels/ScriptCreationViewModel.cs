@@ -12,6 +12,7 @@
     using Services;
     using Shared.Contracts;
     using Shared.Contracts.DataAccess;
+    using Shared.Contracts.Services;
     using Shared.Events;
     using Shared.Models;
 
