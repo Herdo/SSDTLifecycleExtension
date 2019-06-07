@@ -1,8 +1,8 @@
-﻿namespace SSDTLifecycleExtension.Shared.Variables
+﻿namespace SSDTLifecycleExtension.Shared.Contracts
 {
     using System;
 
-    public struct ScriptCreationVariables
+    public class ScriptCreationVariables
     {
         public string SqlTargetName { get; }
         public string ProjectPath { get; }

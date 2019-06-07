@@ -14,8 +14,6 @@ namespace SSDTLifecycleExtension.Services
     using Annotations;
     using DataAccess;
     using Shared.Contracts;
-    //using Shared.ScriptModifiers;
-    using Shared.Variables;
 
     [UsedImplicitly]
     public class ScriptCreationService : IScriptCreationService

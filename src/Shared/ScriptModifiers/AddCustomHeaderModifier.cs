@@ -4,7 +4,6 @@
     using System.Text;
     using Contracts;
     using Models;
-    using Variables;
 
     internal class AddCustomHeaderModifier : IScriptModifier
     {

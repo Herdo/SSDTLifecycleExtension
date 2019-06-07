@@ -2,7 +2,6 @@
 {
     using System;
     using Models;
-    using Variables;
 
     public interface IScriptModifier
     {
