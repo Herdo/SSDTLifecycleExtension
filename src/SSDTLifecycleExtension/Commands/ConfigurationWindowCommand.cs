@@ -34,7 +34,13 @@
 
             var menuCommandId = new CommandID(CommandSet, CommandId);
             var menuItem = new OleMenuCommand(Execute, menuCommandId);
-            menuItem.BeforeQueryStatus += commandAvailabilityService.HandleCommandAvailability;
+            menuItem.BeforeQueryStatus += (sender,
+                                           args) =>
+            {
+                if (!(sender is OleMenuCommand command))
+                    return;
+                commandAvailabilityService.HandleCommandAvailability(b => command.Visible = b, b => command.Enabled = b);
+            };
             commandService.AddCommand(menuItem);
         }
 

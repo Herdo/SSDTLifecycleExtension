@@ -3,7 +3,6 @@
 namespace SSDTLifecycleExtension.Services
 {
     using Annotations;
-    using Microsoft.VisualStudio.Shell;
     using Shared.Contracts.DataAccess;
     using Shared.Contracts.Services;
 
@@ -20,18 +19,15 @@ namespace SSDTLifecycleExtension.Services
             _scriptCreationService = scriptCreationService;
         }
 
-        void ICommandAvailabilityService.HandleCommandAvailability(object sender,
-                                                                   EventArgs e)
+        void ICommandAvailabilityService.HandleCommandAvailability(Action<bool> setVisible,
+                                                                   Action<bool> setEnabled)
         {
-            if (!(sender is OleMenuCommand command))
-                return;
-
             var projectKind = _visualStudioAccess.GetSelectedProjectKind();
             if (projectKind == null)
                 return;
 
-            command.Visible = projectKind == $"{{{Constants.SqlProjectKindGuid}}}";
-            command.Enabled = !_scriptCreationService.IsCreating;
+            setVisible(projectKind == $"{{{Constants.SqlProjectKindGuid}}}");
+            setEnabled(!_scriptCreationService.IsCreating);
         }
     }
 }

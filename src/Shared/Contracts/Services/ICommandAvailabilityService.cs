@@ -4,7 +4,7 @@
 
     public interface ICommandAvailabilityService
     {
-        void HandleCommandAvailability(object sender,
-                                       EventArgs e);
+        void HandleCommandAvailability(Action<bool> setVisible,
+                                       Action<bool> setEnabled);
     }
 }
