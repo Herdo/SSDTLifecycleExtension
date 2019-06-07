@@ -3,6 +3,7 @@
     using System;
     using System.Text;
     using Annotations;
+    using Shared.Contracts;
     using Shared.Models;
 
     [UsedImplicitly]

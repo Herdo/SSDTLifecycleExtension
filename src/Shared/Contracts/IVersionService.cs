@@ -1,8 +1,8 @@
-﻿namespace SSDTLifecycleExtension.Services
+﻿namespace SSDTLifecycleExtension.Shared.Contracts
 {
     using System;
-    using Annotations;
-    using Shared.Models;
+    using Models;
+    using Shared;
 
     public interface IVersionService
     {
