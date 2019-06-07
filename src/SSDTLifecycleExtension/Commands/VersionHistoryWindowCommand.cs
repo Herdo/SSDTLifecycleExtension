@@ -6,8 +6,8 @@
     using Annotations;
     using Microsoft.VisualStudio.Shell;
     using Microsoft.VisualStudio.Shell.Interop;
-    using Services;
     using Shared.Contracts.DataAccess;
+    using Shared.Contracts.Services;
     using ViewModels;
 
     [UsedImplicitly]

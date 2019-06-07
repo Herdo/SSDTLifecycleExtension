@@ -1,4 +1,4 @@
-﻿namespace SSDTLifecycleExtension.Shared.Contracts.DataAccess
+﻿namespace SSDTLifecycleExtension.Shared.Contracts.Services
 {
     using System;
 

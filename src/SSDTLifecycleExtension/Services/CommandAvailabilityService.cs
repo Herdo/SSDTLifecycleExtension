@@ -5,6 +5,7 @@ namespace SSDTLifecycleExtension.Services
     using Annotations;
     using Microsoft.VisualStudio.Shell;
     using Shared.Contracts.DataAccess;
+    using Shared.Contracts.Services;
 
     [UsedImplicitly]
     public class CommandAvailabilityService : ICommandAvailabilityService
