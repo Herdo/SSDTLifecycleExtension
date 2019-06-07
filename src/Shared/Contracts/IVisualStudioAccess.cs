@@ -1,8 +1,7 @@
-﻿namespace SSDTLifecycleExtension.DataAccess
+﻿namespace SSDTLifecycleExtension.Shared.Contracts
 {
     using System.Threading.Tasks;
-    using Annotations;
-    using Shared.Contracts;
+    using Shared;
 
     public interface IVisualStudioAccess
     {
