@@ -1,5 +1,6 @@
 ﻿namespace SSDTLifecycleExtension.Shared.Contracts.DataAccess
 {
+    using System;
     using System.Threading.Tasks;
     using Shared;
 
@@ -8,8 +9,8 @@
         /// <summary>
         /// Gets the kind of the selected project.
         /// </summary>
-        /// <returns>The kind of the currently selected project, or <b>null</b>, if none is selected.</returns>
-        string GetSelectedProjectKind();
+        /// <returns>The kind of the currently selected project, or <b><see cref="Guid.Empty"/></b>, if none is selected.</returns>
+        Guid GetSelectedProjectKind();
 
         /// <summary>
         /// Gets the selected SQL project.

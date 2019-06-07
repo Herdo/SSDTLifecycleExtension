@@ -56,13 +56,13 @@
             throw new InvalidOperationException($"Failed to get or create SSDT Lifecycle output pane.");
         }
 
-        string IVisualStudioAccess.GetSelectedProjectKind()
+        Guid IVisualStudioAccess.GetSelectedProjectKind()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
             return _dte2.SelectedItems.Count == 1
-                       ? _dte2.SelectedItems.Item(1).Project.Kind
-                       : null;
+                       ? Guid.Parse(_dte2.SelectedItems.Item(1).Project.Kind)
+                       : Guid.Empty;
         }
 
         SqlProject IVisualStudioAccess.GetSelectedSqlProject()
@@ -73,7 +73,9 @@
                 return null;
 
             var selectedProject = _dte2.SelectedItems.Item(1).Project;
-            if (selectedProject.Kind != Shared.Constants.SqlProjectKindGuid)
+            var selectedProjectKindGuid = Guid.Parse(selectedProject.Kind);
+            var sqlProjectKindGuid = Guid.Parse(Shared.Constants.SqlProjectKindGuid);
+            if (selectedProjectKindGuid != sqlProjectKindGuid)
                 return null;
 
             return new SqlProject(selectedProject.Name,

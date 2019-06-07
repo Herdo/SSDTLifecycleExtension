@@ -22,10 +22,10 @@
                                                                    Action<bool> setEnabled)
         {
             var projectKind = _visualStudioAccess.GetSelectedProjectKind();
-            if (projectKind == null)
+            if (projectKind == Guid.Empty)
                 return;
 
-            setVisible(projectKind == $"{{{Shared.Constants.SqlProjectKindGuid}}}");
+            setVisible(projectKind == Guid.Parse(Shared.Constants.SqlProjectKindGuid));
             setEnabled(!_scriptCreationService.IsCreating);
         }
     }
