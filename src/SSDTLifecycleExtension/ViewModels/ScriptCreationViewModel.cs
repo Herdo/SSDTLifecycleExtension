@@ -20,6 +20,7 @@
     {
         private readonly SqlProject _project;
         private readonly IConfigurationService _configurationService;
+        private readonly IScaffoldingService _scaffoldingService;
         private readonly IScriptCreationService _scriptCreationService;
         private readonly IVisualStudioAccess _visualStudioAccess;
         private readonly IFileSystemAccess _fileSystemAccess;
@@ -50,12 +51,14 @@
 
         public ScriptCreationViewModel(SqlProject project,
                                        IConfigurationService configurationService,
+                                       IScaffoldingService scaffoldingService,
                                        IScriptCreationService scriptCreationService,
                                        IVisualStudioAccess visualStudioAccess,
                                        IFileSystemAccess fileSystemAccess)
         {
             _project = project;
             _configurationService = configurationService;
+            _scaffoldingService = scaffoldingService;
             _scriptCreationService = scriptCreationService;
             _visualStudioAccess = visualStudioAccess;
             _fileSystemAccess = fileSystemAccess;
@@ -72,26 +75,33 @@
         private bool ScaffoldDevelopmentVersion_CanExecute() =>
             _configuration != null
             && !_configuration.HasErrors
+            && !_scaffoldingService.IsScaffolding
             && !_scriptCreationService.IsCreating;
 
-        private void ScaffoldDevelopmentVersion_Executed()
+        private async void ScaffoldDevelopmentVersion_Executed()
         {
-            throw new NotImplementedException();
+            await _scaffoldingService.ScaffoldAsync(_project, _configuration, new Version(0, 0, 0, 0), CancellationToken.None);
+            ScaffoldDevelopmentVersionCommand.RaiseCanExecuteChanged();
+            ScaffoldCurrentProductionVersionCommand.RaiseCanExecuteChanged();
         }
 
         private bool ScaffoldCurrentProductionVersion_CanExecute() =>
             _configuration != null
             && !_configuration.HasErrors
+            && !_scaffoldingService.IsScaffolding
             && !_scriptCreationService.IsCreating;
 
-        private void ScaffoldCurrentProductionVersion_Executed()
+        private async void ScaffoldCurrentProductionVersion_Executed()
         {
-            throw new NotImplementedException();
+            await _scaffoldingService.ScaffoldAsync(_project, _configuration, new Version(1, 0, 0, 0), CancellationToken.None);
+            ScaffoldDevelopmentVersionCommand.RaiseCanExecuteChanged();
+            ScaffoldCurrentProductionVersionCommand.RaiseCanExecuteChanged();
         }
 
         private bool StartCreation_CanExecute() =>
             _configuration != null
             && !_configuration.HasErrors
+            && !_scaffoldingService.IsScaffolding
             && !_scriptCreationService.IsCreating;
 
         private async void StartCreation_Executed()

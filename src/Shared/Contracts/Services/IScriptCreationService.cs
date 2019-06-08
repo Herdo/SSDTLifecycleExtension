@@ -25,7 +25,7 @@
         /// <param name="newVersion">The new version, can be null to generate "latest".</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> used to cancel the script creation.</param>
         /// <exception cref="ArgumentNullException"><paramref name="project"/>, <paramref name="configuration"/>, or <paramref name="previousVersion"/> are <b>null</b>.</exception>
-        /// <exception cref="InvalidOperationException">A creation us currently running. Check <see cref="IsCreating"/> before calling.</exception>
+        /// <exception cref="InvalidOperationException">A creation is currently running. Check <see cref="IsCreating"/> before calling.</exception>
         /// <returns>An awaitable <see cref="Task"/>.</returns>
         Task CreateAsync([NotNull] SqlProject project,
                          [NotNull] ConfigurationModel configuration,

@@ -9,12 +9,15 @@
     public class CommandAvailabilityService : ICommandAvailabilityService
     {
         private readonly IVisualStudioAccess _visualStudioAccess;
+        private readonly IScaffoldingService _scaffoldingService;
         private readonly IScriptCreationService _scriptCreationService;
 
         public CommandAvailabilityService(IVisualStudioAccess visualStudioAccess,
+                                          IScaffoldingService scaffoldingService,
                                           IScriptCreationService scriptCreationService)
         {
             _visualStudioAccess = visualStudioAccess;
+            _scaffoldingService = scaffoldingService;
             _scriptCreationService = scriptCreationService;
         }
 
@@ -26,7 +29,7 @@
                 return;
 
             setVisible(projectKind == Guid.Parse(Shared.Constants.SqlProjectKindGuid));
-            setEnabled(!_scriptCreationService.IsCreating);
+            setEnabled(!_scaffoldingService.IsScaffolding && !_scriptCreationService.IsCreating);
         }
     }
 }

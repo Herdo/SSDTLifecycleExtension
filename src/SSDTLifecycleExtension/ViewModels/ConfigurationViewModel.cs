@@ -17,6 +17,7 @@
         private readonly SqlProject _project;
         private readonly IConfigurationService _configurationService;
         private readonly IFileSystemAccess _fileSystemAccess;
+        private readonly IScaffoldingService _scaffoldingService;
         private readonly IScriptCreationService _scriptCreationService;
 
         private ConfigurationModel _lastSavedModel;
@@ -58,12 +59,15 @@
         public ConfigurationViewModel(SqlProject project,
                                       IConfigurationService configurationService,
                                       IFileSystemAccess fileSystemAccess,
+                                      IScaffoldingService scaffoldingService,
                                       IScriptCreationService scriptCreationService)
         {
             _project = project;
             _configurationService = configurationService;
             _fileSystemAccess = fileSystemAccess;
+            _scaffoldingService = scaffoldingService;
             _scriptCreationService = scriptCreationService;
+            _scaffoldingService.IsScaffoldingChanged += ScaffoldingService_IsScaffoldingChanged;
             _scriptCreationService.IsCreatingChanged += ScriptCreationService_IsCreatingChanged;
 
             BrowseSqlPackageCommand = new DelegateCommand(BrowseSqlPackage_Executed);
@@ -101,6 +105,7 @@
             return Model != null
                 && !Model.HasErrors
                 && IsModelDirty
+                && !_scaffoldingService.IsScaffolding
                 && !_scriptCreationService.IsCreating;
         }
 
@@ -145,6 +150,11 @@
         {
             _lastSavedModel = await _configurationService.GetConfigurationOrDefaultAsync(_project);
             Model = _lastSavedModel.Copy();
+        }
+
+        private void ScaffoldingService_IsScaffoldingChanged(object sender, EventArgs e)
+        {
+            SaveConfigurationCommand.RaiseCanExecuteChanged();
         }
 
         private void ScriptCreationService_IsCreatingChanged(object sender, EventArgs e)

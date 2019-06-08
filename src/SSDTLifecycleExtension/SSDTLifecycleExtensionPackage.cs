@@ -78,6 +78,7 @@
                 // Services
                .RegisterSingleton<IConfigurationService, ConfigurationService>()
                .RegisterSingleton<ICommandAvailabilityService, CommandAvailabilityService>()
+               .RegisterSingleton<IScaffoldingService, ScaffoldingService>()
                .RegisterSingleton<IScriptCreationService, ScriptCreationService>()
                .RegisterSingleton<IVersionService, VersionService>()
                .RegisterSingleton<ISqlProjectService, SqlProjectService>()
