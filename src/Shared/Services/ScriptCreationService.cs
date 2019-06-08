@@ -20,6 +20,7 @@
     {
         private readonly IVersionService _versionService;
         private readonly ISqlProjectService _sqlProjectService;
+        private readonly IBuildService _buildService;
         private readonly IScriptModifierFactory _scriptModifierFactory;
         private readonly IVisualStudioAccess _visualStudioAccess;
         private readonly IFileSystemAccess _fileSystemAccess;
@@ -29,6 +30,7 @@
 
         public ScriptCreationService(IVersionService versionService,
                                      ISqlProjectService sqlProjectService,
+                                     IBuildService buildService,
                                      IScriptModifierFactory scriptModifierFactory,
                                      IVisualStudioAccess visualStudioAccess,
                                      IFileSystemAccess fileSystemAccess,
@@ -36,6 +38,7 @@
         {
             _versionService = versionService;
             _sqlProjectService = sqlProjectService;
+            _buildService = buildService;
             _scriptModifierFactory = scriptModifierFactory;
             _visualStudioAccess = visualStudioAccess;
             _fileSystemAccess = fileSystemAccess;
@@ -51,19 +54,15 @@
             return true;
         }
 
-        private async Task<ScriptCreationVariables> CreateVariablesAsync(SqlProject project,
-                                                                         ConfigurationModel configuration,
-                                                                         Version previousVersion,
-                                                                         Version newVersion)
+        private ScriptCreationVariables CreateVariables(SqlProject project,
+                                                        ConfigurationModel configuration,
+                                                        Version previousVersion,
+                                                        Version newVersion)
         {
             var projectPath = project.FullName;
             var projectDirectory = Path.GetDirectoryName(projectPath);
             if (projectDirectory == null)
                 throw new InvalidOperationException("Cannot get project directory.");
-
-            // DACPAC data from *.sqlproj
-            var pi = await _sqlProjectService.GetSqlProjectInformationAsync(projectPath);
-            var binaryDirectory = Path.Combine(projectDirectory, pi.OutputPath);
 
             // Versions
             var createLatest = newVersion == null;
@@ -78,18 +77,15 @@
             var profilePath = Path.Combine(projectDirectory, configuration.PublishProfilePath);
             var artifactsPath = Path.Combine(projectDirectory, configuration.ArtifactsPath);
             var previousVersionDirectory = Path.Combine(artifactsPath, previousVersionString);
-            var previousVersionPath = Path.Combine(previousVersionDirectory, $"{pi.SqlTargetName}.dacpac");
+            var previousVersionPath = Path.Combine(previousVersionDirectory, $"{project.ProjectProperties.SqlTargetName}.dacpac");
             var newVersionDirectory = Path.Combine(artifactsPath, newVersionString);
-            var newVersionPath = Path.Combine(newVersionDirectory, $"{pi.SqlTargetName}.dacpac");
-            var outputPath = Path.Combine(newVersionDirectory, $"{pi.SqlTargetName}_{previousVersionString}_{newVersionString}.sql");
+            var newVersionPath = Path.Combine(newVersionDirectory, $"{project.ProjectProperties.SqlTargetName}.dacpac");
+            var outputPath = Path.Combine(newVersionDirectory, $"{project.ProjectProperties.SqlTargetName}_{previousVersionString}_{newVersionString}.sql");
             var documentationPath = configuration.CreateDocumentationWithScriptCreation
-                ? Path.Combine(newVersionDirectory, $"{pi.SqlTargetName}_{previousVersionString}_{newVersionString}.xml")
-                : null;
+                                        ? Path.Combine(newVersionDirectory, $"{project.ProjectProperties.SqlTargetName}_{previousVersionString}_{newVersionString}.xml")
+                                        : null;
 
-            return new ScriptCreationVariables(pi.SqlTargetName,
-                                               projectPath,
-                                               binaryDirectory,
-                                               profilePath,
+            return new ScriptCreationVariables(profilePath,
                                                newVersionDirectory,
                                                newVersionPath,
                                                previousVersionPath,
@@ -124,11 +120,6 @@
                                                       string sqlPackagePath)
         {
             await _logger.LogAsync("Verifying variables ...");
-            if (!_fileSystemAccess.CheckIfFileExists(variables.ProjectPath))
-            {
-                await _logger.LogAsync("ERROR: Failed to find project file.");
-                return false;
-            }
 
             if (!_fileSystemAccess.CheckIfFileExists(variables.ProfilePath))
             {
@@ -144,35 +135,7 @@
 
             return true;
         }
-
-        private async Task BuildAsync(SqlProject project,
-                                      ConfigurationModel configuration)
-        {
-            if (configuration.BuildBeforeScriptCreation)
-            {
-                await _logger.LogAsync("Building project ...");
-                _visualStudioAccess.BuildProject(project);
-            }
-        }
-
-        private async Task<bool> CopyOutputAsync(ScriptCreationVariables variables)
-        {
-            await _logger.LogAsync("Copying files to target directory ...");
-            var directoryCreationError = _fileSystemAccess.EnsureDirectoryExists(variables.SourceDirectory);
-            if (directoryCreationError != null)
-            {
-                await _logger.LogAsync("ERROR: Failed to ensure the target directory exists.");
-                return false;
-            }
-
-            var copyFilesError = _fileSystemAccess.CopyFiles(variables.BinaryDirectory, variables.SourceDirectory, "*.dacpac");
-            if (copyFilesError == null)
-                return true;
-
-            await _logger.LogAsync($"ERROR: Failed to copy files to the target directory: {copyFilesError}");
-            return false;
-        }
-
+        
         private async Task<bool> CreateScriptAsync(ScriptCreationVariables variables,
                                                    string sqlPackagePath,
                                                    CancellationToken cancellationToken)
@@ -210,7 +173,8 @@
             return false;
         }
 
-        private async Task<bool> ModifyCreatedScriptAsync(ConfigurationModel configuration,
+        private async Task<bool> ModifyCreatedScriptAsync(SqlProject project,
+                                                          ConfigurationModel configuration,
                                                           ScriptCreationVariables variables,
                                                           CancellationToken cancellationToken)
         {
@@ -225,6 +189,7 @@
                 await _logger.LogAsync($"Modifying script: {m.Key}");
 
                 scriptContent = m.Value.Modify(scriptContent,
+                                               project,
                                                configuration,
                                                variables);
 
@@ -296,7 +261,14 @@
                     return;
 
                 // No check for the cancellation token before the first action.
-                var variables = await CreateVariablesAsync(project, configuration, previousVersion, newVersion);
+                await _sqlProjectService.LoadSqlProjectPropertiesAsync(project);
+
+                // Cancel if requested
+                if (await ShouldCancelAsync(cancellationToken))
+                    return;
+
+                // Create variables required for script creation
+                var variables = CreateVariables(project, configuration, previousVersion, newVersion);
 
                 // Cancel if requested
                 if (await ShouldCancelAsync(cancellationToken))
@@ -317,13 +289,14 @@
                 if (await ShouldCancelAsync(cancellationToken))
                     return;
 
-                await BuildAsync(project, configuration);
+                if (configuration.BuildBeforeScriptCreation)
+                    await _buildService.BuildProjectAsync(project);
 
                 // Cancel if requested
                 if (await ShouldCancelAsync(cancellationToken))
                     return;
 
-                if (!await CopyOutputAsync(variables))
+                if (!await _buildService.CopyBuildResultAsync(project, variables.ArtifactsDirectoryWithVersion))
                     return;
 
                 // Cancel if requested
@@ -346,7 +319,7 @@
                     return;
 
                 // Modify the script
-                if (!await ModifyCreatedScriptAsync(configuration, variables, cancellationToken))
+                if (!await ModifyCreatedScriptAsync(project, configuration, variables, cancellationToken))
                     return;
 
                 // No check for the cancellation token after the last action.

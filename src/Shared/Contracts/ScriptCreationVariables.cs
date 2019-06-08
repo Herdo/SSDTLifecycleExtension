@@ -4,11 +4,8 @@
 
     public class ScriptCreationVariables
     {
-        public string SqlTargetName { get; }
-        public string ProjectPath { get; }
-        public string BinaryDirectory { get; }
         public string ProfilePath { get; }
-        public string SourceDirectory { get; }
+        public string ArtifactsDirectoryWithVersion { get; }
         public string SourceFile { get; }
         public string TargetFile { get; }
         public string DeployScriptPath { get; }
@@ -17,11 +14,8 @@
         public Version PreviousVersion { get; }
         public Version NewVersion { get; }
 
-        public ScriptCreationVariables(string sqlTargetName,
-                                       string projectPath,
-                                       string binaryDirectory,
-                                       string profilePath,
-                                       string sourceDirectory,
+        public ScriptCreationVariables(string profilePath,
+                                       string artifactsDirectoryWithVersion,
                                        string sourceFile,
                                        string targetFile,
                                        string deployScriptPath,
@@ -29,11 +23,8 @@
                                        Version previousVersion,
                                        Version newVersion)
         {
-            SqlTargetName = sqlTargetName;
-            ProjectPath = projectPath;
-            BinaryDirectory = binaryDirectory;
             ProfilePath = profilePath;
-            SourceDirectory = sourceDirectory;
+            ArtifactsDirectoryWithVersion = artifactsDirectoryWithVersion;
             SourceFile = sourceFile;
             TargetFile = targetFile;
             DeployScriptPath = deployScriptPath;

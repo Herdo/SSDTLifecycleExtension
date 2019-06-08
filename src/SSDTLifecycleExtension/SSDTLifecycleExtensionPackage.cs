@@ -75,13 +75,16 @@
                .RegisterType<VersionHistoryViewModel>()
                .RegisterType<ConfigurationViewModel>()
                 
-                // Services
+                // Services with state / events
                .RegisterSingleton<IConfigurationService, ConfigurationService>()
-               .RegisterSingleton<ICommandAvailabilityService, CommandAvailabilityService>()
                .RegisterSingleton<IScaffoldingService, ScaffoldingService>()
                .RegisterSingleton<IScriptCreationService, ScriptCreationService>()
-               .RegisterSingleton<IVersionService, VersionService>()
-               .RegisterSingleton<ISqlProjectService, SqlProjectService>()
+
+                // Stateless services
+               .RegisterType<ICommandAvailabilityService, CommandAvailabilityService>()
+               .RegisterType<IBuildService, BuildService>()
+               .RegisterType<IVersionService, VersionService>()
+               .RegisterType<ISqlProjectService, SqlProjectService>()
                 
                 // Data Access
                .RegisterSingleton<IFileSystemAccess, FileSystemAccess>()

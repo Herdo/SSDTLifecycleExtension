@@ -17,7 +17,18 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers
             IScriptModifier s = new AddCustomHeaderModifier();
 
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => s.Modify(null, null, default));
+            Assert.Throws<ArgumentNullException>(() => s.Modify(null, null, null, default));
+        }
+
+        [Test]
+        public void Modify_ArgumentNullException_Project()
+        {
+            // Arrange
+            IScriptModifier s = new AddCustomHeaderModifier();
+            const string input = "foobar";
+
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() => s.Modify(input, null, null, default));
         }
 
         [Test]
@@ -26,9 +37,10 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers
             // Arrange
             IScriptModifier s = new AddCustomHeaderModifier();
             const string input = "foobar";
+            var project = new SqlProject("a", "b", "c");
 
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => s.Modify(input, null, default));
+            Assert.Throws<ArgumentNullException>(() => s.Modify(input, project, null, default));
         }
 
         [Test]
@@ -37,13 +49,14 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers
             // Arrange
             IScriptModifier s = new AddCustomHeaderModifier();
             const string input = "foobar";
+            var project = new SqlProject("a", "b", "c");
             var configuration = new ConfigurationModel
             {
                 CustomHeader = "Header"
             };
 
             // Act
-            var modified = s.Modify(input, configuration, default);
+            var modified = s.Modify(input, project, configuration, default);
 
             // Assert
             Assert.IsNotNull(modified);
@@ -60,13 +73,14 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers
             // Arrange
             IScriptModifier s = new AddCustomHeaderModifier();
             const string input = "foobar";
+            var project = new SqlProject("a", "b", "c");
             var configuration = new ConfigurationModel
             {
                 CustomHeader = customHeader
             };
 
             // Act
-            var modified = s.Modify(input, configuration, default);
+            var modified = s.Modify(input, project, configuration, default);
 
             // Assert
             Assert.IsNotNull(modified);

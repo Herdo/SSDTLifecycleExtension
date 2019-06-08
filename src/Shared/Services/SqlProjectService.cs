@@ -1,9 +1,11 @@
 ﻿namespace SSDTLifecycleExtension.Shared.Services
 {
     using System;
+    using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
     using System.Xml.Linq;
+    using Contracts;
     using Contracts.DataAccess;
     using Contracts.Services;
 
@@ -17,12 +19,16 @@
             _fileSystemAccess = fileSystemAccess;
         }
 
-        async Task<(string OutputPath, string SqlTargetName)> ISqlProjectService.GetSqlProjectInformationAsync(string projectPath)
+        async Task ISqlProjectService.LoadSqlProjectPropertiesAsync(SqlProject project)
         {
-            var content = await _fileSystemAccess.ReadFileAsync(projectPath);
+            var projectDirectory = Path.GetDirectoryName(project.FullName);
+            if (projectDirectory == null)
+                throw new InvalidOperationException("Cannot get project directory.");
+
+            var content = await _fileSystemAccess.ReadFileAsync(project.FullName);
             var doc = XDocument.Parse(content);
             if (doc.Root == null)
-                throw new InvalidOperationException($"Cannot read contents of {projectPath}");
+                throw new InvalidOperationException($"Cannot read contents of {project.FullName}");
 
             string name = null;
             string outputPath = null;
@@ -50,13 +56,13 @@
             }
 
             if (name == null)
-                throw new InvalidOperationException($"Cannot read name of {projectPath}");
+                throw new InvalidOperationException($"Cannot read name of {project.FullName}");
             if (outputPath == null)
-                throw new InvalidOperationException($"Cannot read output path of {projectPath}");
+                throw new InvalidOperationException($"Cannot read output path of {project.FullName}");
 
-            return sqlTargetName == null
-                       ? (outputPath, name)
-                       : (outputPath, sqlTargetName);
+            // Set properties on the project object
+            project.ProjectProperties.SqlTargetName = sqlTargetName ?? name;
+            project.ProjectProperties.BinaryDirectory = Path.Combine(projectDirectory, outputPath);
         }
     }
 }

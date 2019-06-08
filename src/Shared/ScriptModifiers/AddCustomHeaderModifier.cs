@@ -8,11 +8,14 @@
     internal class AddCustomHeaderModifier : IScriptModifier
     {
         string IScriptModifier.Modify(string input,
+                                      SqlProject project,
                                       ConfigurationModel configuration,
                                       ScriptCreationVariables variables)
         {
             if (input == null)
                 throw new ArgumentNullException(nameof(input));
+            if (project == null)
+                throw new ArgumentNullException(nameof(project));
             if (configuration == null)
                 throw new ArgumentNullException(nameof(configuration));
 

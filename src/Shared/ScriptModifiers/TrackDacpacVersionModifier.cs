@@ -57,11 +57,14 @@ UPDATE [dv]
 GO";
 
         string IScriptModifier.Modify(string input,
+                                      SqlProject project,
                                       ConfigurationModel configuration,
                                       ScriptCreationVariables variables)
         {
             if (input == null)
                 throw new ArgumentNullException(nameof(input));
+            if (project == null)
+                throw new ArgumentNullException(nameof(project));
             if (configuration == null)
                 throw new ArgumentNullException(nameof(configuration));
 
@@ -71,13 +74,13 @@ GO";
             var buildVersion = variables.NewVersion.Build == -1 ? "NULL" : variables.NewVersion.Build.ToString();
             var revisionVersion = variables.NewVersion.Revision == -1 ? "NULL" : variables.NewVersion.Revision.ToString();
             var createAndInsert = string.Format(_CREATE_AND_INSERT_SCRIPT_TEMPLATE,
-                                                variables.SqlTargetName,
+                                                project.ProjectProperties.SqlTargetName,
                                                 majorVersion,
                                                 minorVersion,
                                                 buildVersion,
                                                 revisionVersion);
             var update = string.Format(_UPDATE_SCRIPT_TEMPLATE,
-                                       variables.SqlTargetName,
+                                       project.ProjectProperties.SqlTargetName,
                                        majorVersion,
                                        minorVersion,
                                        buildVersion,
