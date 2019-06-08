@@ -42,6 +42,10 @@
 
         public ObservableCollection<string> ExistingVersions { get; }
 
+        public DelegateCommand ScaffoldDevelopmentVersionCommand { get; }
+
+        public DelegateCommand ScaffoldCurrentProductionVersionCommand { get; }
+
         public DelegateCommand StartCreationCommand { get; }
 
         public ScriptCreationViewModel(SqlProject project,
@@ -58,14 +62,37 @@
 
             ExistingVersions = new ObservableCollection<string>();
 
+            ScaffoldDevelopmentVersionCommand = new DelegateCommand(ScaffoldDevelopmentVersion_Executed, ScaffoldDevelopmentVersion_CanExecute);
+            ScaffoldCurrentProductionVersionCommand = new DelegateCommand(ScaffoldCurrentProductionVersion_Executed, ScaffoldCurrentProductionVersion_CanExecute);
             StartCreationCommand = new DelegateCommand(StartCreation_Executed, StartCreation_CanExecute);
 
             _configurationService.ConfigurationChanged += ConfigurationService_ConfigurationChanged;
         }
 
-        private bool StartCreation_CanExecute() => _configuration != null
-                                                   && !_configuration.HasErrors
-                                                   && !_scriptCreationService.IsCreating;
+        private bool ScaffoldDevelopmentVersion_CanExecute() =>
+            _configuration != null
+            && !_configuration.HasErrors
+            && !_scriptCreationService.IsCreating;
+
+        private void ScaffoldDevelopmentVersion_Executed()
+        {
+            throw new NotImplementedException();
+        }
+
+        private bool ScaffoldCurrentProductionVersion_CanExecute() =>
+            _configuration != null
+            && !_configuration.HasErrors
+            && !_scriptCreationService.IsCreating;
+
+        private void ScaffoldCurrentProductionVersion_Executed()
+        {
+            throw new NotImplementedException();
+        }
+
+        private bool StartCreation_CanExecute() =>
+            _configuration != null
+            && !_configuration.HasErrors
+            && !_scriptCreationService.IsCreating;
 
         private async void StartCreation_Executed()
         {
@@ -86,7 +113,7 @@
             var projectDirectory = Path.GetDirectoryName(projectPath);
             if (projectDirectory == null)
             {
-                _visualStudioAccess.ShowModalError($"ERROR: Cannot determine project directory.");
+                _visualStudioAccess.ShowModalError("ERROR: Cannot determine project directory.");
                 return false;
             }
             var artifactsPath = Path.Combine(projectDirectory, _configuration.ArtifactsPath);
@@ -114,6 +141,8 @@
             Scaffolding = ExistingVersions.Count == 0;
 
             // Evaluate commands
+            ScaffoldDevelopmentVersionCommand.RaiseCanExecuteChanged();
+            ScaffoldCurrentProductionVersionCommand.RaiseCanExecuteChanged();
             StartCreationCommand.RaiseCanExecuteChanged();
             return true;
         }
@@ -124,6 +153,8 @@
                 return;
 
             _configuration = await _configurationService.GetConfigurationOrDefaultAsync(_project);
+            ScaffoldDevelopmentVersionCommand.RaiseCanExecuteChanged();
+            ScaffoldCurrentProductionVersionCommand.RaiseCanExecuteChanged();
             StartCreationCommand.RaiseCanExecuteChanged();
         }
     }

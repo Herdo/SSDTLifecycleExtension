@@ -109,7 +109,8 @@
                              FontWeight="Bold"/><Run Text="."/>
                     </TextBlock>
                     <Button Style="{StaticResource ActionButtonStyle}"
-                            Content="Scaffold Version 0.0.0.0"/>
+                            Content="Scaffold Version 0.0.0.0"
+                            Command="{Binding ScaffoldDevelopmentVersionCommand, Mode=OneWay}"/>
                 </StackPanel>
 
                 <!-- Separator -->
@@ -147,7 +148,8 @@
                              FontWeight="Bold"/><Run Text="."/>
                     </TextBlock>
                     <Button Style="{StaticResource ActionButtonStyle}"
-                            Content="Scaffold Version 1.0.0.0"/>
+                            Content="Scaffold Version 1.0.0.0"
+                            Command="{Binding ScaffoldCurrentProductionVersionCommand, Mode=OneWay}"/>
                 </StackPanel>
             </Grid>
         </GroupBox>
