@@ -3,6 +3,7 @@
     using System;
     using System.IO;
     using System.Linq;
+    using System.Threading.Tasks;
     using System.Windows;
     using Annotations;
     using EnvDTE;
@@ -15,7 +16,8 @@
     using Task = System.Threading.Tasks.Task;
 
     [UsedImplicitly]
-    public class VisualStudioAccess : IVisualStudioAccess
+    public class VisualStudioAccess : IVisualStudioAccess,
+                                      ILogger
     {
         private readonly DTE2 _dte2;
         private readonly AsyncPackage _package;
@@ -89,18 +91,6 @@
 
             var outputPane = await GetOrCreateSSDTOutputPaneAsync();
             outputPane.Clear();
-        }
-
-        async Task IVisualStudioAccess.WriteLineToSSDTLifecycleOutputAsync(string message)
-        {
-            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-
-            if (message == null)
-                throw new ArgumentNullException(nameof(message));
-
-            var outputPane = await GetOrCreateSSDTOutputPaneAsync();
-            outputPane.OutputString(message);
-            outputPane.OutputString(Environment.NewLine);
         }
 
         void IVisualStudioAccess.ShowModalError(string error)
@@ -180,6 +170,18 @@
                 ThreadHelper.ThrowIfNotOnUIThread();
                 return m.Name != fileName;
             })) properties.ProjectItems.AddFromFile(targetPath);
+        }
+
+        async Task ILogger.LogAsync(string message)
+        {
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+            if (message == null)
+                throw new ArgumentNullException(nameof(message));
+
+            var outputPane = await GetOrCreateSSDTOutputPaneAsync();
+            outputPane.OutputString(message);
+            outputPane.OutputString(Environment.NewLine);
         }
     }
 }

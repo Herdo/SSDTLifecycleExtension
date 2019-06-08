@@ -23,6 +23,7 @@
         private readonly IScriptModifierFactory _scriptModifierFactory;
         private readonly IVisualStudioAccess _visualStudioAccess;
         private readonly IFileSystemAccess _fileSystemAccess;
+        private readonly ILogger _logger;
 
         private bool _isCreating;
 
@@ -30,13 +31,15 @@
                                      ISqlProjectService sqlProjectService,
                                      IScriptModifierFactory scriptModifierFactory,
                                      IVisualStudioAccess visualStudioAccess,
-                                     IFileSystemAccess fileSystemAccess)
+                                     IFileSystemAccess fileSystemAccess,
+                                     ILogger logger)
         {
             _versionService = versionService;
             _sqlProjectService = sqlProjectService;
             _scriptModifierFactory = scriptModifierFactory;
             _visualStudioAccess = visualStudioAccess;
             _fileSystemAccess = fileSystemAccess;
+            _logger = logger;
         }
 
         private async Task<bool> ShouldCancelAsync(CancellationToken cancellationToken)
@@ -44,7 +47,7 @@
             if (!cancellationToken.IsCancellationRequested)
                 return false;
 
-            await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync("Creation was canceled by the user.");
+            await _logger.LogAsync("Creation was canceled by the user.");
             return true;
         }
 
@@ -102,40 +105,40 @@
             if (configuration.SqlPackagePath != ConfigurationModel.SqlPackageSpecialKeyword)
                 return configuration.SqlPackagePath;
 
-            await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync("Searching latest SqlPackage.exe ...");
+            await _logger.LogAsync("Searching latest SqlPackage.exe ...");
             var sqlPackageExecutables = _fileSystemAccess.SearchForFiles(Environment.SpecialFolder.ProgramFilesX86, "Microsoft SQL Server", "SqlPackage.exe");
             if (sqlPackageExecutables.Error != null)
             {
-                await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync($"ERROR: Failed to find any SqlPackage.exe: {sqlPackageExecutables.Error}");
+                await _logger.LogAsync($"ERROR: Failed to find any SqlPackage.exe: {sqlPackageExecutables.Error}");
                 return null;
             }
 
             if (sqlPackageExecutables.Result.Length > 0)
                 return sqlPackageExecutables.Result.OrderByDescending(m => m).First();
 
-            await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync("ERROR: Failed to find latest SqlPackage.exe. Please specify an absolute path to the SqlPackage.exe to use.");
+            await _logger.LogAsync("ERROR: Failed to find latest SqlPackage.exe. Please specify an absolute path to the SqlPackage.exe to use.");
             return null;
         }
 
         private async Task<bool> VerifyVariablesAsync(ScriptCreationVariables variables,
                                                       string sqlPackagePath)
         {
-            await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync("Verifying variables ...");
+            await _logger.LogAsync("Verifying variables ...");
             if (!_fileSystemAccess.CheckIfFileExists(variables.ProjectPath))
             {
-                await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync("ERROR: Failed to find project file.");
+                await _logger.LogAsync("ERROR: Failed to find project file.");
                 return false;
             }
 
             if (!_fileSystemAccess.CheckIfFileExists(variables.ProfilePath))
             {
-                await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync("ERROR: Failed to find publish profile.");
+                await _logger.LogAsync("ERROR: Failed to find publish profile.");
                 return false;
             }
 
             if (!_fileSystemAccess.CheckIfFileExists(sqlPackagePath))
             {
-                await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync("ERROR: Failed to find SqlPackage.exe.");
+                await _logger.LogAsync("ERROR: Failed to find SqlPackage.exe.");
                 return false;
             }
 
@@ -147,18 +150,18 @@
         {
             if (configuration.BuildBeforeScriptCreation)
             {
-                await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync("Building project ...");
+                await _logger.LogAsync("Building project ...");
                 _visualStudioAccess.BuildProject(project);
             }
         }
 
         private async Task<bool> CopyOutputAsync(ScriptCreationVariables variables)
         {
-            await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync("Copying files to target directory ...");
+            await _logger.LogAsync("Copying files to target directory ...");
             var directoryCreationError = _fileSystemAccess.EnsureDirectoryExists(variables.SourceDirectory);
             if (directoryCreationError != null)
             {
-                await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync("ERROR: Failed to ensure the target directory exists.");
+                await _logger.LogAsync("ERROR: Failed to ensure the target directory exists.");
                 return false;
             }
 
@@ -166,7 +169,7 @@
             if (copyFilesError == null)
                 return true;
 
-            await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync($"ERROR: Failed to copy files to the target directory: {copyFilesError}");
+            await _logger.LogAsync($"ERROR: Failed to copy files to the target directory: {copyFilesError}");
             return false;
         }
 
@@ -174,7 +177,7 @@
                                                    string sqlPackagePath,
                                                    CancellationToken cancellationToken)
         {
-            await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync("Creating script ...");
+            await _logger.LogAsync("Creating script ...");
             var sqlPackageArguments = new StringBuilder();
             sqlPackageArguments.Append("/Action:Script ");
             sqlPackageArguments.Append($"/Profile:\"{variables.ProfilePath}\" ");
@@ -189,21 +192,21 @@
                                                                                      async s =>
                                                                                      {
                                                                                          if (!string.IsNullOrWhiteSpace(s))
-                                                                                             await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync($"SqlPackage.exe INFO: {s}");
+                                                                                             await _logger.LogAsync($"SqlPackage.exe INFO: {s}");
                                                                                      },
                                                                                      async s =>
                                                                                      {
                                                                                          if (!string.IsNullOrWhiteSpace(s))
                                                                                          {
                                                                                              hasErrors = true;
-                                                                                             await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync($"SqlPackage.exe ERROR: {s}");
+                                                                                             await _logger.LogAsync($"SqlPackage.exe ERROR: {s}");
                                                                                          }
                                                                                      },
                                                                                      cancellationToken);
             if (processStartError == null)
                 return !hasErrors;
 
-            await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync($"ERROR: Failed to start the SqlPackage.exe process: {processStartError}");
+            await _logger.LogAsync($"ERROR: Failed to start the SqlPackage.exe process: {processStartError}");
             return false;
         }
 
@@ -219,7 +222,7 @@
 
             foreach (var m in modifiers.OrderBy(m => m.Key))
             {
-                await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync($"Modifying script: {m.Key}");
+                await _logger.LogAsync($"Modifying script: {m.Key}");
 
                 scriptContent = m.Value.Modify(scriptContent,
                                                configuration,
@@ -286,7 +289,7 @@
             {
                 await _visualStudioAccess.StartLongRunningTaskIndicatorAsync();
                 await _visualStudioAccess.ClearSSDTLifecycleOutputAsync();
-                await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync("Initializing script creation ...");
+                await _logger.LogAsync("Initializing script creation ...");
                 var sw = new Stopwatch();
                 sw.Start();
                 if (await ShouldCancelAsync(cancellationToken))
@@ -334,7 +337,7 @@
                 if (!success)
                 {
                     sw.Stop();
-                    await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync($"ERROR: Script creation aborted after {sw.ElapsedMilliseconds / 1000} seconds.");
+                    await _logger.LogAsync($"ERROR: Script creation aborted after {sw.ElapsedMilliseconds / 1000} seconds.");
                     return;
                 }
 
@@ -349,13 +352,13 @@
                 // No check for the cancellation token after the last action.
                 // Completion
                 sw.Stop();
-                await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync($"========== Script creation finished after {sw.ElapsedMilliseconds / 1000} seconds. ==========");
+                await _logger.LogAsync($"========== Script creation finished after {sw.ElapsedMilliseconds / 1000} seconds. ==========");
             }
             catch (Exception e)
             {
                 try
                 {
-                    await _visualStudioAccess.WriteLineToSSDTLifecycleOutputAsync($"ERROR: Script creation failed: {e.Message}");
+                    await _logger.LogAsync($"ERROR: Script creation failed: {e.Message}");
                 }
                 catch
                 {

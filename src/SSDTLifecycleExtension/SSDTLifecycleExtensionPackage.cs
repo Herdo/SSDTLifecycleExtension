@@ -62,6 +62,8 @@
             if (!(await GetServiceAsync(typeof(IMenuCommandService)) is OleMenuCommandService commandService))
                 throw new InvalidOperationException($"Cannot initialize {nameof(SSDTLifecycleExtensionPackage)} without the {nameof(OleMenuCommandService)}.");
 
+            var visualStudioAccess = new VisualStudioAccess(_dte2, this);
+
             var container = new UnityContainer()
 
                 // Visual Studio dependencies
@@ -82,7 +84,8 @@
                 
                 // Data Access
                .RegisterSingleton<IFileSystemAccess, FileSystemAccess>()
-               .RegisterInstance<IVisualStudioAccess>(new VisualStudioAccess(_dte2, this), new ContainerControlledLifetimeManager())
+               .RegisterInstance<IVisualStudioAccess>(visualStudioAccess, new ContainerControlledLifetimeManager())
+               .RegisterInstance<ILogger>(visualStudioAccess, new ContainerControlledLifetimeManager())
                 
                 // Factories
                .RegisterSingleton<IScriptModifierFactory, ScriptModifierFactory>();

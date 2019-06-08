@@ -20,8 +20,6 @@
 
         Task ClearSSDTLifecycleOutputAsync();
 
-        Task WriteLineToSSDTLifecycleOutputAsync([NotNull] string message);
-
         void ShowModalError([NotNull] string error);
 
         void BuildProject([NotNull] SqlProject project);
