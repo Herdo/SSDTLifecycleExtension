@@ -20,6 +20,7 @@
     {
         private readonly ISqlProjectService _sqlProjectService;
         private readonly IBuildService _buildService;
+        private readonly IVersionService _versionService;
         private readonly IScriptModifierFactory _scriptModifierFactory;
         private readonly IVisualStudioAccess _visualStudioAccess;
         private readonly IFileSystemAccess _fileSystemAccess;
@@ -29,6 +30,7 @@
 
         public ScriptCreationService(ISqlProjectService sqlProjectService,
                                      IBuildService buildService,
+                                     IVersionService versionService,
                                      IScriptModifierFactory scriptModifierFactory,
                                      IVisualStudioAccess visualStudioAccess,
                                      IFileSystemAccess fileSystemAccess,
@@ -36,6 +38,7 @@
         {
             _sqlProjectService = sqlProjectService ?? throw new ArgumentNullException(nameof(sqlProjectService));
             _buildService = buildService ?? throw new ArgumentNullException(nameof(buildService));
+            _versionService = versionService ?? throw new ArgumentNullException(nameof(versionService));
             _scriptModifierFactory = scriptModifierFactory ?? throw new ArgumentNullException(nameof(scriptModifierFactory));
             _visualStudioAccess = visualStudioAccess ?? throw new ArgumentNullException(nameof(visualStudioAccess));
             _fileSystemAccess = fileSystemAccess ?? throw new ArgumentNullException(nameof(fileSystemAccess));
@@ -220,6 +223,22 @@
 
                 if(!await _sqlProjectService.TryLoadSqlProjectPropertiesAsync(project))
                     return;
+
+                // Cancel if requested
+                if (await ShouldCancelAsync(cancellationToken))
+                    return;
+
+                // Check DacVersion against base version, if not running latest creation
+                if (!latest)
+                {
+                    var formattedTargetVersion = Version.Parse(_versionService.DetermineFinalVersion(project.ProjectProperties.DacVersion, configuration));
+                    if (formattedTargetVersion <= previousVersion)
+                    {
+                        await _logger.LogAsync($"ERROR: DacVersion of SQL project ({formattedTargetVersion}) is equal to or smaller than the previous version ({previousVersion}).");
+                        _visualStudioAccess.ShowModalError("Please change the DAC version in the SQL project settings (see output window).");
+                        return;
+                    }
+                }
 
                 // Cancel if requested
                 if (await ShouldCancelAsync(cancellationToken))
