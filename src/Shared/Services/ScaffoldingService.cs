@@ -58,10 +58,10 @@
 
         bool IScaffoldingService.IsScaffolding => IsScaffolding;
 
-        async Task IScaffoldingService.ScaffoldAsync(SqlProject project,
-                                                     ConfigurationModel configuration,
-                                                     Version targetVersion,
-                                                     CancellationToken cancellationToken)
+        async Task<bool> IScaffoldingService.ScaffoldAsync(SqlProject project,
+                                                           ConfigurationModel configuration,
+                                                           Version targetVersion,
+                                                           CancellationToken cancellationToken)
         {
             if (project == null)
                 throw new ArgumentNullException(nameof(project));
@@ -83,50 +83,50 @@
 
                 // Cancel if requested
                 if (await ShouldCancelAsync(cancellationToken))
-                    return;
+                    return false;
 
                 var formattedTargetVersion = Version.Parse(_versionService.DetermineFinalVersion(targetVersion, configuration));
 
                 // Cancel if requested
                 if (await ShouldCancelAsync(cancellationToken))
-                    return;
+                    return false;
 
                 if (!await _sqlProjectService.TryLoadSqlProjectPropertiesAsync(project))
-                    return;
+                    return false;
 
                 // Cancel if requested
                 if (await ShouldCancelAsync(cancellationToken))
-                    return;
+                    return false;
 
                 // Check DacVersion against planned target version
                 if (project.ProjectProperties.DacVersion != formattedTargetVersion)
                 {
                     await _logger.LogAsync($"ERROR: DacVersion of SQL project ({project.ProjectProperties.DacVersion}) doesn't match target version ({formattedTargetVersion}).");
                     _visualStudioAccess.ShowModalError("Please change the DAC version in the SQL project settings (see output window).");
-                    return;
+                    return false;
                 }
 
                 // Cancel if requested
                 if (await ShouldCancelAsync(cancellationToken))
-                    return;
+                    return false;
 
                 var paths = await _sqlProjectService.TryLoadPathsAsync(project, configuration);
                 if (paths == null)
-                    return;
+                    return false;
 
                 // Cancel if requested
                 if (await ShouldCancelAsync(cancellationToken))
-                    return;
+                    return false;
 
                 await _buildService.BuildProjectAsync(project);
 
                 // Cancel if requested
                 if (await ShouldCancelAsync(cancellationToken))
-                    return;
+                    return false;
 
                 // Copy build result
                 if (!await _buildService.CopyBuildResultAsync(project, paths.NewDacpacDirectory))
-                    return;
+                    return false;
 
                 // No check for the cancellation token after the last action.
                 // Completion
@@ -157,6 +157,7 @@
 
                 IsScaffolding = false;
             }
+            return true;
         }
     }
 }

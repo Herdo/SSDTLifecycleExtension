@@ -80,9 +80,16 @@
 
         private async void ScaffoldDevelopmentVersion_Executed()
         {
-            await _scaffoldingService.ScaffoldAsync(_project, _configuration, new Version(0, 0, 0, 0), CancellationToken.None);
-            ScaffoldDevelopmentVersionCommand.RaiseCanExecuteChanged();
-            ScaffoldCurrentProductionVersionCommand.RaiseCanExecuteChanged();
+            var successful = await _scaffoldingService.ScaffoldAsync(_project, _configuration, new Version(0, 0, 0, 0), CancellationToken.None);
+            if (successful)
+            {
+                await InitializeAsync();
+            }
+            else
+            {
+                ScaffoldDevelopmentVersionCommand.RaiseCanExecuteChanged();
+                ScaffoldCurrentProductionVersionCommand.RaiseCanExecuteChanged();
+            }
         }
 
         private bool ScaffoldCurrentProductionVersion_CanExecute() =>
@@ -93,9 +100,16 @@
 
         private async void ScaffoldCurrentProductionVersion_Executed()
         {
-            await _scaffoldingService.ScaffoldAsync(_project, _configuration, new Version(1, 0, 0, 0), CancellationToken.None);
-            ScaffoldDevelopmentVersionCommand.RaiseCanExecuteChanged();
-            ScaffoldCurrentProductionVersionCommand.RaiseCanExecuteChanged();
+            var successful = await _scaffoldingService.ScaffoldAsync(_project, _configuration, new Version(1, 0, 0, 0), CancellationToken.None);
+            if (successful)
+            {
+                await InitializeAsync();
+            }
+            else
+            {
+                ScaffoldDevelopmentVersionCommand.RaiseCanExecuteChanged();
+                ScaffoldCurrentProductionVersionCommand.RaiseCanExecuteChanged();
+            }
         }
 
         private bool StartCreation_CanExecute() =>

@@ -24,10 +24,10 @@
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> used to cancel the script creation.</param>
         /// <exception cref="ArgumentNullException"><paramref name="project"/>, <paramref name="configuration"/>, or <paramref name="targetVersion"/> are <b>null</b>.</exception>
         /// <exception cref="InvalidOperationException">A scaffolding is currently running. Check <see cref="IsScaffolding"/> before calling.</exception>
-        /// <returns>An awaitable <see cref="Task"/>.</returns>
-        Task ScaffoldAsync([NotNull] SqlProject project,
-                           [NotNull] ConfigurationModel configuration,
-                           [NotNull] Version targetVersion,
-                           CancellationToken cancellationToken);
+        /// <returns><b>True</b>, if scaffolding was successful, otherwise <b>false</b>.</returns>
+        Task<bool> ScaffoldAsync([NotNull] SqlProject project,
+                                 [NotNull] ConfigurationModel configuration,
+                                 [NotNull] Version targetVersion,
+                                 CancellationToken cancellationToken);
     }
 }
