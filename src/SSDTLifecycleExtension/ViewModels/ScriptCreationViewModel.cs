@@ -60,7 +60,9 @@
 
         public DelegateCommand ScaffoldCurrentProductionVersionCommand { get; }
 
-        public DelegateCommand StartCreationCommand { get; }
+        public DelegateCommand StartLatestCreationCommand { get; }
+
+        public DelegateCommand StartVersionedCreationCommand { get; }
 
         public ScriptCreationViewModel(SqlProject project,
                                        IConfigurationService configurationService,
@@ -80,7 +82,8 @@
 
             ScaffoldDevelopmentVersionCommand = new DelegateCommand(ScaffoldDevelopmentVersion_Executed, ScaffoldDevelopmentVersion_CanExecute);
             ScaffoldCurrentProductionVersionCommand = new DelegateCommand(ScaffoldCurrentProductionVersion_Executed, ScaffoldCurrentProductionVersion_CanExecute);
-            StartCreationCommand = new DelegateCommand(StartCreation_Executed, StartCreation_CanExecute);
+            StartLatestCreationCommand = new DelegateCommand(StartLatestCreation_Executed, StartLatestCreation_CanExecute);
+            StartVersionedCreationCommand = new DelegateCommand(StartVersionedCreation_Executed, StartVersionedCreation_CanExecute);
 
             _configurationService.ConfigurationChanged += ConfigurationService_ConfigurationChanged;
         }
@@ -125,16 +128,28 @@
             }
         }
 
-        private bool StartCreation_CanExecute() =>
+        private bool StartLatestCreation_CanExecute() =>
             _configuration != null
             && !_configuration.HasErrors
             && !_scaffoldingService.IsScaffolding
             && !_scriptCreationService.IsCreating;
 
-        private async void StartCreation_Executed()
+        private async void StartLatestCreation_Executed()
         {
-            await _scriptCreationService.CreateAsync(_project, _configuration, SelectedBaseVersion.UnderlyingVersion, null, CancellationToken.None);
-            StartCreationCommand.RaiseCanExecuteChanged();
+            await _scriptCreationService.CreateAsync(_project, _configuration, SelectedBaseVersion.UnderlyingVersion, true, CancellationToken.None);
+            StartLatestCreationCommand.RaiseCanExecuteChanged();
+        }
+
+        private bool StartVersionedCreation_CanExecute() =>
+            _configuration != null
+            && !_configuration.HasErrors
+            && !_scaffoldingService.IsScaffolding
+            && !_scriptCreationService.IsCreating;
+
+        private async void StartVersionedCreation_Executed()
+        {
+            await _scriptCreationService.CreateAsync(_project, _configuration, SelectedBaseVersion.UnderlyingVersion, false, CancellationToken.None);
+            StartLatestCreationCommand.RaiseCanExecuteChanged();
         }
 
         /// <summary>
@@ -193,7 +208,7 @@
             // Evaluate commands
             ScaffoldDevelopmentVersionCommand.RaiseCanExecuteChanged();
             ScaffoldCurrentProductionVersionCommand.RaiseCanExecuteChanged();
-            StartCreationCommand.RaiseCanExecuteChanged();
+            StartLatestCreationCommand.RaiseCanExecuteChanged();
             return true;
         }
 
@@ -205,7 +220,7 @@
             _configuration = await _configurationService.GetConfigurationOrDefaultAsync(_project);
             ScaffoldDevelopmentVersionCommand.RaiseCanExecuteChanged();
             ScaffoldCurrentProductionVersionCommand.RaiseCanExecuteChanged();
-            StartCreationCommand.RaiseCanExecuteChanged();
+            StartLatestCreationCommand.RaiseCanExecuteChanged();
         }
     }
 }

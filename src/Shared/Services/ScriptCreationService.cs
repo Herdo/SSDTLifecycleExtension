@@ -193,7 +193,7 @@
         async Task IScriptCreationService.CreateAsync(SqlProject project,
                                                       ConfigurationModel configuration,
                                                       Version previousVersion,
-                                                      Version newVersion,
+                                                      bool latest,
                                                       CancellationToken cancellationToken)
         {
             if (project == null)
@@ -226,7 +226,7 @@
                     return;
 
                 // Create paths required for script creation
-                var paths = await _sqlProjectService.TryLoadPathsAsync(project, configuration, previousVersion, newVersion == null);
+                var paths = await _sqlProjectService.TryLoadPathsAsync(project, configuration, previousVersion, latest);
                 if (paths == null)
                     return;
 

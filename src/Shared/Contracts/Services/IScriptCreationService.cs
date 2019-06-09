@@ -22,7 +22,7 @@
         /// <param name="project">The project to generate the script for.</param>
         /// <param name="configuration">The configuration to use.</param>
         /// <param name="previousVersion">The previous version used as base version.</param>
-        /// <param name="newVersion">The new version, can be null to generate "latest".</param>
+        /// <param name="latest">Whether to generate "latest" or the configured DacVersion.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> used to cancel the script creation.</param>
         /// <exception cref="ArgumentNullException"><paramref name="project"/>, <paramref name="configuration"/>, or <paramref name="previousVersion"/> are <b>null</b>.</exception>
         /// <exception cref="InvalidOperationException">A creation is currently running. Check <see cref="IsCreating"/> before calling.</exception>
@@ -30,7 +30,7 @@
         Task CreateAsync([NotNull] SqlProject project,
                          [NotNull] ConfigurationModel configuration,
                          [NotNull] Version previousVersion,
-                         [CanBeNull] Version newVersion,
+                         bool latest,
                          CancellationToken cancellationToken);
     }
 }

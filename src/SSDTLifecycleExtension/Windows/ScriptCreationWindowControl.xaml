@@ -171,22 +171,33 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="15"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="15"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="300"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="300"/>
+                </Grid.ColumnDefinitions>
 
                 <!-- Introduction -->
                 <TextBlock Grid.Row="0"
+                           Grid.Column="0"
+                           Grid.ColumnSpan="3"
                            Style="{StaticResource DescriptionTextBlockStyle}">
                     <Run Text="There are multiple base versions that can be used to create a deployment script."/>
                     <LineBreak/>
-                    <Run Text="Please select a base version below."/>
+                    <Run Text="Please select a base version and the version to create below."/>
                 </TextBlock>
 
-                <StackPanel Grid.Row="2"
-                            HorizontalAlignment="Center">
-                    <imaging:CrispImage Style="{StaticResource ScaffoldingCrispImageStyle}"
-                                        Moniker="{x:Static catalog:KnownMonikers.GenerateChangeScript}"/>
-                    <StackPanel Orientation="Horizontal">
+                <!-- Base version -->
+                <Border Grid.Row="2"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="3"
+                        HorizontalAlignment="Stretch">
+                    <StackPanel HorizontalAlignment="Center"
+                                Orientation="Horizontal">
                         <TextBlock Text="Base version:"
                                    Style="{StaticResource ComboBoxDescriptionTextBlockStyle}"/>
                         <ComboBox ItemsSource="{Binding ExistingVersions}"
@@ -194,9 +205,74 @@
                                   DisplayMemberPath="DisplayName"
                                   Style="{StaticResource VersionSelectionComboBoxStyle}"/>
                     </StackPanel>
-                    <Button Content="Start creation"
+                </Border>
+
+                <!-- Create latest script -->
+                <StackPanel Grid.Row="4"
+                            Grid.Column="0"
+                            HorizontalAlignment="Center">
+                    <TextBlock Text="Latest Script"
+                               Style="{StaticResource HeaderTextBlockStyle}"/>
+                    <imaging:CrispImage Style="{StaticResource ScaffoldingCrispImageStyle}"
+                                        Moniker="{x:Static catalog:KnownMonikers.UpdateScript}"/>
+                    <TextBlock Style="{StaticResource DescriptionTextBlockStyle}">
+                        <Run Text="The current database project is under development"/>
+                        <LineBreak/>
+                        <Run Text="and"/>
+                        <Run Text="not ready"
+                             FontWeight="Bold"/>
+                        <Run Text="for deployment. This will create a"/>
+                        <LineBreak/>
+                        <Run Text="latest"
+                             FontWeight="Bold"/>
+                        <Run Text="sub-directory in your artifacts"/>
+                        <LineBreak/>
+                        <Run Text="directory. You can always re-run"/>
+                        <LineBreak/>
+                        <Run Text="this to create the latest script, without"/>
+                        <LineBreak/>
+                        <Run Text="losing your version control history."/>
+                    </TextBlock>
+                    <Button Content="Create 'latest' script"
                             Style="{StaticResource ActionButtonStyle}"
-                            Command="{Binding StartCreationCommand, Mode=OneWay}"/>
+                            Command="{Binding StartLatestCreationCommand, Mode=OneWay}"/>
+                </StackPanel>
+
+                <!-- Separator -->
+                <GridSplitter Grid.Row="4"
+                              Grid.Column="1"
+                              Background="Black"
+                              Width="1"
+                              IsEnabled="False"/>
+
+                <!-- Create versioned script -->
+                <StackPanel Grid.Row="4"
+                            Grid.Column="2"
+                            HorizontalAlignment="Center">
+                    <TextBlock Text="Versioned Script"
+                               Style="{StaticResource HeaderTextBlockStyle}"/>
+                    <imaging:CrispImage Style="{StaticResource ScaffoldingCrispImageStyle}"
+                                        Moniker="{x:Static catalog:KnownMonikers.ValidatedScript}"/>
+                    <TextBlock Style="{StaticResource DescriptionTextBlockStyle}">
+                        <Run Text="The current database project is finalized and"/>
+                        <LineBreak/>
+                        <Run Text="ready"
+                             FontWeight="Bold"/>
+                        <Run Text="for deployment. This will create a "/>
+                        <LineBreak/>
+                        <Run Text="versioned"
+                             FontWeight="Bold"/>
+                        <Run Text="sub-directory in your artifacts"/>
+                        <LineBreak/>
+                        <Run Text="directory. The new version can be used"/>
+                        <LineBreak/>
+                        <Run Text="as base version for further developments"/>
+                        <LineBreak/>
+                        <Run Text="and scripting actions."/>
+                    </TextBlock>
+                    <Button Content="Create versioned script"
+                            Style="{StaticResource ActionButtonStyle}"
+                            Command="{Binding StartVersionedCreationCommand, Mode=OneWay}"/>
                 </StackPanel>
             </Grid>
         </GroupBox>
