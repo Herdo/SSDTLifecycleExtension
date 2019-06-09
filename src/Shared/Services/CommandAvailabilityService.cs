@@ -16,9 +16,9 @@
                                           IScaffoldingService scaffoldingService,
                                           IScriptCreationService scriptCreationService)
         {
-            _visualStudioAccess = visualStudioAccess;
-            _scaffoldingService = scaffoldingService;
-            _scriptCreationService = scriptCreationService;
+            _visualStudioAccess = visualStudioAccess ?? throw new ArgumentNullException(nameof(visualStudioAccess));
+            _scaffoldingService = scaffoldingService ?? throw new ArgumentNullException(nameof(scaffoldingService));
+            _scriptCreationService = scriptCreationService ?? throw new ArgumentNullException(nameof(scriptCreationService));
         }
 
         void ICommandAvailabilityService.HandleCommandAvailability(Action<bool> setVisible,

@@ -19,8 +19,8 @@
         public SqlProjectService(IFileSystemAccess fileSystemAccess,
                                  ILogger logger)
         {
-            _fileSystemAccess = fileSystemAccess;
-            _logger = logger;
+            _fileSystemAccess = fileSystemAccess ?? throw new ArgumentNullException(nameof(fileSystemAccess));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         private static void ReadProperties(XContainer root,

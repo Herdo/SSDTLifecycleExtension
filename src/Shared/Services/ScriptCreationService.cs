@@ -37,13 +37,13 @@
                                      IFileSystemAccess fileSystemAccess,
                                      ILogger logger)
         {
-            _versionService = versionService;
-            _sqlProjectService = sqlProjectService;
-            _buildService = buildService;
-            _scriptModifierFactory = scriptModifierFactory;
-            _visualStudioAccess = visualStudioAccess;
-            _fileSystemAccess = fileSystemAccess;
-            _logger = logger;
+            _versionService = versionService ?? throw new ArgumentNullException(nameof(versionService));
+            _sqlProjectService = sqlProjectService ?? throw new ArgumentNullException(nameof(sqlProjectService));
+            _buildService = buildService ?? throw new ArgumentNullException(nameof(buildService));
+            _scriptModifierFactory = scriptModifierFactory ?? throw new ArgumentNullException(nameof(scriptModifierFactory));
+            _visualStudioAccess = visualStudioAccess ?? throw new ArgumentNullException(nameof(visualStudioAccess));
+            _fileSystemAccess = fileSystemAccess ?? throw new ArgumentNullException(nameof(fileSystemAccess));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         private async Task<bool> ShouldCancelAsync(CancellationToken cancellationToken)

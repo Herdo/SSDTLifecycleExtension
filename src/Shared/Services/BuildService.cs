@@ -16,9 +16,9 @@
                             IFileSystemAccess fileSystemAccess,
                             ILogger logger)
         {
-            _visualStudioAccess = visualStudioAccess;
-            _fileSystemAccess = fileSystemAccess;
-            _logger = logger;
+            _visualStudioAccess = visualStudioAccess ?? throw new ArgumentNullException(nameof(visualStudioAccess));
+            _fileSystemAccess = fileSystemAccess ?? throw new ArgumentNullException(nameof(fileSystemAccess));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         async Task IBuildService.BuildProjectAsync(SqlProject project)

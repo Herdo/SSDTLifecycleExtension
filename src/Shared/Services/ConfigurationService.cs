@@ -21,8 +21,8 @@
         public ConfigurationService(IFileSystemAccess fileSystemAccess,
                                     IVisualStudioAccess visualStudioAccess)
         {
-            _fileSystemAccess = fileSystemAccess;
-            _visualStudioAccess = visualStudioAccess;
+            _fileSystemAccess = fileSystemAccess ?? throw new ArgumentNullException(nameof(fileSystemAccess));
+            _visualStudioAccess = visualStudioAccess ?? throw new ArgumentNullException(nameof(visualStudioAccess));
         }
 
         private static string GetConfigurationPath(SqlProject project)

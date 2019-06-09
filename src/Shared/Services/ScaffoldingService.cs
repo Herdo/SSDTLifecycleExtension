@@ -25,10 +25,10 @@
                                   IVisualStudioAccess visualStudioAccess,
                                   ILogger logger)
         {
-            _sqlProjectService = sqlProjectService;
-            _buildService = buildService;
-            _visualStudioAccess = visualStudioAccess;
-            _logger = logger;
+            _sqlProjectService = sqlProjectService ?? throw new ArgumentNullException(nameof(sqlProjectService));
+            _buildService = buildService ?? throw new ArgumentNullException(nameof(buildService));
+            _visualStudioAccess = visualStudioAccess ?? throw new ArgumentNullException(nameof(visualStudioAccess));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         private async Task<bool> ShouldCancelAsync(CancellationToken cancellationToken)
