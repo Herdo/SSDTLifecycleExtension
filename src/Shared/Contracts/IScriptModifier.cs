@@ -11,12 +11,10 @@
         /// <param name="input">The <see cref="string"/> to modify.</param>
         /// <param name="project">The <see cref="SqlProject"/> used as data source for certain modifiers.</param>
         /// <param name="configuration">The <see cref="ConfigurationModel"/> used as data source for certain modifiers.</param>
-        /// <param name="variables">The <see cref="ScriptCreationVariables"/> used as data source for certain modifiers.</param>
         /// <exception cref="ArgumentNullException"><paramref name="input"/>, <paramref name="project"/> or <paramref name="configuration"/> are <b>null</b>.</exception>
         /// <returns>The modified <see cref="string"/>.</returns>
         string Modify(string input,
                       SqlProject project,
-                      ConfigurationModel configuration,
-                      ScriptCreationVariables variables);
+                      ConfigurationModel configuration);
     }
 }

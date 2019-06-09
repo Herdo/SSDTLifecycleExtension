@@ -17,7 +17,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers
             IScriptModifier s = new AddCustomFooterModifier();
 
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => s.Modify(null, null, null, default));
+            Assert.Throws<ArgumentNullException>(() => s.Modify(null, null, null));
         }
 
         [Test]
@@ -28,7 +28,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers
             const string input = "foobar";
 
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => s.Modify(input, null, null, default));
+            Assert.Throws<ArgumentNullException>(() => s.Modify(input, null, null));
         }
 
         [Test]
@@ -40,7 +40,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers
             var project = new SqlProject("a", "b", "c");
 
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => s.Modify(input, project, null, default));
+            Assert.Throws<ArgumentNullException>(() => s.Modify(input, project, null));
         }
 
         [Test]
@@ -56,7 +56,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers
             };
 
             // Act
-            var modified = s.Modify(input, project, configuration, default);
+            var modified = s.Modify(input, project, configuration);
 
             // Assert
             Assert.IsNotNull(modified);
@@ -80,7 +80,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers
             };
 
             // Act
-            var modified = s.Modify(input, project, configuration, default);
+            var modified = s.Modify(input, project, configuration);
 
             // Assert
             Assert.IsNotNull(modified);

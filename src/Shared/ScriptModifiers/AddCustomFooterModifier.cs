@@ -9,8 +9,7 @@
     {
         string IScriptModifier.Modify(string input,
                                       SqlProject project,
-                                      ConfigurationModel configuration,
-                                      ScriptCreationVariables variables)
+                                      ConfigurationModel configuration)
         {
             if (input == null)
                 throw new ArgumentNullException(nameof(input));

@@ -7,7 +7,7 @@
 
     internal class TrackDacpacVersionModifier : IScriptModifier
     {
-        private const string _CREATE_AND_INSERT_SCRIPT_TEMPLATE =
+        private const string CreateAndInsertScriptTemplate =
 @"
 IF OBJECT_ID(N'[dbo].[__DacpacVersion]', N'U') IS NULL
 BEGIN
@@ -42,7 +42,7 @@ INSERT INTO [dbo].[__DacpacVersion]
 		);
 GO";
 
-        private const string _UPDATE_SCRIPT_TEMPLATE =
+        private const string UpdateScriptTemplate =
 @"
 PRINT 'Tracking deployment execution time for current deployment'
 GO
@@ -58,8 +58,7 @@ GO";
 
         string IScriptModifier.Modify(string input,
                                       SqlProject project,
-                                      ConfigurationModel configuration,
-                                      ScriptCreationVariables variables)
+                                      ConfigurationModel configuration)
         {
             if (input == null)
                 throw new ArgumentNullException(nameof(input));
@@ -69,17 +68,18 @@ GO";
                 throw new ArgumentNullException(nameof(configuration));
 
             // Prepare format string
-            var majorVersion = variables.NewVersion.Major.ToString();
-            var minorVersion = variables.NewVersion.Minor.ToString();
-            var buildVersion = variables.NewVersion.Build == -1 ? "NULL" : variables.NewVersion.Build.ToString();
-            var revisionVersion = variables.NewVersion.Revision == -1 ? "NULL" : variables.NewVersion.Revision.ToString();
-            var createAndInsert = string.Format(_CREATE_AND_INSERT_SCRIPT_TEMPLATE,
+            var newVersion = project.ProjectProperties.DacVersion;
+            var majorVersion = newVersion.Major.ToString();
+            var minorVersion = newVersion.Minor.ToString();
+            var buildVersion = newVersion.Build == -1 ? "NULL" : newVersion.Build.ToString();
+            var revisionVersion = newVersion.Revision == -1 ? "NULL" : newVersion.Revision.ToString();
+            var createAndInsert = string.Format(CreateAndInsertScriptTemplate,
                                                 project.ProjectProperties.SqlTargetName,
                                                 majorVersion,
                                                 minorVersion,
                                                 buildVersion,
                                                 revisionVersion);
-            var update = string.Format(_UPDATE_SCRIPT_TEMPLATE,
+            var update = string.Format(UpdateScriptTemplate,
                                        project.ProjectProperties.SqlTargetName,
                                        majorVersion,
                                        minorVersion,

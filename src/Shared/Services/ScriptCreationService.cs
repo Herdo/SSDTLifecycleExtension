@@ -55,7 +55,7 @@
             return true;
         }
 
-        private ScriptCreationVariables CreateVariables(SqlProject project,
+        private PathCollection CreateVariables(SqlProject project,
                                                         ConfigurationModel configuration,
                                                         Version previousVersion,
                                                         Version newVersion)
@@ -86,14 +86,12 @@
                                         ? Path.Combine(newVersionDirectory, $"{project.ProjectProperties.SqlTargetName}_{previousVersionString}_{newVersionString}.xml")
                                         : null;
 
-            return new ScriptCreationVariables(profilePath,
-                                               newVersionDirectory,
-                                               newVersionPath,
-                                               previousVersionPath,
-                                               outputPath,
-                                               documentationPath,
-                                               finalPreviousVersion,
-                                               finalNewVersion);
+            return new PathCollection(profilePath,
+                                      newVersionDirectory,
+                                      newVersionPath,
+                                      previousVersionPath,
+                                      outputPath,
+                                      documentationPath);
         }
 
         private async Task<string> DetermineSqlPackagePathAsync(ConfigurationModel configuration)
@@ -117,10 +115,10 @@
             return null;
         }
 
-        private async Task<bool> VerifyVariablesAsync(ScriptCreationVariables variables,
+        private async Task<bool> VerifyVariablesAsync(PathCollection variables,
                                                       string sqlPackagePath)
         {
-            await _logger.LogAsync("Verifying variables ...");
+            await _logger.LogAsync("Verifying paths ...");
 
             if (!_fileSystemAccess.CheckIfFileExists(variables.ProfilePath))
             {
@@ -137,7 +135,8 @@
             return true;
         }
         
-        private async Task<bool> CreateScriptAsync(ScriptCreationVariables variables,
+        private async Task<bool> CreateScriptAsync(PathCollection variables,
+                                                   bool createDocumentation,
                                                    string sqlPackagePath,
                                                    CancellationToken cancellationToken)
         {
@@ -148,7 +147,7 @@
             sqlPackageArguments.Append($"/SourceFile:\"{variables.SourceFile}\" "); // new version
             sqlPackageArguments.Append($"/TargetFile:\"{variables.TargetFile}\" "); // previous version from artifacts directory
             sqlPackageArguments.Append($"/DeployScriptPath:\"{variables.DeployScriptPath}\" ");
-            if (variables.CreateDocumentation)
+            if (createDocumentation)
                 sqlPackageArguments.Append($"/DeployReportPath:\"{variables.DeployReportPath}\" ");
             var hasErrors = false;
             var processStartError = await _fileSystemAccess.StartProcessAndWaitAsync(sqlPackagePath,
@@ -176,14 +175,14 @@
 
         private async Task<bool> ModifyCreatedScriptAsync(SqlProject project,
                                                           ConfigurationModel configuration,
-                                                          ScriptCreationVariables variables,
+                                                          PathCollection paths,
                                                           CancellationToken cancellationToken)
         {
             var modifiers = GetScriptModifiers(configuration);
             if (!modifiers.Any())
                 return true;
 
-            var scriptContent = await _fileSystemAccess.ReadFileAsync(variables.DeployScriptPath);
+            var scriptContent = await _fileSystemAccess.ReadFileAsync(paths.DeployScriptPath);
 
             foreach (var m in modifiers.OrderBy(m => m.Key))
             {
@@ -191,15 +190,14 @@
 
                 scriptContent = m.Value.Modify(scriptContent,
                                                project,
-                                               configuration,
-                                               variables);
+                                               configuration);
 
                 // Cancel if requested
                 if (await ShouldCancelAsync(cancellationToken))
                     return false;
             }
 
-            await _fileSystemAccess.WriteFileAsync(variables.DeployScriptPath, scriptContent);
+            await _fileSystemAccess.WriteFileAsync(paths.DeployScriptPath, scriptContent);
 
             return true;
         }
@@ -270,8 +268,8 @@
                 if (await ShouldCancelAsync(cancellationToken))
                     return;
 
-                // Create variables required for script creation
-                var variables = CreateVariables(project, configuration, previousVersion, newVersion);
+                // Create paths required for script creation
+                var paths = CreateVariables(project, configuration, previousVersion, newVersion);
 
                 // Cancel if requested
                 if (await ShouldCancelAsync(cancellationToken))
@@ -285,7 +283,7 @@
                 if (await ShouldCancelAsync(cancellationToken))
                     return;
 
-                if (!await VerifyVariablesAsync(variables, sqlPackagePath))
+                if (!await VerifyVariablesAsync(paths, sqlPackagePath))
                     return;
 
                 // Cancel if requested
@@ -299,14 +297,14 @@
                 if (await ShouldCancelAsync(cancellationToken))
                     return;
 
-                if (!await _buildService.CopyBuildResultAsync(project, variables.ArtifactsDirectoryWithVersion))
+                if (!await _buildService.CopyBuildResultAsync(project, paths.ArtifactsDirectoryWithVersion))
                     return;
 
                 // Cancel if requested
                 if (await ShouldCancelAsync(cancellationToken))
                     return;
 
-                var success = await CreateScriptAsync(variables, sqlPackagePath, cancellationToken);
+                var success = await CreateScriptAsync(paths, configuration.CreateDocumentationWithScriptCreation, sqlPackagePath, cancellationToken);
                 // Wait 1 second after creating the script to get any messages from the standard output before continuing with the script creation.
                 await Task.Delay(1000, cancellationToken);
 
@@ -322,7 +320,7 @@
                     return;
 
                 // Modify the script
-                if (!await ModifyCreatedScriptAsync(project, configuration, variables, cancellationToken))
+                if (!await ModifyCreatedScriptAsync(project, configuration, paths, cancellationToken))
                     return;
 
                 // No check for the cancellation token after the last action.
