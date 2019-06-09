@@ -15,6 +15,7 @@
     {
         private readonly ISqlProjectService _sqlProjectService;
         private readonly IBuildService _buildService;
+        private readonly IVersionService _versionService;
         private readonly IVisualStudioAccess _visualStudioAccess;
         private readonly ILogger _logger;
 
@@ -22,11 +23,13 @@
 
         public ScaffoldingService(ISqlProjectService sqlProjectService,
                                   IBuildService buildService,
+                                  IVersionService versionService,
                                   IVisualStudioAccess visualStudioAccess,
                                   ILogger logger)
         {
             _sqlProjectService = sqlProjectService ?? throw new ArgumentNullException(nameof(sqlProjectService));
             _buildService = buildService ?? throw new ArgumentNullException(nameof(buildService));
+            _versionService = versionService ?? throw new ArgumentNullException(nameof(versionService));
             _visualStudioAccess = visualStudioAccess ?? throw new ArgumentNullException(nameof(visualStudioAccess));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -82,6 +85,12 @@
                 if (await ShouldCancelAsync(cancellationToken))
                     return;
 
+                var formattedTargetVersion = Version.Parse(_versionService.DetermineFinalVersion(targetVersion, configuration));
+
+                // Cancel if requested
+                if (await ShouldCancelAsync(cancellationToken))
+                    return;
+
                 if (!await _sqlProjectService.TryLoadSqlProjectPropertiesAsync(project))
                     return;
 
@@ -90,9 +99,9 @@
                     return;
 
                 // Check DacVersion against planned target version
-                if (project.ProjectProperties.DacVersion != targetVersion)
+                if (project.ProjectProperties.DacVersion != formattedTargetVersion)
                 {
-                    await _logger.LogAsync($"ERROR: DacVersion of SQL project ({project.ProjectProperties.DacVersion}) doesn't match target version ({targetVersion}).");
+                    await _logger.LogAsync($"ERROR: DacVersion of SQL project ({project.ProjectProperties.DacVersion}) doesn't match target version ({formattedTargetVersion}).");
                     _visualStudioAccess.ShowModalError("Please change the DAC version in the SQL project settings (see output window).");
                     return;
                 }
@@ -122,7 +131,7 @@
                 // No check for the cancellation token after the last action.
                 // Completion
                 sw.Stop();
-                await _logger.LogAsync($"========== Scaffolding version {targetVersion} finished after {sw.ElapsedMilliseconds} milliseconds. ==========");
+                await _logger.LogAsync($"========== Scaffolding version {formattedTargetVersion} finished after {sw.ElapsedMilliseconds} milliseconds. ==========");
             }
             catch (Exception e)
             {
