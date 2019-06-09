@@ -258,11 +258,13 @@
                 await _logger.LogAsync("Initializing script creation ...");
                 var sw = new Stopwatch();
                 sw.Start();
+
+                // Cancel if requested
                 if (await ShouldCancelAsync(cancellationToken))
                     return;
 
-                // No check for the cancellation token before the first action.
-                await _sqlProjectService.LoadSqlProjectPropertiesAsync(project);
+                if(!await _sqlProjectService.TryLoadSqlProjectPropertiesAsync(project))
+                    return;
 
                 // Cancel if requested
                 if (await ShouldCancelAsync(cancellationToken))

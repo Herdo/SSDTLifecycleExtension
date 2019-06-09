@@ -13,16 +13,19 @@
     [UsedImplicitly]
     public class ScaffoldingService : IScaffoldingService
     {
+        private readonly ISqlProjectService _sqlProjectService;
         private readonly IBuildService _buildService;
         private readonly IVisualStudioAccess _visualStudioAccess;
         private readonly ILogger _logger;
 
         private bool _isScaffolding;
 
-        public ScaffoldingService(IBuildService buildService,
+        public ScaffoldingService(ISqlProjectService sqlProjectService,
+                                  IBuildService buildService,
                                   IVisualStudioAccess visualStudioAccess,
                                   ILogger logger)
         {
+            _sqlProjectService = sqlProjectService;
             _buildService = buildService;
             _visualStudioAccess = visualStudioAccess;
             _logger = logger;
@@ -74,6 +77,15 @@
                 await _logger.LogAsync("Initializing scaffolding ...");
                 var sw = new Stopwatch();
                 sw.Start();
+
+                // Cancel if requested
+                if (await ShouldCancelAsync(cancellationToken))
+                    return;
+
+                if (!await _sqlProjectService.TryLoadSqlProjectPropertiesAsync(project))
+                    return;
+
+                // Cancel if requested
                 if (await ShouldCancelAsync(cancellationToken))
                     return;
 

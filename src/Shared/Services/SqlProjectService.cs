@@ -14,28 +14,25 @@
     public class SqlProjectService : ISqlProjectService
     {
         private readonly IFileSystemAccess _fileSystemAccess;
+        private readonly ILogger _logger;
 
-        public SqlProjectService(IFileSystemAccess fileSystemAccess)
+        public SqlProjectService(IFileSystemAccess fileSystemAccess,
+                                 ILogger logger)
         {
             _fileSystemAccess = fileSystemAccess;
+            _logger = logger;
         }
 
-        async Task ISqlProjectService.LoadSqlProjectPropertiesAsync(SqlProject project)
+        private static void ReadProperties(XContainer root,
+                                           out string name,
+                                           out string outputPath,
+                                           out string sqlTargetName)
         {
-            var projectDirectory = Path.GetDirectoryName(project.FullName);
-            if (projectDirectory == null)
-                throw new InvalidOperationException("Cannot get project directory.");
+            name = null;
+            outputPath = null;
+            sqlTargetName = null;
 
-            var content = await _fileSystemAccess.ReadFileAsync(project.FullName);
-            var doc = XDocument.Parse(content);
-            if (doc.Root == null)
-                throw new InvalidOperationException($"Cannot read contents of {project.FullName}");
-
-            string name = null;
-            string outputPath = null;
-            string sqlTargetName = null;
-
-            var propertyGroups = doc.Root.Elements().Where(m => m.Name.LocalName == "PropertyGroup").ToArray();
+            var propertyGroups = root.Elements().Where(m => m.Name.LocalName == "PropertyGroup").ToArray();
             foreach (var propertyGroup in propertyGroups)
             {
                 // If the property group has a condition, check if that condition contains "Release", otherwise skip this group
@@ -55,15 +52,50 @@
                 if (sqlTargetNameElement != null)
                     sqlTargetName = sqlTargetNameElement.Value;
             }
+        }
+
+        async Task<bool> ISqlProjectService.TryLoadSqlProjectPropertiesAsync(SqlProject project)
+        {
+            if (project == null)
+                throw new ArgumentNullException(nameof(project));
+
+            var projectDirectory = Path.GetDirectoryName(project.FullName);
+            if (projectDirectory == null)
+            {
+                await _logger.LogAsync($"ERROR: Cannot get project directory for {project.FullName}");
+                return false;
+            }
+
+            var content = await _fileSystemAccess.ReadFileAsync(project.FullName);
+            var doc = XDocument.Parse(content);
+            if (doc.Root == null)
+            {
+                await _logger.LogAsync($"ERROR: Cannot read contents of {project.FullName}");
+                return false;
+            }
+
+            ReadProperties(doc.Root,
+                          out var name,
+                          out var outputPath,
+                          out var sqlTargetName);
 
             if (name == null)
-                throw new InvalidOperationException($"Cannot read name of {project.FullName}");
+            {
+                await _logger.LogAsync($"ERROR: Cannot read name of {project.FullName}");
+                return false;
+            }
+
             if (outputPath == null)
-                throw new InvalidOperationException($"Cannot read output path of {project.FullName}");
+            {
+                await _logger.LogAsync($"ERROR: Cannot read output path of {project.FullName}");
+                return false;
+            }
 
             // Set properties on the project object
             project.ProjectProperties.SqlTargetName = sqlTargetName ?? name;
             project.ProjectProperties.BinaryDirectory = Path.Combine(projectDirectory, outputPath);
+
+            return true;
         }
     }
 }
