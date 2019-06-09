@@ -138,6 +138,7 @@
         {
             await _scriptCreationService.CreateAsync(_project, _configuration, SelectedBaseVersion.UnderlyingVersion, true, CancellationToken.None);
             StartLatestCreationCommand.RaiseCanExecuteChanged();
+            StartVersionedCreationCommand.RaiseCanExecuteChanged();
         }
 
         private bool StartVersionedCreation_CanExecute() =>
@@ -150,6 +151,7 @@
         {
             await _scriptCreationService.CreateAsync(_project, _configuration, SelectedBaseVersion.UnderlyingVersion, false, CancellationToken.None);
             StartLatestCreationCommand.RaiseCanExecuteChanged();
+            StartVersionedCreationCommand.RaiseCanExecuteChanged();
         }
 
         /// <summary>
