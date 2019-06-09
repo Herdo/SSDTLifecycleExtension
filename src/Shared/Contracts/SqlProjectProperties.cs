@@ -8,6 +8,6 @@
 
         public string BinaryDirectory { get; set; }
 
-        public Version ConfiguredVersion { get; set; }
+        public Version DacVersion { get; set; }
     }
 }

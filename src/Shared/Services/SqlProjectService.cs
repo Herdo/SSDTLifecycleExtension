@@ -26,11 +26,13 @@
         private static void ReadProperties(XContainer root,
                                            out string name,
                                            out string outputPath,
-                                           out string sqlTargetName)
+                                           out string sqlTargetName,
+                                           out string dacVersion)
         {
             name = null;
             outputPath = null;
             sqlTargetName = null;
+            dacVersion = null;
 
             var propertyGroups = root.Elements().Where(m => m.Name.LocalName == "PropertyGroup").ToArray();
             foreach (var propertyGroup in propertyGroups)
@@ -51,6 +53,10 @@
                 var sqlTargetNameElement = propertyGroup.Elements().SingleOrDefault(m => m.Name.LocalName == "SqlTargetName");
                 if (sqlTargetNameElement != null)
                     sqlTargetName = sqlTargetNameElement.Value;
+
+                var dacVersionAttribute = propertyGroup.Elements().SingleOrDefault(m => m.Name.LocalName == "DacVersion");
+                if (dacVersionAttribute != null)
+                    dacVersion = dacVersionAttribute.Value;
             }
         }
 
@@ -75,9 +81,10 @@
             }
 
             ReadProperties(doc.Root,
-                          out var name,
-                          out var outputPath,
-                          out var sqlTargetName);
+                           out var name,
+                           out var outputPath,
+                           out var sqlTargetName,
+                           out var dacVersion);
 
             if (name == null)
             {
@@ -91,9 +98,16 @@
                 return false;
             }
 
+            if (dacVersion == null)
+            {
+                await _logger.LogAsync($"ERROR: Cannot read DacVersion of {project.FullName}");
+                return false;
+            }
+
             // Set properties on the project object
             project.ProjectProperties.SqlTargetName = sqlTargetName ?? name;
             project.ProjectProperties.BinaryDirectory = Path.Combine(projectDirectory, outputPath);
+            project.ProjectProperties.DacVersion = Version.Parse(dacVersion);
 
             return true;
         }
