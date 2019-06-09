@@ -55,10 +55,10 @@
             return true;
         }
 
-        private PathCollection CreateVariables(SqlProject project,
-                                                        ConfigurationModel configuration,
-                                                        Version previousVersion,
-                                                        Version newVersion)
+        private PathCollection GetPaths(SqlProject project,
+                                        ConfigurationModel configuration,
+                                        Version previousVersion,
+                                        Version newVersion)
         {
             var projectPath = project.FullName;
             var projectDirectory = Path.GetDirectoryName(projectPath);
@@ -69,10 +69,6 @@
             var createLatest = newVersion == null;
             var previousVersionString = _versionService.DetermineFinalVersion(previousVersion, configuration);
             var newVersionString = createLatest ? "latest" : _versionService.DetermineFinalVersion(newVersion, configuration);
-            var finalPreviousVersion = Version.Parse(previousVersionString);
-            var finalNewVersion = createLatest
-                                      ? new Version(finalPreviousVersion.Major + 1, int.MaxValue, int.MaxValue, int.MaxValue)
-                                      : Version.Parse(newVersionString);
 
             // DACPAC paths
             var profilePath = Path.Combine(projectDirectory, configuration.PublishProfilePath);
@@ -115,12 +111,12 @@
             return null;
         }
 
-        private async Task<bool> VerifyVariablesAsync(PathCollection variables,
-                                                      string sqlPackagePath)
+        private async Task<bool> VerifyPathsAsync(PathCollection paths,
+                                                  string sqlPackagePath)
         {
             await _logger.LogAsync("Verifying paths ...");
 
-            if (!_fileSystemAccess.CheckIfFileExists(variables.ProfilePath))
+            if (!_fileSystemAccess.CheckIfFileExists(paths.ProfilePath))
             {
                 await _logger.LogAsync("ERROR: Failed to find publish profile.");
                 return false;
@@ -134,8 +130,8 @@
 
             return true;
         }
-        
-        private async Task<bool> CreateScriptAsync(PathCollection variables,
+
+        private async Task<bool> CreateScriptAsync(PathCollection paths,
                                                    bool createDocumentation,
                                                    string sqlPackagePath,
                                                    CancellationToken cancellationToken)
@@ -143,12 +139,12 @@
             await _logger.LogAsync("Creating script ...");
             var sqlPackageArguments = new StringBuilder();
             sqlPackageArguments.Append("/Action:Script ");
-            sqlPackageArguments.Append($"/Profile:\"{variables.ProfilePath}\" ");
-            sqlPackageArguments.Append($"/SourceFile:\"{variables.SourceFile}\" "); // new version
-            sqlPackageArguments.Append($"/TargetFile:\"{variables.TargetFile}\" "); // previous version from artifacts directory
-            sqlPackageArguments.Append($"/DeployScriptPath:\"{variables.DeployScriptPath}\" ");
+            sqlPackageArguments.Append($"/Profile:\"{paths.ProfilePath}\" ");
+            sqlPackageArguments.Append($"/SourceFile:\"{paths.SourceFile}\" "); // new version
+            sqlPackageArguments.Append($"/TargetFile:\"{paths.TargetFile}\" "); // previous version from artifacts directory
+            sqlPackageArguments.Append($"/DeployScriptPath:\"{paths.DeployScriptPath}\" ");
             if (createDocumentation)
-                sqlPackageArguments.Append($"/DeployReportPath:\"{variables.DeployReportPath}\" ");
+                sqlPackageArguments.Append($"/DeployReportPath:\"{paths.DeployReportPath}\" ");
             var hasErrors = false;
             var processStartError = await _fileSystemAccess.StartProcessAndWaitAsync(sqlPackagePath,
                                                                                      sqlPackageArguments.ToString(),
@@ -269,7 +265,7 @@
                     return;
 
                 // Create paths required for script creation
-                var paths = CreateVariables(project, configuration, previousVersion, newVersion);
+                var paths = GetPaths(project, configuration, previousVersion, newVersion);
 
                 // Cancel if requested
                 if (await ShouldCancelAsync(cancellationToken))
@@ -283,7 +279,7 @@
                 if (await ShouldCancelAsync(cancellationToken))
                     return;
 
-                if (!await VerifyVariablesAsync(paths, sqlPackagePath))
+                if (!await VerifyPathsAsync(paths, sqlPackagePath))
                     return;
 
                 // Cancel if requested
