@@ -328,7 +328,7 @@
                 // No check for the cancellation token after the last action.
                 // Completion
                 sw.Stop();
-                await _logger.LogAsync($"========== Script creation finished after {sw.ElapsedMilliseconds / 1000} seconds. ==========");
+                await _logger.LogAsync($"========== Script creation finished after {sw.ElapsedMilliseconds} milliseconds. ==========");
             }
             catch (Exception e)
             {

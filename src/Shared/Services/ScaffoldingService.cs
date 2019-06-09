@@ -89,11 +89,28 @@
                 if (await ShouldCancelAsync(cancellationToken))
                     return;
 
+                // Check DacVersion against planned target version
+                if (project.ProjectProperties.DacVersion != targetVersion)
+                {
+                    await _logger.LogAsync($"ERROR: DacVersion of SQL project ({project.ProjectProperties.DacVersion}) doesn't match target version ({targetVersion}).");
+                    _visualStudioAccess.ShowModalError("Please change the DAC version in the SQL project settings (see output window).");
+                    return;
+                }
+
                 await _buildService.BuildProjectAsync(project);
 
                 // Cancel if requested
                 if (await ShouldCancelAsync(cancellationToken))
                     return;
+
+                // Copy build result
+                if (!await _buildService.CopyBuildResultAsync(project, variables.ArtifactsDirectoryWithVersion))
+                    return;
+
+                // No check for the cancellation token after the last action.
+                // Completion
+                sw.Stop();
+                await _logger.LogAsync($"========== Scaffolding version {targetVersion} finished after {sw.ElapsedMilliseconds} milliseconds. ==========");
             }
             catch (Exception e)
             {
