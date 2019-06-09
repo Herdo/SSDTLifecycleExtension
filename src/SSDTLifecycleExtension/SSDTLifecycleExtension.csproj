@@ -49,7 +49,6 @@
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="DataAccess\FileSystemAccess.cs" />
     <Compile Include="DataAccess\VisualStudioAccess.cs" />
-    <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SSDTLifecycleExtensionPackage.cs" />
     <Compile Include="ViewModels\ConfigurationViewModel.cs" />
@@ -89,6 +88,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="JetBrains.Annotations">
+      <Version>2019.1.1</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.SDK" Version="16.0.200" ExcludeAssets="runtime" />
     <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="16.2.2060">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

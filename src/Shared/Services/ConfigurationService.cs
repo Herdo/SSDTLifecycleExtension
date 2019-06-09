@@ -7,6 +7,7 @@
     using Contracts.DataAccess;
     using Contracts.Services;
     using Events;
+    using JetBrains.Annotations;
     using Models;
     using Newtonsoft.Json;
     using Task = System.Threading.Tasks.Task;

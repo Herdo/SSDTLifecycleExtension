@@ -1,8 +1,8 @@
 ﻿namespace SSDTLifecycleExtension.Shared.Contracts.Services
 {
     using System;
+    using JetBrains.Annotations;
     using Models;
-    using Shared;
 
     public interface IVersionService
     {

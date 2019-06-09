@@ -1,6 +1,7 @@
 ﻿namespace SSDTLifecycleExtension.Shared.Contracts.DataAccess
 {
     using System.Threading.Tasks;
+    using JetBrains.Annotations;
 
     public interface ILogger
     {

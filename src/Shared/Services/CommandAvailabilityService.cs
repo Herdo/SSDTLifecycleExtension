@@ -3,7 +3,7 @@
     using System;
     using Contracts.DataAccess;
     using Contracts.Services;
-    using Shared;
+    using JetBrains.Annotations;
 
     [UsedImplicitly]
     public class CommandAvailabilityService : ICommandAvailabilityService

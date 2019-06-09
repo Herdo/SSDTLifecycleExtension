@@ -5,6 +5,7 @@
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
+    using JetBrains.Annotations;
 
     public abstract class BaseModel : INotifyPropertyChanged, INotifyDataErrorInfo
     {

@@ -4,6 +4,7 @@
     using Contracts;
     using Contracts.Enums;
     using Contracts.Factories;
+    using JetBrains.Annotations;
 
     [UsedImplicitly]
     public class ScriptModifierFactory : IScriptModifierFactory

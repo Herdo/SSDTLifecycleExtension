@@ -3,11 +3,10 @@
     using System;
     using System.IO;
     using System.Linq;
-    using System.Threading.Tasks;
     using System.Windows;
-    using Annotations;
     using EnvDTE;
     using EnvDTE80;
+    using JetBrains.Annotations;
     using Microsoft.VisualStudio.Shell;
     using Microsoft.VisualStudio.Shell.Interop;
     using Shared.Contracts;

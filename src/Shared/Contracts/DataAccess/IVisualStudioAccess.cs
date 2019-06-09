@@ -2,7 +2,7 @@
 {
     using System;
     using System.Threading.Tasks;
-    using Shared;
+    using JetBrains.Annotations;
 
     public interface IVisualStudioAccess
     {

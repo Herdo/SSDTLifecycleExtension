@@ -3,7 +3,7 @@
     using System;
     using System.ComponentModel.Design;
     using Windows;
-    using Annotations;
+    using JetBrains.Annotations;
     using Microsoft.VisualStudio.Shell;
     using Microsoft.VisualStudio.Shell.Interop;
     using Shared.Contracts.DataAccess;

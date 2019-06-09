@@ -3,7 +3,7 @@
     using System;
     using System.ComponentModel;
     using System.Windows.Input;
-    using Annotations;
+    using JetBrains.Annotations;
     using Microsoft.VisualStudio.PlatformUI;
     using Shared.Contracts;
     using Shared.Contracts.DataAccess;

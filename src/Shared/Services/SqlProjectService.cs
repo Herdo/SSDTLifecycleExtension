@@ -8,6 +8,7 @@
     using Contracts;
     using Contracts.DataAccess;
     using Contracts.Services;
+    using JetBrains.Annotations;
 
     [UsedImplicitly]
     public class SqlProjectService : ISqlProjectService

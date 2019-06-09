@@ -2,7 +2,7 @@
 {
     using System;
     using Contracts;
-    using Shared;
+    using JetBrains.Annotations;
 
     public class ProjectConfigurationChangedEventArgs : EventArgs
     {

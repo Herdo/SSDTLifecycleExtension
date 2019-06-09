@@ -5,7 +5,7 @@
     using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
-    using Annotations;
+    using JetBrains.Annotations;
     using Microsoft.VisualStudio.Threading;
     using Microsoft.Win32;
     using Shared.Contracts.DataAccess;
