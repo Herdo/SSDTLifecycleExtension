@@ -52,6 +52,15 @@
             <Setter Property="Padding" Value="10, 5"/>
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
         </Style>
+        <Style TargetType="TextBlock" x:Key="ComboBoxDescriptionTextBlockStyle">
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="TextAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,0,5,0"/>
+        </Style>
+        <Style TargetType="ComboBox" x:Key="VersionSelectionComboBoxStyle">
+            <Setter Property="Width" Value="110"/>
+        </Style>
     </UserControl.Resources>
 
     <Grid>
@@ -158,10 +167,38 @@
         <GroupBox Header="Creation"
                   Style="{StaticResource CenteredGroupBoxStyle}"
                   Visibility="{Binding Scaffolding, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=invert}">
-            <Button Content="Start creation"
-                    Command="{Binding StartCreationCommand, Mode=OneWay}"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"/>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="15"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Introduction -->
+                <TextBlock Grid.Row="0"
+                           Style="{StaticResource DescriptionTextBlockStyle}">
+                    <Run Text="There are multiple base versions that can be used to create a deployment script."/>
+                    <LineBreak/>
+                    <Run Text="Please select a base version below."/>
+                </TextBlock>
+
+                <StackPanel Grid.Row="2"
+                            HorizontalAlignment="Center">
+                    <imaging:CrispImage Style="{StaticResource ScaffoldingCrispImageStyle}"
+                                        Moniker="{x:Static catalog:KnownMonikers.GenerateChangeScript}"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Base version:"
+                                   Style="{StaticResource ComboBoxDescriptionTextBlockStyle}"/>
+                        <ComboBox ItemsSource="{Binding ExistingVersions}"
+                                  SelectedItem="{Binding SelectedBaseVersion}"
+                                  DisplayMemberPath="DisplayName"
+                                  Style="{StaticResource VersionSelectionComboBoxStyle}"/>
+                    </StackPanel>
+                    <Button Content="Start creation"
+                            Style="{StaticResource ActionButtonStyle}"
+                            Command="{Binding StartCreationCommand, Mode=OneWay}"/>
+                </StackPanel>
+            </Grid>
         </GroupBox>
     </Grid>
 </UserControl>

@@ -28,6 +28,7 @@
         private ConfigurationModel _configuration;
 
         private bool _scaffolding;
+        private VersionModel _selectedBaseVersion;
 
         public bool Scaffolding
         {
@@ -41,7 +42,19 @@
             }
         }
 
-        public ObservableCollection<string> ExistingVersions { get; }
+        public VersionModel SelectedBaseVersion
+        {
+            get => _selectedBaseVersion;
+            set
+            {
+                if (Equals(value, _selectedBaseVersion))
+                    return;
+                _selectedBaseVersion = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public ObservableCollection<VersionModel> ExistingVersions { get; }
 
         public DelegateCommand ScaffoldDevelopmentVersionCommand { get; }
 
@@ -63,7 +76,7 @@
             _visualStudioAccess = visualStudioAccess;
             _fileSystemAccess = fileSystemAccess;
 
-            ExistingVersions = new ObservableCollection<string>();
+            ExistingVersions = new ObservableCollection<VersionModel>();
 
             ScaffoldDevelopmentVersionCommand = new DelegateCommand(ScaffoldDevelopmentVersion_Executed, ScaffoldDevelopmentVersion_CanExecute);
             ScaffoldCurrentProductionVersionCommand = new DelegateCommand(ScaffoldCurrentProductionVersion_Executed, ScaffoldCurrentProductionVersion_CanExecute);
@@ -120,7 +133,7 @@
 
         private async void StartCreation_Executed()
         {
-            await _scriptCreationService.CreateAsync(_project, _configuration, Version.Parse("0.0.0.0"), null, CancellationToken.None);
+            await _scriptCreationService.CreateAsync(_project, _configuration, SelectedBaseVersion.UnderlyingVersion, null, CancellationToken.None);
             StartCreationCommand.RaiseCanExecuteChanged();
         }
 
@@ -158,8 +171,21 @@
                 if (Version.TryParse(di.Name, out var existingVersion))
                     existingVersions.Add(existingVersion);
             }
-            foreach (var version in existingVersions.OrderBy(m => m))
-                ExistingVersions.Add(version.ToString());
+
+            SelectedBaseVersion = null;
+            ExistingVersions.Clear();
+            foreach (var version in existingVersions.OrderByDescending(m => m))
+                ExistingVersions.Add(new VersionModel
+                {
+                    UnderlyingVersion = version
+                });
+            if (existingVersions.Any())
+            {
+                var highestVersion = existingVersions.Max();
+                var highestModel = ExistingVersions.Single(m => m.UnderlyingVersion == highestVersion);
+                highestModel.IsNewestVersion = true;
+                SelectedBaseVersion = highestModel;
+            }
 
             // Check for scaffolding or creation mode
             Scaffolding = ExistingVersions.Count == 0;
