@@ -140,8 +140,8 @@
             var existingVersions = new List<Version>();
             foreach (var artifactDirectory in artifactDirectories)
             {
-                var directoryName = Path.GetDirectoryName(artifactDirectory);
-                if (directoryName != null && Version.TryParse(directoryName, out var existingVersion))
+                var di = new DirectoryInfo(artifactDirectory);
+                if (Version.TryParse(di.Name, out var existingVersion))
                     existingVersions.Add(existingVersion);
             }
             foreach (var version in existingVersions.OrderBy(m => m))
