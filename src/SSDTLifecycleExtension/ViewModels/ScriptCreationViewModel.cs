@@ -231,6 +231,12 @@
             ScaffoldDevelopmentVersionCommand.RaiseCanExecuteChanged();
             ScaffoldCurrentProductionVersionCommand.RaiseCanExecuteChanged();
             StartLatestCreationCommand.RaiseCanExecuteChanged();
+
+            // If the configuration has errors, notify the user
+            if (_configuration.HasErrors)
+                _visualStudioAccess.ShowModalError("The SSDT Lifecycle configuration for this project is not correct. " +
+                                                   "Please verify that the SSDT Lifecycle configuration for this project exists and has no errors.");
+
             return true;
         }
 
