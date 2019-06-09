@@ -38,7 +38,7 @@
                 throw new ArgumentException($"{nameof(SqlProjectProperties.BinaryDirectory)} must be filled.", nameof(project));
 
             await _logger.LogAsync("Copying files to target directory ...");
-            var directoryCreationError = _fileSystemAccess.EnsureDirectoryExists(project.ProjectProperties.BinaryDirectory);
+            var directoryCreationError = _fileSystemAccess.EnsureDirectoryExists(targetDirectory);
             if (directoryCreationError != null)
             {
                 await _logger.LogAsync("ERROR: Failed to ensure the target directory exists.");
