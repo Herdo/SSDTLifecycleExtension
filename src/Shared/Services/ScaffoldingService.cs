@@ -53,7 +53,7 @@
             }
         }
 
-        bool IScaffoldingService.IsScaffolding => throw new NotImplementedException();
+        bool IScaffoldingService.IsScaffolding => IsScaffolding;
 
         async Task IScaffoldingService.ScaffoldAsync(SqlProject project,
                                                      ConfigurationModel configuration,
@@ -97,6 +97,18 @@
                     return;
                 }
 
+                // Cancel if requested
+                if (await ShouldCancelAsync(cancellationToken))
+                    return;
+
+                var paths = await _sqlProjectService.TryLoadPathsAsync(project, configuration);
+                if (paths == null)
+                    return;
+
+                // Cancel if requested
+                if (await ShouldCancelAsync(cancellationToken))
+                    return;
+
                 await _buildService.BuildProjectAsync(project);
 
                 // Cancel if requested
@@ -104,7 +116,7 @@
                     return;
 
                 // Copy build result
-                if (!await _buildService.CopyBuildResultAsync(project, variables.ArtifactsDirectoryWithVersion))
+                if (!await _buildService.CopyBuildResultAsync(project, paths.NewDacpacDirectory))
                     return;
 
                 // No check for the cancellation token after the last action.

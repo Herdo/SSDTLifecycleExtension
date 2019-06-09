@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.IO;
     using System.Linq;
     using System.Text;
     using System.Threading;
@@ -19,7 +18,6 @@
     [UsedImplicitly]
     public class ScriptCreationService : IScriptCreationService
     {
-        private readonly IVersionService _versionService;
         private readonly ISqlProjectService _sqlProjectService;
         private readonly IBuildService _buildService;
         private readonly IScriptModifierFactory _scriptModifierFactory;
@@ -29,15 +27,13 @@
 
         private bool _isCreating;
 
-        public ScriptCreationService(IVersionService versionService,
-                                     ISqlProjectService sqlProjectService,
+        public ScriptCreationService(ISqlProjectService sqlProjectService,
                                      IBuildService buildService,
                                      IScriptModifierFactory scriptModifierFactory,
                                      IVisualStudioAccess visualStudioAccess,
                                      IFileSystemAccess fileSystemAccess,
                                      ILogger logger)
         {
-            _versionService = versionService ?? throw new ArgumentNullException(nameof(versionService));
             _sqlProjectService = sqlProjectService ?? throw new ArgumentNullException(nameof(sqlProjectService));
             _buildService = buildService ?? throw new ArgumentNullException(nameof(buildService));
             _scriptModifierFactory = scriptModifierFactory ?? throw new ArgumentNullException(nameof(scriptModifierFactory));
@@ -53,41 +49,6 @@
 
             await _logger.LogAsync("Creation was canceled by the user.");
             return true;
-        }
-
-        private PathCollection GetPaths(SqlProject project,
-                                        ConfigurationModel configuration,
-                                        Version previousVersion,
-                                        Version newVersion)
-        {
-            var projectPath = project.FullName;
-            var projectDirectory = Path.GetDirectoryName(projectPath);
-            if (projectDirectory == null)
-                throw new InvalidOperationException("Cannot get project directory.");
-
-            // Versions
-            var createLatest = newVersion == null;
-            var previousVersionString = _versionService.DetermineFinalVersion(previousVersion, configuration);
-            var newVersionString = createLatest ? "latest" : _versionService.DetermineFinalVersion(newVersion, configuration);
-
-            // DACPAC paths
-            var profilePath = Path.Combine(projectDirectory, configuration.PublishProfilePath);
-            var artifactsPath = Path.Combine(projectDirectory, configuration.ArtifactsPath);
-            var previousVersionDirectory = Path.Combine(artifactsPath, previousVersionString);
-            var previousVersionPath = Path.Combine(previousVersionDirectory, $"{project.ProjectProperties.SqlTargetName}.dacpac");
-            var newVersionDirectory = Path.Combine(artifactsPath, newVersionString);
-            var newVersionPath = Path.Combine(newVersionDirectory, $"{project.ProjectProperties.SqlTargetName}.dacpac");
-            var outputPath = Path.Combine(newVersionDirectory, $"{project.ProjectProperties.SqlTargetName}_{previousVersionString}_{newVersionString}.sql");
-            var documentationPath = configuration.CreateDocumentationWithScriptCreation
-                                        ? Path.Combine(newVersionDirectory, $"{project.ProjectProperties.SqlTargetName}_{previousVersionString}_{newVersionString}.xml")
-                                        : null;
-
-            return new PathCollection(profilePath,
-                                      newVersionDirectory,
-                                      newVersionPath,
-                                      previousVersionPath,
-                                      outputPath,
-                                      documentationPath);
         }
 
         private async Task<string> DetermineSqlPackagePathAsync(ConfigurationModel configuration)
@@ -116,7 +77,7 @@
         {
             await _logger.LogAsync("Verifying paths ...");
 
-            if (!_fileSystemAccess.CheckIfFileExists(paths.ProfilePath))
+            if (!_fileSystemAccess.CheckIfFileExists(paths.PublishProfilePath))
             {
                 await _logger.LogAsync("ERROR: Failed to find publish profile.");
                 return false;
@@ -139,9 +100,9 @@
             await _logger.LogAsync("Creating script ...");
             var sqlPackageArguments = new StringBuilder();
             sqlPackageArguments.Append("/Action:Script ");
-            sqlPackageArguments.Append($"/Profile:\"{paths.ProfilePath}\" ");
-            sqlPackageArguments.Append($"/SourceFile:\"{paths.SourceFile}\" "); // new version
-            sqlPackageArguments.Append($"/TargetFile:\"{paths.TargetFile}\" "); // previous version from artifacts directory
+            sqlPackageArguments.Append($"/Profile:\"{paths.PublishProfilePath}\" ");
+            sqlPackageArguments.Append($"/SourceFile:\"{paths.NewDacpacPath}\" "); // new version
+            sqlPackageArguments.Append($"/TargetFile:\"{paths.PreviousDacpacPath}\" "); // previous version from artifacts directory
             sqlPackageArguments.Append($"/DeployScriptPath:\"{paths.DeployScriptPath}\" ");
             if (createDocumentation)
                 sqlPackageArguments.Append($"/DeployReportPath:\"{paths.DeployReportPath}\" ");
@@ -265,7 +226,9 @@
                     return;
 
                 // Create paths required for script creation
-                var paths = GetPaths(project, configuration, previousVersion, newVersion);
+                var paths = await _sqlProjectService.TryLoadPathsAsync(project, configuration, previousVersion, newVersion == null);
+                if (paths == null)
+                    return;
 
                 // Cancel if requested
                 if (await ShouldCancelAsync(cancellationToken))
@@ -293,7 +256,7 @@
                 if (await ShouldCancelAsync(cancellationToken))
                     return;
 
-                if (!await _buildService.CopyBuildResultAsync(project, paths.ArtifactsDirectoryWithVersion))
+                if (!await _buildService.CopyBuildResultAsync(project, paths.NewDacpacDirectory))
                     return;
 
                 // Cancel if requested

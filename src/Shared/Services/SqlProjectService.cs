@@ -9,16 +9,20 @@
     using Contracts.DataAccess;
     using Contracts.Services;
     using JetBrains.Annotations;
+    using Models;
 
     [UsedImplicitly]
     public class SqlProjectService : ISqlProjectService
     {
+        private readonly IVersionService _versionService;
         private readonly IFileSystemAccess _fileSystemAccess;
         private readonly ILogger _logger;
 
-        public SqlProjectService(IFileSystemAccess fileSystemAccess,
+        public SqlProjectService(IVersionService versionService,
+                                 IFileSystemAccess fileSystemAccess,
                                  ILogger logger)
         {
+            _versionService = versionService ?? throw new ArgumentNullException(nameof(versionService));
             _fileSystemAccess = fileSystemAccess ?? throw new ArgumentNullException(nameof(fileSystemAccess));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -58,6 +62,44 @@
                 if (dacVersionAttribute != null)
                     dacVersion = dacVersionAttribute.Value;
             }
+        }
+
+
+        private async Task<PathCollection> DeterminePathsAsync(SqlProject project,
+                                                               ConfigurationModel configuration,
+                                                               Version previousVersion,
+                                                               bool createLatest)
+        {
+            var projectPath = project.FullName;
+            var projectDirectory = Path.GetDirectoryName(projectPath);
+            if (projectDirectory == null)
+            {
+                await _logger.LogAsync($"ERROR: Cannot get project directory for {project.FullName}");
+                return null;
+            }
+
+            // Versions
+            var previousVersionString = previousVersion == null ? null : _versionService.DetermineFinalVersion(previousVersion, configuration);
+            var newVersionString = createLatest ? "latest" : _versionService.DetermineFinalVersion(project.ProjectProperties.DacVersion, configuration);
+
+            // DACPAC paths
+            var profilePath = Path.Combine(projectDirectory, configuration.PublishProfilePath);
+            var artifactsPath = Path.Combine(projectDirectory, configuration.ArtifactsPath);
+            var previousVersionDirectory = previousVersion == null ? null : Path.Combine(artifactsPath, previousVersionString);
+            var previousVersionPath = previousVersion == null ? null : Path.Combine(previousVersionDirectory, $"{project.ProjectProperties.SqlTargetName}.dacpac");
+            var newVersionDirectory = Path.Combine(artifactsPath, newVersionString);
+            var newVersionPath = Path.Combine(newVersionDirectory, $"{project.ProjectProperties.SqlTargetName}.dacpac");
+            var outputPath = Path.Combine(newVersionDirectory, $"{project.ProjectProperties.SqlTargetName}_{previousVersionString}_{newVersionString}.sql");
+            var documentationPath = configuration.CreateDocumentationWithScriptCreation
+                                        ? Path.Combine(newVersionDirectory, $"{project.ProjectProperties.SqlTargetName}_{previousVersionString}_{newVersionString}.xml")
+                                        : null;
+
+            return new PathCollection(profilePath,
+                                      newVersionDirectory,
+                                      newVersionPath,
+                                      previousVersionPath,
+                                      outputPath,
+                                      documentationPath);
         }
 
         async Task<bool> ISqlProjectService.TryLoadSqlProjectPropertiesAsync(SqlProject project)
@@ -110,6 +152,20 @@
             project.ProjectProperties.DacVersion = Version.Parse(dacVersion);
 
             return true;
+        }
+
+        async Task<PathCollection> ISqlProjectService.TryLoadPathsAsync(SqlProject project,
+                                                                        ConfigurationModel configuration)
+        {
+            return await DeterminePathsAsync(project, configuration, null, false);
+        }
+
+        async Task<PathCollection> ISqlProjectService.TryLoadPathsAsync(SqlProject project,
+                                                                        ConfigurationModel configuration,
+                                                                        Version previousVersion,
+                                                                        bool createLatest)
+        {
+            return await DeterminePathsAsync(project, configuration, previousVersion, createLatest);
         }
     }
 }

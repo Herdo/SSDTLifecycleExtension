@@ -13,68 +13,53 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
     public class ScriptCreationServiceTests
     {
         [Test]
-        public void Constructor_ArgumentNullException_VersionService()
-        {
-            // Act & Assert
-            // ReSharper disable once ObjectCreationAsStatement
-            Assert.Throws<ArgumentNullException>(() => new ScriptCreationService(null, null, null, null, null, null, null));
-        }
-
-        [Test]
         public void Constructor_ArgumentNullException_SqlProjectService()
         {
-            // Arrange
-            var vsMock = Mock.Of<IVersionService>();
-
             // Act & Assert
             // ReSharper disable once ObjectCreationAsStatement
-            Assert.Throws<ArgumentNullException>(() => new ScriptCreationService(vsMock, null, null, null, null, null, null));
+            Assert.Throws<ArgumentNullException>(() => new ScriptCreationService(null, null, null, null, null, null));
         }
 
         [Test]
         public void Constructor_ArgumentNullException_BuildService()
         {
             // Arrange
-            var vsMock = Mock.Of<IVersionService>();
             var spsMock = Mock.Of<ISqlProjectService>();
 
             // Act & Assert
             // ReSharper disable once ObjectCreationAsStatement
-            Assert.Throws<ArgumentNullException>(() => new ScriptCreationService(vsMock, spsMock, null, null, null, null, null));
+            Assert.Throws<ArgumentNullException>(() => new ScriptCreationService(spsMock, null, null, null, null, null));
         }
 
         [Test]
         public void Constructor_ArgumentNullException_ScriptModifierFactory()
         {
             // Arrange
-            var vsMock = Mock.Of<IVersionService>();
             var spsMock = Mock.Of<ISqlProjectService>();
             var bsMock = Mock.Of<IBuildService>();
 
             // Act & Assert
             // ReSharper disable once ObjectCreationAsStatement
-            Assert.Throws<ArgumentNullException>(() => new ScriptCreationService(vsMock, spsMock, bsMock, null, null, null, null));
+            Assert.Throws<ArgumentNullException>(() => new ScriptCreationService(spsMock, bsMock, null, null, null, null));
         }
 
         [Test]
         public void Constructor_ArgumentNullException_VisualStudioAccess()
         {
             // Arrange
-            var vsMock = Mock.Of<IVersionService>();
             var spsMock = Mock.Of<ISqlProjectService>();
             var bsMock = Mock.Of<IBuildService>();
             var smfMock = Mock.Of<IScriptModifierFactory>();
 
             // Act & Assert
             // ReSharper disable once ObjectCreationAsStatement
-            Assert.Throws<ArgumentNullException>(() => new ScriptCreationService(vsMock, spsMock, bsMock, smfMock, null, null, null));
+            Assert.Throws<ArgumentNullException>(() => new ScriptCreationService(spsMock, bsMock, smfMock, null, null, null));
         }
 
         [Test]
         public void Constructor_ArgumentNullException_FileSystemAccess()
         {
             // Arrange
-            var vsMock = Mock.Of<IVersionService>();
             var spsMock = Mock.Of<ISqlProjectService>();
             var bsMock = Mock.Of<IBuildService>();
             var smfMock = Mock.Of<IScriptModifierFactory>();
@@ -82,14 +67,13 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
 
             // Act & Assert
             // ReSharper disable once ObjectCreationAsStatement
-            Assert.Throws<ArgumentNullException>(() => new ScriptCreationService(vsMock, spsMock, bsMock, smfMock, vsaMock, null, null));
+            Assert.Throws<ArgumentNullException>(() => new ScriptCreationService(spsMock, bsMock, smfMock, vsaMock, null, null));
         }
 
         [Test]
         public void Constructor_ArgumentNullException_Logger()
         {
             // Arrange
-            var vsMock = Mock.Of<IVersionService>();
             var spsMock = Mock.Of<ISqlProjectService>();
             var bsMock = Mock.Of<IBuildService>();
             var smfMock = Mock.Of<IScriptModifierFactory>();
@@ -98,7 +82,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
 
             // Act & Assert
             // ReSharper disable once ObjectCreationAsStatement
-            Assert.Throws<ArgumentNullException>(() => new ScriptCreationService(vsMock, spsMock, bsMock, smfMock, vsaMock, fsaMock, null));
+            Assert.Throws<ArgumentNullException>(() => new ScriptCreationService(spsMock, bsMock, smfMock, vsaMock, fsaMock, null));
         }
     }
 }
