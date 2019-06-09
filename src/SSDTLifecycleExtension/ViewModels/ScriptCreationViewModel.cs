@@ -29,6 +29,7 @@
 
         private bool _scaffolding;
         private VersionModel _selectedBaseVersion;
+        private bool _isCreatingScript;
 
         public bool Scaffolding
         {
@@ -50,6 +51,18 @@
                 if (Equals(value, _selectedBaseVersion))
                     return;
                 _selectedBaseVersion = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool IsCreatingScript
+        {
+            get => _isCreatingScript;
+            private set
+            {
+                if (value == _isCreatingScript)
+                    return;
+                _isCreatingScript = value;
                 OnPropertyChanged();
             }
         }
@@ -88,15 +101,9 @@
             _configurationService.ConfigurationChanged += ConfigurationService_ConfigurationChanged;
         }
 
-        private bool ScaffoldDevelopmentVersion_CanExecute() =>
-            _configuration != null
-            && !_configuration.HasErrors
-            && !_scaffoldingService.IsScaffolding
-            && !_scriptCreationService.IsCreating;
-
-        private async void ScaffoldDevelopmentVersion_Executed()
+        private async Task ScaffoldInternal(Version targetVersion)
         {
-            var successful = await _scaffoldingService.ScaffoldAsync(_project, _configuration, new Version(0, 0, 0, 0), CancellationToken.None);
+            var successful = await _scaffoldingService.ScaffoldAsync(_project, _configuration, targetVersion, CancellationToken.None);
             if (successful)
             {
                 await InitializeAsync();
@@ -106,6 +113,32 @@
                 ScaffoldDevelopmentVersionCommand.RaiseCanExecuteChanged();
                 ScaffoldCurrentProductionVersionCommand.RaiseCanExecuteChanged();
             }
+        }
+
+        private async Task CreateScriptInternal(bool latest)
+        {
+            IsCreatingScript = true;
+            try
+            {
+                await _scriptCreationService.CreateAsync(_project, _configuration, SelectedBaseVersion.UnderlyingVersion, latest, CancellationToken.None);
+                StartLatestCreationCommand.RaiseCanExecuteChanged();
+                StartVersionedCreationCommand.RaiseCanExecuteChanged();
+            }
+            finally
+            {
+                IsCreatingScript = false;
+            }
+        }
+
+        private bool ScaffoldDevelopmentVersion_CanExecute() =>
+            _configuration != null
+            && !_configuration.HasErrors
+            && !_scaffoldingService.IsScaffolding
+            && !_scriptCreationService.IsCreating;
+
+        private async void ScaffoldDevelopmentVersion_Executed()
+        {
+            await ScaffoldInternal(new Version(0, 0, 0, 0));
         }
 
         private bool ScaffoldCurrentProductionVersion_CanExecute() =>
@@ -116,16 +149,7 @@
 
         private async void ScaffoldCurrentProductionVersion_Executed()
         {
-            var successful = await _scaffoldingService.ScaffoldAsync(_project, _configuration, new Version(1, 0, 0, 0), CancellationToken.None);
-            if (successful)
-            {
-                await InitializeAsync();
-            }
-            else
-            {
-                ScaffoldDevelopmentVersionCommand.RaiseCanExecuteChanged();
-                ScaffoldCurrentProductionVersionCommand.RaiseCanExecuteChanged();
-            }
+            await ScaffoldInternal(new Version(1, 0, 0, 0));
         }
 
         private bool StartLatestCreation_CanExecute() =>
@@ -136,9 +160,7 @@
 
         private async void StartLatestCreation_Executed()
         {
-            await _scriptCreationService.CreateAsync(_project, _configuration, SelectedBaseVersion.UnderlyingVersion, true, CancellationToken.None);
-            StartLatestCreationCommand.RaiseCanExecuteChanged();
-            StartVersionedCreationCommand.RaiseCanExecuteChanged();
+            await CreateScriptInternal(true);
         }
 
         private bool StartVersionedCreation_CanExecute() =>
@@ -149,9 +171,7 @@
 
         private async void StartVersionedCreation_Executed()
         {
-            await _scriptCreationService.CreateAsync(_project, _configuration, SelectedBaseVersion.UnderlyingVersion, false, CancellationToken.None);
-            StartLatestCreationCommand.RaiseCanExecuteChanged();
-            StartVersionedCreationCommand.RaiseCanExecuteChanged();
+            await CreateScriptInternal(false);
         }
 
         /// <summary>

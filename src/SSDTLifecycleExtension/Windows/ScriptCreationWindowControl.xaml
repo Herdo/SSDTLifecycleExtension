@@ -17,6 +17,7 @@
 
     <UserControl.Resources>
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <converters:BoolInvertConverter x:Key="BoolInvertConverter"/>
         <Style TargetType="GroupBox" x:Key="CenteredGroupBoxStyle">
             <Setter Property="Margin" Value="10"/>
             <Setter Property="Padding" Value="5"/>
@@ -203,6 +204,7 @@
                         <ComboBox ItemsSource="{Binding ExistingVersions}"
                                   SelectedItem="{Binding SelectedBaseVersion}"
                                   DisplayMemberPath="DisplayName"
+                                  IsEnabled="{Binding IsCreatingScript, Mode=OneWay, Converter={StaticResource BoolInvertConverter}}"
                                   Style="{StaticResource VersionSelectionComboBoxStyle}"/>
                     </StackPanel>
                 </Border>
