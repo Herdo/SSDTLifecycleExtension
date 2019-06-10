@@ -19,6 +19,10 @@
                     return new AddCustomFooterModifier();
                 case ScriptModifier.TrackDacpacVersion:
                     return new TrackDacpacVersionModifier();
+                case ScriptModifier.CommentOutUnnamedDefaultConstraintDrops:
+                    return new CommentOutUnnamedDefaultConstraintDropsModifier();
+                case ScriptModifier.ReplaceUnnamedDefaultConstraintDrops:
+                    return new ReplaceUnnamedDefaultConstraintDropsModifier();
                 default:
                     throw new ArgumentOutOfRangeException(nameof(scriptModifier), scriptModifier, null);
             }

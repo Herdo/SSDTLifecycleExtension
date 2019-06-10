@@ -25,6 +25,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers
         [TestCase(ScriptModifier.AddCustomHeader, typeof(AddCustomHeaderModifier))]
         [TestCase(ScriptModifier.AddCustomFooter, typeof(AddCustomFooterModifier))]
         [TestCase(ScriptModifier.TrackDacpacVersion, typeof(TrackDacpacVersionModifier))]
+        [TestCase(ScriptModifier.CommentOutUnnamedDefaultConstraintDrops, typeof(CommentOutUnnamedDefaultConstraintDropsModifier))]
+        [TestCase(ScriptModifier.ReplaceUnnamedDefaultConstraintDrops, typeof(ReplaceUnnamedDefaultConstraintDropsModifier))]
         public void CreateScriptModifier_CorrectCreation(ScriptModifier scriptModifier,
                                                          Type implementingType)
         {

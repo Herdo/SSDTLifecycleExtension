@@ -166,6 +166,12 @@
         {
             var result = new Dictionary<ScriptModifier, IScriptModifier>();
 
+            if (configuration.CommentOutUnnamedDefaultConstraintDrops)
+                result[ScriptModifier.CommentOutUnnamedDefaultConstraintDrops] = _scriptModifierFactory.CreateScriptModifier(ScriptModifier.CommentOutUnnamedDefaultConstraintDrops);
+
+            if (configuration.ReplaceUnnamedDefaultConstraintDrops)
+                result[ScriptModifier.ReplaceUnnamedDefaultConstraintDrops] = _scriptModifierFactory.CreateScriptModifier(ScriptModifier.ReplaceUnnamedDefaultConstraintDrops);
+
             if (!string.IsNullOrWhiteSpace(configuration.CustomHeader))
                 result[ScriptModifier.AddCustomHeader] = _scriptModifierFactory.CreateScriptModifier(ScriptModifier.AddCustomHeader);
 
