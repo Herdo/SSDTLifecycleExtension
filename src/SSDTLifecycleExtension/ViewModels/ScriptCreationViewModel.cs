@@ -249,7 +249,7 @@
 
         private async void ConfigurationService_ConfigurationChanged(object sender, ProjectConfigurationChangedEventArgs e)
         {
-            if (!ReferenceEquals(e.Project, _project))
+            if (e.Project.UniqueName != _project.UniqueName)
                 return;
 
             _configuration = await _configurationService.GetConfigurationOrDefaultAsync(_project);
