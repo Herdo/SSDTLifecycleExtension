@@ -150,7 +150,8 @@
 
                 scriptContent = m.Value.Modify(scriptContent,
                                                project,
-                                               configuration);
+                                               configuration,
+                                               paths);
 
                 // Cancel if requested
                 if (await ShouldCancelAsync(cancellationToken))

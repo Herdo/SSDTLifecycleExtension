@@ -9,7 +9,8 @@
     {
         string IScriptModifier.Modify(string input,
                                       SqlProject project,
-                                      ConfigurationModel configuration)
+                                      ConfigurationModel configuration,
+                                      PathCollection paths)
         {
             if (input == null)
                 throw new ArgumentNullException(nameof(input));
@@ -17,6 +18,8 @@
                 throw new ArgumentNullException(nameof(project));
             if (configuration == null)
                 throw new ArgumentNullException(nameof(configuration));
+            if (paths == null)
+                throw new ArgumentNullException(nameof(paths));
 
             if (string.IsNullOrWhiteSpace(configuration.CustomFooter))
                 return input;

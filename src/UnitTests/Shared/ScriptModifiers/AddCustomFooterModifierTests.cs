@@ -17,7 +17,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers
             IScriptModifier s = new AddCustomFooterModifier();
 
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => s.Modify(null, null, null));
+            Assert.Throws<ArgumentNullException>(() => s.Modify(null, null, null, null));
         }
 
         [Test]
@@ -28,7 +28,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers
             const string input = "foobar";
 
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => s.Modify(input, null, null));
+            Assert.Throws<ArgumentNullException>(() => s.Modify(input, null, null, null));
         }
 
         [Test]
@@ -40,7 +40,20 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers
             var project = new SqlProject("a", "b", "c");
 
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => s.Modify(input, project, null));
+            Assert.Throws<ArgumentNullException>(() => s.Modify(input, project, null, null));
+        }
+
+        [Test]
+        public void Modify_ArgumentNullException_Paths()
+        {
+            // Arrange
+            IScriptModifier s = new AddCustomFooterModifier();
+            const string input = "foobar";
+            var project = new SqlProject("a", "b", "c");
+            var configuration = new ConfigurationModel();
+
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() => s.Modify(input, project, configuration, null));
         }
 
         [Test]
@@ -54,9 +67,10 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers
             {
                 CustomFooter = "footer"
             };
+            var paths = new PathCollection("a", "b", "c", "d", "e", "f");
 
             // Act
-            var modified = s.Modify(input, project, configuration);
+            var modified = s.Modify(input, project, configuration, paths);
 
             // Assert
             Assert.IsNotNull(modified);
@@ -78,9 +92,10 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers
             {
                 CustomFooter = customFooter
             };
+            var paths = new PathCollection("a", "b", "c", "d", "e", "f");
 
             // Act
-            var modified = s.Modify(input, project, configuration);
+            var modified = s.Modify(input, project, configuration, paths);
 
             // Assert
             Assert.IsNotNull(modified);

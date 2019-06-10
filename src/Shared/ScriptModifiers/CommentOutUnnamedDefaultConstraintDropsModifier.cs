@@ -10,7 +10,8 @@
     {
         string IScriptModifier.Modify(string input,
                                       SqlProject project,
-                                      ConfigurationModel configuration)
+                                      ConfigurationModel configuration,
+                                      PathCollection paths)
         {
             if (input == null)
                 throw new ArgumentNullException(nameof(input));
@@ -18,6 +19,8 @@
                 throw new ArgumentNullException(nameof(project));
             if (configuration == null)
                 throw new ArgumentNullException(nameof(configuration));
+            if (paths == null)
+                throw new ArgumentNullException(nameof(paths));
 
             var (startIndex, endIndex) = SearchStatementRange(input, "DROP CONSTRAINT ;");
             if (startIndex == -1 || endIndex == -1)
