@@ -193,11 +193,11 @@
 
         bool IScriptCreationService.IsCreating => IsCreating;
 
-        async Task IScriptCreationService.CreateAsync(SqlProject project,
-                                                      ConfigurationModel configuration,
-                                                      Version previousVersion,
-                                                      bool latest,
-                                                      CancellationToken cancellationToken)
+        async Task<bool> IScriptCreationService.CreateAsync(SqlProject project,
+                                                            ConfigurationModel configuration,
+                                                            Version previousVersion,
+                                                            bool latest,
+                                                            CancellationToken cancellationToken)
         {
             if (project == null)
                 throw new ArgumentNullException(nameof(project));
@@ -219,14 +219,14 @@
 
                 // Cancel if requested
                 if (await ShouldCancelAsync(cancellationToken))
-                    return;
+                    return false;
 
-                if(!await _sqlProjectService.TryLoadSqlProjectPropertiesAsync(project))
-                    return;
+                if (!await _sqlProjectService.TryLoadSqlProjectPropertiesAsync(project))
+                    return false;
 
                 // Cancel if requested
                 if (await ShouldCancelAsync(cancellationToken))
-                    return;
+                    return false;
 
                 // Check DacVersion against base version, if not running latest creation
                 if (!latest)
@@ -236,51 +236,51 @@
                     {
                         await _logger.LogAsync($"ERROR: DacVersion of SQL project ({formattedTargetVersion}) is equal to or smaller than the previous version ({previousVersion}).");
                         _visualStudioAccess.ShowModalError("Please change the DAC version in the SQL project settings (see output window).");
-                        return;
+                        return false;
                     }
                 }
 
                 // Cancel if requested
                 if (await ShouldCancelAsync(cancellationToken))
-                    return;
+                    return false;
 
                 // Create paths required for script creation
                 var paths = await _sqlProjectService.TryLoadPathsAsync(project, configuration, previousVersion, latest);
                 if (paths == null)
-                    return;
+                    return false;
 
                 // Cancel if requested
                 if (await ShouldCancelAsync(cancellationToken))
-                    return;
+                    return false;
 
                 var sqlPackagePath = await DetermineSqlPackagePathAsync(configuration);
                 if (sqlPackagePath == null)
-                    return;
+                    return false;
 
                 // Cancel if requested
                 if (await ShouldCancelAsync(cancellationToken))
-                    return;
+                    return false;
 
                 if (!await VerifyPathsAsync(paths, sqlPackagePath))
-                    return;
+                    return false;
 
                 // Cancel if requested
                 if (await ShouldCancelAsync(cancellationToken))
-                    return;
+                    return false;
 
                 if (configuration.BuildBeforeScriptCreation)
                     await _buildService.BuildProjectAsync(project);
 
                 // Cancel if requested
                 if (await ShouldCancelAsync(cancellationToken))
-                    return;
+                    return false;
 
                 if (!await _buildService.CopyBuildResultAsync(project, paths.NewDacpacDirectory))
-                    return;
+                    return false;
 
                 // Cancel if requested
                 if (await ShouldCancelAsync(cancellationToken))
-                    return;
+                    return false;
 
                 var success = await CreateScriptAsync(paths, configuration.CreateDocumentationWithScriptCreation, sqlPackagePath, cancellationToken);
                 // Wait 1 second after creating the script to get any messages from the standard output before continuing with the script creation.
@@ -290,16 +290,16 @@
                 {
                     sw.Stop();
                     await _logger.LogAsync($"ERROR: Script creation aborted after {sw.ElapsedMilliseconds / 1000} seconds.");
-                    return;
+                    return false;
                 }
 
                 // Cancel if requested
                 if (await ShouldCancelAsync(cancellationToken))
-                    return;
+                    return false;
 
                 // Modify the script
                 if (!await ModifyCreatedScriptAsync(project, configuration, paths, cancellationToken))
-                    return;
+                    return false;
 
                 // No check for the cancellation token after the last action.
                 // Completion
@@ -330,6 +330,8 @@
 
                 IsCreating = false;
             }
+
+            return true;
         }
     }
 }

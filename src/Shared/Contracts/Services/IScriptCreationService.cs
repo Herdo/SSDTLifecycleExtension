@@ -26,11 +26,11 @@
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> used to cancel the script creation.</param>
         /// <exception cref="ArgumentNullException"><paramref name="project"/>, <paramref name="configuration"/>, or <paramref name="previousVersion"/> are <b>null</b>.</exception>
         /// <exception cref="InvalidOperationException">A creation is currently running. Check <see cref="IsCreating"/> before calling.</exception>
-        /// <returns>An awaitable <see cref="Task"/>.</returns>
-        Task CreateAsync([NotNull] SqlProject project,
-                         [NotNull] ConfigurationModel configuration,
-                         [NotNull] Version previousVersion,
-                         bool latest,
-                         CancellationToken cancellationToken);
+        /// <returns><b>True</b>, if the creation was successful, otherwise <b>false</b>.</returns>
+        Task<bool> CreateAsync([NotNull] SqlProject project,
+                               [NotNull] ConfigurationModel configuration,
+                               [NotNull] Version previousVersion,
+                               bool latest,
+                               CancellationToken cancellationToken);
     }
 }

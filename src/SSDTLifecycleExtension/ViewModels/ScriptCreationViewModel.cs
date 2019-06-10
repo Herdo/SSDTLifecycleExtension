@@ -101,7 +101,7 @@
             _configurationService.ConfigurationChanged += ConfigurationService_ConfigurationChanged;
         }
 
-        private async Task ScaffoldInternal(Version targetVersion)
+        private async Task ScaffoldInternalAsync(Version targetVersion)
         {
             var successful = await _scaffoldingService.ScaffoldAsync(_project, _configuration, targetVersion, CancellationToken.None);
             if (successful)
@@ -115,14 +115,21 @@
             }
         }
 
-        private async Task CreateScriptInternal(bool latest)
+        private async Task CreateScriptInternalAsync(bool latest)
         {
             IsCreatingScript = true;
             try
             {
-                await _scriptCreationService.CreateAsync(_project, _configuration, SelectedBaseVersion.UnderlyingVersion, latest, CancellationToken.None);
-                StartLatestCreationCommand.RaiseCanExecuteChanged();
-                StartVersionedCreationCommand.RaiseCanExecuteChanged();
+                var successful = await _scriptCreationService.CreateAsync(_project, _configuration, SelectedBaseVersion.UnderlyingVersion, latest, CancellationToken.None);
+                if (successful)
+                {
+                    await InitializeAsync();
+                }
+                else
+                {
+                    StartLatestCreationCommand.RaiseCanExecuteChanged();
+                    StartVersionedCreationCommand.RaiseCanExecuteChanged();
+                }
             }
             finally
             {
@@ -138,7 +145,7 @@
 
         private async void ScaffoldDevelopmentVersion_Executed()
         {
-            await ScaffoldInternal(new Version(0, 0, 0, 0));
+            await ScaffoldInternalAsync(new Version(0, 0, 0, 0));
         }
 
         private bool ScaffoldCurrentProductionVersion_CanExecute() =>
@@ -149,7 +156,7 @@
 
         private async void ScaffoldCurrentProductionVersion_Executed()
         {
-            await ScaffoldInternal(new Version(1, 0, 0, 0));
+            await ScaffoldInternalAsync(new Version(1, 0, 0, 0));
         }
 
         private bool StartLatestCreation_CanExecute() =>
@@ -160,7 +167,7 @@
 
         private async void StartLatestCreation_Executed()
         {
-            await CreateScriptInternal(true);
+            await CreateScriptInternalAsync(true);
         }
 
         private bool StartVersionedCreation_CanExecute() =>
@@ -171,7 +178,7 @@
 
         private async void StartVersionedCreation_Executed()
         {
-            await CreateScriptInternal(false);
+            await CreateScriptInternalAsync(false);
         }
 
         /// <summary>
