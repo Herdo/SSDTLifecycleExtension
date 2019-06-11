@@ -90,6 +90,7 @@
                .RegisterSingleton<IFileSystemAccess, FileSystemAccess>()
                .RegisterInstance<IVisualStudioAccess>(visualStudioAccess, new ContainerControlledLifetimeManager())
                .RegisterInstance<ILogger>(visualStudioAccess, new ContainerControlledLifetimeManager())
+               .RegisterType<IDacAccess, DacAccess>()
                 
                 // Factories
                .RegisterSingleton<IScriptModifierFactory, ScriptModifierFactory>();

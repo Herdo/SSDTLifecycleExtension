@@ -249,7 +249,6 @@
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
@@ -278,59 +277,8 @@
                                      Style="{StaticResource DefaultTextTextBoxStyle}"
                                      Text="{Binding Model.ArtifactsPath, Mode=TwoWay}"/>
 
-                            <!-- SqlPackage.exe path -->
-                            <TextBlock Grid.Row="1"
-                                       Grid.Column="0"
-                                       Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
-                                <Run Text="SqlPackage.exe path"
-                                     FontWeight="Bold"/>
-                                <LineBreak/>
-                                <Run Text="The path where the SqlPackage.exe"
-                                     FontStyle="Italic"/>
-                                <LineBreak/>
-                                <Run Text="is located."
-                                     FontStyle="Italic"/>
-                                <LineBreak/>
-                                <LineBreak/>
-                                <Run Text="Absolute path. Use the special keyword"
-                                     FontStyle="Italic"/>
-                                <LineBreak/>
-                                <Run Text="{}{DEFAULT_LATEST_VERSION} to use the"
-                                     FontStyle="Italic"/>
-                                <LineBreak/>
-                                <Run Text="latest SqlPackage.exe automatically."
-                                     FontStyle="Italic"/>
-                                <LineBreak/>
-                                <Run Text="This may fail, if no latest version"
-                                     FontStyle="Italic"/>
-                                <LineBreak/>
-                                <Run Text="is found."
-                                     FontStyle="Italic"/>
-                            </TextBlock>
-                            <Grid Grid.Row="1"
-                                  Grid.Column="1"
-                                  HorizontalAlignment="Stretch"
-                                  Margin="0,5,0,0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBox Grid.Column="0"
-                                         x:Name="SqlPackagePathTextBox"
-                                         Style="{StaticResource DefaultTextTextBoxStyle}"
-                                         Margin="0,0,5,0"
-                                         Text="{Binding Model.SqlPackagePath, Mode=TwoWay, ValidatesOnDataErrors=True}"/>
-                                <Button Grid.Column="1"
-                                        Command="{Binding BrowseSqlPackageCommand}"
-                                        VerticalAlignment="Top"
-                                        Height="{Binding ElementName=SqlPackagePathTextBox, Path=ActualHeight}"
-                                        Padding="5,0"
-                                        Content="..."
-                                        ToolTip="Browse..."/>
-                            </Grid>
-
                             <!-- Publish profile  path -->
-                            <TextBlock Grid.Row="2"
+                            <TextBlock Grid.Row="1"
                                        Grid.Column="0"
                                        Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
                                 <Run Text="Publish profile path"
@@ -346,7 +294,7 @@
                                 <Run Text="Relative path to the *.sqlproj file."
                                      FontStyle="Italic"/>
                             </TextBlock>
-                            <Grid Grid.Row="2"
+                            <Grid Grid.Row="1"
                                   Grid.Column="1"
                                   HorizontalAlignment="Stretch"
                                   Margin="0,5,0,0">

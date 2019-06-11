@@ -4,7 +4,6 @@
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
-    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
     using Contracts;
@@ -24,6 +23,7 @@
         private readonly IScriptModifierFactory _scriptModifierFactory;
         private readonly IVisualStudioAccess _visualStudioAccess;
         private readonly IFileSystemAccess _fileSystemAccess;
+        private readonly IDacAccess _dacAccess;
         private readonly ILogger _logger;
 
         private bool _isCreating;
@@ -34,6 +34,7 @@
                                      IScriptModifierFactory scriptModifierFactory,
                                      IVisualStudioAccess visualStudioAccess,
                                      IFileSystemAccess fileSystemAccess,
+                                     IDacAccess dacAccess,
                                      ILogger logger)
         {
             _sqlProjectService = sqlProjectService ?? throw new ArgumentNullException(nameof(sqlProjectService));
@@ -42,6 +43,7 @@
             _scriptModifierFactory = scriptModifierFactory ?? throw new ArgumentNullException(nameof(scriptModifierFactory));
             _visualStudioAccess = visualStudioAccess ?? throw new ArgumentNullException(nameof(visualStudioAccess));
             _fileSystemAccess = fileSystemAccess ?? throw new ArgumentNullException(nameof(fileSystemAccess));
+            _dacAccess = dacAccess ?? throw new ArgumentNullException(nameof(dacAccess));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -54,29 +56,7 @@
             return true;
         }
 
-        private async Task<string> DetermineSqlPackagePathAsync(ConfigurationModel configuration)
-        {
-            // Determine SqlPackage.exe path
-            if (configuration.SqlPackagePath != ConfigurationModel.SqlPackageSpecialKeyword)
-                return configuration.SqlPackagePath;
-
-            await _logger.LogAsync("Searching latest SqlPackage.exe ...");
-            var sqlPackageExecutables = _fileSystemAccess.SearchForFiles(Environment.SpecialFolder.ProgramFilesX86, "Microsoft SQL Server", "SqlPackage.exe");
-            if (sqlPackageExecutables.Error != null)
-            {
-                await _logger.LogAsync($"ERROR: Failed to find any SqlPackage.exe: {sqlPackageExecutables.Error}");
-                return null;
-            }
-
-            if (sqlPackageExecutables.Result.Length > 0)
-                return sqlPackageExecutables.Result.OrderByDescending(m => m).First();
-
-            await _logger.LogAsync("ERROR: Failed to find latest SqlPackage.exe. Please specify an absolute path to the SqlPackage.exe to use.");
-            return null;
-        }
-
-        private async Task<bool> VerifyPathsAsync(PathCollection paths,
-                                                  string sqlPackagePath)
+        private async Task<bool> VerifyPathsAsync(PathCollection paths)
         {
             await _logger.LogAsync("Verifying paths ...");
 
@@ -86,51 +66,55 @@
                 return false;
             }
 
-            if (!_fileSystemAccess.CheckIfFileExists(sqlPackagePath))
-            {
-                await _logger.LogAsync("ERROR: Failed to find SqlPackage.exe.");
-                return false;
-            }
-
             return true;
         }
 
         private async Task<bool> CreateScriptAsync(PathCollection paths,
-                                                   bool createDocumentation,
-                                                   string sqlPackagePath,
-                                                   CancellationToken cancellationToken)
+                                                   bool createDocumentation)
         {
-            await _logger.LogAsync("Creating script ...");
-            var sqlPackageArguments = new StringBuilder();
-            sqlPackageArguments.Append("/Action:Script ");
-            sqlPackageArguments.Append($"/Profile:\"{paths.PublishProfilePath}\" ");
-            sqlPackageArguments.Append($"/SourceFile:\"{paths.NewDacpacPath}\" "); // new version
-            sqlPackageArguments.Append($"/TargetFile:\"{paths.PreviousDacpacPath}\" "); // previous version from artifacts directory
-            sqlPackageArguments.Append($"/DeployScriptPath:\"{paths.DeployScriptPath}\" ");
-            if (createDocumentation)
-                sqlPackageArguments.Append($"/DeployReportPath:\"{paths.DeployReportPath}\" ");
-            var hasErrors = false;
-            var processStartError = await _fileSystemAccess.StartProcessAndWaitAsync(sqlPackagePath,
-                                                                                     sqlPackageArguments.ToString(),
-                                                                                     async s =>
-                                                                                     {
-                                                                                         if (!string.IsNullOrWhiteSpace(s))
-                                                                                             await _logger.LogAsync($"SqlPackage.exe INFO: {s}");
-                                                                                     },
-                                                                                     async s =>
-                                                                                     {
-                                                                                         if (!string.IsNullOrWhiteSpace(s))
-                                                                                         {
-                                                                                             hasErrors = true;
-                                                                                             await _logger.LogAsync($"SqlPackage.exe ERROR: {s}");
-                                                                                         }
-                                                                                     },
-                                                                                     cancellationToken);
-            if (processStartError == null)
-                return !hasErrors;
+            await _logger.LogAsync("Creating diff files ...");
+            var result = await _dacAccess.CreateDeployFilesAsync(paths.PreviousDacpacPath,
+                                                                 paths.NewDacpacPath,
+                                                                 paths.PublishProfilePath,
+                                                                 true,
+                                                                 createDocumentation);
 
-            await _logger.LogAsync($"ERROR: Failed to start the SqlPackage.exe process: {processStartError}");
-            return false;
+            if (result.Errors != null)
+            {
+                await _logger.LogAsync("ERROR: Failed to create script:");
+                foreach (var s in result.Errors)
+                    await _logger.LogAsync(s);
+
+                return false;
+            }
+
+            var success = true;
+            try
+            {
+                await _logger.LogAsync($"Writing deploy script to {paths.DeployScriptPath} ...");
+                await _fileSystemAccess.WriteFileAsync(paths.DeployScriptPath, result.DeployScriptContent);
+            }
+            catch (Exception e)
+            {
+                await _logger.LogAsync($"ERROR: Failed to write deploy script: {e.Message}");
+                success = false;
+            }
+
+            if (!createDocumentation)
+                return success;
+
+            try
+            {
+                await _logger.LogAsync($"Writing deploy report to {paths.DeployReportPath} ...");
+                await _fileSystemAccess.WriteFileAsync(paths.DeployReportPath, result.DeployReportContent);
+            }
+            catch (Exception e)
+            {
+                await _logger.LogAsync($"ERROR: Failed to write deploy report: {e.Message}");
+                success = false;
+            }
+
+            return success;
         }
 
         private async Task<bool> ModifyCreatedScriptAsync(SqlProject project,
@@ -260,15 +244,7 @@
                 if (await ShouldCancelAsync(cancellationToken))
                     return false;
 
-                var sqlPackagePath = await DetermineSqlPackagePathAsync(configuration);
-                if (sqlPackagePath == null)
-                    return false;
-
-                // Cancel if requested
-                if (await ShouldCancelAsync(cancellationToken))
-                    return false;
-
-                if (!await VerifyPathsAsync(paths, sqlPackagePath))
+                if (!await VerifyPathsAsync(paths))
                     return false;
 
                 // Cancel if requested
@@ -289,7 +265,7 @@
                 if (await ShouldCancelAsync(cancellationToken))
                     return false;
 
-                var success = await CreateScriptAsync(paths, configuration.CreateDocumentationWithScriptCreation, sqlPackagePath, cancellationToken);
+                var success = await CreateScriptAsync(paths, configuration.CreateDocumentationWithScriptCreation);
                 // Wait 1 second after creating the script to get any messages from the standard output before continuing with the script creation.
                 await Task.Delay(1000, cancellationToken);
 

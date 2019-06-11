@@ -7,14 +7,12 @@
 
     public class ConfigurationModel : BaseModel
     {
-        public const string SqlPackageSpecialKeyword = "{DEFAULT_LATEST_VERSION}";
         public const string MajorVersionSpecialKeyword = "{MAJOR}";
         public const string MinorVersionSpecialKeyword = "{MINOR}";
         public const string BuildVersionSpecialKeyword = "{BUILD}";
         public const string RevisionVersionSpecialKeyword = "{REVISION}";
         
         private string _artifactsPath;
-        private string _sqlPackagePath;
         private string _publishProfilePath;
         private bool _buildBeforeScriptCreation;
         private bool _createDocumentationWithScriptCreation;
@@ -39,21 +37,6 @@
                 _artifactsPath = value;
                 OnPropertyChanged();
                 SetValidationErrors(ValidateArtifactsPath(_artifactsPath));
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the absolute SqlPackage.exe path.
-        /// </summary>
-        public string SqlPackagePath
-        {
-            get => _sqlPackagePath;
-            set
-            {
-                if (value == _sqlPackagePath) return;
-                _sqlPackagePath = value;
-                OnPropertyChanged();
-                SetValidationErrors(ValidateSqlPackagePath(_sqlPackagePath));
             }
         }
 
@@ -212,7 +195,6 @@
             new ConfigurationModel
             {
                 ArtifactsPath = "_Deployment",
-                SqlPackagePath = SqlPackageSpecialKeyword,
                 PublishProfilePath = null,
                 BuildBeforeScriptCreation = true,
                 CreateDocumentationWithScriptCreation = true,
@@ -228,7 +210,6 @@
         public void ValidateAll()
         {
             SetValidationErrors(ValidateArtifactsPath(ArtifactsPath, nameof(ArtifactsPath)), nameof(ArtifactsPath));
-            SetValidationErrors(ValidateSqlPackagePath(SqlPackagePath, nameof(SqlPackagePath)), nameof(SqlPackagePath));
             SetValidationErrors(ValidatePublishProfilePath(PublishProfilePath, nameof(PublishProfilePath)), nameof(PublishProfilePath));
             SetValidationErrors(ValidateCommentOutUnnamedDefaultConstraintDrops(CommentOutUnnamedDefaultConstraintDrops, nameof(CommentOutUnnamedDefaultConstraintDrops)), nameof(CommentOutUnnamedDefaultConstraintDrops));
             SetValidationErrors(ValidateReplaceUnnamedDefaultConstraintDrops(ReplaceUnnamedDefaultConstraintDrops, nameof(ReplaceUnnamedDefaultConstraintDrops)), nameof(ReplaceUnnamedDefaultConstraintDrops));
@@ -240,7 +221,6 @@
             var copy = new ConfigurationModel
             {
                 ArtifactsPath = ArtifactsPath,
-                SqlPackagePath = SqlPackagePath,
                 PublishProfilePath = PublishProfilePath,
                 BuildBeforeScriptCreation = BuildBeforeScriptCreation,
                 CreateDocumentationWithScriptCreation = CreateDocumentationWithScriptCreation,
@@ -277,44 +257,6 @@
                 catch (ArgumentException)
                 {
                     errors.Add("Path contains invalid characters.");
-                }
-            }
-
-            return errors;
-        }
-
-        private List<string> ValidateSqlPackagePath(string value, [CallerMemberName] string propertyName = null)
-        {
-            if (propertyName == null)
-                throw new ArgumentNullException(nameof(propertyName));
-
-            var errors = new List<string>();
-
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                errors.Add("Path cannot be empty.");
-            }
-            else
-            {
-                if (value == SqlPackageSpecialKeyword)
-                    return errors;
-
-                const string execName = "SqlPackage.exe";
-                if (!value.EndsWith(execName))
-                {
-                    errors.Add($"Executable must be '{execName}' or the special keyword.");
-                }
-                else
-                {
-                    try
-                    {
-                        if (!Path.IsPathRooted(value))
-                            errors.Add("Path must be an absolute path.");
-                    }
-                    catch (ArgumentException)
-                    {
-                        errors.Add("Path contains invalid characters.");
-                    }
                 }
             }
 

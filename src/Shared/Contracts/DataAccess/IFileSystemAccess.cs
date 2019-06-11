@@ -1,7 +1,5 @@
 ﻿namespace SSDTLifecycleExtension.Shared.Contracts.DataAccess
 {
-    using System;
-    using System.Threading;
     using System.Threading.Tasks;
     using JetBrains.Annotations;
 
@@ -15,19 +13,9 @@
         string BrowseForFile([NotNull] string extension,
                              [NotNull] string filter);
 
-        (string[] Result, string Error) SearchForFiles(Environment.SpecialFolder rootFolder,
-                                                       [NotNull] string subFolder,
-                                                       [NotNull] string searchPattern);
-
         bool CheckIfFileExists([NotNull] string filePath);
 
         string EnsureDirectoryExists([NotNull] string path);
-
-        Task<string> StartProcessAndWaitAsync([NotNull] string fileName,
-                                              [NotNull] string arguments,
-                                              [CanBeNull] Func<string, Task> outputDataHandler,
-                                              [CanBeNull] Func<string, Task> errorDataHandler,
-                                              CancellationToken cancellationToken);
 
         string CopyFiles([NotNull] string sourceDirectory,
                          [NotNull] string targetDirectory,

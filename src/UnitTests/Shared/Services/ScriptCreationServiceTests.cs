@@ -17,7 +17,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
         {
             // Act & Assert
             // ReSharper disable once ObjectCreationAsStatement
-            Assert.Throws<ArgumentNullException>(() => new ScriptCreationService(null, null, null, null, null, null, null));
+            Assert.Throws<ArgumentNullException>(() => new ScriptCreationService(null, null, null, null, null, null, null, null));
         }
 
         [Test]
@@ -28,7 +28,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
 
             // Act & Assert
             // ReSharper disable once ObjectCreationAsStatement
-            Assert.Throws<ArgumentNullException>(() => new ScriptCreationService(spsMock, null, null, null, null, null, null));
+            Assert.Throws<ArgumentNullException>(() => new ScriptCreationService(spsMock, null, null, null, null, null, null, null));
         }
 
         [Test]
@@ -40,7 +40,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
 
             // Act & Assert
             // ReSharper disable once ObjectCreationAsStatement
-            Assert.Throws<ArgumentNullException>(() => new ScriptCreationService(spsMock, bsMock, null, null, null, null, null));
+            Assert.Throws<ArgumentNullException>(() => new ScriptCreationService(spsMock, bsMock, null, null, null, null, null, null));
         }
 
         [Test]
@@ -53,7 +53,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
 
             // Act & Assert
             // ReSharper disable once ObjectCreationAsStatement
-            Assert.Throws<ArgumentNullException>(() => new ScriptCreationService(spsMock, bsMock, vsMock, null, null, null, null));
+            Assert.Throws<ArgumentNullException>(() => new ScriptCreationService(spsMock, bsMock, vsMock, null, null, null, null, null));
         }
 
         [Test]
@@ -67,7 +67,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
 
             // Act & Assert
             // ReSharper disable once ObjectCreationAsStatement
-            Assert.Throws<ArgumentNullException>(() => new ScriptCreationService(spsMock, bsMock, vsMock, smfMock, null, null, null));
+            Assert.Throws<ArgumentNullException>(() => new ScriptCreationService(spsMock, bsMock, vsMock, smfMock, null, null, null, null));
         }
 
         [Test]
@@ -82,7 +82,23 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
 
             // Act & Assert
             // ReSharper disable once ObjectCreationAsStatement
-            Assert.Throws<ArgumentNullException>(() => new ScriptCreationService(spsMock, bsMock, vsMock, smfMock, vsaMock, null, null));
+            Assert.Throws<ArgumentNullException>(() => new ScriptCreationService(spsMock, bsMock, vsMock, smfMock, vsaMock, null, null, null));
+        }
+
+        [Test]
+        public void Constructor_ArgumentNullException_DacAccess()
+        {
+            // Arrange
+            var spsMock = Mock.Of<ISqlProjectService>();
+            var bsMock = Mock.Of<IBuildService>();
+            var vsMock = Mock.Of<IVersionService>();
+            var smfMock = Mock.Of<IScriptModifierFactory>();
+            var vsaMock = Mock.Of<IVisualStudioAccess>();
+            var fsaMock = Mock.Of<IFileSystemAccess>();
+
+            // Act & Assert
+            // ReSharper disable once ObjectCreationAsStatement
+            Assert.Throws<ArgumentNullException>(() => new ScriptCreationService(spsMock, bsMock, vsMock, smfMock, vsaMock, fsaMock, null, null));
         }
 
         [Test]
@@ -95,10 +111,11 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             var smfMock = Mock.Of<IScriptModifierFactory>();
             var vsaMock = Mock.Of<IVisualStudioAccess>();
             var fsaMock = Mock.Of<IFileSystemAccess>();
+            var daMock = Mock.Of<IDacAccess>();
 
             // Act & Assert
             // ReSharper disable once ObjectCreationAsStatement
-            Assert.Throws<ArgumentNullException>(() => new ScriptCreationService(spsMock, bsMock, vsMock, smfMock, vsaMock, fsaMock, null));
+            Assert.Throws<ArgumentNullException>(() => new ScriptCreationService(spsMock, bsMock, vsMock, smfMock, vsaMock, fsaMock, daMock, null));
         }
     }
 }

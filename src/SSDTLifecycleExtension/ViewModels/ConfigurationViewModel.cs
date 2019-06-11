@@ -50,8 +50,6 @@
                 SaveConfigurationCommand.RaiseCanExecuteChanged();
             }
         }
-
-        public ICommand BrowseSqlPackageCommand { get; }
         public ICommand BrowsePublishProfileCommand { get; }
         public ICommand ResetConfigurationToDefaultCommand { get; }
         public DelegateCommand SaveConfigurationCommand { get; }
@@ -70,16 +68,9 @@
             _scaffoldingService.IsScaffoldingChanged += ScaffoldingService_IsScaffoldingChanged;
             _scriptCreationService.IsCreatingChanged += ScriptCreationService_IsCreatingChanged;
 
-            BrowseSqlPackageCommand = new DelegateCommand(BrowseSqlPackage_Executed);
             BrowsePublishProfileCommand = new DelegateCommand(BrowsePublishProfile_Executed);
             ResetConfigurationToDefaultCommand = new DelegateCommand(ResetConfigurationToDefault_Executed);
             SaveConfigurationCommand = new DelegateCommand(SaveConfiguration_Executed, SaveConfiguration_CanExecute);
-        }
-
-        private void BrowseSqlPackage_Executed(object obj)
-        {
-            var browsedPath = _fileSystemAccess.BrowseForFile(".exe", "Executable file (*.exe)|*.exe");
-            if (browsedPath != null) Model.SqlPackagePath = browsedPath;
         }
 
         private void BrowsePublishProfile_Executed(object obj)
@@ -133,7 +124,6 @@
 
             // Check by properties
             IsModelDirty = Model.ArtifactsPath != _lastSavedModel.ArtifactsPath
-                           || Model.SqlPackagePath != _lastSavedModel.SqlPackagePath
                            || Model.PublishProfilePath != _lastSavedModel.PublishProfilePath
                            || Model.BuildBeforeScriptCreation != _lastSavedModel.BuildBeforeScriptCreation
                            || Model.CreateDocumentationWithScriptCreation != _lastSavedModel.CreateDocumentationWithScriptCreation
