@@ -2,7 +2,10 @@
 {
     using System;
     using System.Linq;
+    using System.Text;
     using System.Threading.Tasks;
+    using System.Xml;
+    using System.Xml.Linq;
     using JetBrains.Annotations;
     using Microsoft.SqlServer.Dac;
     using Shared.Contracts.DataAccess;
@@ -10,11 +13,30 @@
     [UsedImplicitly]
     public class DacAccess : IDacAccess
     {
-        public async Task<(string DeployScriptContent, string DeployReportContent, string[] Errors)> CreateDeployFilesAsync(string previousVersionDacpacPath,
-                                                 string newVersionDacpacPath,
-                                                 string publishProfilePath,
-                                                 bool createDeployScript,
-                                                 bool createDeployReport)
+        private static string FormatDeployReport(string deploymentReport)
+        {
+            if (deploymentReport == null)
+                return null;
+
+            var doc = XDocument.Parse(deploymentReport);
+            var sb = new StringBuilder();
+            var settings = new XmlWriterSettings
+            {
+                Indent = true,
+                IndentChars = "    ",
+                NewLineChars = "\r\n",
+                NewLineHandling = NewLineHandling.Replace
+            };
+            using (var writer = XmlWriter.Create(sb, settings))
+                doc.Save(writer);
+            return sb.ToString();
+        }
+
+        async Task<(string DeployScriptContent, string DeployReportContent, string[] Errors)> IDacAccess.CreateDeployFilesAsync(string previousVersionDacpacPath,
+                                                                                                                                string newVersionDacpacPath,
+                                                                                                                                string publishProfilePath,
+                                                                                                                                bool createDeployScript,
+                                                                                                                                bool createDeployReport)
         {
             if (previousVersionDacpacPath == null)
                 throw new ArgumentNullException(nameof(previousVersionDacpacPath));
@@ -53,13 +75,13 @@
                                        .ToArray());
                     }
 
-                    return (null, new[] { e.Message });
+                    return (null, new[] {e.Message});
                 }
 
                 return (result, null);
             });
 
-            return (publishResult?.DatabaseScript, publishResult?.DeploymentReport, errors);
+            return (publishResult?.DatabaseScript, FormatDeployReport(publishResult?.DeploymentReport), errors);
         }
     }
 }
