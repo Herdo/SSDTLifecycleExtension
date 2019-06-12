@@ -22,17 +22,18 @@
             if (paths == null)
                 throw new ArgumentNullException(nameof(paths));
 
-            var (startIndex, endIndex) = SearchStatementRange(input, "DROP CONSTRAINT ;", 0, 1);
-            if (startIndex == -1 || endIndex == -1)
-                return input;
-
-            var pre = input.Substring(0, startIndex);
-            var post = input.Substring(endIndex);
-            var range = input.Substring(startIndex, endIndex - startIndex);
-            var lines = range.Split(new[] {Environment.NewLine}, StringSplitOptions.None);
-            var newLines = lines.Select(m => $"-- {m}").ToArray();
-            var replacement = string.Join(Environment.NewLine, newLines);
-            return pre + replacement + post;
+            return ForEachMatch(input,
+                                "DROP CONSTRAINT ;",
+                                1,
+                                (pre,
+                                 range,
+                                 post) =>
+                                {
+                                    var lines = range.Split(new[] {Environment.NewLine}, StringSplitOptions.None);
+                                    var newLines = lines.Select(m => $"-- {m}").ToArray();
+                                    var replacement = string.Join(Environment.NewLine, newLines);
+                                    return pre + replacement + post;
+                                });
         }
     }
 }

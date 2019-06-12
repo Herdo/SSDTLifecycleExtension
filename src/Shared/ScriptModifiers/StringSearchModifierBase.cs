@@ -5,12 +5,23 @@
     public abstract class StringSearchModifierBase
     {
         /// <summary>
+        /// A delegate for construct a result, based on the <paramref name="range"/> itself, as well as the text <paramref name="pre"/> and <paramref name="post"/> the <paramref name="range"/>.
+        /// </summary>
+        /// <param name="pre">The text before the <paramref name="range"/>.</param>
+        /// <param name="range">The text between the <paramref name="pre"/> and <paramref name="post"/>.</param>
+        /// <param name="post">The text after the <paramref name="range"/>.</param>
+        /// <returns>The constructed string.</returns>
+        protected delegate string InputModifier(string pre,
+                                                string range,
+                                                string post);
+
+        /// <summary>
         /// Searches the <paramref name="input"/> for the <paramref name="statement"/>.
         /// </summary>
         /// <param name="input">The text to search in.</param>
         /// <param name="statement">The text to search for.</param>
         /// <param name="startAfterIndex">Start searching after this index.</param>
-        /// <param name="numberOfLeadingStatementsToInclude">The number of leading statements to include in the range. See example</param>
+        /// <param name="numberOfLeadingStatementsToInclude">The number of leading statements to include in the range. See example.</param>
         /// <exception cref="ArgumentNullException"><paramref name="input"/> or <paramref name="statement"/> are <b>null</b>.</exception>
         /// <exception cref="ArgumentException"><paramref name="statement"/> contains only white spaces.</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="startAfterIndex"/> is negative.</exception>
@@ -96,6 +107,51 @@
             }
 
             return (startIndex, endIndex);
+        }
+
+        /// <summary>
+        /// Searches the <paramref name="input"/> for the <paramref name="statement"/> and applies the <paramref name="modifier"/> for each match.
+        /// </summary>
+        /// <param name="input">The text to search in.</param>
+        /// <param name="statement">The text to search for.</param>
+        /// <param name="numberOfLeadingStatementsToInclude">The number of leading statements to include in the range.</param>
+        /// <param name="modifier">The <see cref="InputModifier"/> to apply for each match.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="input"/>, <paramref name="statement"/> or <paramref name="modifier"/> are <b>null</b>.</exception>
+        /// <exception cref="ArgumentException"><paramref name="statement"/> contains only white spaces.</exception>
+        /// <returns>The <paramref name="input"/> string, if no match is found, otherwise the result after applying the modifications.</returns>
+        protected string ForEachMatch(string input,
+                                      string statement,
+                                      byte numberOfLeadingStatementsToInclude,
+                                      InputModifier modifier)
+        {
+            if (input == null)
+                throw new ArgumentNullException(nameof(input));
+            if (statement == null)
+                throw new ArgumentNullException(nameof(statement));
+            if (modifier == null)
+                throw new ArgumentNullException(nameof(modifier));
+            if (string.IsNullOrWhiteSpace(statement))
+                throw new ArgumentException("Parameter may not be only white spaces.", nameof(statement));
+
+            var modified = input;
+            var startAfterIndex = 0;
+            int startIndex;
+
+            do
+            {
+                int endIndex;
+                (startIndex, endIndex) = SearchStatementRange(modified, statement, startAfterIndex, numberOfLeadingStatementsToInclude);
+                if (startIndex == -1)
+                    break;
+
+                startAfterIndex = endIndex;
+                var pre = modified.Substring(0, startIndex);
+                var range = modified.Substring(startIndex, endIndex - startIndex);
+                var post = modified.Substring(endIndex);
+                modified = modifier(pre, range, post);
+            } while (startIndex > 0);
+
+            return modified;
         }
     }
 }
