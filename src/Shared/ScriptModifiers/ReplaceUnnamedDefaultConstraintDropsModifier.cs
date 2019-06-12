@@ -21,7 +21,7 @@
             if (paths == null)
                 throw new ArgumentNullException(nameof(paths));
 
-            var (startIndex, endIndex) = SearchStatementRange(input, "DROP CONSTRAINT ;");
+            var (startIndex, endIndex) = SearchStatementRange(input, "DROP CONSTRAINT ;", 0, 1);
             if (startIndex == -1 || endIndex == -1)
                 return input;
 
