@@ -73,7 +73,7 @@
             SaveConfigurationCommand = new DelegateCommand(SaveConfiguration_Executed, SaveConfiguration_CanExecute);
         }
 
-        private void BrowsePublishProfile_Executed(object obj)
+        private void BrowsePublishProfile_Executed()
         {
             var browsedPath = _fileSystemAccess.BrowseForFile(".publish.xml", "Publish profile (*.publish.xml)|*.publish.xml");
             if (browsedPath != null)
@@ -85,13 +85,13 @@
             }
         }
 
-        private void ResetConfigurationToDefault_Executed(object obj)
+        private void ResetConfigurationToDefault_Executed()
         {
             Model = ConfigurationModel.GetDefault();
             Model.ValidateAll();
         }
 
-        private bool SaveConfiguration_CanExecute(object obj)
+        private bool SaveConfiguration_CanExecute()
         {
             return Model != null
                 && !Model.HasErrors
@@ -100,7 +100,7 @@
                 && !_scriptCreationService.IsCreating;
         }
 
-        private async void SaveConfiguration_Executed(object obj)
+        private async void SaveConfiguration_Executed()
         {
             var copy = Model.Copy();
             await _configurationService.SaveConfigurationAsync(_project, copy);
