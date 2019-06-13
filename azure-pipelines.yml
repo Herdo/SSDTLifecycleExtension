@@ -17,15 +17,14 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-- script: |
-    dotnet tool install --global dotnet-sonarscanner
-  name: InstallSonarScanner
-  displayName: Install SonarScanner
-
-- script: |
-    dotnet sonarscanner begin /k:"SSDTLifecycleExtension" /o:"herdo-github" /d:sonar.host.url="https://sonarcloud.io"  /d:sonar.login="$(SONAR_TOKEN)" /v:"$(Build.BuildId)"
-  name: BeginSonarScanner
-  displayName: Begin SonarScanner
+- task: SonarCloudPrepare@1
+  displayName: Prepare SonarCloud
+  inputs:
+    projectName: 'SSDT Lifecycle Extension'
+    projectKey: 'SSDTLifecycleExtension'
+    projectVersion: '$(Build.BuildId)'
+    organization: 'herdo-github'
+    SonarCloud: 'SonarCloud-CodeAnalysis-Server'
 
 - task: NuGetToolInstaller@0
   displayName: NuGet Tool Installer
@@ -49,7 +48,5 @@ steps:
     configuration: '$(buildConfiguration)'
     codeCoverageEnabled: true
 
-- script: |
-    dotnet sonarscanner end /d:sonar.login="$(SONAR_TOKEN)"
-  name: EndSonarScanner
-  displayName: End SonarScanner
+- task: SonarCloudAnalyze@1 
+  displayName: Run SonarCloud Analyzer
