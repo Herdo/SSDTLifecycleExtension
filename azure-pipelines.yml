@@ -4,7 +4,9 @@
 # https://docs.microsoft.com/azure/devops/pipelines/apps/windows/dot-net
 
 trigger:
-- master
+ branches:
+   include:
+     - master/src
 
 pool:
   vmImage: 'windows-latest'
@@ -15,19 +17,39 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
+- script: |
+    dotnet tool install --global dotnet-sonarscanner
+  name: InstallSonarScanner
+  displayName: Install SonarScanner
+
+- script: |
+    dotnet sonarscanner begin /k:"SSDTLifecycleExtension" /o:"herdo-github" /d:sonar.host.url="https://sonarcloud.io"  /d:sonar.login="$(SONAR_TOKEN)" /v:"$(Build.BuildId)"
+  name: BeginSonarScanner
+  displayName: Begin SonarScanner
+
 - task: NuGetToolInstaller@0
+  displayName: NuGet Tool Installer
 
 - task: NuGetCommand@2
+  displayName: Restore NuGet packages
   inputs:
     restoreSolution: '$(solution)'
 
 - task: VSBuild@1
+  displayName: Build solution
   inputs:
     solution: '$(solution)'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
 
 - task: VSTest@2
+  displayName: Run tests
   inputs:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+    codeCoverageEnabled: true
+
+- script: |
+    dotnet sonarscanner end /d:sonar.login="$(SONAR_TOKEN)"
+  name: EndSonarScanner
+  displayName: End SonarScanner
