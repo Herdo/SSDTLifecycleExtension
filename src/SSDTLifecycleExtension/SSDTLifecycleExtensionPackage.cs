@@ -49,7 +49,6 @@
         })]
     public sealed class SSDTLifecycleExtensionPackage : AsyncPackage
     {
-
         public const string SqlProjectContextGuid = "b5759c1b-ffdd-48bd-ae82-61317eeb3a75";
 
         public const string PackageGuidString = "757ac7eb-a0da-4387-9fa2-675e78561cde";
@@ -125,7 +124,10 @@
             {
                 _container?.Dispose();
             }
-            catch { }
+            catch
+            {
+                // ignored - when the extension gets disposed, there's no logger left to log the exception.
+            }
             finally
             {
                 base.Dispose(disposing);
