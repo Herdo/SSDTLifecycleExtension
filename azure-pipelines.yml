@@ -23,7 +23,7 @@ steps:
 
 # Begin SonarScanner
 - script: |
-    dotnet sonarscanner begin /k:"SSDTLifecycleExtension" /d:sonar.organization="herdo-github" /d:sonar.host.url="https://sonarcloud.io"  /d:sonar.login="$(SONAR_TOKEN)" /v:"$(Build.BuildId)"
+    dotnet sonarscanner begin /k:"SSDTLifecycleExtension" /o:"herdo-github" /d:sonar.host.url="https://sonarcloud.io"  /d:sonar.login="$(SONAR_TOKEN)" /v:"$(Build.BuildId)"
 
 - task: NuGetToolInstaller@0
 
