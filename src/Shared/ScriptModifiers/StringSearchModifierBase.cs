@@ -11,9 +11,9 @@
         /// <param name="range">The text between the <paramref name="pre"/> and <paramref name="post"/>.</param>
         /// <param name="post">The text after the <paramref name="range"/>.</param>
         /// <returns>The constructed string.</returns>
-        protected delegate string InputModifier(string pre,
-                                                string range,
-                                                string post);
+        public delegate string InputModifier(string pre,
+                                             string range,
+                                             string post);
 
         /// <summary>
         /// Searches the <paramref name="input"/> for the <paramref name="statement"/>.

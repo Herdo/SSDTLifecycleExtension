@@ -204,6 +204,16 @@ PRINT 'Update complete'
             Assert.AreEqual(expectedEndIndex, endIndex, "Wrong end index");
         }
 
+        [Test]
+        public void ForEachMatch_ArgumentNullException_Input()
+        {
+            // Arrange
+            var s = new StringSearchModifierBaseTestImplementation();
+
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() => s.ForEachMatchBase(null, null, 0, null));
+        }
+
         private class StringSearchModifierBaseTestImplementation : StringSearchModifierBase
         {
             internal (int StartIndex, int EndIndex) SearchStatementRangeBase(string input,
@@ -211,6 +221,12 @@ PRINT 'Update complete'
                                                                              int startAfterIndex,
                                                                              byte numberOfLeadingStatementsToInclude) =>
                 SearchStatementRange(input, statement, startAfterIndex, numberOfLeadingStatementsToInclude);
+
+            internal string ForEachMatchBase(string input,
+                                             string statement,
+                                             byte numberOfLeadingStatementsToInclude,
+                                             InputModifier modifier) =>
+                ForEachMatch(input, statement, numberOfLeadingStatementsToInclude, modifier);
         }
     }
 }
