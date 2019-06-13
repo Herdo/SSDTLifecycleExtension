@@ -8,7 +8,7 @@
     using System.Threading;
     using System.Threading.Tasks;
     using JetBrains.Annotations;
-    using Microsoft.VisualStudio.PlatformUI;
+    using MVVM;
     using Shared.Contracts;
     using Shared.Contracts.DataAccess;
     using Shared.Contracts.Services;
@@ -16,7 +16,8 @@
     using Shared.Models;
 
     [UsedImplicitly]
-    public class ScriptCreationViewModel : ViewModelBase
+    public class ScriptCreationViewModel : ViewModelBase,
+                                           IErrorHandler
     {
         private readonly SqlProject _project;
         private readonly IConfigurationService _configurationService;
@@ -24,6 +25,7 @@
         private readonly IScriptCreationService _scriptCreationService;
         private readonly IVisualStudioAccess _visualStudioAccess;
         private readonly IFileSystemAccess _fileSystemAccess;
+        private readonly ILogger _logger;
 
         private ConfigurationModel _configuration;
 
@@ -69,20 +71,21 @@
 
         public ObservableCollection<VersionModel> ExistingVersions { get; }
 
-        public DelegateCommand ScaffoldDevelopmentVersionCommand { get; }
+        public IAsyncCommand ScaffoldDevelopmentVersionCommand { get; }
 
-        public DelegateCommand ScaffoldCurrentProductionVersionCommand { get; }
+        public IAsyncCommand ScaffoldCurrentProductionVersionCommand { get; }
 
-        public DelegateCommand StartLatestCreationCommand { get; }
+        public IAsyncCommand StartLatestCreationCommand { get; }
 
-        public DelegateCommand StartVersionedCreationCommand { get; }
+        public IAsyncCommand StartVersionedCreationCommand { get; }
 
         public ScriptCreationViewModel(SqlProject project,
                                        IConfigurationService configurationService,
                                        IScaffoldingService scaffoldingService,
                                        IScriptCreationService scriptCreationService,
                                        IVisualStudioAccess visualStudioAccess,
-                                       IFileSystemAccess fileSystemAccess)
+                                       IFileSystemAccess fileSystemAccess,
+                                       ILogger logger)
         {
             _project = project;
             _configurationService = configurationService;
@@ -90,15 +93,18 @@
             _scriptCreationService = scriptCreationService;
             _visualStudioAccess = visualStudioAccess;
             _fileSystemAccess = fileSystemAccess;
+            _logger = logger;
 
             ExistingVersions = new ObservableCollection<VersionModel>();
 
-            ScaffoldDevelopmentVersionCommand = new DelegateCommand(ScaffoldDevelopmentVersion_Executed, ScaffoldDevelopmentVersion_CanExecute);
-            ScaffoldCurrentProductionVersionCommand = new DelegateCommand(ScaffoldCurrentProductionVersion_Executed, ScaffoldCurrentProductionVersion_CanExecute);
-            StartLatestCreationCommand = new DelegateCommand(StartLatestCreation_Executed, StartLatestCreation_CanExecute);
-            StartVersionedCreationCommand = new DelegateCommand(StartVersionedCreation_Executed, StartVersionedCreation_CanExecute);
+            ScaffoldDevelopmentVersionCommand = new AsyncCommand(ScaffoldDevelopmentVersion_ExecutedAsync, ScaffoldDevelopmentVersion_CanExecute, this);
+            ScaffoldCurrentProductionVersionCommand = new AsyncCommand(ScaffoldCurrentProductionVersion_ExecutedAsync, ScaffoldCurrentProductionVersion_CanExecute, this);
+            StartLatestCreationCommand = new AsyncCommand(StartLatestCreation_ExecutedAsync, StartLatestCreation_CanExecute, this);
+            StartVersionedCreationCommand = new AsyncCommand(StartVersionedCreation_ExecutedAsync, StartVersionedCreation_CanExecute, this);
 
             _configurationService.ConfigurationChanged += ConfigurationService_ConfigurationChanged;
+            _scaffoldingService.IsScaffoldingChanged += ScaffoldingService_IsScaffoldingChanged;
+            _scriptCreationService.IsCreatingChanged += ScriptCreationService_IsCreatingChanged;
         }
 
         private async Task ScaffoldInternalAsync(Version targetVersion)
@@ -143,7 +149,7 @@
             && !_scaffoldingService.IsScaffolding
             && !_scriptCreationService.IsCreating;
 
-        private async void ScaffoldDevelopmentVersion_Executed()
+        private async Task ScaffoldDevelopmentVersion_ExecutedAsync()
         {
             await ScaffoldInternalAsync(new Version(0, 0, 0, 0));
         }
@@ -154,7 +160,7 @@
             && !_scaffoldingService.IsScaffolding
             && !_scriptCreationService.IsCreating;
 
-        private async void ScaffoldCurrentProductionVersion_Executed()
+        private async Task ScaffoldCurrentProductionVersion_ExecutedAsync()
         {
             await ScaffoldInternalAsync(new Version(1, 0, 0, 0));
         }
@@ -165,7 +171,7 @@
             && !_scaffoldingService.IsScaffolding
             && !_scriptCreationService.IsCreating;
 
-        private async void StartLatestCreation_Executed()
+        private async Task StartLatestCreation_ExecutedAsync()
         {
             await CreateScriptInternalAsync(true);
         }
@@ -176,7 +182,7 @@
             && !_scaffoldingService.IsScaffolding
             && !_scriptCreationService.IsCreating;
 
-        private async void StartVersionedCreation_Executed()
+        private async Task StartVersionedCreation_ExecutedAsync()
         {
             await CreateScriptInternalAsync(false);
         }
@@ -247,15 +253,56 @@
             return true;
         }
 
+        private void EvaluateCommands()
+        {
+            ScaffoldDevelopmentVersionCommand.RaiseCanExecuteChanged();
+            ScaffoldCurrentProductionVersionCommand.RaiseCanExecuteChanged();
+            StartLatestCreationCommand.RaiseCanExecuteChanged();
+            StartVersionedCreationCommand.RaiseCanExecuteChanged();
+        }
+
         private async void ConfigurationService_ConfigurationChanged(object sender, ProjectConfigurationChangedEventArgs e)
         {
             if (e.Project.UniqueName != _project.UniqueName)
                 return;
 
             _configuration = await _configurationService.GetConfigurationOrDefaultAsync(_project);
-            ScaffoldDevelopmentVersionCommand.RaiseCanExecuteChanged();
-            ScaffoldCurrentProductionVersionCommand.RaiseCanExecuteChanged();
-            StartLatestCreationCommand.RaiseCanExecuteChanged();
+            EvaluateCommands();
+        }
+
+        private void ScaffoldingService_IsScaffoldingChanged(object sender, EventArgs e)
+        {
+            EvaluateCommands();
+        }
+
+        private void ScriptCreationService_IsCreatingChanged(object sender, EventArgs e)
+        {
+            EvaluateCommands();
+        }
+
+        void IErrorHandler.HandleError(IAsyncCommand command, Exception exception)
+        {
+            string commandName = null;
+            if (ReferenceEquals(command, ScaffoldDevelopmentVersionCommand))
+                commandName = nameof(ScaffoldDevelopmentVersionCommand);
+            else if(ReferenceEquals(command, ScaffoldCurrentProductionVersionCommand))
+                commandName = nameof(ScaffoldCurrentProductionVersionCommand);
+            else if (ReferenceEquals(command, StartLatestCreationCommand))
+                commandName = nameof(StartLatestCreationCommand);
+            else if (ReferenceEquals(command, StartVersionedCreationCommand))
+                commandName = nameof(StartVersionedCreationCommand);
+
+            if (commandName == null)
+                throw new NotSupportedException();
+
+            try
+            {
+                _logger.LogAsync($"Error during execution of {commandName}: {exception}").RunSynchronously();
+            }
+            catch
+            {
+                // ignored - when logging the exception fails, we don't want to end up in a stack overflow.
+            }
         }
     }
 }

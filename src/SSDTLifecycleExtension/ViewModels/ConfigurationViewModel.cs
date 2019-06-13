@@ -5,6 +5,7 @@
     using System.Windows.Input;
     using JetBrains.Annotations;
     using Microsoft.VisualStudio.PlatformUI;
+    using MVVM;
     using Shared.Contracts;
     using Shared.Contracts.DataAccess;
     using Shared.Contracts.Services;
@@ -12,13 +13,15 @@
     using Task = System.Threading.Tasks.Task;
 
     [UsedImplicitly]
-    public class ConfigurationViewModel : ViewModelBase
+    public class ConfigurationViewModel : ViewModelBase,
+                                          IErrorHandler
     {
         private readonly SqlProject _project;
         private readonly IConfigurationService _configurationService;
         private readonly IFileSystemAccess _fileSystemAccess;
         private readonly IScaffoldingService _scaffoldingService;
         private readonly IScriptCreationService _scriptCreationService;
+        private readonly ILogger _logger;
 
         private ConfigurationModel _lastSavedModel;
         private ConfigurationModel _model;
@@ -52,25 +55,27 @@
         }
         public ICommand BrowsePublishProfileCommand { get; }
         public ICommand ResetConfigurationToDefaultCommand { get; }
-        public DelegateCommand SaveConfigurationCommand { get; }
+        public IAsyncCommand SaveConfigurationCommand { get; }
 
         public ConfigurationViewModel(SqlProject project,
                                       IConfigurationService configurationService,
                                       IFileSystemAccess fileSystemAccess,
                                       IScaffoldingService scaffoldingService,
-                                      IScriptCreationService scriptCreationService)
+                                      IScriptCreationService scriptCreationService,
+                                      ILogger logger)
         {
             _project = project;
             _configurationService = configurationService;
             _fileSystemAccess = fileSystemAccess;
             _scaffoldingService = scaffoldingService;
             _scriptCreationService = scriptCreationService;
+            _logger = logger;
             _scaffoldingService.IsScaffoldingChanged += ScaffoldingService_IsScaffoldingChanged;
             _scriptCreationService.IsCreatingChanged += ScriptCreationService_IsCreatingChanged;
 
             BrowsePublishProfileCommand = new DelegateCommand(BrowsePublishProfile_Executed);
             ResetConfigurationToDefaultCommand = new DelegateCommand(ResetConfigurationToDefault_Executed);
-            SaveConfigurationCommand = new DelegateCommand(SaveConfiguration_Executed, SaveConfiguration_CanExecute);
+            SaveConfigurationCommand = new AsyncCommand(SaveConfiguration_ExecutedAsync, SaveConfiguration_CanExecute, this);
         }
 
         private void BrowsePublishProfile_Executed()
@@ -100,7 +105,7 @@
                 && !_scriptCreationService.IsCreating;
         }
 
-        private async void SaveConfiguration_Executed()
+        private async Task SaveConfiguration_ExecutedAsync()
         {
             var copy = Model.Copy();
             await _configurationService.SaveConfigurationAsync(_project, copy);
@@ -155,6 +160,21 @@
         private void Model_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             CheckIfModelIsDirty();
+        }
+
+        void IErrorHandler.HandleError(IAsyncCommand command, Exception exception)
+        {
+            if (!ReferenceEquals(command, SaveConfigurationCommand))
+                throw new NotSupportedException();
+
+            try
+            {
+                _logger.LogAsync($"Error during execution of {nameof(SaveConfigurationCommand)}: {exception}").RunSynchronously();
+            }
+            catch
+            {
+                // ignored - when logging the exception fails, we don't want to end up in a stack overflow.
+            }
         }
     }
 }
