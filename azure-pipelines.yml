@@ -26,9 +26,6 @@ steps:
     organization: 'herdo-github'
     SonarCloud: 'SonarCloud-CodeAnalysis-Server'
 
-- task: SonarCloudAnalyze@1 
-  displayName: Begin SonarCloud Analyzer
-
 - task: NuGetToolInstaller@0
   displayName: NuGet Tool Installer
 
@@ -51,5 +48,5 @@ steps:
     configuration: '$(buildConfiguration)'
     codeCoverageEnabled: true
 
-- task: SonarCloudPublish@1
-  displayName: Publish SonarCloud results
+- task: SonarCloudAnalyze@1 
+  displayName: Run SonarCloud Analyzer
