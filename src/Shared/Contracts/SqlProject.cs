@@ -1,5 +1,7 @@
 ﻿namespace SSDTLifecycleExtension.Shared.Contracts
 {
+    using System;
+
     public class SqlProject
     {
         public string Name { get; }
@@ -14,9 +16,9 @@
                           string fullName,
                           string uniqueName)
         {
-            Name = name;
-            FullName = fullName;
-            UniqueName = uniqueName;
+            Name = name ?? throw new ArgumentNullException(nameof(name));
+            FullName = fullName ?? throw new ArgumentNullException(nameof(fullName));
+            UniqueName = uniqueName ?? throw new ArgumentNullException(nameof(uniqueName));
             ProjectProperties = new SqlProjectProperties();
         }
     }
