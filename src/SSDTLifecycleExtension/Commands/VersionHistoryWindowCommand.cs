@@ -53,11 +53,6 @@
             private set;
         }
 
-        /// <summary>
-        /// Gets the service provider from the owner package.
-        /// </summary>
-        private Microsoft.VisualStudio.Shell.IAsyncServiceProvider ServiceProvider => _package;
-
         public static void Initialize(VersionHistoryWindowCommand instance)
         {
             Instance = instance;
