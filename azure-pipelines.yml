@@ -56,12 +56,19 @@ steps:
 - task: SonarCloudAnalyze@1 
   displayName: Run SonarCloud Analyzer
 
+- task: PowerShell@2
+  displayName: Scan for files
+  inputs:
+    targetType: inline
+    script: Get-ChildItem -Path '$(Build.SourcesDirectory)' -Recurse
+
 - task: CopyFiles@2
   displayName: Copy VSIX to artifact staging directory
   inputs:
     SourceFolder: '$(Build.SourcesDirectory)'
-    Contents: '**\bin\*.vsix'
-    TargetFolder: $(Build.ArtifactStagingDirectory)
+    Contents: |
+     **\bin\*.vsix
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
 
 - task: PublishBuildArtifacts@1
   displayName: Publish VSIX build artifact
