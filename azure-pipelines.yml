@@ -55,3 +55,15 @@ steps:
 
 - task: SonarCloudAnalyze@1 
   displayName: Run SonarCloud Analyzer
+
+- task: CopyFiles@2
+  displayName: Copy VSIX to artifact staging directory
+  inputs:
+    Contents: '**\\bin\\*.vsix'
+    TargetFolder: $(Build.ArtifactStagingDirectory)
+
+- task: PublishBuildArtifacts@1
+  displayName: Publish VSIX build artifact
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: VSIX
