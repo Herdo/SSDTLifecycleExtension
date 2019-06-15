@@ -63,6 +63,7 @@ steps:
     SourceFolder: '$(Build.SourcesDirectory)'
     Contents: |
      deployment\*
+     README.md
     TargetFolder: '$(Build.ArtifactStagingDirectory)'
 
 - task: CopyFiles@2
