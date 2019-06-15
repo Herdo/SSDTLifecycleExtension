@@ -9,6 +9,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "Shared\Shared.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{BF5937A9-8E34-4E88-9B7D-3ADA04C5D1B6}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deployment", "Deployment", "{12F46FDE-FF67-4CE6-9360-FF7F46C61F11}"
+	ProjectSection(SolutionItems) = preProject
+		..\deployment\extension-manifest.json = ..\deployment\extension-manifest.json
+		..\deployment\publish-vsix.ps1 = ..\deployment\publish-vsix.ps1
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
