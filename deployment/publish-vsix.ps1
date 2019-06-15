@@ -1,5 +1,5 @@
 $PersonalAccessToken = $args[0]
-$VsixPath = "$PSScriptRoot\SSDTLifecycleExtension.vsix"
+$VsixPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath("$PSScriptRoot\..\SSDTLifecycleExtension.vsix")
 $ManifestPath = "$PSScriptRoot\extension-manifest.json"
 
 # Find the location of VsixPublisher
