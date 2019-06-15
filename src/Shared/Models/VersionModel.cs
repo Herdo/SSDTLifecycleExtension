@@ -1,6 +1,7 @@
 ﻿namespace SSDTLifecycleExtension.Shared.Models
 {
     using System;
+    using JetBrains.Annotations;
 
     public class VersionModel : BaseModel
     {
@@ -31,11 +32,17 @@
             }
         }
 
-        public string DisplayName =>
-            UnderlyingVersion == null
-                ? "<null>"
-                : IsNewestVersion
-                    ? $"{UnderlyingVersion} (newest)"
-                    : UnderlyingVersion.ToString();
+        [UsedImplicitly] // Used from XAML as display name for the model.
+        public string DisplayName
+        {
+            get
+            {
+                if (UnderlyingVersion == null)
+                           return "<null>";
+                return IsNewestVersion
+                           ? $"{UnderlyingVersion} (newest)"
+                           : UnderlyingVersion.ToString();
+            }
+        }
     }
 }
