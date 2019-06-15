@@ -59,7 +59,8 @@ steps:
 - task: CopyFiles@2
   displayName: Copy VSIX to artifact staging directory
   inputs:
-    Contents: '**\\bin\\*.vsix'
+    SourceFolder: '$(Build.SourcesDirectory)'
+    Contents: '**\bin\*.vsix'
     TargetFolder: $(Build.ArtifactStagingDirectory)
 
 - task: PublishBuildArtifacts@1
