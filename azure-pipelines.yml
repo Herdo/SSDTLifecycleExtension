@@ -57,6 +57,16 @@ steps:
   displayName: Run SonarCloud Analyzer
 
 - task: CopyFiles@2
+  name: CopyDeploymentData
+  displayName: Copy deployment data to artifact staging directory
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)'
+    Contents: |
+     deployment\*
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+- task: CopyFiles@2
+  name: CopyVSIX
   displayName: Copy VSIX to artifact staging directory
   inputs:
     SourceFolder: '$(Build.SourcesDirectory)'
