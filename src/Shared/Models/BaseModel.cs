@@ -41,7 +41,7 @@
         public IEnumerable GetErrors(string propertyName)
         {
             if (string.IsNullOrWhiteSpace(propertyName))
-                return null;
+                return new string[0];
             return _validationErrors.TryGetValue(propertyName, out var errors)
                        ? errors
                        : new string[0];
