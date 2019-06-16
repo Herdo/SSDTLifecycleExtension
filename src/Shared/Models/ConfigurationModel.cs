@@ -5,14 +5,14 @@
     using System.IO;
     using System.Runtime.CompilerServices;
 
-    public class ConfigurationModel : BaseModel,
-                                      IEquatable<ConfigurationModel>
+    public sealed class ConfigurationModel : BaseModel,
+                                             IEquatable<ConfigurationModel>
     {
         public const string MajorVersionSpecialKeyword = "{MAJOR}";
         public const string MinorVersionSpecialKeyword = "{MINOR}";
         public const string BuildVersionSpecialKeyword = "{BUILD}";
         public const string RevisionVersionSpecialKeyword = "{REVISION}";
-        
+
         private string _artifactsPath;
         private string _publishProfilePath;
         private bool _buildBeforeScriptCreation;
@@ -111,7 +111,8 @@
                 _commentOutUnnamedDefaultConstraintDrops = value;
                 OnPropertyChanged();
                 SetValidationErrors(ValidateCommentOutUnnamedDefaultConstraintDrops(value));
-                SetValidationErrors(ValidateReplaceUnnamedDefaultConstraintDrops(ReplaceUnnamedDefaultConstraintDrops, nameof(ReplaceUnnamedDefaultConstraintDrops)), nameof(ReplaceUnnamedDefaultConstraintDrops));
+                SetValidationErrors(ValidateReplaceUnnamedDefaultConstraintDrops(ReplaceUnnamedDefaultConstraintDrops, nameof(ReplaceUnnamedDefaultConstraintDrops)),
+                                    nameof(ReplaceUnnamedDefaultConstraintDrops));
             }
         }
 
@@ -127,7 +128,8 @@
                 _replaceUnnamedDefaultConstraintDrops = value;
                 OnPropertyChanged();
                 SetValidationErrors(ValidateReplaceUnnamedDefaultConstraintDrops(value));
-                SetValidationErrors(ValidateCommentOutUnnamedDefaultConstraintDrops(CommentOutUnnamedDefaultConstraintDrops, nameof(CommentOutUnnamedDefaultConstraintDrops)), nameof(CommentOutUnnamedDefaultConstraintDrops));
+                SetValidationErrors(ValidateCommentOutUnnamedDefaultConstraintDrops(CommentOutUnnamedDefaultConstraintDrops, nameof(CommentOutUnnamedDefaultConstraintDrops)),
+                                    nameof(CommentOutUnnamedDefaultConstraintDrops));
             }
         }
 
@@ -212,8 +214,10 @@
         {
             SetValidationErrors(ValidateArtifactsPath(ArtifactsPath, nameof(ArtifactsPath)), nameof(ArtifactsPath));
             SetValidationErrors(ValidatePublishProfilePath(PublishProfilePath, nameof(PublishProfilePath)), nameof(PublishProfilePath));
-            SetValidationErrors(ValidateCommentOutUnnamedDefaultConstraintDrops(CommentOutUnnamedDefaultConstraintDrops, nameof(CommentOutUnnamedDefaultConstraintDrops)), nameof(CommentOutUnnamedDefaultConstraintDrops));
-            SetValidationErrors(ValidateReplaceUnnamedDefaultConstraintDrops(ReplaceUnnamedDefaultConstraintDrops, nameof(ReplaceUnnamedDefaultConstraintDrops)), nameof(ReplaceUnnamedDefaultConstraintDrops));
+            SetValidationErrors(ValidateCommentOutUnnamedDefaultConstraintDrops(CommentOutUnnamedDefaultConstraintDrops, nameof(CommentOutUnnamedDefaultConstraintDrops)),
+                                nameof(CommentOutUnnamedDefaultConstraintDrops));
+            SetValidationErrors(ValidateReplaceUnnamedDefaultConstraintDrops(ReplaceUnnamedDefaultConstraintDrops, nameof(ReplaceUnnamedDefaultConstraintDrops)),
+                                nameof(ReplaceUnnamedDefaultConstraintDrops));
             SetValidationErrors(ValidateVersionPattern(VersionPattern, nameof(VersionPattern)), nameof(VersionPattern));
         }
 
@@ -237,7 +241,8 @@
             return copy;
         }
 
-        private List<string> ValidateArtifactsPath(string value, [CallerMemberName] string propertyName = null)
+        private List<string> ValidateArtifactsPath(string value,
+                                                   [CallerMemberName] string propertyName = null)
         {
             if (propertyName == null)
                 throw new ArgumentNullException(nameof(propertyName));
@@ -264,7 +269,8 @@
             return errors;
         }
 
-        private List<string> ValidatePublishProfilePath(string value, [CallerMemberName] string propertyName = null)
+        private List<string> ValidatePublishProfilePath(string value,
+                                                        [CallerMemberName] string propertyName = null)
         {
             if (propertyName == null)
                 throw new ArgumentNullException(nameof(propertyName));
@@ -295,7 +301,8 @@
             return errors;
         }
 
-        private List<string> ValidateCommentOutUnnamedDefaultConstraintDrops(bool value, [CallerMemberName] string propertyName = null)
+        private List<string> ValidateCommentOutUnnamedDefaultConstraintDrops(bool value,
+                                                                             [CallerMemberName] string propertyName = null)
         {
             if (propertyName == null)
                 throw new ArgumentNullException(nameof(propertyName));
@@ -308,7 +315,8 @@
             return errors;
         }
 
-        private List<string> ValidateReplaceUnnamedDefaultConstraintDrops(bool value, [CallerMemberName] string propertyName = null)
+        private List<string> ValidateReplaceUnnamedDefaultConstraintDrops(bool value,
+                                                                          [CallerMemberName] string propertyName = null)
         {
             if (propertyName == null)
                 throw new ArgumentNullException(nameof(propertyName));
@@ -321,7 +329,8 @@
             return errors;
         }
 
-        private List<string> ValidateVersionPattern(string value, [CallerMemberName] string propertyName = null)
+        private List<string> ValidateVersionPattern(string value,
+                                                    [CallerMemberName] string propertyName = null)
         {
             if (propertyName == null)
                 throw new ArgumentNullException(nameof(propertyName));
@@ -334,7 +343,7 @@
             }
             else
             {
-                var split = value.Split(new []{'.'}, StringSplitOptions.None);
+                var split = value.Split(new[] {'.'}, StringSplitOptions.None);
                 if (split.Length < 2) errors.Add("Pattern doesn't contain enough parts.");
                 if (split.Length > 4) errors.Add("Pattern contains too many parts.");
                 for (var position = 0; position < split.Length; position++)

@@ -3,7 +3,7 @@
     using System;
     using JetBrains.Annotations;
 
-    public class VersionModel : BaseModel
+    public sealed class VersionModel : BaseModel
     {
         private Version _underlyingVersion;
         private bool _isNewestVersion;
@@ -38,7 +38,7 @@
             get
             {
                 if (UnderlyingVersion == null)
-                           return "<null>";
+                    return "<null>";
                 return IsNewestVersion
                            ? $"{UnderlyingVersion} (newest)"
                            : UnderlyingVersion.ToString();
