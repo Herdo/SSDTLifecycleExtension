@@ -128,17 +128,7 @@
             }
 
             // Check by properties
-            IsModelDirty = Model.ArtifactsPath != _lastSavedModel.ArtifactsPath
-                           || Model.PublishProfilePath != _lastSavedModel.PublishProfilePath
-                           || Model.BuildBeforeScriptCreation != _lastSavedModel.BuildBeforeScriptCreation
-                           || Model.CreateDocumentationWithScriptCreation != _lastSavedModel.CreateDocumentationWithScriptCreation
-                           || Model.CommentOutReferencedProjectRefactorings != _lastSavedModel.CommentOutReferencedProjectRefactorings
-                           || Model.CommentOutUnnamedDefaultConstraintDrops != _lastSavedModel.CommentOutUnnamedDefaultConstraintDrops
-                           || Model.ReplaceUnnamedDefaultConstraintDrops != _lastSavedModel.ReplaceUnnamedDefaultConstraintDrops
-                           || Model.VersionPattern != _lastSavedModel.VersionPattern
-                           || Model.TrackDacpacVersion != _lastSavedModel.TrackDacpacVersion
-                           || Model.CustomHeader != _lastSavedModel.CustomHeader
-                           || Model.CustomFooter != _lastSavedModel.CustomFooter;
+            IsModelDirty = !Model.Equals(_lastSavedModel);
         }
 
         public async Task InitializeAsync()

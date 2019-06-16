@@ -5,7 +5,8 @@
     using System.IO;
     using System.Runtime.CompilerServices;
 
-    public class ConfigurationModel : BaseModel
+    public class ConfigurationModel : BaseModel,
+                                      IEquatable<ConfigurationModel>
     {
         public const string MajorVersionSpecialKeyword = "{MAJOR}";
         public const string MinorVersionSpecialKeyword = "{MINOR}";
@@ -395,6 +396,25 @@
                 errors.Add("Invalid special keyword for build number.");
             else if (position == 3 && split[position] != RevisionVersionSpecialKeyword)
                 errors.Add("Invalid special keyword for revision number.");
+        }
+
+        public bool Equals(ConfigurationModel other)
+        {
+            if (ReferenceEquals(null, other))
+                return false;
+            if (ReferenceEquals(this, other))
+                return true;
+            return string.Equals(_artifactsPath, other._artifactsPath)
+                   && string.Equals(_publishProfilePath, other._publishProfilePath)
+                   && _buildBeforeScriptCreation == other._buildBeforeScriptCreation
+                   && _createDocumentationWithScriptCreation == other._createDocumentationWithScriptCreation
+                   && _commentOutReferencedProjectRefactorings == other._commentOutReferencedProjectRefactorings
+                   && _commentOutUnnamedDefaultConstraintDrops == other._commentOutUnnamedDefaultConstraintDrops
+                   && _replaceUnnamedDefaultConstraintDrops == other._replaceUnnamedDefaultConstraintDrops
+                   && string.Equals(_versionPattern, other._versionPattern)
+                   && _trackDacpacVersion == other._trackDacpacVersion
+                   && string.Equals(_customHeader, other._customHeader)
+                   && string.Equals(_customFooter, other._customFooter);
         }
     }
 }
