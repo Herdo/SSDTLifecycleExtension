@@ -24,12 +24,20 @@
         void ICommandAvailabilityService.HandleCommandAvailability(Action<bool> setVisible,
                                                                    Action<bool> setEnabled)
         {
+            if (setVisible == null)
+                throw new ArgumentNullException(nameof(setVisible));
+            if (setEnabled == null)
+                throw new ArgumentNullException(nameof(setEnabled));
+
             var projectKind = _visualStudioAccess.GetSelectedProjectKind();
             if (projectKind == Guid.Empty)
                 return;
 
-            setVisible(projectKind == Guid.Parse(Shared.Constants.SqlProjectKindGuid));
-            setEnabled(!_scaffoldingService.IsScaffolding && !_scriptCreationService.IsCreating);
+            var visible = projectKind == Guid.Parse(Constants.SqlProjectKindGuid);
+            var enabled = visible && !_scaffoldingService.IsScaffolding && !_scriptCreationService.IsCreating;
+
+            setVisible(visible);
+            setEnabled(enabled);
         }
     }
 }
