@@ -31,13 +31,8 @@
             return Path.Combine(directory ?? throw new InvalidOperationException("Cannot find configuration file. Directory is <null>."), "Properties", "ssdtlifecycle.json");
         }
 
-        public event EventHandler<ProjectConfigurationChangedEventArgs> ConfigurationChanged;
-
-        async Task<ConfigurationModel> IConfigurationService.GetConfigurationOrDefaultAsync(SqlProject project)
+        private async Task<ConfigurationModel> GetConfigurationOrDefaultInternalAsync(SqlProject project)
         {
-            if (project == null)
-                throw new ArgumentNullException(nameof(project));
-            
             var sourcePath = GetConfigurationPath(project);
             var serialized = await _fileSystemAccess.ReadFileAsync(sourcePath);
             var deserialized = serialized == null
@@ -47,14 +42,9 @@
             return deserialized;
         }
 
-        async Task IConfigurationService.SaveConfigurationAsync(SqlProject project,
-                                                                ConfigurationModel model)
+        private async Task SaveConfigurationInternalAsync(SqlProject project,
+                                                          ConfigurationModel model)
         {
-            if (project == null)
-                throw new ArgumentNullException(nameof(project));
-            if (model == null)
-                throw new ArgumentNullException(nameof(model));
-
             var targetPath = GetConfigurationPath(project);
             var serialized = JsonConvert.SerializeObject(model, Formatting.Indented);
 
@@ -66,6 +56,27 @@
 
             // Add configuration to the project, if it hasn't been added before.
             _visualStudioAccess.AddItemToProjectProperties(project, targetPath);
+        }
+
+        public event EventHandler<ProjectConfigurationChangedEventArgs> ConfigurationChanged;
+
+        Task<ConfigurationModel> IConfigurationService.GetConfigurationOrDefaultAsync(SqlProject project)
+        {
+            if (project == null)
+                throw new ArgumentNullException(nameof(project));
+
+            return GetConfigurationOrDefaultInternalAsync(project);
+        }
+
+        Task IConfigurationService.SaveConfigurationAsync(SqlProject project,
+                                                          ConfigurationModel model)
+        {
+            if (project == null)
+                throw new ArgumentNullException(nameof(project));
+            if (model == null)
+                throw new ArgumentNullException(nameof(model));
+
+            return SaveConfigurationInternalAsync(project, model);
         }
     }
 }

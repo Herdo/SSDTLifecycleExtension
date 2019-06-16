@@ -43,35 +43,11 @@
             return true;
         }
 
-        public event EventHandler IsScaffoldingChanged;
-
-        private bool IsScaffolding
+        private async Task<bool> ScaffoldInternalAsync(SqlProject project,
+                                                 ConfigurationModel configuration,
+                                                 Version targetVersion,
+                                                 CancellationToken cancellationToken)
         {
-            get => _isScaffolding;
-            set
-            {
-                if (value == _isScaffolding) return;
-                _isScaffolding = value;
-                IsScaffoldingChanged?.Invoke(this, EventArgs.Empty);
-            }
-        }
-
-        bool IScaffoldingService.IsScaffolding => IsScaffolding;
-
-        async Task<bool> IScaffoldingService.ScaffoldAsync(SqlProject project,
-                                                           ConfigurationModel configuration,
-                                                           Version targetVersion,
-                                                           CancellationToken cancellationToken)
-        {
-            if (project == null)
-                throw new ArgumentNullException(nameof(project));
-            if (configuration == null)
-                throw new ArgumentNullException(nameof(configuration));
-            if (targetVersion == null)
-                throw new ArgumentNullException(nameof(targetVersion));
-            if (IsScaffolding)
-                throw new InvalidOperationException($"Service is already running a {nameof(IScriptCreationService.CreateAsync)} task.");
-
             IsScaffolding = true;
             try
             {
@@ -157,7 +133,40 @@
 
                 IsScaffolding = false;
             }
+
             return true;
+        }
+
+        public event EventHandler IsScaffoldingChanged;
+
+        private bool IsScaffolding
+        {
+            get => _isScaffolding;
+            set
+            {
+                if (value == _isScaffolding) return;
+                _isScaffolding = value;
+                IsScaffoldingChanged?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        bool IScaffoldingService.IsScaffolding => IsScaffolding;
+
+        Task<bool> IScaffoldingService.ScaffoldAsync(SqlProject project,
+                                                     ConfigurationModel configuration,
+                                                     Version targetVersion,
+                                                     CancellationToken cancellationToken)
+        {
+            if (project == null)
+                throw new ArgumentNullException(nameof(project));
+            if (configuration == null)
+                throw new ArgumentNullException(nameof(configuration));
+            if (targetVersion == null)
+                throw new ArgumentNullException(nameof(targetVersion));
+            if (IsScaffolding)
+                throw new InvalidOperationException($"Service is already running a {nameof(IScriptCreationService.CreateAsync)} task.");
+
+            return ScaffoldInternalAsync(project, configuration, targetVersion, cancellationToken);
         }
     }
 }

@@ -10,11 +10,8 @@
     [UsedImplicitly]
     public class FileSystemAccess : IFileSystemAccess
     {
-        async Task<string> IFileSystemAccess.ReadFileAsync(string sourcePath)
+        private static async Task<string> ReadFileInternalAsync(string sourcePath)
         {
-            if (sourcePath == null)
-                throw new ArgumentNullException(nameof(sourcePath));
-
             try
             {
                 using (var stream = new FileStream(sourcePath, FileMode.Open))
@@ -27,8 +24,32 @@
             }
         }
 
-        async Task IFileSystemAccess.WriteFileAsync(string targetPath,
-                                                    string content)
+        private static async Task WriteFileInternalAsync(string targetPath,
+                                                         string content)
+        {
+            Stream stream = null;
+            try
+            {
+                stream = new FileStream(targetPath, FileMode.Create);
+                using (var writer = new StreamWriter(stream))
+                    await writer.WriteAsync(content);
+            }
+            finally
+            {
+                stream?.Dispose();
+            }
+        }
+
+        Task<string> IFileSystemAccess.ReadFileAsync(string sourcePath)
+        {
+            if (sourcePath == null)
+                throw new ArgumentNullException(nameof(sourcePath));
+
+            return ReadFileInternalAsync(sourcePath);
+        }
+
+        Task IFileSystemAccess.WriteFileAsync(string targetPath,
+                                              string content)
         {
             if (targetPath == null)
                 throw new ArgumentNullException(nameof(targetPath));
@@ -43,17 +64,7 @@
             if (!di.Exists) di.Create();
 
             // Write the file.
-            Stream stream = null;
-            try
-            {
-                stream = new FileStream(targetPath, FileMode.Create);
-                using (var writer = new StreamWriter(stream))
-                    await writer.WriteAsync(content);
-            }
-            finally
-            {
-                stream?.Dispose();
-            }
+            return WriteFileInternalAsync(targetPath, content);
         }
 
         string IFileSystemAccess.BrowseForFile(string extension,

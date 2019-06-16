@@ -32,22 +32,12 @@
             return sb.ToString();
         }
 
-        async Task<(string DeployScriptContent, string DeployReportContent, string[] Errors)> IDacAccess.CreateDeployFilesAsync(string previousVersionDacpacPath,
-                                                                                                                                string newVersionDacpacPath,
-                                                                                                                                string publishProfilePath,
-                                                                                                                                bool createDeployScript,
-                                                                                                                                bool createDeployReport)
+        private static async Task<(string DeployScriptContent, string DeployReportContent, string[] Errors)> CreateDeployFilesInternalAsync(string previousVersionDacpacPath,
+                                                                                                                                            string newVersionDacpacPath,
+                                                                                                                                            string publishProfilePath,
+                                                                                                                                            bool createDeployScript,
+                                                                                                                                            bool createDeployReport)
         {
-            if (previousVersionDacpacPath == null)
-                throw new ArgumentNullException(nameof(previousVersionDacpacPath));
-            if (newVersionDacpacPath == null)
-                throw new ArgumentNullException(nameof(newVersionDacpacPath));
-            if (publishProfilePath == null)
-                throw new ArgumentNullException(nameof(publishProfilePath));
-
-            if (!createDeployScript && !createDeployReport)
-                throw new InvalidOperationException($"Either {nameof(createDeployScript)} or {nameof(createDeployReport)} must be true.");
-
             var (publishResult, errors) = await Task.Run<(PublishResult Result, string[] Errors)>(() =>
             {
                 var previousDacpac = DacPackage.Load(previousVersionDacpacPath, DacSchemaModelStorageType.Memory);
@@ -75,13 +65,31 @@
                                        .ToArray());
                     }
 
-                    return (null, new[] {e.Message});
+                    return (null, new[] { e.Message });
                 }
 
                 return (result, null);
             });
 
             return (publishResult?.DatabaseScript, FormatDeployReport(publishResult?.DeploymentReport), errors);
+        }
+
+        Task<(string DeployScriptContent, string DeployReportContent, string[] Errors)> IDacAccess.CreateDeployFilesAsync(string previousVersionDacpacPath,
+                                                                                                                          string newVersionDacpacPath,
+                                                                                                                          string publishProfilePath,
+                                                                                                                          bool createDeployScript,
+                                                                                                                          bool createDeployReport)
+        {
+            if (previousVersionDacpacPath == null)
+                throw new ArgumentNullException(nameof(previousVersionDacpacPath));
+            if (newVersionDacpacPath == null)
+                throw new ArgumentNullException(nameof(newVersionDacpacPath));
+            if (publishProfilePath == null)
+                throw new ArgumentNullException(nameof(publishProfilePath));
+            if (!createDeployScript && !createDeployReport)
+                throw new InvalidOperationException($"Either {nameof(createDeployScript)} or {nameof(createDeployReport)} must be true.");
+
+            return CreateDeployFilesInternalAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, createDeployScript, createDeployReport);
         }
     }
 }

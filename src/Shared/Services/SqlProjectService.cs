@@ -102,11 +102,8 @@
                                       documentationPath);
         }
 
-        async Task<bool> ISqlProjectService.TryLoadSqlProjectPropertiesAsync(SqlProject project)
+        private async Task<bool> TryLoadSqlProjectPropertiesInternalAsync(SqlProject project)
         {
-            if (project == null)
-                throw new ArgumentNullException(nameof(project));
-
             var projectDirectory = Path.GetDirectoryName(project.FullName);
             if (projectDirectory == null)
             {
@@ -152,6 +149,14 @@
             project.ProjectProperties.DacVersion = Version.Parse(dacVersion);
 
             return true;
+        }
+
+        Task<bool> ISqlProjectService.TryLoadSqlProjectPropertiesAsync(SqlProject project)
+        {
+            if (project == null)
+                throw new ArgumentNullException(nameof(project));
+
+            return TryLoadSqlProjectPropertiesInternalAsync(project);
         }
 
         async Task<PathCollection> ISqlProjectService.TryLoadPathsAsync(SqlProject project,

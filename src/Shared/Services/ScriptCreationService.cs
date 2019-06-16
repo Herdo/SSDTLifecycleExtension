@@ -170,36 +170,12 @@
             return result;
         }
 
-        public event EventHandler IsCreatingChanged;
-
-        private bool IsCreating
+        private async Task<bool> CreateInternalAsync(SqlProject project,
+                                               ConfigurationModel configuration,
+                                               Version previousVersion,
+                                               bool latest,
+                                               CancellationToken cancellationToken)
         {
-            get => _isCreating;
-            set
-            {
-                if (value == _isCreating) return;
-                _isCreating = value;
-                IsCreatingChanged?.Invoke(this, EventArgs.Empty);
-            }
-        }
-
-        bool IScriptCreationService.IsCreating => IsCreating;
-
-        async Task<bool> IScriptCreationService.CreateAsync(SqlProject project,
-                                                            ConfigurationModel configuration,
-                                                            Version previousVersion,
-                                                            bool latest,
-                                                            CancellationToken cancellationToken)
-        {
-            if (project == null)
-                throw new ArgumentNullException(nameof(project));
-            if (configuration == null)
-                throw new ArgumentNullException(nameof(configuration));
-            if (previousVersion == null)
-                throw new ArgumentNullException(nameof(previousVersion));
-            if (IsCreating)
-                throw new InvalidOperationException($"Service is already running a {nameof(IScriptCreationService.CreateAsync)} task.");
-
             IsCreating = true;
             try
             {
@@ -316,6 +292,39 @@
             }
 
             return true;
+        }
+
+        public event EventHandler IsCreatingChanged;
+
+        private bool IsCreating
+        {
+            get => _isCreating;
+            set
+            {
+                if (value == _isCreating) return;
+                _isCreating = value;
+                IsCreatingChanged?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        bool IScriptCreationService.IsCreating => IsCreating;
+
+        Task<bool> IScriptCreationService.CreateAsync(SqlProject project,
+                                                      ConfigurationModel configuration,
+                                                      Version previousVersion,
+                                                      bool latest,
+                                                      CancellationToken cancellationToken)
+        {
+            if (project == null)
+                throw new ArgumentNullException(nameof(project));
+            if (configuration == null)
+                throw new ArgumentNullException(nameof(configuration));
+            if (previousVersion == null)
+                throw new ArgumentNullException(nameof(previousVersion));
+            if (IsCreating)
+                throw new InvalidOperationException($"Service is already running a {nameof(IScriptCreationService.CreateAsync)} task.");
+
+            return CreateInternalAsync(project, configuration, previousVersion, latest, cancellationToken);
         }
     }
 }

@@ -21,22 +21,9 @@
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        async Task IBuildService.BuildProjectAsync(SqlProject project)
+        private async Task<bool> CopyBuildResultInternalAsync(SqlProject project,
+                                                              string targetDirectory)
         {
-            await _logger.LogAsync("Building project ...");
-            _visualStudioAccess.BuildProject(project);
-        }
-
-        async Task<bool> IBuildService.CopyBuildResultAsync(SqlProject project,
-                                                            string targetDirectory)
-        {
-            if (project == null)
-                throw new ArgumentNullException(nameof(project));
-            if (targetDirectory == null)
-                throw new ArgumentNullException(nameof(targetDirectory));
-            if (string.IsNullOrWhiteSpace(project.ProjectProperties.BinaryDirectory))
-                throw new ArgumentException($"{nameof(SqlProjectProperties.BinaryDirectory)} must be filled.", nameof(project));
-
             await _logger.LogAsync("Copying files to target directory ...");
             var directoryCreationError = _fileSystemAccess.EnsureDirectoryExists(targetDirectory);
             if (directoryCreationError != null)
@@ -51,6 +38,25 @@
 
             await _logger.LogAsync($"ERROR: Failed to copy files to the target directory: {copyFilesError}");
             return false;
+        }
+
+        async Task IBuildService.BuildProjectAsync(SqlProject project)
+        {
+            await _logger.LogAsync("Building project ...");
+            _visualStudioAccess.BuildProject(project);
+        }
+
+        Task<bool> IBuildService.CopyBuildResultAsync(SqlProject project,
+                                                            string targetDirectory)
+        {
+            if (project == null)
+                throw new ArgumentNullException(nameof(project));
+            if (targetDirectory == null)
+                throw new ArgumentNullException(nameof(targetDirectory));
+            if (string.IsNullOrWhiteSpace(project.ProjectProperties.BinaryDirectory))
+                throw new ArgumentException($"{nameof(SqlProjectProperties.BinaryDirectory)} must be filled.", nameof(project));
+
+            return CopyBuildResultInternalAsync(project, targetDirectory);
         }
     }
 }
