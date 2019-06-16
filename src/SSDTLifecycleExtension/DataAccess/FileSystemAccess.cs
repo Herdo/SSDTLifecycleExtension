@@ -1,6 +1,7 @@
 ﻿namespace SSDTLifecycleExtension.DataAccess
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Threading.Tasks;
     using JetBrains.Annotations;
@@ -8,6 +9,7 @@
     using Shared.Contracts.DataAccess;
 
     [UsedImplicitly]
+    [ExcludeFromCodeCoverage] // Test would require IO access.
     public class FileSystemAccess : IFileSystemAccess
     {
         private static async Task<string> ReadFileInternalAsync(string sourcePath)

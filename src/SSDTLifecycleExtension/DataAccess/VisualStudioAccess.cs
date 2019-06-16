@@ -1,6 +1,7 @@
 ﻿namespace SSDTLifecycleExtension.DataAccess
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Linq;
     using System.Windows;
@@ -15,6 +16,7 @@
     using Task = System.Threading.Tasks.Task;
 
     [UsedImplicitly]
+    [ExcludeFromCodeCoverage] // Test would require a Visual Studio shell.
     public class VisualStudioAccess : IVisualStudioAccess,
                                       ILogger
     {
