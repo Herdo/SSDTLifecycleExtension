@@ -18,10 +18,12 @@
         public static readonly Guid CommandSet = new Guid(Constants.CommandSetGuid);
 
         public ScriptCreationWindowCommand(SSDTLifecycleExtensionPackage package,
+                                           DependencyResolver dependencyResolver,
                                            OleMenuCommandService commandService,
                                            ICommandAvailabilityService commandAvailabilityService,
                                            IVisualStudioAccess visualStudioAccess)
             : base(package,
+                   dependencyResolver,
                    commandService,
                    commandAvailabilityService,
                    visualStudioAccess,
