@@ -38,10 +38,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extension\Converters\BoolInvertConverterTests.cs" />
+    <Compile Include="Extension\Converters\BoolToVisibilityConverterTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Shared\Contracts\PathCollectionTests.cs" />
     <Compile Include="Shared\Contracts\SqlProjectPropertiesTests.cs" />
