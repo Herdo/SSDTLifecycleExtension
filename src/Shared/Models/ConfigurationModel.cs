@@ -379,7 +379,7 @@
                     errors.Add("Revision number cannot be negative.");
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentOutOfRangeException(nameof(position), "A version number cannot have less than 0 and more than 4 positions.");
             }
         }
 
