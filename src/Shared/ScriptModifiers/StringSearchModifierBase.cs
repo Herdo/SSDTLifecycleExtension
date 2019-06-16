@@ -15,6 +15,69 @@
                                              string range,
                                              string post);
 
+        private static int SearchStartIndex(string input,
+                                            int statementIndex,
+                                            byte numberOfLeadingStatementsToInclude)
+        {
+            var startIndex = -1;
+            var searchBefore = statementIndex;
+            for (var i = 0; i <= numberOfLeadingStatementsToInclude; i++)
+            {
+                var indexOfPreviousGo = input.LastIndexOf("GO", searchBefore, StringComparison.Ordinal);
+                if (i == numberOfLeadingStatementsToInclude)
+                {
+                    // Finish search
+                    if (indexOfPreviousGo == -1)
+                    {
+                        // When no GO statement is found, we start the the beginning of input
+                        startIndex = 0;
+                    }
+                    else
+                    {
+                        // When a GO statement is found, determine if it has a trailing line break or not,
+                        // and get the index of after the GO (with line break).
+                        var goWithLineBreak = input.Substring(indexOfPreviousGo, 4) == "GO\r\n";
+                        startIndex = indexOfPreviousGo + (goWithLineBreak ? 4 : 2);
+                    }
+
+                    break;
+                }
+
+                // Search before this one, if this was a match
+                if (indexOfPreviousGo >= 0)
+                    searchBefore = indexOfPreviousGo;
+            }
+
+            return startIndex;
+        }
+
+        private static int SearchEndIndex(string input,
+                                          int statementIndex)
+        {
+            var endIndex = input.IndexOf("GO\r\n", statementIndex, StringComparison.Ordinal);
+            if (endIndex >= 0)
+            {
+                // End after the new line
+                endIndex += 4;
+            }
+            else
+            {
+                endIndex = input.IndexOf("GO", statementIndex, StringComparison.Ordinal);
+                if (endIndex >= 0)
+                {
+                    // End after the GO
+                    endIndex += 2;
+                }
+                else
+                {
+                    // No trailing GO, end at the end of input
+                    endIndex = input.Length;
+                }
+            }
+
+            return endIndex;
+        }
+
         /// <summary>
         /// Searches the <paramref name="input"/> for the <paramref name="statement"/>.
         /// </summary>
@@ -56,55 +119,10 @@
                 return (-1, -1); // No match for the statement
 
             // Search for GO statements
-            var startIndex = -1;
-            var searchBefore = statementIndex;
-            for (var i = 0; i <= numberOfLeadingStatementsToInclude; i++)
-            {
-                var indexOfPreviousGo = input.LastIndexOf("GO", searchBefore, StringComparison.Ordinal);
-                if (i == numberOfLeadingStatementsToInclude)
-                {
-                    // Finish search
-                    if (indexOfPreviousGo == -1)
-                    {
-                        // When no GO statement is found, we start the the beginning of input
-                        startIndex = 0;
-                    }
-                    else
-                    {
-                        // When a GO statement is found, determine if it has a trailing line break or not,
-                        // and get the index of after the GO (with line break).
-                        var goWithLineBreak = input.Substring(indexOfPreviousGo, 4) == "GO\r\n";
-                        startIndex = indexOfPreviousGo + (goWithLineBreak ? 4 : 2);
-                    }
-                    break;
-                }
-
-                // Search before this one, if this was a match
-                if (indexOfPreviousGo >= 0)
-                    searchBefore = indexOfPreviousGo;
-            }
+            var startIndex = SearchStartIndex(input, statementIndex, numberOfLeadingStatementsToInclude);
 
             // Search for the next GO statement, then get the index of the next line
-            var endIndex = input.IndexOf("GO\r\n", statementIndex, StringComparison.Ordinal);
-            if (endIndex >= 0)
-            {
-                // End after the new line
-                endIndex += 4;
-            }
-            else
-            {
-                endIndex = input.IndexOf("GO", statementIndex, StringComparison.Ordinal);
-                if (endIndex >= 0)
-                {
-                    // End after the GO
-                    endIndex += 2;
-                }
-                else
-                {
-                    // No trailing GO, end at the end of input
-                    endIndex = input.Length;
-                }
-            }
+            var endIndex = SearchEndIndex(input, statementIndex);
 
             return (startIndex, endIndex);
         }
