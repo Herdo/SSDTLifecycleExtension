@@ -45,6 +45,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Commands\BaseCommand.cs" />
+    <Compile Include="Commands\WindowBaseCommand.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Converters\BoolInvertConverter.cs" />
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
@@ -68,6 +70,7 @@
       <DependentUpon>ConfigurationWindowControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\IView.cs" />
+    <Compile Include="Windows\IVisualStudioToolWindow.cs" />
     <Compile Include="Windows\ScriptCreationWindow.cs" />
     <Compile Include="Commands\ScriptCreationWindowCommand.cs" />
     <Compile Include="Windows\ScriptCreationWindowControl.xaml.cs">

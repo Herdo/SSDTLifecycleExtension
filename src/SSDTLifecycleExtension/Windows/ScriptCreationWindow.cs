@@ -6,7 +6,7 @@
 
     [Guid("6e00e764-f71a-438f-84fe-5fe986514012")]
     [ExcludeFromCodeCoverage] // Test would require a UI thread.
-    public class ScriptCreationWindow : ToolWindowPane
+    public class ScriptCreationWindow : ToolWindowPane, IVisualStudioToolWindow
     {
         public ScriptCreationWindow() : base(null)
         {
@@ -14,7 +14,7 @@
             Content = new ScriptCreationWindowControl();
         }
 
-        internal void SetCaption(string projectName)
+        public void SetCaption(string projectName)
         {
             Caption = projectName == null
                           ? "Script Creation"
