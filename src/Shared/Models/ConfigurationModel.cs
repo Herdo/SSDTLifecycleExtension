@@ -336,42 +336,65 @@
                 var split = value.Split(new []{'.'}, StringSplitOptions.None);
                 if (split.Length < 2) errors.Add("Pattern doesn't contain enough parts.");
                 if (split.Length > 4) errors.Add("Pattern contains too many parts.");
-                for (var i = 0; i < split.Length; i++)
-                {
-                    var isMajor = i == 0;
-                    var isMinor = i == 1;
-                    var isBuild = i == 2;
-                    var isRevision = i == 3;
-
-                    if (int.TryParse(split[i], out var number))
-                    {
-                        if (number >= 0) continue;
-
-                        if (isMajor)
-                            errors.Add("Major number cannot be negative.");
-                        else if (isMinor)
-                            errors.Add("Minor number cannot be negative.");
-                        else if (isBuild)
-                            errors.Add("Build number cannot be negative.");
-                        else if (isRevision)
-                            errors.Add("Revision number cannot be negative.");
-                    }
-                    else
-                    {
-                        if (isMajor && split[i] != MajorVersionSpecialKeyword)
-                            errors.Add("Invalid special keyword for major number.");
-                        else if (isMinor && split[i] != MinorVersionSpecialKeyword)
-                            errors.Add("Invalid special keyword for minor number.");
-                        else if (isBuild && split[i] != BuildVersionSpecialKeyword)
-                            errors.Add("Invalid special keyword for build number.");
-                        else if (isRevision && split[i] != RevisionVersionSpecialKeyword)
-                            errors.Add("Invalid special keyword for revision number.");
-                    }
-                }
+                for (var position = 0; position < split.Length; position++)
+                    ValidateVersionNumberPosition(split, position, errors);
 
             }
 
             return errors;
+        }
+
+        private static void ValidateVersionNumberPosition(IReadOnlyList<string> split,
+                                                          int position,
+                                                          ICollection<string> errors)
+        {
+            if (int.TryParse(split[position], out var number))
+            {
+                ValidateVersionNumberDigits(position, errors, number);
+            }
+            else
+            {
+                ValidateVersionNumberSpecialKeywords(split, position, errors);
+            }
+        }
+
+        private static void ValidateVersionNumberDigits(int position,
+                                                        ICollection<string> errors,
+                                                        int number)
+        {
+            if (number >= 0) return;
+
+            switch (position)
+            {
+                case 0:
+                    errors.Add("Major number cannot be negative.");
+                    break;
+                case 1:
+                    errors.Add("Minor number cannot be negative.");
+                    break;
+                case 2:
+                    errors.Add("Build number cannot be negative.");
+                    break;
+                case 3:
+                    errors.Add("Revision number cannot be negative.");
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        private static void ValidateVersionNumberSpecialKeywords(IReadOnlyList<string> split,
+                                                                 int position,
+                                                                 ICollection<string> errors)
+        {
+            if (position == 0 && split[position] != MajorVersionSpecialKeyword)
+                errors.Add("Invalid special keyword for major number.");
+            else if (position == 1 && split[position] != MinorVersionSpecialKeyword)
+                errors.Add("Invalid special keyword for minor number.");
+            else if (position == 2 && split[position] != BuildVersionSpecialKeyword)
+                errors.Add("Invalid special keyword for build number.");
+            else if (position == 3 && split[position] != RevisionVersionSpecialKeyword)
+                errors.Add("Invalid special keyword for revision number.");
         }
     }
 }
