@@ -6,7 +6,6 @@
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using System.Xml.Linq;
     using Contracts;
     using Contracts.DataAccess;
     using Contracts.Enums;
@@ -243,9 +242,6 @@
                     return false;
 
                 var success = await CreateScriptAsync(paths, configuration.CreateDocumentationWithScriptCreation);
-                // Wait 1 second after creating the script to get any messages from the standard output before continuing with the script creation.
-                await Task.Delay(1000, cancellationToken);
-
                 if (!success)
                 {
                     sw.Stop();
