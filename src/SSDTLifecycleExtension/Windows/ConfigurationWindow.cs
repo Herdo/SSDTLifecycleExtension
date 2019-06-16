@@ -1,5 +1,6 @@
 ﻿namespace SSDTLifecycleExtension.Windows
 {
+    using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Runtime.InteropServices;
     using Microsoft.VisualStudio.Shell;
@@ -12,6 +13,13 @@
         {
             SetCaption(null);
             Content = new ConfigurationWindowControl();
+        }
+
+        public ConfigurationWindow(string message)
+            : this()
+        {
+            if (message == null)
+                throw new ArgumentNullException(nameof(message));
         }
 
         public void SetCaption(string projectName)

@@ -5,20 +5,22 @@
     using System.Runtime.InteropServices;
     using System.Threading;
     using System.Threading.Tasks;
+    using Windows;
     using Commands;
     using DataAccess;
     using EnvDTE;
     using EnvDTE80;
     using Microsoft.VisualStudio;
     using Microsoft.VisualStudio.Shell;
+    using Microsoft.VisualStudio.Shell.Interop;
     using Task = System.Threading.Tasks.Task;
 
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [Guid(PackageGuidString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    [ProvideToolWindow(typeof(Windows.ScriptCreationWindow), Transient = true, Style = VsDockStyle.Tabbed, MultiInstances = false)]
-    [ProvideToolWindow(typeof(Windows.VersionHistoryWindow), Transient = true, Style = VsDockStyle.Tabbed, MultiInstances = false)]
-    [ProvideToolWindow(typeof(Windows.ConfigurationWindow), Transient = true, Style = VsDockStyle.Tabbed, MultiInstances = false)]
+    [ProvideToolWindow(typeof(ScriptCreationWindow), Transient = true, Style = VsDockStyle.Tabbed, MultiInstances = false)]
+    [ProvideToolWindow(typeof(VersionHistoryWindow), Transient = true, Style = VsDockStyle.Tabbed, MultiInstances = false)]
+    [ProvideToolWindow(typeof(ConfigurationWindow), Transient = true, Style = VsDockStyle.Tabbed, MultiInstances = false)]
     [ProvideAutoLoad(SqlProjectContextGuid, PackageAutoLoadFlags.BackgroundLoad)]
     [ProvideUIContextRule(SqlProjectContextGuid,
         name: "SqlProject auto load",
@@ -39,8 +41,10 @@
         })]
     public sealed class SSDTLifecycleExtensionPackage : AsyncPackage
     {
+        // ReSharper disable once MemberCanBePrivate.Global
         public const string SqlProjectContextGuid = "b5759c1b-ffdd-48bd-ae82-61317eeb3a75";
 
+        // ReSharper disable once MemberCanBePrivate.Global
         public const string PackageGuidString = "757ac7eb-a0da-4387-9fa2-675e78561cde";
 
         private DependencyResolver _dependencyResolver;
@@ -74,6 +78,33 @@
             ScriptCreationWindowCommand.Initialize(_dependencyResolver.Get<ScriptCreationWindowCommand>());
             VersionHistoryWindowCommand.Initialize(_dependencyResolver.Get<VersionHistoryWindowCommand>());
             ConfigurationWindowCommand.Initialize(_dependencyResolver.Get<ConfigurationWindowCommand>());
+        }
+
+        public override IVsAsyncToolWindowFactory GetAsyncToolWindowFactory(Guid toolWindowType)
+        {
+            if (toolWindowType == typeof(ScriptCreationWindow).GUID
+                || toolWindowType == typeof(VersionHistoryWindow).GUID
+                || toolWindowType == typeof(ConfigurationWindow).GUID)
+                return this;
+
+            ThreadHelper.ThrowIfNotOnUIThread();
+            return base.GetAsyncToolWindowFactory(toolWindowType);
+        }
+
+        protected override string GetToolWindowTitle(Type toolWindowType,
+                                                     int id)
+        {
+            return ReferenceEquals(typeof(SSDTLifecycleExtensionPackage).Assembly, toolWindowType.Assembly)
+                       ? "Loading SSDT Lifecycle window ..."
+                       : base.GetToolWindowTitle(toolWindowType, id);
+        }
+
+        protected override Task<object> InitializeToolWindowAsync(Type toolWindowType,
+                                                                  int id,
+                                                                  CancellationToken cancellationToken)
+        {
+            // If there's any common async one-time initialization for tool windows to perform, perform them here.
+            return Task.FromResult((object)string.Empty);
         }
 
         protected override void Dispose(bool disposing)
