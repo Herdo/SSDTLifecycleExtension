@@ -44,7 +44,7 @@
                 return null;
             return _validationErrors.TryGetValue(propertyName, out var errors)
                        ? errors
-                       : null;
+                       : new string[0];
         }
 
         public bool HasErrors => _validationErrors.Count > 0;
