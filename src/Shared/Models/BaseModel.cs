@@ -6,6 +6,7 @@
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
     using JetBrains.Annotations;
+    using Newtonsoft.Json;
 
     public abstract class BaseModel : INotifyPropertyChanged, INotifyDataErrorInfo
     {
@@ -47,6 +48,7 @@
                        : new string[0];
         }
 
+        [JsonIgnore]
         public bool HasErrors => _validationErrors.Count > 0;
 
         public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
