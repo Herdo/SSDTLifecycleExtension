@@ -8,5 +8,4 @@ $VsixPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSP
 $VsixSignTool = $env:userprofile + '\.nuget\packages\microsoft.vssdk.vsixsigntool\16.1.28916.169\tools\vssdk\vsixsigntool.exe'
 
 # Sign VSIX with certificate
-Write-Host "Signing $VsixPath with $CertFile ..."
 & $VsixSignTool sign /f $CertFile /p $Password $VsixPath
