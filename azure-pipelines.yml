@@ -57,8 +57,6 @@ steps:
   displayName: Run SonarCloud Analyzer
 
 - task: DownloadSecureFile@1
-  name: DownloadVsixCertificate
-  displayName: Download VSIX certificate
   inputs:
     secureFile: SSDTLifecycleExtensionKey.pfx
 
