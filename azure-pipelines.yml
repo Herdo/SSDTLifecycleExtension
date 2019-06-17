@@ -56,6 +56,21 @@ steps:
 - task: SonarCloudAnalyze@1 
   displayName: Run SonarCloud Analyzer
 
+- task: DownloadSecureFile@1
+  name: DownloadVsixCertificate
+  displayName: Download VSIX certificate
+  inputs:
+    secureFile: SSDTLifecycleExtensionKey.pfx
+
+- task: PowerShell@2
+  name: SignVSIX
+  displayName: Sign VSIX
+  inputs:
+    targetType: filePath
+    filePath: |
+     '$(Build.SourcesDirectory)\build\sign-vsix.ps1'
+    arguments: $(SSDTLifecycleExtensionKeyPassword)
+
 - task: CopyFiles@2
   name: CopyDeploymentData
   displayName: Copy deployment data to artifact staging directory
