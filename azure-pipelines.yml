@@ -68,7 +68,7 @@ steps:
   inputs:
     targetType: filePath
     filePath: |
-     'build\sign-vsix.ps1'
+     build\sign-vsix.ps1
     arguments: $(SSDTLifecycleExtensionKeyPassword)
 
 - task: CopyFiles@2
