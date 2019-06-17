@@ -56,6 +56,14 @@ steps:
 - task: SonarCloudAnalyze@1 
   displayName: Run SonarCloud Analyzer
 
+- task: PowerShell@2
+  name: SignVSIX
+  displayName: Sign VSIX
+  inputs:
+    targetType: filePath
+    filePath: |
+     '$(Build.SourcesDirectory)\build\sign-vsix.ps1'
+
 - task: CopyFiles@2
   name: CopyDeploymentData
   displayName: Copy deployment data to artifact staging directory
