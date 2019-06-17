@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="SSDTLifecycleExtension.b7365ffe-c5f9-4096-ae64-450b02416d55" Version="1.0.0" Language="en-US" Publisher="Stefan 'Herdo' Over" />
+        <Identity Id="SSDTLifecycleExtension.b7365ffe-c5f9-4096-ae64-450b02416d55" Version="1.0.1" Language="en-US" Publisher="Stefan 'Herdo' Over" />
         <DisplayName>SSDT Lifecycle Extension</DisplayName>
         <Description xml:space="preserve">SQL Server Data Tools Lifecycle Extension for Visual Studio.
 Enables a controlled lifecycle management for SQL database projects.</Description>
