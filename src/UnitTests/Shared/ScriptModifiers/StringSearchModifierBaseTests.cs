@@ -24,6 +24,40 @@ PRINT 'Update complete'
 
 GO";
 
+        private const string MultiLineInputWithFinalGoWithDifferentSchema =
+            @"PRINT 'First statement';
+
+GO
+ALTER TABLE [config].[Author] ADD COLUMN Birthday DATE NULL;
+
+GO
+PRINT 'Second statement'
+
+GO
+ALTER TABLE [config].[Author] DROP COLUMN Birthday;
+
+GO
+PRINT 'Update complete'
+
+GO";
+
+        private const string MultiLineInputWithFinalGoWithDifferentSchemaAndPrints =
+            @"PRINT 'First go';
+
+GO
+ALTER TABLE [config].[Author] ADD COLUMN Birthday DATE NULL;
+
+GO
+PRINT 'Second go'
+
+GO
+ALTER TABLE [config].[Author] DROP COLUMN Birthday;
+
+GO
+PRINT 'Update complete'
+
+GO";
+
         private const string MultiLineInputWithoutFinalGo =
             @"PRINT 'First statement';
 
@@ -212,6 +246,139 @@ PRINT 'Update complete'
 
             // Act & Assert
             Assert.Throws<ArgumentNullException>(() => s.ForEachMatchBase(null, null, 0, null));
+        }
+
+        [Test]
+        public void ForEachMatch_ArgumentNullException_Statement()
+        {
+            // Arrange
+            var s = new StringSearchModifierBaseTestImplementation();
+            const string input = "input";
+
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() => s.ForEachMatchBase(input, null, 0, null));
+        }
+
+        [Test]
+        public void ForEachMatch_ArgumentNullException_Modifier()
+        {
+            // Arrange
+            var s = new StringSearchModifierBaseTestImplementation();
+            const string input = "input";
+            const string statement = "statement";
+
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() => s.ForEachMatchBase(input, statement, 0, null));
+        }
+
+        [Test]
+        public void ForEachMatch_ArgumentException_Statement()
+        {
+            // Arrange
+            var s = new StringSearchModifierBaseTestImplementation();
+            const string input = @"";
+            const string statement = @"";
+
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() => s.ForEachMatchBase(input, statement, 0, null));
+        }
+
+        [Test]
+        public void ForEachMatch_InvalidOperationException_ModifiedDoesNotContainPre()
+        {
+            // Arrange
+            var modifier = new StringSearchModifierBase.InputModifier((pre,
+                                                                       range,
+                                                                       post) => range.Replace("dbo", "config") + post);
+            var s = new StringSearchModifierBaseTestImplementation();
+            const string statement = @"[dbo].";
+
+            // Act & Assert
+            Assert.Throws<InvalidOperationException>(() => s.ForEachMatchBase(MultiLineInputWithFinalGo, statement, 0, modifier));
+        }
+
+        [Test]
+        public void ForEachMatch_InvalidOperationException_ModifiedDoesNotContainPost()
+        {
+            // Arrange
+            var modifier = new StringSearchModifierBase.InputModifier((pre,
+                                                                       range,
+                                                                       post) => pre + range.Replace("dbo", "config"));
+            var s = new StringSearchModifierBaseTestImplementation();
+            const string statement = @"[dbo].";
+
+            // Act & Assert
+            Assert.Throws<InvalidOperationException>(() => s.ForEachMatchBase(MultiLineInputWithFinalGo, statement, 0, modifier));
+        }
+
+        [Test]
+        public void ForEachMatch_NoMatch()
+        {
+            // Arrange
+            var modifierCalled = false;
+            var modifier = new StringSearchModifierBase.InputModifier((pre,
+                                                                       range,
+                                                                       post) =>
+            {
+                modifierCalled = true;
+                return pre + range + post;
+            });
+            var s = new StringSearchModifierBaseTestImplementation();
+            const string input = @"foobar";
+            const string statement = @"test";
+
+            // Act
+            var modified = s.ForEachMatchBase(input, statement, 0, modifier);
+
+            // Assert
+            Assert.IsFalse(modifierCalled);
+            Assert.AreEqual("foobar", modified);
+        }
+
+        [Test]
+        public void ForEachMatch_ReplaceMultipleMatches()
+        {
+            // Arrange
+            var modifierCalled = false;
+            var modifier = new StringSearchModifierBase.InputModifier((pre,
+                                                                       range,
+                                                                       post) =>
+            {
+                modifierCalled = true;
+                return pre + range.Replace("dbo", "config") + post;
+            });
+            var s = new StringSearchModifierBaseTestImplementation();
+            const string statement = @"[dbo].";
+
+            // Act
+            var modified = s.ForEachMatchBase(MultiLineInputWithFinalGo, statement, 0, modifier);
+
+            // Assert
+            Assert.IsTrue(modifierCalled);
+            Assert.AreEqual(MultiLineInputWithFinalGoWithDifferentSchema, modified);
+        }
+
+        [Test]
+        public void ForEachMatch_ReplaceMultipleMatchesIncludeLeadingStatement()
+        {
+            // Arrange
+            var modifierCalled = false;
+            var modifier = new StringSearchModifierBase.InputModifier((pre,
+                                                                       range,
+                                                                       post) =>
+            {
+                modifierCalled = true;
+                return pre + range.Replace("dbo", "config").Replace("statement", "go") + post;
+            });
+            var s = new StringSearchModifierBaseTestImplementation();
+            const string statement = @"[dbo].";
+
+            // Act
+            var modified = s.ForEachMatchBase(MultiLineInputWithFinalGo, statement, 1, modifier);
+
+            // Assert
+            Assert.IsTrue(modifierCalled);
+            Assert.AreEqual(MultiLineInputWithFinalGoWithDifferentSchemaAndPrints, modified);
         }
 
         private class StringSearchModifierBaseTestImplementation : StringSearchModifierBase

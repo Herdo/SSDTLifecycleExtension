@@ -136,6 +136,7 @@
         /// <param name="modifier">The <see cref="InputModifier"/> to apply for each match.</param>
         /// <exception cref="ArgumentNullException"><paramref name="input"/>, <paramref name="statement"/> or <paramref name="modifier"/> are <b>null</b>.</exception>
         /// <exception cref="ArgumentException"><paramref name="statement"/> contains only white spaces.</exception>
+        /// <exception cref="InvalidOperationException">The result returned from the <paramref name="modifier"/> doesn't contain the contents (pre and post) outside the statement range.</exception>
         /// <returns>The <paramref name="input"/> string, if no match is found, otherwise the result after applying the modifications.</returns>
         protected string ForEachMatch(string input,
                                       string statement,
@@ -162,12 +163,16 @@
                 if (startIndex == -1)
                     break;
 
-                startAfterIndex = endIndex;
                 var pre = modified.Substring(0, startIndex);
                 var range = modified.Substring(startIndex, endIndex - startIndex);
                 var post = modified.Substring(endIndex);
                 modified = modifier(pre, range, post);
-            } while (startIndex > 0);
+                if (!modified.StartsWith(pre))
+                    throw new InvalidOperationException($"The result returned from the {nameof(modifier)} doesn't start with the {nameof(pre)}-block.");
+                if (!modified.EndsWith(post))
+                    throw new InvalidOperationException($"The result returned from the {nameof(modifier)} doesn't end with the {nameof(post)}-block.");
+                startAfterIndex = modified.LastIndexOf(post, StringComparison.Ordinal);
+            } while (startIndex >= 0);
 
             return modified;
         }
