@@ -58,7 +58,7 @@ steps:
 
 - task: DownloadSecureFile@1
   inputs:
-    secureFile: SSDTLifecycleExtensionKey.pfx
+    secureFile: SSDTLifecycleExtensionKey.pfx    
 
 - task: PowerShell@2
   name: SignVSIX
@@ -67,7 +67,7 @@ steps:
     targetType: filePath
     filePath: |
      build\sign-vsix.ps1
-    arguments: $(SSDTLifecycleExtensionKeyPassword)
+    arguments: $(DownloadSecureFile.secureFilePath) $(SSDTLifecycleExtensionKeyPassword)
 
 - task: CopyFiles@2
   name: CopyDeploymentData
