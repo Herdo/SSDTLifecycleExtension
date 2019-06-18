@@ -3,6 +3,7 @@
     using System;
     using System.Threading.Tasks;
     using System.Windows.Input;
+    using JetBrains.Annotations;
 
     public class AsyncCommand : IAsyncCommand
     {
@@ -13,9 +14,9 @@
         private readonly Func<bool> _canExecute;
         private readonly IErrorHandler _errorHandler;
 
-        public AsyncCommand(Func<Task> execute,
-                            Func<bool> canExecute,
-                            IErrorHandler errorHandler)
+        public AsyncCommand([NotNull] Func<Task> execute,
+                            [NotNull] Func<bool> canExecute,
+                            [NotNull] IErrorHandler errorHandler)
         {
             _execute = execute ?? throw new ArgumentNullException(nameof(execute));
             _canExecute = canExecute ?? throw new ArgumentNullException(nameof(canExecute));
@@ -24,7 +25,7 @@
 
         public bool CanExecute()
         {
-            return !_isExecuting && (_canExecute?.Invoke() ?? true);
+            return !_isExecuting && _canExecute.Invoke();
         }
 
         public async Task ExecuteAsync()
@@ -55,7 +56,7 @@
 
         bool ICommand.CanExecute(object parameter)
         {
-            return !_isExecuting && CanExecute();
+            return CanExecute();
         }
 
         void ICommand.Execute(object parameter)

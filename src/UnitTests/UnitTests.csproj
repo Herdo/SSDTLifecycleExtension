@@ -44,6 +44,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extension\MVVM\AsyncCommandTests.cs" />
     <Compile Include="Extension\Commands\BaseCommandTests.cs" />
     <Compile Include="Extension\Converters\BoolInvertConverterTests.cs" />
     <Compile Include="Extension\Converters\BoolToVisibilityConverterTests.cs" />
