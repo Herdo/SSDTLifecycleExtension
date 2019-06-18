@@ -2,6 +2,7 @@
 {
     using System;
     using System.ComponentModel.Design;
+    using System.Diagnostics.CodeAnalysis;
     using System.Runtime.InteropServices;
     using System.Threading;
     using System.Threading.Tasks;
@@ -39,6 +40,7 @@
             VSConstants.UICONTEXT.SolutionExistsAndFullyLoaded_string,
             "ActiveProjectFlavor:" + Shared.Constants.SqlProjectKindGuid
         })]
+    [ExcludeFromCodeCoverage] // Test would require a Visual Studio shell.
     public sealed class SSDTLifecycleExtensionPackage : AsyncPackage
     {
         // ReSharper disable once MemberCanBePrivate.Global
