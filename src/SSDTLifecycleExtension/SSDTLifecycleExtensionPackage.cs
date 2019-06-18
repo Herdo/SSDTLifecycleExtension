@@ -58,7 +58,7 @@
                 throw new InvalidOperationException($"Cannot initialize {nameof(SSDTLifecycleExtensionPackage)} without the {nameof(OleMenuCommandService)}.");
 
             var visualStudioAccess = new VisualStudioAccess(_dte2, this);
-            return new DependencyResolver(visualStudioAccess, commandService);
+            return new DependencyResolver(visualStudioAccess, visualStudioAccess, commandService);
         }
 
         #region Base Overrides

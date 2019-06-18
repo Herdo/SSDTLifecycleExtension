@@ -2,6 +2,7 @@
 {
     using System;
     using DataAccess;
+    using JetBrains.Annotations;
     using Microsoft.VisualStudio.Shell;
     using Shared.Contracts;
     using Shared.Contracts.DataAccess;
@@ -17,46 +18,70 @@
     internal sealed class DependencyResolver : IDisposable
     {
         private readonly IUnityContainer _container;
+        private bool _disposed;
 
-        internal DependencyResolver(VisualStudioAccess visualStudioAccess,
-                                    OleMenuCommandService commandService)
+        internal DependencyResolver([NotNull] IVisualStudioAccess visualStudioAccess,
+                                    [NotNull] ILogger logger,
+                                    [NotNull] OleMenuCommandService commandService)
         {
-            _container = new UnityContainer()
+            if (visualStudioAccess == null)
+                throw new ArgumentNullException(nameof(visualStudioAccess));
+            if (logger == null)
+                throw new ArgumentNullException(nameof(logger));
+            if (commandService == null)
+                throw new ArgumentNullException(nameof(commandService));
 
-                         // Visual Studio dependencies
-                        .RegisterInstance(this, new ContainerControlledLifetimeManager()) // The package
-                        .RegisterInstance(commandService, new ContainerControlledLifetimeManager()) // The command service
-
-                         // ViewModels
-                        .RegisterType<ScriptCreationViewModel>()
-                        .RegisterType<VersionHistoryViewModel>()
-                        .RegisterType<ConfigurationViewModel>()
-
-                         // Services with state / events
-                        .RegisterSingleton<IConfigurationService, ConfigurationService>()
-                        .RegisterSingleton<IScaffoldingService, ScaffoldingService>()
-                        .RegisterSingleton<IScriptCreationService, ScriptCreationService>()
-
-                         // Stateless services
-                        .RegisterType<ICommandAvailabilityService, CommandAvailabilityService>()
-                        .RegisterType<IBuildService, BuildService>()
-                        .RegisterType<IVersionService, VersionService>()
-                        .RegisterType<ISqlProjectService, SqlProjectService>()
-
-                         // Data Access
-                        .RegisterSingleton<IFileSystemAccess, FileSystemAccess>()
-                        .RegisterInstance<IVisualStudioAccess>(visualStudioAccess, new ContainerControlledLifetimeManager())
-                        .RegisterInstance<ILogger>(visualStudioAccess, new ContainerControlledLifetimeManager())
-                        .RegisterType<IDacAccess, DacAccess>()
-
-                         // Factories
-                        .RegisterSingleton<IScriptModifierFactory, ScriptModifierFactory>();
+            _container = CreateContainer(visualStudioAccess,
+                                         logger,
+                                         commandService);
         }
 
-        internal T Get<T>() => _container.Resolve<T>();
-
-        internal TViewModel GetViewModel<TViewModel>(SqlProject project) where TViewModel : IViewModel
+        private static IUnityContainer CreateContainer(IVisualStudioAccess visualStudioAccess,
+                                                       ILogger logger,
+                                                       OleMenuCommandService commandService)
         {
+            return new UnityContainer()
+
+                   // Visual Studio dependencies
+                  .RegisterInstance(commandService, new ContainerControlledLifetimeManager()) // The command service
+
+                   // ViewModels
+                  .RegisterType<ScriptCreationViewModel>()
+                  .RegisterType<VersionHistoryViewModel>()
+                  .RegisterType<ConfigurationViewModel>()
+
+                   // Services with state / events
+                  .RegisterSingleton<IConfigurationService, ConfigurationService>()
+                  .RegisterSingleton<IScaffoldingService, ScaffoldingService>()
+                  .RegisterSingleton<IScriptCreationService, ScriptCreationService>()
+
+                   // Stateless services
+                  .RegisterType<ICommandAvailabilityService, CommandAvailabilityService>()
+                  .RegisterType<IBuildService, BuildService>()
+                  .RegisterType<IVersionService, VersionService>()
+                  .RegisterType<ISqlProjectService, SqlProjectService>()
+
+                   // Data Access
+                  .RegisterSingleton<IFileSystemAccess, FileSystemAccess>()
+                  .RegisterInstance(visualStudioAccess, new ContainerControlledLifetimeManager())
+                  .RegisterInstance(logger, new ContainerControlledLifetimeManager())
+                  .RegisterType<IDacAccess, DacAccess>()
+
+                   // Factories
+                  .RegisterSingleton<IScriptModifierFactory, ScriptModifierFactory>();
+        }
+
+        internal T Get<T>()
+        {
+            if (_disposed)
+                throw new ObjectDisposedException(nameof(DependencyResolver));
+            return _container.Resolve<T>();
+        }
+
+        internal TViewModel GetViewModel<TViewModel>([NotNull] SqlProject project) where TViewModel : IViewModel
+        {
+            if (_disposed)
+                throw new ObjectDisposedException(nameof(DependencyResolver));
             if (project == null)
                 throw new ArgumentNullException(nameof(project));
 
@@ -72,6 +97,9 @@
 
         public void Dispose()
         {
+            if (_disposed)
+                return;
+            _disposed = true;
             _container.Dispose();
         }
     }
