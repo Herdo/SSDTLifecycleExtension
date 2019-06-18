@@ -1,6 +1,7 @@
 ﻿namespace SSDTLifecycleExtension.Commands
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using Windows;
     using Microsoft.VisualStudio.Shell;
     using Microsoft.VisualStudio.Shell.Interop;
@@ -8,6 +9,7 @@
     using Shared.Contracts.Services;
     using ViewModels;
 
+    [ExcludeFromCodeCoverage] // Test would require a Visual Studio shell.
     internal abstract class WindowBaseCommand<TWindow, TViewModel> : BaseCommand
         where TWindow : ToolWindowPane, IVisualStudioToolWindow
         where TViewModel : IViewModel

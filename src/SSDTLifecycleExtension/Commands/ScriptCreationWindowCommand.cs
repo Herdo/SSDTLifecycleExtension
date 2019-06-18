@@ -1,6 +1,7 @@
 ﻿namespace SSDTLifecycleExtension.Commands
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using Windows;
     using JetBrains.Annotations;
     using Microsoft.VisualStudio.Shell;
@@ -9,6 +10,7 @@
     using ViewModels;
 
     [UsedImplicitly]
+    [ExcludeFromCodeCoverage] // Test would require a Visual Studio shell.
     internal sealed class ScriptCreationWindowCommand : WindowBaseCommand<ScriptCreationWindow, ScriptCreationViewModel>
     {
         // ReSharper disable once MemberCanBePrivate.Global
