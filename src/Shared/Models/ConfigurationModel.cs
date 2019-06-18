@@ -348,7 +348,6 @@
                 if (split.Length > 4) errors.Add("Pattern contains too many parts.");
                 for (var position = 0; position < split.Length; position++)
                     ValidateVersionNumberPosition(split, position, errors);
-
             }
 
             return errors;

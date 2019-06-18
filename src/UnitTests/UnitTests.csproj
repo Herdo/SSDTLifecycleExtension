@@ -63,6 +63,7 @@
     <Compile Include="Shared\Services\ScaffoldingServiceTests.cs" />
     <Compile Include="Shared\Services\ScriptCreationServiceTests.cs" />
     <Compile Include="Shared\Services\SqlProjectServiceTests.cs" />
+    <Compile Include="Shared\Services\VersionServiceTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.SDK">

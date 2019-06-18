@@ -61,7 +61,7 @@
                 if (await ShouldCancelAsync(cancellationToken))
                     return false;
 
-                var formattedTargetVersion = Version.Parse(_versionService.DetermineFinalVersion(targetVersion, configuration));
+                var formattedTargetVersion = Version.Parse(_versionService.FormatVersion(targetVersion, configuration));
 
                 // Cancel if requested
                 if (await ShouldCancelAsync(cancellationToken))

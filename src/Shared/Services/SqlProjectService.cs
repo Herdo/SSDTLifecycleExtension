@@ -79,8 +79,8 @@
             }
 
             // Versions
-            var previousVersionString = previousVersion == null ? null : _versionService.DetermineFinalVersion(previousVersion, configuration);
-            var newVersionString = createLatest ? "latest" : _versionService.DetermineFinalVersion(project.ProjectProperties.DacVersion, configuration);
+            var previousVersionString = previousVersion == null ? null : _versionService.FormatVersion(previousVersion, configuration);
+            var newVersionString = createLatest ? "latest" : _versionService.FormatVersion(project.ProjectProperties.DacVersion, configuration);
 
             // DACPAC paths
             var profilePath = Path.Combine(projectDirectory, configuration.PublishProfilePath);

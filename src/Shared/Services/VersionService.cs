@@ -9,17 +9,20 @@
     [UsedImplicitly]
     public class VersionService : IVersionService
     {
-        public string DetermineFinalVersion(Version version,
-                                            ConfigurationModel versionConfiguration)
+        string IVersionService.FormatVersion(Version version,
+                                             ConfigurationModel configuration)
         {
             if (version == null)
                 throw new ArgumentNullException(nameof(version));
-            if (versionConfiguration == null)
-                throw new ArgumentNullException(nameof(versionConfiguration));
+            if (configuration == null)
+                throw new ArgumentNullException(nameof(configuration));
 
-            var pattern = versionConfiguration.VersionPattern.Split(new[] {'.'}, StringSplitOptions.RemoveEmptyEntries);
+            var configurationVersionPattern = configuration.VersionPattern ?? string.Empty;
+            var pattern = configurationVersionPattern.Split(new[] {'.'}, StringSplitOptions.RemoveEmptyEntries);
             if (pattern.Length < 2)
                 throw new InvalidOperationException("Version pattern is not long enough. Pattern must at least contain a major and minor number.");
+            if (pattern.Length > 4)
+                throw new InvalidOperationException("Version pattern is too long. Patter must not contain more than four parts.");
 
             var final = new StringBuilder();
 

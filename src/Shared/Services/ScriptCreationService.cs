@@ -198,7 +198,7 @@
                 // Check DacVersion against base version, if not running latest creation
                 if (!latest)
                 {
-                    var formattedTargetVersion = Version.Parse(_versionService.DetermineFinalVersion(project.ProjectProperties.DacVersion, configuration));
+                    var formattedTargetVersion = Version.Parse(_versionService.FormatVersion(project.ProjectProperties.DacVersion, configuration));
                     if (formattedTargetVersion <= previousVersion)
                     {
                         await _logger.LogAsync($"ERROR: DacVersion of SQL project ({formattedTargetVersion}) is equal to or smaller than the previous version ({previousVersion}).");
