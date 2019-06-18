@@ -16,21 +16,12 @@
             if (commandAvailabilityService == null) throw new ArgumentNullException(nameof(commandAvailabilityService));
 
             var menuCommandId = new CommandID(commandSet, commandId);
-
             var menuItem = new OleMenuCommand(Execute, menuCommandId);
-
             menuItem.BeforeQueryStatus += (sender,
-
                                            args) =>
-
             {
-
-                if (!(sender is OleMenuCommand command))
-
-                    return;
-
-                commandAvailabilityService.HandleCommandAvailability(b => command.Visible = b, b => command.Enabled = b);
-
+                commandAvailabilityService.HandleCommandAvailability(b => menuItem.Visible = b,
+                                                                     b => menuItem.Enabled = b);
             };
 
             commandService.AddCommand(menuItem);

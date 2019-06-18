@@ -44,6 +44,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extension\Commands\BaseCommandTests.cs" />
     <Compile Include="Extension\Converters\BoolInvertConverterTests.cs" />
     <Compile Include="Extension\Converters\BoolToVisibilityConverterTests.cs" />
     <Compile Include="Extension\ViewModels\ViewModelBaseTests.cs" />
@@ -64,6 +65,9 @@
     <Compile Include="Shared\Services\SqlProjectServiceTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.SDK">
+      <Version>16.0.200</Version>
+    </PackageReference>
     <PackageReference Include="Moq">
       <Version>4.11.0</Version>
     </PackageReference>
