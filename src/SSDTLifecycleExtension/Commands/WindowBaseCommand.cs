@@ -2,11 +2,9 @@
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
-    using System.Threading.Tasks;
     using Windows;
     using Microsoft.VisualStudio.Shell;
     using Microsoft.VisualStudio.Shell.Interop;
-    using Shared.Contracts.DataAccess;
     using Shared.Contracts.Services;
     using ViewModels;
 

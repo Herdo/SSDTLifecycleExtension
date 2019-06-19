@@ -75,6 +75,15 @@
                   .RegisterSingleton<IScriptModifierFactory, ScriptModifierFactory>();
         }
 
+        internal void RegisterPackage(SSDTLifecycleExtensionPackage package)
+        {
+            if (_disposed)
+                throw new ObjectDisposedException(nameof(DependencyResolver));
+            if (package == null)
+                throw new ArgumentNullException(nameof(package));
+            _container.RegisterInstance(package, new ContainerControlledLifetimeManager());
+        }
+
         internal T Get<T>()
         {
             if (_disposed)

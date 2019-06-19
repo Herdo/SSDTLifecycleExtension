@@ -75,6 +75,7 @@
 
             // Initialize DependencyResolver
             _dependencyResolver = await GetDependencyResolverAsync();
+            _dependencyResolver.RegisterPackage(this);
 
             // Initialize commands
             ScriptCreationWindowCommand.Initialize(_dependencyResolver.Get<ScriptCreationWindowCommand>());
