@@ -54,6 +54,7 @@
     <Compile Include="Shared\Contracts\PathCollectionTests.cs" />
     <Compile Include="Shared\Contracts\SqlProjectPropertiesTests.cs" />
     <Compile Include="Shared\Contracts\SqlProjectTests.cs" />
+    <Compile Include="Shared\Models\BaseModelTests.cs" />
     <Compile Include="Shared\Models\VersionModelTests.cs" />
     <Compile Include="Shared\ScriptModifiers\AddCustomHeaderModifierTests.cs" />
     <Compile Include="Shared\ScriptModifiers\AddCustomFooterModifierTests.cs" />
