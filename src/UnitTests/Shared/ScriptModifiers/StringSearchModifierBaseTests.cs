@@ -275,12 +275,15 @@ PRINT 'Update complete'
         public void ForEachMatch_ArgumentException_Statement()
         {
             // Arrange
+            var modifier = new StringSearchModifierBase.InputModifier((pre,
+                                                                       range,
+                                                                       post) => pre + range + post);
             var s = new StringSearchModifierBaseTestImplementation();
             const string input = @"";
             const string statement = @"";
 
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => s.ForEachMatchBase(input, statement, 0, null));
+            Assert.Throws<ArgumentException>(() => s.ForEachMatchBase(input, statement, 0, modifier));
         }
 
         [Test]
