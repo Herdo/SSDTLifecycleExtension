@@ -1,6 +1,7 @@
 ﻿namespace SSDTLifecycleExtension.UnitTests.Extension.MVVM
 {
     using System;
+    using System.Collections.Generic;
     using System.Threading.Tasks;
     using System.Windows.Input;
     using JetBrains.Annotations;
@@ -173,6 +174,96 @@
 
             // Assert
             Assert.IsFalse(executed);
+        }
+
+        [Test]
+        public void ExecuteWithParam_CorrectExecutionWithCanExecuteChanged()
+        {
+            // Arrange
+            var executed = false;
+            Task Execute()
+            {
+                executed = true;
+                return Task.CompletedTask;
+            }
+            bool CanExecute() => true;
+            var errorHandler = new ErrorHandlerTestImplementation((cmd,
+                                                                   exception) =>
+            {
+            });
+            IAsyncCommand command = new AsyncCommand(Execute, CanExecute, errorHandler);
+            var invokedSenderList = new List<object>();
+            var invokedArgsList = new List<EventArgs>();
+            var invokedCanExecuteStateList = new List<bool>();
+            command.CanExecuteChanged += (sender,
+                                          args) =>
+            {
+                if (sender != null)
+                    invokedSenderList.Add(sender);
+                if (args != null)
+                    invokedArgsList.Add(args);
+                invokedCanExecuteStateList.Add(command.CanExecute());
+            };
+
+            // Act
+            command.Execute(null);
+
+            // Assert
+            Assert.IsTrue(executed);
+            Assert.AreEqual(2, invokedSenderList.Count);
+            Assert.AreSame(command, invokedSenderList[0]);
+            Assert.AreSame(command, invokedSenderList[1]);
+            Assert.AreEqual(2, invokedArgsList.Count);
+            Assert.AreSame(EventArgs.Empty, invokedArgsList[0]);
+            Assert.AreSame(EventArgs.Empty, invokedArgsList[1]);
+            Assert.AreEqual(2, invokedCanExecuteStateList.Count);
+            Assert.IsFalse(invokedCanExecuteStateList[0]); // Cannot execute during first execution, even when the CanExecute delegate returns true.
+            Assert.IsTrue(invokedCanExecuteStateList[1]); // Can execute after the execution has finished.
+        }
+
+        [Test]
+        public async Task ExecuteAsync_CorrectExecutionWithCanExecuteChanged_Async()
+        {
+            // Arrange
+            var executed = false;
+            Task Execute()
+            {
+                executed = true;
+                return Task.CompletedTask;
+            }
+            bool CanExecute() => true;
+            var errorHandler = new ErrorHandlerTestImplementation((cmd,
+                                                                   exception) =>
+            {
+            });
+            IAsyncCommand command = new AsyncCommand(Execute, CanExecute, errorHandler);
+            var invokedSenderList = new List<object>();
+            var invokedArgsList = new List<EventArgs>();
+            var invokedCanExecuteStateList = new List<bool>();
+            command.CanExecuteChanged += (sender,
+                                          args) =>
+            {
+                if (sender != null)
+                    invokedSenderList.Add(sender);
+                if (args != null)
+                    invokedArgsList.Add(args);
+                invokedCanExecuteStateList.Add(command.CanExecute());
+            };
+
+            // Act
+            await command.ExecuteAsync();
+
+            // Assert
+            Assert.IsTrue(executed);
+            Assert.AreEqual(2, invokedSenderList.Count);
+            Assert.AreSame(command, invokedSenderList[0]);
+            Assert.AreSame(command, invokedSenderList[1]);
+            Assert.AreEqual(2, invokedArgsList.Count);
+            Assert.AreSame(EventArgs.Empty, invokedArgsList[0]);
+            Assert.AreSame(EventArgs.Empty, invokedArgsList[1]);
+            Assert.AreEqual(2, invokedCanExecuteStateList.Count);
+            Assert.IsFalse(invokedCanExecuteStateList[0]); // Cannot execute during first execution, even when the CanExecute delegate returns true.
+            Assert.IsTrue(invokedCanExecuteStateList[1]); // Can execute after the execution has finished.
         }
 
         private class ErrorHandlerTestImplementation : IErrorHandler
