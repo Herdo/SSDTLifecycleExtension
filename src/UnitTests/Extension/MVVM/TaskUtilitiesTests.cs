@@ -57,7 +57,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.MVVM
             task.FireAndForget(commandMock, errorHandlerMock);
 
             // Assert
-            Assert.IsTrue(hasRun);
+            Assert.That(() => hasRun, Is.True.After(1000, 10), $"{nameof(hasRun)} hasn't been set to true.");
         }
 
         [Test]
