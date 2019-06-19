@@ -57,19 +57,19 @@
         public ICommand ResetConfigurationToDefaultCommand { get; }
         public IAsyncCommand SaveConfigurationCommand { get; }
 
-        public ConfigurationViewModel(SqlProject project,
-                                      IConfigurationService configurationService,
-                                      IFileSystemAccess fileSystemAccess,
-                                      IScaffoldingService scaffoldingService,
-                                      IScriptCreationService scriptCreationService,
-                                      ILogger logger)
+        public ConfigurationViewModel([NotNull] SqlProject project,
+                                      [NotNull] IConfigurationService configurationService,
+                                      [NotNull] IFileSystemAccess fileSystemAccess,
+                                      [NotNull] IScaffoldingService scaffoldingService,
+                                      [NotNull] IScriptCreationService scriptCreationService,
+                                      [NotNull] ILogger logger)
         {
-            _project = project;
-            _configurationService = configurationService;
-            _fileSystemAccess = fileSystemAccess;
-            _scaffoldingService = scaffoldingService;
-            _scriptCreationService = scriptCreationService;
-            _logger = logger;
+            _project = project ?? throw new ArgumentNullException(nameof(project));
+            _configurationService = configurationService ?? throw new ArgumentNullException(nameof(configurationService));
+            _fileSystemAccess = fileSystemAccess ?? throw new ArgumentNullException(nameof(fileSystemAccess));
+            _scaffoldingService = scaffoldingService ?? throw new ArgumentNullException(nameof(scaffoldingService));
+            _scriptCreationService = scriptCreationService ?? throw new ArgumentNullException(nameof(scriptCreationService));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _scaffoldingService.IsScaffoldingChanged += ScaffoldingService_IsScaffoldingChanged;
             _scriptCreationService.IsCreatingChanged += ScriptCreationService_IsCreatingChanged;
 
