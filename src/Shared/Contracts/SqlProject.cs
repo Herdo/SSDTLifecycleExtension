@@ -1,15 +1,20 @@
 ﻿namespace SSDTLifecycleExtension.Shared.Contracts
 {
     using System;
+    using JetBrains.Annotations;
 
     public class SqlProject
     {
+        [NotNull]
         public string Name { get; }
 
+        [NotNull]
         public string FullName { get; }
 
+        [NotNull]
         public string UniqueName { get; }
 
+        [NotNull]
         public SqlProjectProperties ProjectProperties { get; }
 
         public SqlProject(string name,

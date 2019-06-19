@@ -8,8 +8,7 @@
     internal class TrackDacpacVersionModifier : IScriptModifier
     {
         private const string CreateAndInsertScriptTemplate =
-@"
-IF OBJECT_ID(N'[dbo].[__DacpacVersion]', N'U') IS NULL
+@"IF OBJECT_ID(N'[dbo].[__DacpacVersion]', N'U') IS NULL
 BEGIN
 	PRINT 'Creating table dbo.__DacpacVersion'
 	CREATE TABLE [dbo].[__DacpacVersion]
@@ -25,9 +24,10 @@ BEGIN
 		CONSTRAINT PK_DacpacVersion_DacpacVersionID PRIMARY KEY (DacpacVersionID)
 	);
 END
-GO
 
+GO
 PRINT 'Tracking version number for current deployment'
+
 GO
 INSERT INTO [dbo].[__DacpacVersion]
 		   (DacpacName, Major, Minor, Build, Revision, DeploymentStart)
@@ -40,11 +40,15 @@ INSERT INTO [dbo].[__DacpacVersion]
 			NULLIF({4}, -1),
 			SYSDATETIME()
 		);
-GO";
+
+GO
+";
 
         private const string UpdateScriptTemplate =
 @"
+GO
 PRINT 'Tracking deployment execution time for current deployment'
+
 GO
 UPDATE [dv]
    SET [dv].[DeploymentEnd] = SYSDATETIME()
@@ -54,7 +58,20 @@ UPDATE [dv]
    AND [dv].[Minor] = {2}
    AND ISNULL([dv].[Build], -1) = {3}
    AND ISNULL([dv].[Revision], -1) = {4};
-GO";
+
+GO
+";
+
+        private static void ChangeUpdateStatementDependingOnInputEnd(ref string update,
+                                                                     string input)
+        {
+            if (input.EndsWith("GO"))
+                update = Environment.NewLine + update.Substring(6);
+            else if (input.EndsWith($"GO{Environment.NewLine}"))
+                update = update.Substring(6);
+            else if (!input.EndsWith(Environment.NewLine))
+                update = Environment.NewLine + update;
+        }
 
         string IScriptModifier.Modify(string input,
                                       SqlProject project,
@@ -69,13 +86,17 @@ GO";
                 throw new ArgumentNullException(nameof(configuration));
             if (paths == null)
                 throw new ArgumentNullException(nameof(paths));
+            if (project.ProjectProperties.SqlTargetName == null)
+                throw new ArgumentException($"{nameof(SqlProjectProperties)}.{nameof(SqlProjectProperties.SqlTargetName)} must be set.", nameof(project));
+            if (project.ProjectProperties.DacVersion == null)
+                throw new ArgumentException($"{nameof(SqlProjectProperties)}.{nameof(SqlProjectProperties.DacVersion)} must be set.", nameof(project));
 
             // Prepare format string
             var newVersion = project.ProjectProperties.DacVersion;
             var majorVersion = newVersion.Major.ToString();
             var minorVersion = newVersion.Minor.ToString();
-            var buildVersion = newVersion.Build == -1 ? "NULL" : newVersion.Build.ToString();
-            var revisionVersion = newVersion.Revision == -1 ? "NULL" : newVersion.Revision.ToString();
+            var buildVersion = newVersion.Build.ToString();
+            var revisionVersion = newVersion.Revision.ToString();
             var createAndInsert = string.Format(CreateAndInsertScriptTemplate,
                                                 project.ProjectProperties.SqlTargetName,
                                                 majorVersion,
@@ -88,18 +109,18 @@ GO";
                                        minorVersion,
                                        buildVersion,
                                        revisionVersion);
+            ChangeUpdateStatementDependingOnInputEnd(ref update, input);
 
             var sb = new StringBuilder();
 
             // Create table and insert
-            sb.AppendLine(createAndInsert);
-            sb.AppendLine();
+            sb.Append(createAndInsert);
 
             // Input
-            sb.AppendLine(input);
+            sb.Append(input);
 
             // Update existing entry
-            sb.AppendLine(update);
+            sb.Append(update);
 
             return sb.ToString();
         }
