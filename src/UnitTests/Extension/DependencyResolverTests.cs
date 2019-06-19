@@ -233,6 +233,21 @@ namespace SSDTLifecycleExtension.UnitTests.Extension
             Assert.AreSame(p1, vm2.Project);
         }
 
+        [Test]
+        public void Dispose_NoExceptionWhenDisposingTwice()
+        {
+            // Arrange
+            var vsaMock = Mock.Of<IVisualStudioAccess>();
+            var loggerMock = Mock.Of<ILogger>();
+            var spMock = Mock.Of<IServiceProvider>();
+            var cs = new OleMenuCommandService(spMock);
+            var dr = new DependencyResolver(vsaMock, loggerMock, cs);
+            dr.Dispose();
+
+            // Act & Assert
+            Assert.DoesNotThrow(() => dr.Dispose());
+        }
+
         [UsedImplicitly]
         private class ViewModelTestImplementation : ViewModelBase
         {
