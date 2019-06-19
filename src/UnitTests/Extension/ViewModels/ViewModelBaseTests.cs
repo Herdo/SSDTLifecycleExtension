@@ -2,7 +2,9 @@
 
 namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
 {
+    using System;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
     using SSDTLifecycleExtension.ViewModels;
 
     [TestFixture]
@@ -85,6 +87,11 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
                     _explicitName = value;
                     OnPropertyChanged(nameof(ExplicitName) + "Extra");
                 }
+            }
+
+            public override Task<bool> InitializeAsync()
+            {
+                throw new NotSupportedException();
             }
         }
     }

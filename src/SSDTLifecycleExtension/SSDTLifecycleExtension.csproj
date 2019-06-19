@@ -84,6 +84,7 @@
     <Compile Include="Windows\ScriptCreationWindowControl.xaml.cs">
       <DependentUpon>ScriptCreationWindowControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Windows\ToolWindowInitializer.cs" />
     <Compile Include="Windows\VersionHistoryWindow.cs" />
     <Compile Include="Commands\VersionHistoryWindowCommand.cs" />
     <Compile Include="Windows\VersionHistoryWindowControl.xaml.cs">

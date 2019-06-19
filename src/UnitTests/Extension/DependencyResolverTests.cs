@@ -3,6 +3,7 @@
 namespace SSDTLifecycleExtension.UnitTests.Extension
 {
     using System;
+    using System.Threading.Tasks;
     using JetBrains.Annotations;
     using Microsoft.VisualStudio.Shell;
     using Moq;
@@ -256,6 +257,11 @@ namespace SSDTLifecycleExtension.UnitTests.Extension
             public ViewModelTestImplementation(SqlProject project)
             {
                 Project = project;
+            }
+
+            public override Task<bool> InitializeAsync()
+            {
+                throw new NotSupportedException();
             }
         }
     }

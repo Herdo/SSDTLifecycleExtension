@@ -1,6 +1,7 @@
 ﻿namespace SSDTLifecycleExtension
 {
     using System;
+    using Windows;
     using DataAccess;
     using JetBrains.Annotations;
     using Microsoft.VisualStudio.Shell;
@@ -44,6 +45,9 @@
 
                    // Visual Studio dependencies
                   .RegisterInstance(commandService, new ContainerControlledLifetimeManager()) // The command service
+
+                   // Tool window initialization
+                  .RegisterSingleton<ToolWindowInitializer>()
 
                    // ViewModels
                   .RegisterType<ScriptCreationViewModel>()

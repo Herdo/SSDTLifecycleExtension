@@ -2,6 +2,7 @@
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
+    using System.Threading.Tasks;
     using Windows;
     using Microsoft.VisualStudio.Shell;
     using Microsoft.VisualStudio.Shell.Interop;
@@ -15,24 +16,21 @@
         where TViewModel : IViewModel
     {
         private readonly SSDTLifecycleExtensionPackage _package;
-        private readonly DependencyResolver _dependencyResolver;
-        private readonly IVisualStudioAccess _visualStudioAccess;
+        private readonly ToolWindowInitializer _toolWindowInitializer;
 
         protected WindowBaseCommand(SSDTLifecycleExtensionPackage package,
-                                    DependencyResolver dependencyResolver,
                                     OleMenuCommandService commandService,
                                     ICommandAvailabilityService commandAvailabilityService,
-                                    IVisualStudioAccess visualStudioAccess,
                                     int commandId,
-                                    Guid commandSet)
+                                    Guid commandSet,
+                                    ToolWindowInitializer toolWindowInitializer)
             : base(commandService,
                    commandAvailabilityService,
                    commandId,
                    commandSet)
         {
             _package = package ?? throw new ArgumentNullException(nameof(package));
-            _dependencyResolver = dependencyResolver ?? throw new ArgumentNullException(nameof(dependencyResolver));
-            _visualStudioAccess = visualStudioAccess ?? throw new ArgumentNullException(nameof(visualStudioAccess));
+            _toolWindowInitializer = toolWindowInitializer ?? throw new ArgumentNullException(nameof(toolWindowInitializer));
         }
 
         protected override void Execute(object sender,
@@ -47,17 +45,12 @@
                 }
 
                 await _package.JoinableTaskFactory.SwitchToMainThreadAsync();
-                // Set caption
-                var project = _visualStudioAccess.GetSelectedSqlProject();
-                if (project?.Name != null) window.SetCaption(project.Name);
-                // Set data context
-                if (window.Content is IView windowContent)
-                {
-                    var viewModel = _dependencyResolver.GetViewModel<TViewModel>(project);
-                    windowContent.SetDataContext(viewModel);
-                }
+
+                if (!await _toolWindowInitializer.TryInitializeToolWindowAsync<TViewModel>(window))
+                    return;
+
                 // Show the frame
-                var windowFrame = (IVsWindowFrame)window.Frame;
+                var windowFrame = (IVsWindowFrame) window.Frame;
                 Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
             });
         }

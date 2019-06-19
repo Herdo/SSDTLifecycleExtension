@@ -191,7 +191,7 @@
         /// Initializes the view model.
         /// </summary>
         /// <returns><b>True</b>, if the initialization was successful, otherwise <b>false</b>.</returns>
-        public async Task<bool> InitializeAsync()
+        public override async Task<bool> InitializeAsync()
         {
             _configuration = await _configurationService.GetConfigurationOrDefaultAsync(_project);
 

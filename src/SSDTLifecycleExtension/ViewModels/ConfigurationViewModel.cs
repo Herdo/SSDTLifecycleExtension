@@ -2,6 +2,7 @@
 {
     using System;
     using System.ComponentModel;
+    using System.Threading.Tasks;
     using System.Windows.Input;
     using JetBrains.Annotations;
     using Microsoft.VisualStudio.PlatformUI;
@@ -131,10 +132,11 @@
             IsModelDirty = !Model.Equals(_lastSavedModel);
         }
 
-        public async Task InitializeAsync()
+        public override async Task<bool> InitializeAsync()
         {
             _lastSavedModel = await _configurationService.GetConfigurationOrDefaultAsync(_project);
             Model = _lastSavedModel.Copy();
+            return true;
         }
 
         private void ScaffoldingService_IsScaffoldingChanged(object sender, EventArgs e)

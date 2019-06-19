@@ -5,7 +5,6 @@
     using Windows;
     using JetBrains.Annotations;
     using Microsoft.VisualStudio.Shell;
-    using Shared.Contracts.DataAccess;
     using Shared.Contracts.Services;
     using ViewModels;
 
@@ -20,17 +19,15 @@
         public static readonly Guid CommandSet = new Guid(Constants.CommandSetGuid);
 
         public VersionHistoryWindowCommand(SSDTLifecycleExtensionPackage package,
-                                           DependencyResolver dependencyResolver,
                                            OleMenuCommandService commandService,
                                            ICommandAvailabilityService commandAvailabilityService,
-                                           IVisualStudioAccess visualStudioAccess)
+                                           ToolWindowInitializer toolWindowInitializer)
             : base(package,
-                   dependencyResolver,
                    commandService,
                    commandAvailabilityService,
-                   visualStudioAccess,
                    CommandId,
-                   CommandSet)
+                   CommandSet,
+                   toolWindowInitializer)
         {
         }
 
