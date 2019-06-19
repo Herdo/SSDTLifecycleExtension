@@ -275,9 +275,7 @@ PRINT 'Update complete'
         public void ForEachMatch_ArgumentException_Statement()
         {
             // Arrange
-            var modifier = new StringSearchModifierBase.InputModifier((pre,
-                                                                       range,
-                                                                       post) => pre + range + post);
+            var modifier = new Func<string, string>(range => range);
             var s = new StringSearchModifierBaseTestImplementation();
             const string input = @"";
             const string statement = @"";
@@ -287,26 +285,10 @@ PRINT 'Update complete'
         }
 
         [Test]
-        public void ForEachMatch_InvalidOperationException_ModifiedDoesNotContainPre()
+        public void ForEachMatch_InvalidOperationException_ModifiedIsNull()
         {
             // Arrange
-            var modifier = new StringSearchModifierBase.InputModifier((pre,
-                                                                       range,
-                                                                       post) => range.Replace("dbo", "config") + post);
-            var s = new StringSearchModifierBaseTestImplementation();
-            const string statement = @"[dbo].";
-
-            // Act & Assert
-            Assert.Throws<InvalidOperationException>(() => s.ForEachMatchBase(MultiLineInputWithFinalGo, statement, 0, modifier));
-        }
-
-        [Test]
-        public void ForEachMatch_InvalidOperationException_ModifiedDoesNotContainPost()
-        {
-            // Arrange
-            var modifier = new StringSearchModifierBase.InputModifier((pre,
-                                                                       range,
-                                                                       post) => pre + range.Replace("dbo", "config"));
+            var modifier = new Func<string, string>(range => null);
             var s = new StringSearchModifierBaseTestImplementation();
             const string statement = @"[dbo].";
 
@@ -319,12 +301,10 @@ PRINT 'Update complete'
         {
             // Arrange
             var modifierCalled = false;
-            var modifier = new StringSearchModifierBase.InputModifier((pre,
-                                                                       range,
-                                                                       post) =>
+            var modifier = new Func<string, string>(range =>
             {
                 modifierCalled = true;
-                return pre + range + post;
+                return range;
             });
             var s = new StringSearchModifierBaseTestImplementation();
             const string input = @"foobar";
@@ -343,12 +323,10 @@ PRINT 'Update complete'
         {
             // Arrange
             var modifierCalled = false;
-            var modifier = new StringSearchModifierBase.InputModifier((pre,
-                                                                       range,
-                                                                       post) =>
+            var modifier = new Func<string, string>(range =>
             {
                 modifierCalled = true;
-                return pre + range.Replace("dbo", "config") + post;
+                return range.Replace("dbo", "config");
             });
             var s = new StringSearchModifierBaseTestImplementation();
             const string statement = @"[dbo].";
@@ -366,12 +344,10 @@ PRINT 'Update complete'
         {
             // Arrange
             var modifierCalled = false;
-            var modifier = new StringSearchModifierBase.InputModifier((pre,
-                                                                       range,
-                                                                       post) =>
+            var modifier = new Func<string, string>(range =>
             {
                 modifierCalled = true;
-                return pre + range.Replace("dbo", "config").Replace("statement", "go") + post;
+                return range.Replace("dbo", "config").Replace("statement", "go");
             });
             var s = new StringSearchModifierBaseTestImplementation();
             const string statement = @"[dbo].";
@@ -395,7 +371,7 @@ PRINT 'Update complete'
             internal string ForEachMatchBase(string input,
                                              string statement,
                                              byte numberOfLeadingStatementsToInclude,
-                                             InputModifier modifier) =>
+                                             Func<string, string> modifier) =>
                 ForEachMatch(input, statement, numberOfLeadingStatementsToInclude, modifier);
         }
     }

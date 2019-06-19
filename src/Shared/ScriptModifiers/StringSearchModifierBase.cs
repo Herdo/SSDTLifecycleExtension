@@ -4,17 +4,6 @@
 
     public abstract class StringSearchModifierBase
     {
-        /// <summary>
-        /// A delegate for construct a result, based on the <paramref name="range"/> itself, as well as the text <paramref name="pre"/> and <paramref name="post"/> the <paramref name="range"/>.
-        /// </summary>
-        /// <param name="pre">The text before the <paramref name="range"/>.</param>
-        /// <param name="range">The text between the <paramref name="pre"/> and <paramref name="post"/>.</param>
-        /// <param name="post">The text after the <paramref name="range"/>.</param>
-        /// <returns>The constructed string.</returns>
-        public delegate string InputModifier(string pre,
-                                             string range,
-                                             string post);
-
         private static int SearchStartIndex(string input,
                                             int statementIndex,
                                             byte numberOfLeadingStatementsToInclude)
@@ -133,15 +122,15 @@
         /// <param name="input">The text to search in.</param>
         /// <param name="statement">The text to search for.</param>
         /// <param name="numberOfLeadingStatementsToInclude">The number of leading statements to include in the range.</param>
-        /// <param name="modifier">The <see cref="InputModifier"/> to apply for each match.</param>
+        /// <param name="modifier">The <see cref="Func{TResult}"/> to apply for each match.</param>
         /// <exception cref="ArgumentNullException"><paramref name="input"/>, <paramref name="statement"/> or <paramref name="modifier"/> are <b>null</b>.</exception>
         /// <exception cref="ArgumentException"><paramref name="statement"/> contains only white spaces.</exception>
-        /// <exception cref="InvalidOperationException">The result returned from the <paramref name="modifier"/> doesn't contain the contents (pre and post) outside the statement range.</exception>
+        /// <exception cref="InvalidOperationException">The result returned from the <paramref name="modifier"/> is <b>null</b>.</exception>
         /// <returns>The <paramref name="input"/> string, if no match is found, otherwise the result after applying the modifications.</returns>
         protected string ForEachMatch(string input,
                                       string statement,
                                       byte numberOfLeadingStatementsToInclude,
-                                      InputModifier modifier)
+                                      Func<string, string> modifier)
         {
             if (input == null)
                 throw new ArgumentNullException(nameof(input));
@@ -166,11 +155,10 @@
                 var pre = modified.Substring(0, startIndex);
                 var range = modified.Substring(startIndex, endIndex - startIndex);
                 var post = modified.Substring(endIndex);
-                modified = modifier(pre, range, post);
-                if (!modified.StartsWith(pre))
-                    throw new InvalidOperationException($"The result returned from the {nameof(modifier)} doesn't start with the {nameof(pre)}-block.");
-                if (!modified.EndsWith(post))
-                    throw new InvalidOperationException($"The result returned from the {nameof(modifier)} doesn't end with the {nameof(post)}-block.");
+                var modifiedRange = modifier(range);
+                if (modifiedRange == null)
+                    throw new InvalidOperationException($"Result value returned from {nameof(modifier)} cannot be null.");
+                modified = pre + modifiedRange + post;
                 startAfterIndex = modified.LastIndexOf(post, StringComparison.Ordinal);
             } while (startIndex >= 0);
 

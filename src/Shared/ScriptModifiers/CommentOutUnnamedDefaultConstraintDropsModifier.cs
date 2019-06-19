@@ -25,14 +25,12 @@
             return ForEachMatch(input,
                                 "DROP CONSTRAINT ;",
                                 1,
-                                (pre,
-                                 range,
-                                 post) =>
+                                range =>
                                 {
                                     var lines = range.Split(new[] {Environment.NewLine}, StringSplitOptions.None);
                                     var newLines = lines.Select(m => $"-- {m}").ToArray();
                                     var replacement = string.Join(Environment.NewLine, newLines);
-                                    return pre + replacement + post;
+                                    return replacement;
                                 });
         }
     }
