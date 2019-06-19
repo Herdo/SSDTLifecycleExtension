@@ -109,6 +109,8 @@
 
             // Search for GO statements
             var startIndex = SearchStartIndex(input, statementIndex, numberOfLeadingStatementsToInclude);
+            if (startIndex < startAfterIndex)
+                startIndex = startAfterIndex;
 
             // Search for the next GO statement, then get the index of the next line
             var endIndex = SearchEndIndex(input, statementIndex);

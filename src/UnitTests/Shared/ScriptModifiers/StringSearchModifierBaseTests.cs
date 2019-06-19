@@ -40,6 +40,22 @@ GO
 PRINT 'Update complete'
 
 GO";
+        private const string MultiLineInputWithFinalGoWithoutOverlappingComments =
+            @"PRINT 'First statement';
+
+GO
+ALTER TABLE /*[dbo].*/[Author] ADD COLUMN Birthday DATE NULL;
+
+GO
+PRINT 'Second statement'
+
+GO
+ALTER TABLE /*[dbo].*/[Author] DROP COLUMN Birthday;
+
+GO
+PRINT 'Update complete'
+
+GO";
 
         private const string MultiLineInputWithFinalGoWithDifferentSchemaAndPrints =
             @"PRINT 'First go';
@@ -337,6 +353,27 @@ PRINT 'Update complete'
             // Assert
             Assert.IsTrue(modifierCalled);
             Assert.AreEqual(MultiLineInputWithFinalGoWithDifferentSchema, modified);
+        }
+
+        [Test]
+        public void ForEachMatch_ReplaceMultipleMatches_PreventOverlapping()
+        {
+            // Arrange
+            var modifierCalled = false;
+            var modifier = new Func<string, string>(range =>
+            {
+                modifierCalled = true;
+                return range.Replace("[dbo].", "/*[dbo].*/");
+            });
+            var s = new StringSearchModifierBaseTestImplementation();
+            const string statement = @"[dbo].";
+
+            // Act
+            var modified = s.ForEachMatchBase(MultiLineInputWithFinalGo, statement, 5, modifier);
+
+            // Assert
+            Assert.IsTrue(modifierCalled);
+            Assert.AreEqual(MultiLineInputWithFinalGoWithoutOverlappingComments, modified);
         }
 
         [Test]
