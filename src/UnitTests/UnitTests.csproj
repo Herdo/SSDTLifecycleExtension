@@ -59,6 +59,7 @@
     <Compile Include="Shared\Models\VersionModelTests.cs" />
     <Compile Include="Shared\ScriptModifiers\AddCustomHeaderModifierTests.cs" />
     <Compile Include="Shared\ScriptModifiers\AddCustomFooterModifierTests.cs" />
+    <Compile Include="Shared\ScriptModifiers\CommentOutUnnamedDefaultConstraintDropsModifierTests.cs" />
     <Compile Include="Shared\ScriptModifiers\ScriptModifierFactoryTests.cs" />
     <Compile Include="Shared\ScriptModifiers\StringSearchModifierBaseTests.cs" />
     <Compile Include="Shared\Services\BuildServiceTests.cs" />
