@@ -49,6 +49,7 @@
     <Compile Include="Extension\Commands\BaseCommandTests.cs" />
     <Compile Include="Extension\Converters\BoolInvertConverterTests.cs" />
     <Compile Include="Extension\Converters\BoolToVisibilityConverterTests.cs" />
+    <Compile Include="Extension\MVVM\TaskUtilitiesTests.cs" />
     <Compile Include="Extension\ViewModels\ViewModelBaseTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Shared\Contracts\PathCollectionTests.cs" />
