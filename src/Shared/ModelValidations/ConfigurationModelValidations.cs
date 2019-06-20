@@ -149,24 +149,22 @@
                                                         ICollection<string> errors,
                                                         int number)
         {
-            if (number >= 0) return;
-
             switch (position)
             {
-                case 0:
+                case 0 when number < 0:
                     errors.Add("Major number cannot be negative.");
                     break;
-                case 1:
+                case 1 when number < 0:
                     errors.Add("Minor number cannot be negative.");
                     break;
-                case 2:
+                case 2 when number < 0:
                     errors.Add("Build number cannot be negative.");
                     break;
-                case 3:
+                case 3 when number < 0:
                     errors.Add("Revision number cannot be negative.");
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(position), "A version number cannot have less than 0 and more than 4 positions.");
+                    return;
             }
         }
 
@@ -174,14 +172,23 @@
                                                                  int position,
                                                                  ICollection<string> errors)
         {
-            if (position == 0 && split[position] != ConfigurationModel.MajorVersionSpecialKeyword)
-                errors.Add("Invalid special keyword for major number.");
-            else if (position == 1 && split[position] != ConfigurationModel.MinorVersionSpecialKeyword)
-                errors.Add("Invalid special keyword for minor number.");
-            else if (position == 2 && split[position] != ConfigurationModel.BuildVersionSpecialKeyword)
-                errors.Add("Invalid special keyword for build number.");
-            else if (position == 3 && split[position] != ConfigurationModel.RevisionVersionSpecialKeyword)
-                errors.Add("Invalid special keyword for revision number.");
+            switch (position)
+            {
+                case 0 when split[position] != ConfigurationModel.MajorVersionSpecialKeyword:
+                    errors.Add("Invalid special keyword for major number.");
+                    break;
+                case 1 when split[position] != ConfigurationModel.MinorVersionSpecialKeyword:
+                    errors.Add("Invalid special keyword for minor number.");
+                    break;
+                case 2 when split[position] != ConfigurationModel.BuildVersionSpecialKeyword:
+                    errors.Add("Invalid special keyword for build number.");
+                    break;
+                case 3 when split[position] != ConfigurationModel.RevisionVersionSpecialKeyword:
+                    errors.Add("Invalid special keyword for revision number.");
+                    break;
+                default:
+                    return;
+            }
         }
     }
 }
