@@ -127,7 +127,7 @@
                 OnPropertyChanged();
                 var errors = ConfigurationModelValidations.ValidateUnnamedDefaultConstraintDropsBehavior(this);
                 SetValidationErrors(errors);
-                SetValidationErrors(errors, nameof(ReplaceUnnamedDefaultConstraintDrops));
+                SetValidationErrors(errors, nameof(CommentOutUnnamedDefaultConstraintDrops));
             }
         }
 
