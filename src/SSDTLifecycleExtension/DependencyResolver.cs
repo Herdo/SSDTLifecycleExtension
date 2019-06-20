@@ -64,6 +64,7 @@
                   .RegisterType<IBuildService, BuildService>()
                   .RegisterType<IVersionService, VersionService>()
                   .RegisterType<ISqlProjectService, SqlProjectService>()
+                  .RegisterType<IXmlFormatService, XmlFormatService>()
 
                    // Data Access
                   .RegisterSingleton<IFileSystemAccess, FileSystemAccess>()
