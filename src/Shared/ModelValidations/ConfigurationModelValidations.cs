@@ -149,18 +149,19 @@
                                                         ICollection<string> errors,
                                                         int number)
         {
+            var isNegative = number < 0;
             switch (position)
             {
-                case 0 when number < 0:
+                case 0 when isNegative:
                     errors.Add("Major number cannot be negative.");
                     break;
-                case 1 when number < 0:
+                case 1 when isNegative:
                     errors.Add("Minor number cannot be negative.");
                     break;
-                case 2 when number < 0:
+                case 2 when isNegative:
                     errors.Add("Build number cannot be negative.");
                     break;
-                case 3 when number < 0:
+                case 3 when isNegative:
                     errors.Add("Revision number cannot be negative.");
                     break;
                 default:
@@ -172,18 +173,19 @@
                                                                  int position,
                                                                  ICollection<string> errors)
         {
+            var positionValue = split[position];
             switch (position)
             {
-                case 0 when split[position] != ConfigurationModel.MajorVersionSpecialKeyword:
+                case 0 when positionValue != ConfigurationModel.MajorVersionSpecialKeyword:
                     errors.Add("Invalid special keyword for major number.");
                     break;
-                case 1 when split[position] != ConfigurationModel.MinorVersionSpecialKeyword:
+                case 1 when positionValue != ConfigurationModel.MinorVersionSpecialKeyword:
                     errors.Add("Invalid special keyword for minor number.");
                     break;
-                case 2 when split[position] != ConfigurationModel.BuildVersionSpecialKeyword:
+                case 2 when positionValue != ConfigurationModel.BuildVersionSpecialKeyword:
                     errors.Add("Invalid special keyword for build number.");
                     break;
-                case 3 when split[position] != ConfigurationModel.RevisionVersionSpecialKeyword:
+                case 3 when positionValue != ConfigurationModel.RevisionVersionSpecialKeyword:
                     errors.Add("Invalid special keyword for revision number.");
                     break;
                 default:
