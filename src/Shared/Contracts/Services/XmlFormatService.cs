@@ -1,5 +1,6 @@
 ﻿namespace SSDTLifecycleExtension.Shared.Contracts.Services
 {
+    using System.IO;
     using System.Text;
     using System.Xml;
     using System.Xml.Linq;
@@ -8,13 +9,18 @@
     [UsedImplicitly]
     public class XmlFormatService : IXmlFormatService
     {
+        /// <summary>
+        /// Formats the <paramref name="report"/> with line breaks and white spaces.
+        /// </summary>
+        /// <param name="report">The report to format.</param>
+        /// <exception cref="XmlException"><paramref name="report"/> is no valid xml.</exception>
+        /// <returns><b>null</b>, if <paramref name="report"/> is <b>null</b>, otherwise the formatted report.</returns>
         string IXmlFormatService.FormatDeployReport(string report)
         {
             if (report == null)
                 return null;
 
             var doc = XDocument.Parse(report);
-            var sb = new StringBuilder();
             var settings = new XmlWriterSettings
             {
                 Indent = true,
@@ -23,10 +29,18 @@
                 NewLineHandling = NewLineHandling.Replace
             };
 
-            using (var writer = XmlWriter.Create(sb, settings))
-                doc.Save(writer);
+            using (var stringWriter = new Utf8StringWriter())
+            {
+                using (var xmlWriter = XmlWriter.Create(stringWriter, settings))
+                    doc.Save(xmlWriter);
 
-            return sb.ToString();
+                return stringWriter.ToString();
+            }
+        }
+
+        private class Utf8StringWriter : StringWriter
+        {
+            public override Encoding Encoding => Encoding.UTF8;
         }
     }
 }
