@@ -1,9 +1,7 @@
 ﻿namespace SSDTLifecycleExtension.Shared.Models
 {
     using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Runtime.CompilerServices;
+    using ModelValidations;
 
     public sealed class ConfigurationModel : BaseModel,
                                              IEquatable<ConfigurationModel>
@@ -37,7 +35,7 @@
                 if (value == _artifactsPath) return;
                 _artifactsPath = value;
                 OnPropertyChanged();
-                SetValidationErrors(ValidateArtifactsPath(_artifactsPath));
+                SetValidationErrors(ConfigurationModelValidations.ValidateArtifactsPath(this));
             }
         }
 
@@ -53,7 +51,7 @@
                 if (value == _publishProfilePath) return;
                 _publishProfilePath = value;
                 OnPropertyChanged();
-                SetValidationErrors(ValidatePublishProfilePath(_publishProfilePath));
+                SetValidationErrors(ConfigurationModelValidations.ValidatePublishProfilePath(this));
             }
         }
 
@@ -110,9 +108,9 @@
                 if (value == _commentOutUnnamedDefaultConstraintDrops) return;
                 _commentOutUnnamedDefaultConstraintDrops = value;
                 OnPropertyChanged();
-                SetValidationErrors(ValidateCommentOutUnnamedDefaultConstraintDrops(value));
-                SetValidationErrors(ValidateReplaceUnnamedDefaultConstraintDrops(ReplaceUnnamedDefaultConstraintDrops, nameof(ReplaceUnnamedDefaultConstraintDrops)),
-                                    nameof(ReplaceUnnamedDefaultConstraintDrops));
+                var errors = ConfigurationModelValidations.ValidateUnnamedDefaultConstraintDropsBehavior(this);
+                SetValidationErrors(errors);
+                SetValidationErrors(errors, nameof(ReplaceUnnamedDefaultConstraintDrops));
             }
         }
 
@@ -127,9 +125,9 @@
                 if (value == _replaceUnnamedDefaultConstraintDrops) return;
                 _replaceUnnamedDefaultConstraintDrops = value;
                 OnPropertyChanged();
-                SetValidationErrors(ValidateReplaceUnnamedDefaultConstraintDrops(value));
-                SetValidationErrors(ValidateCommentOutUnnamedDefaultConstraintDrops(CommentOutUnnamedDefaultConstraintDrops, nameof(CommentOutUnnamedDefaultConstraintDrops)),
-                                    nameof(CommentOutUnnamedDefaultConstraintDrops));
+                var errors = ConfigurationModelValidations.ValidateUnnamedDefaultConstraintDropsBehavior(this);
+                SetValidationErrors(errors);
+                SetValidationErrors(errors, nameof(ReplaceUnnamedDefaultConstraintDrops));
             }
         }
 
@@ -144,7 +142,7 @@
                 if (value == _versionPattern) return;
                 _versionPattern = value;
                 OnPropertyChanged();
-                SetValidationErrors(ValidateVersionPattern(_versionPattern));
+                SetValidationErrors(ConfigurationModelValidations.ValidateVersionPattern(this));
             }
         }
 
@@ -212,13 +210,14 @@
 
         public void ValidateAll()
         {
-            SetValidationErrors(ValidateArtifactsPath(ArtifactsPath, nameof(ArtifactsPath)), nameof(ArtifactsPath));
-            SetValidationErrors(ValidatePublishProfilePath(PublishProfilePath, nameof(PublishProfilePath)), nameof(PublishProfilePath));
-            SetValidationErrors(ValidateCommentOutUnnamedDefaultConstraintDrops(CommentOutUnnamedDefaultConstraintDrops, nameof(CommentOutUnnamedDefaultConstraintDrops)),
-                                nameof(CommentOutUnnamedDefaultConstraintDrops));
-            SetValidationErrors(ValidateReplaceUnnamedDefaultConstraintDrops(ReplaceUnnamedDefaultConstraintDrops, nameof(ReplaceUnnamedDefaultConstraintDrops)),
-                                nameof(ReplaceUnnamedDefaultConstraintDrops));
-            SetValidationErrors(ValidateVersionPattern(VersionPattern, nameof(VersionPattern)), nameof(VersionPattern));
+            SetValidationErrors(ConfigurationModelValidations.ValidateArtifactsPath(this), nameof(ArtifactsPath));
+            SetValidationErrors(ConfigurationModelValidations.ValidatePublishProfilePath(this), nameof(PublishProfilePath));
+
+            var unnamedDefaultConstraintDropsErrors = ConfigurationModelValidations.ValidateUnnamedDefaultConstraintDropsBehavior(this);
+            SetValidationErrors(unnamedDefaultConstraintDropsErrors, nameof(CommentOutUnnamedDefaultConstraintDrops));
+            SetValidationErrors(unnamedDefaultConstraintDropsErrors, nameof(ReplaceUnnamedDefaultConstraintDrops));
+
+            SetValidationErrors(ConfigurationModelValidations.ValidateVersionPattern(this), nameof(VersionPattern));
         }
 
         public ConfigurationModel Copy()
@@ -239,171 +238,6 @@
             };
             copy.ValidateAll();
             return copy;
-        }
-
-        private List<string> ValidateArtifactsPath(string value,
-                                                   [CallerMemberName] string propertyName = null)
-        {
-            if (propertyName == null)
-                throw new ArgumentNullException(nameof(propertyName));
-
-            var errors = new List<string>();
-
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                errors.Add("Path cannot be empty.");
-            }
-            else
-            {
-                try
-                {
-                    if (Path.IsPathRooted(value))
-                        errors.Add("Path must be a relative path.");
-                }
-                catch (ArgumentException)
-                {
-                    errors.Add("Path contains invalid characters.");
-                }
-            }
-
-            return errors;
-        }
-
-        private List<string> ValidatePublishProfilePath(string value,
-                                                        [CallerMemberName] string propertyName = null)
-        {
-            if (propertyName == null)
-                throw new ArgumentNullException(nameof(propertyName));
-
-            var errors = new List<string>();
-
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                errors.Add("Path cannot be empty.");
-            }
-            else
-            {
-                const string publishProfileExtension = ".publish.xml";
-                if (!value.EndsWith(publishProfileExtension) || value.Length == publishProfileExtension.Length)
-                    errors.Add($"Profile file name must end with *{publishProfileExtension}.");
-
-                try
-                {
-                    if (Path.IsPathRooted(value))
-                        errors.Add("Path must be a relative path.");
-                }
-                catch (ArgumentException)
-                {
-                    errors.Add("Path contains invalid characters.");
-                }
-            }
-
-            return errors;
-        }
-
-        private List<string> ValidateCommentOutUnnamedDefaultConstraintDrops(bool value,
-                                                                             [CallerMemberName] string propertyName = null)
-        {
-            if (propertyName == null)
-                throw new ArgumentNullException(nameof(propertyName));
-
-            var errors = new List<string>();
-
-            if (value && ReplaceUnnamedDefaultConstraintDrops)
-                errors.Add("Behavior for unnamed default constraint drops is ambiguous.");
-
-            return errors;
-        }
-
-        private List<string> ValidateReplaceUnnamedDefaultConstraintDrops(bool value,
-                                                                          [CallerMemberName] string propertyName = null)
-        {
-            if (propertyName == null)
-                throw new ArgumentNullException(nameof(propertyName));
-
-            var errors = new List<string>();
-
-            if (value && CommentOutUnnamedDefaultConstraintDrops)
-                errors.Add("Behavior for unnamed default constraint drops is ambiguous.");
-
-            return errors;
-        }
-
-        private List<string> ValidateVersionPattern(string value,
-                                                    [CallerMemberName] string propertyName = null)
-        {
-            if (propertyName == null)
-                throw new ArgumentNullException(nameof(propertyName));
-
-            var errors = new List<string>();
-
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                errors.Add("Pattern cannot be empty.");
-            }
-            else
-            {
-                var split = value.Split(new[] {'.'}, StringSplitOptions.None);
-                if (split.Length < 2) errors.Add("Pattern doesn't contain enough parts.");
-                if (split.Length > 4) errors.Add("Pattern contains too many parts.");
-                for (var position = 0; position < split.Length; position++)
-                    ValidateVersionNumberPosition(split, position, errors);
-            }
-
-            return errors;
-        }
-
-        private static void ValidateVersionNumberPosition(IReadOnlyList<string> split,
-                                                          int position,
-                                                          ICollection<string> errors)
-        {
-            if (int.TryParse(split[position], out var number))
-            {
-                ValidateVersionNumberDigits(position, errors, number);
-            }
-            else
-            {
-                ValidateVersionNumberSpecialKeywords(split, position, errors);
-            }
-        }
-
-        private static void ValidateVersionNumberDigits(int position,
-                                                        ICollection<string> errors,
-                                                        int number)
-        {
-            if (number >= 0) return;
-
-            switch (position)
-            {
-                case 0:
-                    errors.Add("Major number cannot be negative.");
-                    break;
-                case 1:
-                    errors.Add("Minor number cannot be negative.");
-                    break;
-                case 2:
-                    errors.Add("Build number cannot be negative.");
-                    break;
-                case 3:
-                    errors.Add("Revision number cannot be negative.");
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(position), "A version number cannot have less than 0 and more than 4 positions.");
-            }
-        }
-
-        private static void ValidateVersionNumberSpecialKeywords(IReadOnlyList<string> split,
-                                                                 int position,
-                                                                 ICollection<string> errors)
-        {
-            if (position == 0 && split[position] != MajorVersionSpecialKeyword)
-                errors.Add("Invalid special keyword for major number.");
-            else if (position == 1 && split[position] != MinorVersionSpecialKeyword)
-                errors.Add("Invalid special keyword for minor number.");
-            else if (position == 2 && split[position] != BuildVersionSpecialKeyword)
-                errors.Add("Invalid special keyword for build number.");
-            else if (position == 3 && split[position] != RevisionVersionSpecialKeyword)
-                errors.Add("Invalid special keyword for revision number.");
         }
 
         public bool Equals(ConfigurationModel other)
