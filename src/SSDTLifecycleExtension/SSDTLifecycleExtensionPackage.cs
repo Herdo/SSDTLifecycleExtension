@@ -41,7 +41,7 @@
             "ActiveProjectFlavor:" + Shared.Constants.SqlProjectKindGuid
         })]
     [ExcludeFromCodeCoverage] // Test would require a Visual Studio shell.
-    public sealed class SSDTLifecycleExtensionPackage : AsyncPackage
+    public sealed class SSDTLifecycleExtensionPackage : AsyncPackage, IAsyncPackage
     {
         // ReSharper disable once MemberCanBePrivate.Global
         public const string SqlProjectContextGuid = "b5759c1b-ffdd-48bd-ae82-61317eeb3a75";

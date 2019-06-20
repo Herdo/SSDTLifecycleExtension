@@ -75,7 +75,8 @@
                   .RegisterSingleton<IScriptModifierFactory, ScriptModifierFactory>();
         }
 
-        internal void RegisterPackage(SSDTLifecycleExtensionPackage package)
+        internal void RegisterPackage<TImplementation>([NotNull] TImplementation package)
+            where TImplementation : IAsyncPackage
         {
             if (_disposed)
                 throw new ObjectDisposedException(nameof(DependencyResolver));

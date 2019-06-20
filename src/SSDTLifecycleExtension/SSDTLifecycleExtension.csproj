@@ -61,6 +61,7 @@
     <Compile Include="DataAccess\FileSystemAccess.cs" />
     <Compile Include="DataAccess\VisualStudioAccess.cs" />
     <Compile Include="DependencyResolver.cs" />
+    <Compile Include="IAsyncPackage.cs" />
     <Compile Include="MVVM\AsyncCommand.cs" />
     <Compile Include="MVVM\IAsyncCommand.cs" />
     <Compile Include="MVVM\IErrorHandler.cs" />

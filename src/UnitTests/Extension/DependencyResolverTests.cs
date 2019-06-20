@@ -6,6 +6,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension
     using System.Threading.Tasks;
     using JetBrains.Annotations;
     using Microsoft.VisualStudio.Shell;
+    using Microsoft.VisualStudio.Threading;
     using Moq;
     using SSDTLifecycleExtension.Shared.Contracts;
     using SSDTLifecycleExtension.Shared.Contracts.DataAccess;
@@ -249,6 +250,56 @@ namespace SSDTLifecycleExtension.UnitTests.Extension
             Assert.DoesNotThrow(() => dr.Dispose());
         }
 
+        [Test]
+        public void RegisterPackage_ObjectDisposedException()
+        {
+            // Arrange
+            var vsaMock = Mock.Of<IVisualStudioAccess>();
+            var loggerMock = Mock.Of<ILogger>();
+            var spMock = Mock.Of<IServiceProvider>();
+            var cs = new OleMenuCommandService(spMock);
+            var dr = new DependencyResolver(vsaMock, loggerMock, cs);
+            dr.Dispose();
+
+            // Act & Assert
+            // ReSharper disable once AssignNullToNotNullAttribute
+            Assert.Throws<ObjectDisposedException>(() => dr.RegisterPackage<AsyncPackageTestImplementaton>(null));
+        }
+
+        [Test]
+        public void RegisterPackage_ArgumentNullException_Package()
+        {
+            // Arrange
+            var vsaMock = Mock.Of<IVisualStudioAccess>();
+            var loggerMock = Mock.Of<ILogger>();
+            var spMock = Mock.Of<IServiceProvider>();
+            var cs = new OleMenuCommandService(spMock);
+            var dr = new DependencyResolver(vsaMock, loggerMock, cs);
+
+            // Act & Assert
+            // ReSharper disable once AssignNullToNotNullAttribute
+            Assert.Throws<ArgumentNullException>(() => dr.RegisterPackage<AsyncPackageTestImplementaton>(null));
+        }
+
+        [Test]
+        public void RegisterPackage_Successfully()
+        {
+            // Arrange
+            var vsaMock = Mock.Of<IVisualStudioAccess>();
+            var loggerMock = Mock.Of<ILogger>();
+            var spMock = Mock.Of<IServiceProvider>();
+            var cs = new OleMenuCommandService(spMock);
+            var dr = new DependencyResolver(vsaMock, loggerMock, cs);
+            var package = new AsyncPackageTestImplementaton();
+
+            // Act
+            dr.RegisterPackage(package);
+
+            // Assert
+            var registeredPackage = dr.Get<AsyncPackageTestImplementaton>();
+            Assert.AreSame(package, registeredPackage);
+        }
+
         [UsedImplicitly]
         private class ViewModelTestImplementation : ViewModelBase
         {
@@ -263,6 +314,11 @@ namespace SSDTLifecycleExtension.UnitTests.Extension
             {
                 throw new NotSupportedException();
             }
+        }
+
+        private class AsyncPackageTestImplementaton : IAsyncPackage
+        {
+
         }
     }
 }
