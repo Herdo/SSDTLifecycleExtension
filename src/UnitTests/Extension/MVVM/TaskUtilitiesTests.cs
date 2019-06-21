@@ -3,6 +3,7 @@
 namespace SSDTLifecycleExtension.UnitTests.Extension.MVVM
 {
     using System;
+    using System.IO;
     using System.Threading.Tasks;
     using Moq;
     using SSDTLifecycleExtension.MVVM;
@@ -70,6 +71,23 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.MVVM
 
             // Act
             task.FireAndForget(commandMock, errorHandlerMock.Object);
+
+            // Assert
+            errorHandlerMock.Verify(m => m.HandleErrorAsync(commandMock, It.IsNotNull<InvalidOperationException>()), Times.Once);
+        }
+
+        [Test]
+        public void FireAndForget_CallErrorHandlerOnException_DoNotThrowExceptionFromErrorHandler()
+        {
+            // Arrange
+            var task = Task.Run(() => throw new InvalidOperationException("test exception"));
+            var commandMock = Mock.Of<IAsyncCommand>();
+            var errorHandlerMock = new Mock<IErrorHandler>();
+            errorHandlerMock.Setup(m => m.HandleErrorAsync(commandMock, It.IsNotNull<Exception>()))
+                            .ThrowsAsync(new IOException("generic exception while logging"));
+
+            // Act
+            Assert.DoesNotThrow(() => task.FireAndForget(commandMock, errorHandlerMock.Object));
 
             // Assert
             errorHandlerMock.Verify(m => m.HandleErrorAsync(commandMock, It.IsNotNull<InvalidOperationException>()), Times.Once);
