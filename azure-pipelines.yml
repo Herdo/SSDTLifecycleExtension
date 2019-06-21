@@ -48,10 +48,15 @@ steps:
 
 - task: VSTest@2
   displayName: Run tests
+  continueOnError: true
   inputs:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
     codeCoverageEnabled: true
+    runInParallel: true
+    rerunFailedTests: true
+    rerunType: basedOnTestFailureCount
+    rerunFailedTestCasesMaxLimit: 10
 
 - task: SonarCloudAnalyze@1 
   displayName: Run SonarCloud Analyzer
