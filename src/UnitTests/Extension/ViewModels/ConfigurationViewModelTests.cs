@@ -446,7 +446,10 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
                                                 fsaMock,
                                                 ssMock,
                                                 scsMock,
-                                                loggerMock);
+                                                loggerMock)
+            {
+                Model = null
+            };
 
             // Act
             var canExecute = vm.SaveConfigurationCommand.CanExecute();
