@@ -275,10 +275,11 @@
                 _callback = callback ?? throw new ArgumentNullException(nameof(callback));
             }
 
-            void IErrorHandler.HandleError(IAsyncCommand command,
-                                           Exception exception)
+            Task IErrorHandler.HandleErrorAsync(IAsyncCommand command,
+                                                      Exception exception)
             {
                 _callback.Invoke(command, exception);
+                return Task.CompletedTask;
             }
         }
     }

@@ -6,6 +6,7 @@
     using System.Windows.Input;
     using JetBrains.Annotations;
     using Microsoft.VisualStudio.PlatformUI;
+    using Microsoft.VisualStudio.Threading;
     using MVVM;
     using Shared.Contracts;
     using Shared.Contracts.DataAccess;
@@ -157,11 +158,11 @@
             CheckIfModelIsDirty();
         }
 
-        void IErrorHandler.HandleError(IAsyncCommand command, Exception exception)
+        async Task IErrorHandler.HandleErrorAsync(IAsyncCommand command, Exception exception)
         {
             try
             {
-                _logger.LogAsync($"Error during execution of {nameof(SaveConfigurationCommand)}: {exception}").RunSynchronously();
+                await _logger.LogAsync($"Error during execution of {nameof(SaveConfigurationCommand)}: {exception}").ConfigureAwait(false);
             }
             catch
             {

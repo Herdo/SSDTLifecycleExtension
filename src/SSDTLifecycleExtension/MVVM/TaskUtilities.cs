@@ -32,7 +32,14 @@
             }
             catch (Exception e)
             {
-                handler.HandleError(command, e);
+                try
+                {
+                    await handler.HandleErrorAsync(command, e).ConfigureAwait(false);
+                }
+                catch
+                {
+                    // ignored - when handling the exception fails, we don't want to end up in a stack overflow.
+                }
             }
         }
     }

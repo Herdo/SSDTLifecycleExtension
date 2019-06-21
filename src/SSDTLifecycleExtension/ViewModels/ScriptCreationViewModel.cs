@@ -280,7 +280,7 @@
             EvaluateCommands();
         }
 
-        void IErrorHandler.HandleError(IAsyncCommand command, Exception exception)
+        async Task IErrorHandler.HandleErrorAsync(IAsyncCommand command, Exception exception)
         {
             string commandName = null;
             if (ReferenceEquals(command, ScaffoldDevelopmentVersionCommand))
@@ -297,7 +297,7 @@
 
             try
             {
-                _logger.LogAsync($"Error during execution of {commandName}: {exception}").RunSynchronously();
+                await _logger.LogAsync($"Error during execution of {commandName}: {exception}").ConfigureAwait(false);
             }
             catch
             {

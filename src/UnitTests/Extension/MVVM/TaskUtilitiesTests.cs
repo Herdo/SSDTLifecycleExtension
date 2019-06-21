@@ -72,7 +72,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.MVVM
             task.FireAndForget(commandMock, errorHandlerMock.Object);
 
             // Assert
-            errorHandlerMock.Verify(m => m.HandleError(commandMock, It.IsNotNull<InvalidOperationException>()), Times.Once);
+            errorHandlerMock.Verify(m => m.HandleErrorAsync(commandMock, It.IsNotNull<InvalidOperationException>()), Times.Once);
         }
     }
 }

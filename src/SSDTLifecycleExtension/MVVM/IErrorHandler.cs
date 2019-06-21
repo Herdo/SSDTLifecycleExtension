@@ -1,9 +1,10 @@
 ﻿namespace SSDTLifecycleExtension.MVVM
 {
     using System;
+    using System.Threading.Tasks;
 
     public interface IErrorHandler
     {
-        void HandleError(IAsyncCommand command, Exception exception);
+        Task HandleErrorAsync(IAsyncCommand command, Exception exception);
     }
 }
