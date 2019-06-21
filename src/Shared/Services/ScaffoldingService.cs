@@ -86,7 +86,7 @@
                 if (await ShouldCancelAsync(cancellationToken))
                     return false;
 
-                var paths = await _sqlProjectService.TryLoadPathsAsync(project, configuration);
+                var paths = await _sqlProjectService.TryLoadPathsForScaffoldingAsync(project, configuration);
                 if (paths == null)
                     return false;
 

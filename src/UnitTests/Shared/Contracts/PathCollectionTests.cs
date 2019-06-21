@@ -46,7 +46,21 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Contracts
         }
 
         [Test]
-        public void Constructor_InvalidOperationException_NeitherScriptPathNorDeployPathSet()
+        public void Constructor_InvalidOperationException_NeitherScriptPathNorDeployPathSet_WhenPreviousDacpacPathIsSet()
+        {
+            // Arrange
+            const string publishProfilePath = "publishProfile";
+            const string newDacpacDirectory = "_DIRECTORY_newDacpac";
+            const string newDacpacPath = "_PATH_newDacpac";
+            const string previousDacpacPath = "_PATH_previousDacpac";
+
+            // Act & Assert
+            // ReSharper disable once ObjectCreationAsStatement
+            Assert.Throws<InvalidOperationException>(() => new PathCollection(publishProfilePath, newDacpacDirectory, newDacpacPath, previousDacpacPath, null, null));
+        }
+
+        [Test]
+        public void Constructor_NoInvalidOperationException_NeitherScriptPathNorDeployPathSet_WhenPreviousDacpacPathIsNotSet()
         {
             // Arrange
             const string publishProfilePath = "publishProfile";
@@ -55,7 +69,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Contracts
 
             // Act & Assert
             // ReSharper disable once ObjectCreationAsStatement
-            Assert.Throws<InvalidOperationException>(() => new PathCollection(publishProfilePath, newDacpacDirectory, newDacpacPath, null, null, null));
+            Assert.DoesNotThrow(() => new PathCollection(publishProfilePath, newDacpacDirectory, newDacpacPath, null, null, null));
         }
 
         [Test]

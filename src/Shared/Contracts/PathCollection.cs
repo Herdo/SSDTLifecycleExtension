@@ -51,7 +51,8 @@
         /// <param name="deployScriptPath">The optional path of where to create the deploy script.</param>
         /// <param name="deployReportPath">The optional path of where to create the deploy report.</param>
         /// <exception cref="ArgumentNullException"><paramref name="publishProfilePath"/>, <paramref name="newDacpacDirectory"/> or <paramref name="newDacpacPath"/> are <b>null</b>.</exception>
-        /// <exception cref="InvalidOperationException">Both <paramref name="deployScriptPath"/> and <paramref name="deployReportPath"/> are <b>null</b>.</exception>
+        /// <exception cref="InvalidOperationException">Both <paramref name="deployScriptPath"/> and <paramref name="deployReportPath"/> are <b>null</b>,
+        /// when <paramref name="previousDacpacPath"/> is not <b>null</b>.</exception>
         public PathCollection([NotNull] string publishProfilePath,
                               [NotNull] string newDacpacDirectory,
                               [NotNull] string newDacpacPath,
@@ -63,8 +64,8 @@
             NewDacpacDirectory = newDacpacDirectory ?? throw new ArgumentNullException(nameof(newDacpacDirectory));
             NewDacpacPath = newDacpacPath ?? throw new ArgumentNullException(nameof(newDacpacPath));
             PreviousDacpacPath = previousDacpacPath;
-            if (deployScriptPath == null && deployReportPath == null)
-                throw new InvalidOperationException($"Either {nameof(deployScriptPath)}, {nameof(deployReportPath)}, or both must be provided.");
+            if (previousDacpacPath != null && deployScriptPath == null && deployReportPath == null)
+                throw new InvalidOperationException($"Either {nameof(deployScriptPath)}, {nameof(deployReportPath)}, or both must be provided, when {nameof(previousDacpacPath)} is provided.");
             DeployScriptPath = deployScriptPath;
             DeployReportPath = deployReportPath;
         }

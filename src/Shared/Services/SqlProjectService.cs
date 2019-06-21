@@ -4,6 +4,7 @@
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
+    using System.Xml;
     using System.Xml.Linq;
     using Contracts;
     using Contracts.DataAccess;
@@ -65,9 +66,9 @@
         }
 
 
-        private async Task<PathCollection> DeterminePathsAsync(SqlProject project,
-                                                               ConfigurationModel configuration,
-                                                               Version previousVersion,
+        private async Task<PathCollection> DeterminePathsAsync([NotNull] SqlProject project,
+                                                               [NotNull] ConfigurationModel configuration,
+                                                               [CanBeNull] Version previousVersion,
                                                                bool createLatest)
         {
             var projectPath = project.FullName;
@@ -89,17 +90,20 @@
             var previousVersionPath = previousVersion == null ? null : Path.Combine(previousVersionDirectory, $"{project.ProjectProperties.SqlTargetName}.dacpac");
             var newVersionDirectory = Path.Combine(artifactsPath, newVersionString);
             var newVersionPath = Path.Combine(newVersionDirectory, $"{project.ProjectProperties.SqlTargetName}.dacpac");
-            var outputPath = Path.Combine(newVersionDirectory, $"{project.ProjectProperties.SqlTargetName}_{previousVersionString}_{newVersionString}.sql");
-            var documentationPath = configuration.CreateDocumentationWithScriptCreation
-                                        ? Path.Combine(newVersionDirectory, $"{project.ProjectProperties.SqlTargetName}_{previousVersionString}_{newVersionString}.xml")
-                                        : null;
+            var deployScriptPath = previousVersion == null
+                                       ? null
+                                       : Path.Combine(newVersionDirectory, $"{project.ProjectProperties.SqlTargetName}_{previousVersionString}_{newVersionString}.sql");
+            var deployReportPath = previousVersion != null // Can only create report when comparing against a previous version
+                                   && configuration.CreateDocumentationWithScriptCreation
+                                       ? Path.Combine(newVersionDirectory, $"{project.ProjectProperties.SqlTargetName}_{previousVersionString}_{newVersionString}.xml")
+                                       : null;
 
             return new PathCollection(profilePath,
                                       newVersionDirectory,
                                       newVersionPath,
                                       previousVersionPath,
-                                      outputPath,
-                                      documentationPath);
+                                      deployScriptPath,
+                                      deployReportPath);
         }
 
         private async Task<bool> TryLoadSqlProjectPropertiesInternalAsync(SqlProject project)
@@ -112,14 +116,21 @@
             }
 
             var content = await _fileSystemAccess.ReadFileAsync(project.FullName);
-            var doc = XDocument.Parse(content);
-            if (doc.Root == null)
+            XElement root;
+            try
             {
-                await _logger.LogAsync($"ERROR: Cannot read contents of {project.FullName}");
+                var doc = XDocument.Parse(content);
+                // When using XDocument.Parse, the Root element must exist, otherwise an XmlException would be thrown.
+                // Therefore there's no need to check if doc.Root is null.
+                root = doc.Root;
+            }
+            catch (XmlException e)
+            {
+                await _logger.LogAsync($"ERROR: Cannot read contents of {project.FullName} - {e.Message}");
                 return false;
             }
 
-            ReadProperties(doc.Root,
+            ReadProperties(root,
                            out var name,
                            out var outputPath,
                            out var sqlTargetName,
@@ -144,7 +155,7 @@
             }
 
             // Set properties on the project object
-            project.ProjectProperties.SqlTargetName = sqlTargetName ?? name;
+            project.ProjectProperties.SqlTargetName = string.IsNullOrWhiteSpace(sqlTargetName) ? name : sqlTargetName;
             project.ProjectProperties.BinaryDirectory = Path.Combine(projectDirectory, outputPath);
             project.ProjectProperties.DacVersion = Version.Parse(dacVersion);
 
@@ -159,18 +170,30 @@
             return TryLoadSqlProjectPropertiesInternalAsync(project);
         }
 
-        async Task<PathCollection> ISqlProjectService.TryLoadPathsAsync(SqlProject project,
-                                                                        ConfigurationModel configuration)
+        Task<PathCollection> ISqlProjectService.TryLoadPathsForScaffoldingAsync(SqlProject project,
+                                                                                ConfigurationModel configuration)
         {
-            return await DeterminePathsAsync(project, configuration, null, false);
+            if (project == null)
+                throw new ArgumentNullException(nameof(project));
+            if (configuration == null)
+                throw new ArgumentNullException(nameof(configuration));
+
+            return DeterminePathsAsync(project, configuration, null, false);
         }
 
-        async Task<PathCollection> ISqlProjectService.TryLoadPathsAsync(SqlProject project,
-                                                                        ConfigurationModel configuration,
-                                                                        Version previousVersion,
-                                                                        bool createLatest)
+        Task<PathCollection> ISqlProjectService.TryLoadPathsForScriptCreationAsync(SqlProject project,
+                                                                                   ConfigurationModel configuration,
+                                                                                   Version previousVersion,
+                                                                                   bool createLatest)
         {
-            return await DeterminePathsAsync(project, configuration, previousVersion, createLatest);
+            if (project == null)
+                throw new ArgumentNullException(nameof(project));
+            if (configuration == null)
+                throw new ArgumentNullException(nameof(configuration));
+            if (previousVersion == null)
+                throw new ArgumentNullException(nameof(previousVersion));
+
+            return DeterminePathsAsync(project, configuration, previousVersion, createLatest);
         }
     }
 }

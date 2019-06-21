@@ -212,7 +212,7 @@
                     return false;
 
                 // Create paths required for script creation
-                var paths = await _sqlProjectService.TryLoadPathsAsync(project, configuration, previousVersion, latest);
+                var paths = await _sqlProjectService.TryLoadPathsForScriptCreationAsync(project, configuration, previousVersion, latest);
                 if (paths == null)
                     return false;
 

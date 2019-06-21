@@ -15,10 +15,10 @@
         /// <returns><b>True</b>, if the properties were loaded successfully, otherwise <b>false</b>.</returns>
         Task<bool> TryLoadSqlProjectPropertiesAsync([NotNull] SqlProject project);
 
-        Task<PathCollection> TryLoadPathsAsync([NotNull] SqlProject project,
+        Task<PathCollection> TryLoadPathsForScaffoldingAsync([NotNull] SqlProject project,
                                                [NotNull] ConfigurationModel configuration);
 
-        Task<PathCollection> TryLoadPathsAsync([NotNull] SqlProject project,
+        Task<PathCollection> TryLoadPathsForScriptCreationAsync([NotNull] SqlProject project,
                                                [NotNull] ConfigurationModel configuration,
                                                [NotNull] Version previousVersion,
                                                bool createLatest);
