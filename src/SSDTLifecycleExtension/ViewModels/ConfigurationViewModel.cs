@@ -54,6 +54,7 @@
                 SaveConfigurationCommand.RaiseCanExecuteChanged();
             }
         }
+
         public ICommand BrowsePublishProfileCommand { get; }
         public ICommand ResetConfigurationToDefaultCommand { get; }
         public IAsyncCommand SaveConfigurationCommand { get; }
@@ -74,21 +75,23 @@
             _scaffoldingService.IsScaffoldingChanged += ScaffoldingService_IsScaffoldingChanged;
             _scriptCreationService.IsCreatingChanged += ScriptCreationService_IsCreatingChanged;
 
-            BrowsePublishProfileCommand = new DelegateCommand(BrowsePublishProfile_Executed);
+            BrowsePublishProfileCommand = new DelegateCommand(BrowsePublishProfile_Executed, BrowsePublishProfile_CanExecute);
             ResetConfigurationToDefaultCommand = new DelegateCommand(ResetConfigurationToDefault_Executed);
             SaveConfigurationCommand = new AsyncCommand(SaveConfiguration_ExecutedAsync, SaveConfiguration_CanExecute, this);
         }
 
+        private bool BrowsePublishProfile_CanExecute() => Model != null;
+
         private void BrowsePublishProfile_Executed()
         {
-            var browsedPath = _fileSystemAccess.BrowseForFile(".publish.xml", "Publish profile (*.publish.xml)|*.publish.xml");
-            if (browsedPath != null)
-            {
-                var projectPath = new Uri(_project.FullName, UriKind.Absolute);
-                var profilePath = new Uri(browsedPath, UriKind.Absolute);
-                var relativePath = projectPath.MakeRelativeUri(profilePath).ToString();
-                Model.PublishProfilePath = relativePath;
-            }
+            var browsedPath = _fileSystemAccess.BrowseForFile(".publish.xml", "Publish Profile (*.publish.xml)|*.publish.xml");
+            if (browsedPath == null)
+                return;
+
+            var projectPath = new Uri(_project.FullName, UriKind.Absolute);
+            var profilePath = new Uri(browsedPath, UriKind.Absolute);
+            var relativePath = projectPath.MakeRelativeUri(profilePath).ToString();
+            Model.PublishProfilePath = relativePath;
         }
 
         private void ResetConfigurationToDefault_Executed()
@@ -156,9 +159,6 @@
 
         void IErrorHandler.HandleError(IAsyncCommand command, Exception exception)
         {
-            if (!ReferenceEquals(command, SaveConfigurationCommand))
-                throw new NotSupportedException();
-
             try
             {
                 _logger.LogAsync($"Error during execution of {nameof(SaveConfigurationCommand)}: {exception}").RunSynchronously();
