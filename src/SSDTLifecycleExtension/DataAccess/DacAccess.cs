@@ -1,6 +1,7 @@
 ﻿namespace SSDTLifecycleExtension.DataAccess
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Threading.Tasks;
@@ -13,10 +14,13 @@
     public class DacAccess : IDacAccess
     {
         private readonly IXmlFormatService _xmlFormatService;
+        private readonly IFileSystemAccess _fileSystemAccess;
 
-        public DacAccess([NotNull] IXmlFormatService xmlFormatService)
+        public DacAccess([NotNull] IXmlFormatService xmlFormatService,
+                         [NotNull] IFileSystemAccess fileSystemAccess)
         {
             _xmlFormatService = xmlFormatService ?? throw new ArgumentNullException(nameof(xmlFormatService));
+            _fileSystemAccess = fileSystemAccess ?? throw new ArgumentNullException(nameof(fileSystemAccess));
         }
 
         [ExcludeFromCodeCoverage] // We're not testing the DacServices and other components in that namespace.
@@ -31,17 +35,33 @@
                 PublishResult result;
                 try
                 {
-                    var previousDacpac = DacPackage.Load(previousVersionDacpacPath, DacSchemaModelStorageType.Memory);
-                    var newDacpac = DacPackage.Load(newVersionDacpacPath, DacSchemaModelStorageType.Memory);
-                    var deployOptions = DacProfile.Load(publishProfilePath).DeployOptions;
-                    result = DacServices.Script(newDacpac,
-                                                previousDacpac,
+                    var previousDacpac = _fileSystemAccess.ReadFromStream(previousVersionDacpacPath, 
+                                                                          stream => DacPackage.Load(stream, DacSchemaModelStorageType.Memory));
+                    var newDacpac = _fileSystemAccess.ReadFromStream(newVersionDacpacPath, 
+                                                                     stream => DacPackage.Load(stream, DacSchemaModelStorageType.Memory));
+                    var deployOptions = _fileSystemAccess.ReadFromStream(publishProfilePath, 
+                                                                         stream => DacProfile.Load(stream).DeployOptions);
+
+                    // Check for errors before processing
+                    var fileOpenErrors = new List<string>();
+                    if (previousDacpac.Exception != null)
+                        fileOpenErrors.Add($"Error reading previous DACPAC: {previousDacpac.Exception.Message}");
+                    if (newDacpac.Exception != null)
+                        fileOpenErrors.Add($"Error reading new DACPAC: {newDacpac.Exception.Message}");
+                    if (deployOptions.Exception != null)
+                        fileOpenErrors.Add($"Error reading publish profile: {deployOptions.Exception.Message}");
+                    if (fileOpenErrors.Any())
+                        return (null, fileOpenErrors.ToArray());
+
+                    // Process the input
+                    result = DacServices.Script(newDacpac.Value,
+                                                previousDacpac.Value,
                                                 "PRODUCTION",
                                                 new PublishOptions
                                                 {
                                                     GenerateDeploymentScript = createDeployScript,
                                                     GenerateDeploymentReport = createDeployReport,
-                                                    DeployOptions = deployOptions
+                                                    DeployOptions = deployOptions.Value
                                                 });
                 }
                 catch (DacServicesException e)

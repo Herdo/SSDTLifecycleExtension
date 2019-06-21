@@ -56,6 +56,7 @@
     <Compile Include="Extension\Windows\ToolWindowInitializerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Shared\Contracts\PathCollectionTests.cs" />
+    <Compile Include="Shared\Contracts\SecureResultTests.cs" />
     <Compile Include="Shared\Contracts\SqlProjectPropertiesTests.cs" />
     <Compile Include="Shared\Contracts\SqlProjectTests.cs" />
     <Compile Include="Shared\Models\BaseModelTests.cs" />
