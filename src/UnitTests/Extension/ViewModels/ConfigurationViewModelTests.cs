@@ -448,8 +448,9 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
                                                 scsMock,
                                                 loggerMock)
             {
-                Model = null
+                Model = ConfigurationModel.GetDefault()
             };
+            vm.Model = null;
 
             // Act
             var canExecute = vm.SaveConfigurationCommand.CanExecute();
