@@ -1,9 +1,10 @@
-﻿namespace SSDTLifecycleExtension.Shared.Contracts.Services
+﻿namespace SSDTLifecycleExtension.Shared.Services
 {
     using System.IO;
     using System.Text;
     using System.Xml;
     using System.Xml.Linq;
+    using Contracts.Services;
     using JetBrains.Annotations;
 
     [UsedImplicitly]

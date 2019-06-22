@@ -4,6 +4,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
 {
     using System.Xml;
     using SSDTLifecycleExtension.Shared.Contracts.Services;
+    using SSDTLifecycleExtension.Shared.Services;
 
     [TestFixture]
     public class XmlFormatServiceTests
