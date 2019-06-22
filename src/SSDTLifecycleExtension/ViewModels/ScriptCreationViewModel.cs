@@ -59,8 +59,6 @@
             get => _isCreatingScript;
             private set
             {
-                if (value == _isCreatingScript)
-                    return;
                 _isCreatingScript = value;
                 OnPropertyChanged();
             }

@@ -523,6 +523,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             Assert.IsTrue(initialized);
             Assert.AreEqual(0, vm.ExistingVersions.Count);
             Assert.IsNull(vm.SelectedBaseVersion);
+            Assert.IsTrue(vm.ScaffoldingMode);
         }
 
         [Test]
@@ -579,6 +580,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             Assert.AreEqual(new Version(5, 0), vm.ExistingVersions[0].UnderlyingVersion);
             Assert.IsFalse(vm.ExistingVersions[1].IsNewestVersion);
             Assert.AreEqual(new Version(4, 0, 0), vm.ExistingVersions[1].UnderlyingVersion);
+            Assert.IsFalse(vm.ScaffoldingMode);
         }
 
         [Test]
@@ -612,28 +614,28 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             var loggerMock = Mock.Of<ILogger>();
             var vm = new ScriptCreationViewModel(project, csMock.Object, ssMock, scsMock.Object, asMock.Object, loggerMock);
             await vm.InitializeAsync();
-            var scaffoldDevelopmentVersionCommandCanExecuteChanged = false;
+            var scaffoldDevelopmentVersionCommandCanExecuteChangedCount = 0;
             vm.ScaffoldDevelopmentVersionCommand.CanExecuteChanged += (sender,
-                                                                       args) => scaffoldDevelopmentVersionCommandCanExecuteChanged = true;
-            var scaffoldCurrentProductionVersionCommandCanExecuteChanged = false;
+                                                                       args) => scaffoldDevelopmentVersionCommandCanExecuteChangedCount++;
+            var scaffoldCurrentProductionVersionCommandCanExecuteChangedCount = 0;
             vm.ScaffoldCurrentProductionVersionCommand.CanExecuteChanged += (sender,
-                                                                             args) => scaffoldCurrentProductionVersionCommandCanExecuteChanged = true;
-            var startLatestCreationCommandCanExecuteChanged = false;
+                                                                             args) => scaffoldCurrentProductionVersionCommandCanExecuteChangedCount++;
+            var startLatestCreationCommandCanExecuteChangedCount = 0;
             vm.StartLatestCreationCommand.CanExecuteChanged += (sender,
-                                                                args) => startLatestCreationCommandCanExecuteChanged = true;
-            var startVersionedCreationCommandCanExecuteChanged = false;
+                                                                args) => startLatestCreationCommandCanExecuteChangedCount++;
+            var startVersionedCreationCommandCanExecuteChangedCount = 0;
             vm.StartVersionedCreationCommand.CanExecuteChanged += (sender,
-                                                                   args) => startVersionedCreationCommandCanExecuteChanged = true;
+                                                                   args) => startVersionedCreationCommandCanExecuteChangedCount++;
 
             // Act
             csMock.Raise(m => m.ConfigurationChanged += null, new ProjectConfigurationChangedEventArgs(project));
 
             // Assert
             csMock.Verify(m => m.GetConfigurationOrDefaultAsync(project), Times.Exactly(2));
-            Assert.IsTrue(scaffoldDevelopmentVersionCommandCanExecuteChanged);
-            Assert.IsTrue(scaffoldCurrentProductionVersionCommandCanExecuteChanged);
-            Assert.IsTrue(startLatestCreationCommandCanExecuteChanged);
-            Assert.IsTrue(startVersionedCreationCommandCanExecuteChanged);
+            Assert.AreEqual(1, scaffoldDevelopmentVersionCommandCanExecuteChangedCount);
+            Assert.AreEqual(1, scaffoldCurrentProductionVersionCommandCanExecuteChangedCount);
+            Assert.AreEqual(1, startLatestCreationCommandCanExecuteChangedCount);
+            Assert.AreEqual(1, startVersionedCreationCommandCanExecuteChangedCount);
         }
 
         [Test]
@@ -668,28 +670,28 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             var loggerMock = Mock.Of<ILogger>();
             var vm = new ScriptCreationViewModel(project, csMock.Object, ssMock, scsMock.Object, asMock.Object, loggerMock);
             await vm.InitializeAsync();
-            var scaffoldDevelopmentVersionCommandCanExecuteChanged = false;
+            var scaffoldDevelopmentVersionCommandCanExecuteChangedCount = 0;
             vm.ScaffoldDevelopmentVersionCommand.CanExecuteChanged += (sender,
-                                                                       args) => scaffoldDevelopmentVersionCommandCanExecuteChanged = true;
-            var scaffoldCurrentProductionVersionCommandCanExecuteChanged = false;
+                                                                       args) => scaffoldDevelopmentVersionCommandCanExecuteChangedCount++;
+            var scaffoldCurrentProductionVersionCommandCanExecuteChangedCount = 0;
             vm.ScaffoldCurrentProductionVersionCommand.CanExecuteChanged += (sender,
-                                                                             args) => scaffoldCurrentProductionVersionCommandCanExecuteChanged = true;
-            var startLatestCreationCommandCanExecuteChanged = false;
+                                                                             args) => scaffoldCurrentProductionVersionCommandCanExecuteChangedCount++;
+            var startLatestCreationCommandCanExecuteChangedCount = 0;
             vm.StartLatestCreationCommand.CanExecuteChanged += (sender,
-                                                                args) => startLatestCreationCommandCanExecuteChanged = true;
-            var startVersionedCreationCommandCanExecuteChanged = false;
+                                                                args) => startLatestCreationCommandCanExecuteChangedCount++;
+            var startVersionedCreationCommandCanExecuteChangedCount = 0;
             vm.StartVersionedCreationCommand.CanExecuteChanged += (sender,
-                                                                   args) => startVersionedCreationCommandCanExecuteChanged = true;
+                                                                   args) => startVersionedCreationCommandCanExecuteChangedCount++;
 
             // Act
             csMock.Raise(m => m.ConfigurationChanged += null, new ProjectConfigurationChangedEventArgs(differentProject));
 
             // Assert
             csMock.Verify(m => m.GetConfigurationOrDefaultAsync(project), Times.Exactly(1));
-            Assert.IsFalse(scaffoldDevelopmentVersionCommandCanExecuteChanged);
-            Assert.IsFalse(scaffoldCurrentProductionVersionCommandCanExecuteChanged);
-            Assert.IsFalse(startLatestCreationCommandCanExecuteChanged);
-            Assert.IsFalse(startVersionedCreationCommandCanExecuteChanged);
+            Assert.AreEqual(0, scaffoldDevelopmentVersionCommandCanExecuteChangedCount);
+            Assert.AreEqual(0, scaffoldCurrentProductionVersionCommandCanExecuteChangedCount);
+            Assert.AreEqual(0, startLatestCreationCommandCanExecuteChangedCount);
+            Assert.AreEqual(0, startVersionedCreationCommandCanExecuteChangedCount);
         }
 
         [Test]
@@ -732,18 +734,18 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             var loggerMock = Mock.Of<ILogger>();
             var vm = new ScriptCreationViewModel(project, csMock.Object, ssMock.Object, scsMock.Object, asMock.Object, loggerMock);
             await vm.InitializeAsync();
-            var scaffoldDevelopmentVersionCommandCanExecuteChanged = false;
+            var scaffoldDevelopmentVersionCommandCanExecuteChangedCount = 0;
             vm.ScaffoldDevelopmentVersionCommand.CanExecuteChanged += (sender,
-                                                                       args) => scaffoldDevelopmentVersionCommandCanExecuteChanged = true;
-            var scaffoldCurrentProductionVersionCommandCanExecuteChanged = false;
+                                                                       args) => scaffoldDevelopmentVersionCommandCanExecuteChangedCount++;
+            var scaffoldCurrentProductionVersionCommandCanExecuteChangedCount = 0;
             vm.ScaffoldCurrentProductionVersionCommand.CanExecuteChanged += (sender,
-                                                                             args) => scaffoldCurrentProductionVersionCommandCanExecuteChanged = true;
-            var startLatestCreationCommandCanExecuteChanged = false;
+                                                                             args) => scaffoldCurrentProductionVersionCommandCanExecuteChangedCount++;
+            var startLatestCreationCommandCanExecuteChangedCount = 0;
             vm.StartLatestCreationCommand.CanExecuteChanged += (sender,
-                                                                args) => startLatestCreationCommandCanExecuteChanged = true;
-            var startVersionedCreationCommandCanExecuteChanged = false;
+                                                                args) => startLatestCreationCommandCanExecuteChangedCount++;
+            var startVersionedCreationCommandCanExecuteChangedCount = 0;
             vm.StartVersionedCreationCommand.CanExecuteChanged += (sender,
-                                                                   args) => startVersionedCreationCommandCanExecuteChanged = true;
+                                                                   args) => startVersionedCreationCommandCanExecuteChangedCount++;
 
             // Act
             await vm.ScaffoldDevelopmentVersionCommand.ExecuteAsync();
@@ -752,10 +754,10 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             var expectedConfigurationLoads = success ? 2 : 1;
             csMock.Verify(m => m.GetConfigurationOrDefaultAsync(project), Times.Exactly(expectedConfigurationLoads));
             ssMock.Verify(m => m.ScaffoldAsync(project, config, new Version(0, 0, 0, 0), CancellationToken.None), Times.Once);
-            Assert.IsTrue(scaffoldDevelopmentVersionCommandCanExecuteChanged);
-            Assert.IsTrue(scaffoldCurrentProductionVersionCommandCanExecuteChanged);
-            Assert.IsTrue(startLatestCreationCommandCanExecuteChanged);
-            Assert.IsTrue(startVersionedCreationCommandCanExecuteChanged);
+            Assert.AreEqual(3, scaffoldDevelopmentVersionCommandCanExecuteChangedCount);
+            Assert.AreEqual(1, scaffoldCurrentProductionVersionCommandCanExecuteChangedCount);
+            Assert.AreEqual(1, startLatestCreationCommandCanExecuteChangedCount);
+            Assert.AreEqual(1, startVersionedCreationCommandCanExecuteChangedCount);
         }
 
         [Test]
@@ -798,18 +800,18 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             var loggerMock = Mock.Of<ILogger>();
             var vm = new ScriptCreationViewModel(project, csMock.Object, ssMock.Object, scsMock.Object, asMock.Object, loggerMock);
             await vm.InitializeAsync();
-            var scaffoldDevelopmentVersionCommandCanExecuteChanged = false;
+            var scaffoldDevelopmentVersionCommandCanExecuteChangedCount = 0;
             vm.ScaffoldDevelopmentVersionCommand.CanExecuteChanged += (sender,
-                                                                       args) => scaffoldDevelopmentVersionCommandCanExecuteChanged = true;
-            var scaffoldCurrentProductionVersionCommandCanExecuteChanged = false;
+                                                                       args) => scaffoldDevelopmentVersionCommandCanExecuteChangedCount++;
+            var scaffoldCurrentProductionVersionCommandCanExecuteChangedCount = 0;
             vm.ScaffoldCurrentProductionVersionCommand.CanExecuteChanged += (sender,
-                                                                             args) => scaffoldCurrentProductionVersionCommandCanExecuteChanged = true;
-            var startLatestCreationCommandCanExecuteChanged = false;
+                                                                             args) => scaffoldCurrentProductionVersionCommandCanExecuteChangedCount++;
+            var startLatestCreationCommandCanExecuteChangedCount = 0;
             vm.StartLatestCreationCommand.CanExecuteChanged += (sender,
-                                                                args) => startLatestCreationCommandCanExecuteChanged = true;
-            var startVersionedCreationCommandCanExecuteChanged = false;
+                                                                args) => startLatestCreationCommandCanExecuteChangedCount++;
+            var startVersionedCreationCommandCanExecuteChangedCount = 0;
             vm.StartVersionedCreationCommand.CanExecuteChanged += (sender,
-                                                                   args) => startVersionedCreationCommandCanExecuteChanged = true;
+                                                                   args) => startVersionedCreationCommandCanExecuteChangedCount++;
 
             // Act
             await vm.ScaffoldCurrentProductionVersionCommand.ExecuteAsync();
@@ -818,10 +820,10 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             var expectedConfigurationLoads = success ? 2 : 1;
             csMock.Verify(m => m.GetConfigurationOrDefaultAsync(project), Times.Exactly(expectedConfigurationLoads));
             ssMock.Verify(m => m.ScaffoldAsync(project, config, new Version(1, 0, 0, 0), CancellationToken.None), Times.Once);
-            Assert.IsTrue(scaffoldDevelopmentVersionCommandCanExecuteChanged);
-            Assert.IsTrue(scaffoldCurrentProductionVersionCommandCanExecuteChanged);
-            Assert.IsTrue(startLatestCreationCommandCanExecuteChanged);
-            Assert.IsTrue(startVersionedCreationCommandCanExecuteChanged);
+            Assert.AreEqual(1, scaffoldDevelopmentVersionCommandCanExecuteChangedCount);
+            Assert.AreEqual(3, scaffoldCurrentProductionVersionCommandCanExecuteChangedCount);
+            Assert.AreEqual(1, startLatestCreationCommandCanExecuteChangedCount);
+            Assert.AreEqual(1, startVersionedCreationCommandCanExecuteChangedCount);
         }
 
         [Test]
@@ -873,18 +875,18 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
                     invokedIsCreatingScriptCount++;
             };
             await vm.InitializeAsync();
-            var scaffoldDevelopmentVersionCommandCanExecuteChanged = false;
+            var scaffoldDevelopmentVersionCommandCanExecuteChangedCount = 0;
             vm.ScaffoldDevelopmentVersionCommand.CanExecuteChanged += (sender,
-                                                                       args) => scaffoldDevelopmentVersionCommandCanExecuteChanged = true;
-            var scaffoldCurrentProductionVersionCommandCanExecuteChanged = false;
+                                                                       args) => scaffoldDevelopmentVersionCommandCanExecuteChangedCount++;
+            var scaffoldCurrentProductionVersionCommandCanExecuteChangedCount = 0;
             vm.ScaffoldCurrentProductionVersionCommand.CanExecuteChanged += (sender,
-                                                                             args) => scaffoldCurrentProductionVersionCommandCanExecuteChanged = true;
-            var startLatestCreationCommandCanExecuteChanged = false;
+                                                                             args) => scaffoldCurrentProductionVersionCommandCanExecuteChangedCount++;
+            var startLatestCreationCommandCanExecuteChangedCount = 0;
             vm.StartLatestCreationCommand.CanExecuteChanged += (sender,
-                                                                args) => startLatestCreationCommandCanExecuteChanged = true;
-            var startVersionedCreationCommandCanExecuteChanged = false;
+                                                                args) => startLatestCreationCommandCanExecuteChangedCount++;
+            var startVersionedCreationCommandCanExecuteChangedCount = 0;
             vm.StartVersionedCreationCommand.CanExecuteChanged += (sender,
-                                                                   args) => startVersionedCreationCommandCanExecuteChanged = true;
+                                                                   args) => startVersionedCreationCommandCanExecuteChangedCount++;
 
             // Act
             await vm.StartLatestCreationCommand.ExecuteAsync();
@@ -894,10 +896,10 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             var expectedConfigurationLoads = success ? 2 : 1;
             csMock.Verify(m => m.GetConfigurationOrDefaultAsync(project), Times.Exactly(expectedConfigurationLoads));
             scsMock.Verify(m => m.CreateAsync(project, config, new Version(4, 0), true, CancellationToken.None), Times.Once);
-            Assert.IsTrue(scaffoldDevelopmentVersionCommandCanExecuteChanged);
-            Assert.IsTrue(scaffoldCurrentProductionVersionCommandCanExecuteChanged);
-            Assert.IsTrue(startLatestCreationCommandCanExecuteChanged);
-            Assert.IsTrue(startVersionedCreationCommandCanExecuteChanged);
+            Assert.AreEqual(1, scaffoldDevelopmentVersionCommandCanExecuteChangedCount);
+            Assert.AreEqual(1, scaffoldCurrentProductionVersionCommandCanExecuteChangedCount);
+            Assert.AreEqual(3, startLatestCreationCommandCanExecuteChangedCount);
+            Assert.AreEqual(1, startVersionedCreationCommandCanExecuteChangedCount);
             Assert.IsTrue(isCreatingScriptDuringCall);
             Assert.IsFalse(isCreatingScriptAfterCall);
             Assert.AreEqual(2, invokedIsCreatingScriptCount);
@@ -952,18 +954,18 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
                     invokedIsCreatingScriptCount++;
             };
             await vm.InitializeAsync();
-            var scaffoldDevelopmentVersionCommandCanExecuteChanged = false;
+            var scaffoldDevelopmentVersionCommandCanExecuteChangedCount = 0;
             vm.ScaffoldDevelopmentVersionCommand.CanExecuteChanged += (sender,
-                                                                       args) => scaffoldDevelopmentVersionCommandCanExecuteChanged = true;
-            var scaffoldCurrentProductionVersionCommandCanExecuteChanged = false;
+                                                                       args) => scaffoldDevelopmentVersionCommandCanExecuteChangedCount++;
+            var scaffoldCurrentProductionVersionCommandCanExecuteChangedCount = 0;
             vm.ScaffoldCurrentProductionVersionCommand.CanExecuteChanged += (sender,
-                                                                             args) => scaffoldCurrentProductionVersionCommandCanExecuteChanged = true;
-            var startLatestCreationCommandCanExecuteChanged = false;
+                                                                             args) => scaffoldCurrentProductionVersionCommandCanExecuteChangedCount++;
+            var startLatestCreationCommandCanExecuteChangedCount = 0;
             vm.StartLatestCreationCommand.CanExecuteChanged += (sender,
-                                                                args) => startLatestCreationCommandCanExecuteChanged = true;
-            var startVersionedCreationCommandCanExecuteChanged = false;
+                                                                args) => startLatestCreationCommandCanExecuteChangedCount++;
+            var startVersionedCreationCommandCanExecuteChangedCount = 0;
             vm.StartVersionedCreationCommand.CanExecuteChanged += (sender,
-                                                                   args) => startVersionedCreationCommandCanExecuteChanged = true;
+                                                                   args) => startVersionedCreationCommandCanExecuteChangedCount++;
 
             // Act
             await vm.StartVersionedCreationCommand.ExecuteAsync();
@@ -973,10 +975,328 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             var expectedConfigurationLoads = success ? 2 : 1;
             csMock.Verify(m => m.GetConfigurationOrDefaultAsync(project), Times.Exactly(expectedConfigurationLoads));
             scsMock.Verify(m => m.CreateAsync(project, config, new Version(4, 0), false, CancellationToken.None), Times.Once);
-            Assert.IsTrue(scaffoldDevelopmentVersionCommandCanExecuteChanged);
-            Assert.IsTrue(scaffoldCurrentProductionVersionCommandCanExecuteChanged);
-            Assert.IsTrue(startLatestCreationCommandCanExecuteChanged);
-            Assert.IsTrue(startVersionedCreationCommandCanExecuteChanged);
+            Assert.AreEqual(1, scaffoldDevelopmentVersionCommandCanExecuteChangedCount);
+            Assert.AreEqual(1, scaffoldCurrentProductionVersionCommandCanExecuteChangedCount);
+            Assert.AreEqual(1, startLatestCreationCommandCanExecuteChangedCount);
+            Assert.AreEqual(3, startVersionedCreationCommandCanExecuteChangedCount);
+            Assert.IsTrue(isCreatingScriptDuringCall);
+            Assert.IsFalse(isCreatingScriptAfterCall);
+            Assert.AreEqual(2, invokedIsCreatingScriptCount);
+        }
+
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void ScaffoldDevelopmentVersionCommand_Executed_CallLoggerOnError(bool loggerThrowsException)
+        {
+            var config = new ConfigurationModel
+            {
+                ArtifactsPath = "_Deployment",
+                PublishProfilePath = "TestProfile.publish.xml",
+                ReplaceUnnamedDefaultConstraintDrops = false,
+                VersionPattern = "1.2.3.4",
+                CommentOutUnnamedDefaultConstraintDrops = true,
+                CreateDocumentationWithScriptCreation = false,
+                CustomHeader = "TestHeader",
+                CustomFooter = "TestFooter",
+                BuildBeforeScriptCreation = true,
+                TrackDacpacVersion = true,
+                CommentOutReferencedProjectRefactorings = true
+            };
+            var project = new SqlProject("a", @"C:\TestProject\TestProject.sqlproj", "c");
+            var csMock = new Mock<IConfigurationService>();
+            csMock.Setup(m => m.GetConfigurationOrDefaultAsync(project))
+                  .ReturnsAsync(config);
+            var ssMock = new Mock<IScaffoldingService>();
+            ssMock.Setup(m => m.ScaffoldAsync(project, config, new Version(0, 0, 0, 0), CancellationToken.None))
+                  .ThrowsAsync(new InvalidOperationException("test exception"));
+            var scsMock = new Mock<IScriptCreationService>();
+            var asMock = new Mock<IArtifactsService>();
+            asMock.Setup(m => m.GetExistingArtifactVersions(project, config))
+                  .Returns(new[]
+                   {
+                       new VersionModel
+                       {
+                           IsNewestVersion = true,
+                           UnderlyingVersion = new Version(4, 0)
+                       }
+                   });
+            var loggerMock = new Mock<ILogger>();
+            if (loggerThrowsException)
+            {
+                loggerMock.Setup(m => m.LogAsync(It.IsAny<string>()))
+                          .ThrowsAsync(new InvalidOperationException("logger exception"));
+            }
+            var vm = new ScriptCreationViewModel(project, csMock.Object, ssMock.Object, scsMock.Object, asMock.Object, loggerMock.Object);
+            var initialized = vm.InitializeAsync().Result;
+            Assert.IsTrue(initialized);
+            var scaffoldDevelopmentVersionCommandCanExecuteChangedCount = 0;
+            vm.ScaffoldDevelopmentVersionCommand.CanExecuteChanged += (sender,
+                                                                       args) => scaffoldDevelopmentVersionCommandCanExecuteChangedCount++;
+            var scaffoldCurrentProductionVersionCommandCanExecuteChangedCount = 0;
+            vm.ScaffoldCurrentProductionVersionCommand.CanExecuteChanged += (sender,
+                                                                             args) => scaffoldCurrentProductionVersionCommandCanExecuteChangedCount++;
+            var startLatestCreationCommandCanExecuteChangedCount = 0;
+            vm.StartLatestCreationCommand.CanExecuteChanged += (sender,
+                                                                args) => startLatestCreationCommandCanExecuteChangedCount++;
+            var startVersionedCreationCommandCanExecuteChangedCount = 0;
+            vm.StartVersionedCreationCommand.CanExecuteChanged += (sender,
+                                                                   args) => startVersionedCreationCommandCanExecuteChangedCount++;
+
+            // Act
+            Assert.DoesNotThrow(() => vm.ScaffoldDevelopmentVersionCommand.Execute(null));
+
+            // Assert
+            csMock.Verify(m => m.GetConfigurationOrDefaultAsync(project), Times.Once);
+            ssMock.Verify(m => m.ScaffoldAsync(project, config, new Version(0, 0, 0, 0), CancellationToken.None), Times.Once);
+            loggerMock.Verify(m => m.LogAsync(It.Is<string>(message => message.Contains(nameof(ScriptCreationViewModel.ScaffoldDevelopmentVersionCommand)) && message.Contains("test exception"))),
+                              Times.Once);
+            Assert.AreEqual(1, scaffoldDevelopmentVersionCommandCanExecuteChangedCount);
+            Assert.AreEqual(0, scaffoldCurrentProductionVersionCommandCanExecuteChangedCount);
+            Assert.AreEqual(0, startLatestCreationCommandCanExecuteChangedCount);
+            Assert.AreEqual(0, startVersionedCreationCommandCanExecuteChangedCount);
+        }
+
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void ScaffoldCurrentProductionVersionCommand_Executed_CallLoggerOnError(bool loggerThrowsException)
+        {
+            var config = new ConfigurationModel
+            {
+                ArtifactsPath = "_Deployment",
+                PublishProfilePath = "TestProfile.publish.xml",
+                ReplaceUnnamedDefaultConstraintDrops = false,
+                VersionPattern = "1.2.3.4",
+                CommentOutUnnamedDefaultConstraintDrops = true,
+                CreateDocumentationWithScriptCreation = false,
+                CustomHeader = "TestHeader",
+                CustomFooter = "TestFooter",
+                BuildBeforeScriptCreation = true,
+                TrackDacpacVersion = true,
+                CommentOutReferencedProjectRefactorings = true
+            };
+            var project = new SqlProject("a", @"C:\TestProject\TestProject.sqlproj", "c");
+            var csMock = new Mock<IConfigurationService>();
+            csMock.Setup(m => m.GetConfigurationOrDefaultAsync(project))
+                  .ReturnsAsync(config);
+            var ssMock = new Mock<IScaffoldingService>();
+            ssMock.Setup(m => m.ScaffoldAsync(project, config, new Version(1, 0, 0, 0), CancellationToken.None))
+                  .ThrowsAsync(new InvalidOperationException("test exception"));
+            var scsMock = new Mock<IScriptCreationService>();
+            var asMock = new Mock<IArtifactsService>();
+            asMock.Setup(m => m.GetExistingArtifactVersions(project, config))
+                  .Returns(new[]
+                   {
+                       new VersionModel
+                       {
+                           IsNewestVersion = true,
+                           UnderlyingVersion = new Version(4, 0)
+                       }
+                   });
+            var loggerMock = new Mock<ILogger>();
+            if (loggerThrowsException)
+            {
+                loggerMock.Setup(m => m.LogAsync(It.IsAny<string>()))
+                          .ThrowsAsync(new InvalidOperationException("logger exception"));
+            }
+            var vm = new ScriptCreationViewModel(project, csMock.Object, ssMock.Object, scsMock.Object, asMock.Object, loggerMock.Object);
+            var initialized = vm.InitializeAsync().Result;
+            Assert.IsTrue(initialized);
+            var scaffoldDevelopmentVersionCommandCanExecuteChangedCount = 0;
+            vm.ScaffoldDevelopmentVersionCommand.CanExecuteChanged += (sender,
+                                                                       args) => scaffoldDevelopmentVersionCommandCanExecuteChangedCount++;
+            var scaffoldCurrentProductionVersionCommandCanExecuteChangedCount = 0;
+            vm.ScaffoldCurrentProductionVersionCommand.CanExecuteChanged += (sender,
+                                                                             args) => scaffoldCurrentProductionVersionCommandCanExecuteChangedCount++;
+            var startLatestCreationCommandCanExecuteChangedCount = 0;
+            vm.StartLatestCreationCommand.CanExecuteChanged += (sender,
+                                                                args) => startLatestCreationCommandCanExecuteChangedCount++;
+            var startVersionedCreationCommandCanExecuteChangedCount = 0;
+            vm.StartVersionedCreationCommand.CanExecuteChanged += (sender,
+                                                                   args) => startVersionedCreationCommandCanExecuteChangedCount++;
+
+            // Act
+            Assert.DoesNotThrow(() => vm.ScaffoldCurrentProductionVersionCommand.Execute(null));
+
+            // Assert
+            csMock.Verify(m => m.GetConfigurationOrDefaultAsync(project), Times.Once);
+            ssMock.Verify(m => m.ScaffoldAsync(project, config, new Version(1, 0, 0, 0), CancellationToken.None), Times.Once);
+            loggerMock.Verify(m => m.LogAsync(It.Is<string>(message => message.Contains(nameof(ScriptCreationViewModel.ScaffoldCurrentProductionVersionCommand)) && message.Contains("test exception"))),
+                              Times.Once);
+            Assert.AreEqual(0, scaffoldDevelopmentVersionCommandCanExecuteChangedCount);
+            Assert.AreEqual(1, scaffoldCurrentProductionVersionCommandCanExecuteChangedCount);
+            Assert.AreEqual(0, startLatestCreationCommandCanExecuteChangedCount);
+            Assert.AreEqual(0, startVersionedCreationCommandCanExecuteChangedCount);
+        }
+
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void StartLatestCreationCommand_Executed_CallLoggerOnError(bool loggerThrowsException)
+        {
+            var config = new ConfigurationModel
+            {
+                ArtifactsPath = "_Deployment",
+                PublishProfilePath = "TestProfile.publish.xml",
+                ReplaceUnnamedDefaultConstraintDrops = false,
+                VersionPattern = "1.2.3.4",
+                CommentOutUnnamedDefaultConstraintDrops = true,
+                CreateDocumentationWithScriptCreation = false,
+                CustomHeader = "TestHeader",
+                CustomFooter = "TestFooter",
+                BuildBeforeScriptCreation = true,
+                TrackDacpacVersion = true,
+                CommentOutReferencedProjectRefactorings = true
+            };
+            var project = new SqlProject("a", @"C:\TestProject\TestProject.sqlproj", "c");
+            var csMock = new Mock<IConfigurationService>();
+            csMock.Setup(m => m.GetConfigurationOrDefaultAsync(project))
+                  .ReturnsAsync(config);
+            var ssMock = new Mock<IScaffoldingService>();
+            var scsMock = new Mock<IScriptCreationService>();
+            var asMock = new Mock<IArtifactsService>();
+            asMock.Setup(m => m.GetExistingArtifactVersions(project, config))
+                  .Returns(new[]
+                   {
+                       new VersionModel
+                       {
+                           IsNewestVersion = true,
+                           UnderlyingVersion = new Version(4, 0)
+                       }
+                   });
+            var loggerMock = new Mock<ILogger>();
+            if (loggerThrowsException)
+            {
+                loggerMock.Setup(m => m.LogAsync(It.IsAny<string>()))
+                          .ThrowsAsync(new InvalidOperationException("logger exception"));
+            }
+            var vm = new ScriptCreationViewModel(project, csMock.Object, ssMock.Object, scsMock.Object, asMock.Object, loggerMock.Object);
+            bool? isCreatingScriptDuringCall = null;
+            scsMock.Setup(m => m.CreateAsync(project, config, new Version(4, 0), true, CancellationToken.None))
+                   .Callback(() => isCreatingScriptDuringCall = true)
+                   .ThrowsAsync(new InvalidOperationException("test exception"));
+            var invokedIsCreatingScriptCount = 0;
+            vm.PropertyChanged += (sender,
+                                   args) =>
+            {
+                if (ReferenceEquals(sender, vm) && args?.PropertyName == nameof(ScriptCreationViewModel.IsCreatingScript))
+                    invokedIsCreatingScriptCount++;
+            };
+            var initialized = vm.InitializeAsync().Result;
+            Assert.IsTrue(initialized);
+            var scaffoldDevelopmentVersionCommandCanExecuteChangedCount = 0;
+            vm.ScaffoldDevelopmentVersionCommand.CanExecuteChanged += (sender,
+                                                                       args) => scaffoldDevelopmentVersionCommandCanExecuteChangedCount++;
+            var scaffoldCurrentProductionVersionCommandCanExecuteChangedCount = 0;
+            vm.ScaffoldCurrentProductionVersionCommand.CanExecuteChanged += (sender,
+                                                                             args) => scaffoldCurrentProductionVersionCommandCanExecuteChangedCount++;
+            var startLatestCreationCommandCanExecuteChangedCount = 0;
+            vm.StartLatestCreationCommand.CanExecuteChanged += (sender,
+                                                                args) => startLatestCreationCommandCanExecuteChangedCount++;
+            var startVersionedCreationCommandCanExecuteChangedCount = 0;
+            vm.StartVersionedCreationCommand.CanExecuteChanged += (sender,
+                                                                   args) => startVersionedCreationCommandCanExecuteChangedCount++;
+
+            // Act
+            Assert.DoesNotThrow(() => vm.StartLatestCreationCommand.Execute(null));
+            var isCreatingScriptAfterCall = vm.IsCreatingScript;
+
+            // Assert
+            csMock.Verify(m => m.GetConfigurationOrDefaultAsync(project), Times.Once);
+            scsMock.Verify(m => m.CreateAsync(project, config, new Version(4, 0), true, CancellationToken.None), Times.Once);
+            loggerMock.Verify(m => m.LogAsync(It.Is<string>(message => message.Contains(nameof(ScriptCreationViewModel.StartLatestCreationCommand)) && message.Contains("test exception"))),
+                              Times.Once);
+            Assert.AreEqual(0, scaffoldDevelopmentVersionCommandCanExecuteChangedCount);
+            Assert.AreEqual(0, scaffoldCurrentProductionVersionCommandCanExecuteChangedCount);
+            Assert.AreEqual(1, startLatestCreationCommandCanExecuteChangedCount);
+            Assert.AreEqual(0, startVersionedCreationCommandCanExecuteChangedCount);
+            Assert.IsTrue(isCreatingScriptDuringCall);
+            Assert.IsFalse(isCreatingScriptAfterCall);
+            Assert.AreEqual(2, invokedIsCreatingScriptCount);
+        }
+
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void StartVersionedCreationCommand_Executed_CallLoggerOnError(bool loggerThrowsException)
+        {
+            var config = new ConfigurationModel
+            {
+                ArtifactsPath = "_Deployment",
+                PublishProfilePath = "TestProfile.publish.xml",
+                ReplaceUnnamedDefaultConstraintDrops = false,
+                VersionPattern = "1.2.3.4",
+                CommentOutUnnamedDefaultConstraintDrops = true,
+                CreateDocumentationWithScriptCreation = false,
+                CustomHeader = "TestHeader",
+                CustomFooter = "TestFooter",
+                BuildBeforeScriptCreation = true,
+                TrackDacpacVersion = true,
+                CommentOutReferencedProjectRefactorings = true
+            };
+            var project = new SqlProject("a", @"C:\TestProject\TestProject.sqlproj", "c");
+            var csMock = new Mock<IConfigurationService>();
+            csMock.Setup(m => m.GetConfigurationOrDefaultAsync(project))
+                  .ReturnsAsync(config);
+            var ssMock = new Mock<IScaffoldingService>();
+            var scsMock = new Mock<IScriptCreationService>();
+            var asMock = new Mock<IArtifactsService>();
+            asMock.Setup(m => m.GetExistingArtifactVersions(project, config))
+                  .Returns(new[]
+                   {
+                       new VersionModel
+                       {
+                           IsNewestVersion = true,
+                           UnderlyingVersion = new Version(4, 0)
+                       }
+                   });
+            var loggerMock = new Mock<ILogger>();
+            if (loggerThrowsException)
+            {
+                loggerMock.Setup(m => m.LogAsync(It.IsAny<string>()))
+                          .ThrowsAsync(new InvalidOperationException("logger exception"));
+            }
+            var vm = new ScriptCreationViewModel(project, csMock.Object, ssMock.Object, scsMock.Object, asMock.Object, loggerMock.Object);
+            bool? isCreatingScriptDuringCall = null;
+            scsMock.Setup(m => m.CreateAsync(project, config, new Version(4, 0), false, CancellationToken.None))
+                   .Callback(() => isCreatingScriptDuringCall = true)
+                   .ThrowsAsync(new InvalidOperationException("test exception"));
+            var invokedIsCreatingScriptCount = 0;
+            vm.PropertyChanged += (sender,
+                                   args) =>
+            {
+                if (ReferenceEquals(sender, vm) && args?.PropertyName == nameof(ScriptCreationViewModel.IsCreatingScript))
+                    invokedIsCreatingScriptCount++;
+            };
+            var initialized = vm.InitializeAsync().Result;
+            Assert.IsTrue(initialized);
+            var scaffoldDevelopmentVersionCommandCanExecuteChangedCount = 0;
+            vm.ScaffoldDevelopmentVersionCommand.CanExecuteChanged += (sender,
+                                                                       args) => scaffoldDevelopmentVersionCommandCanExecuteChangedCount++;
+            var scaffoldCurrentProductionVersionCommandCanExecuteChangedCount = 0;
+            vm.ScaffoldCurrentProductionVersionCommand.CanExecuteChanged += (sender,
+                                                                             args) => scaffoldCurrentProductionVersionCommandCanExecuteChangedCount++;
+            var startLatestCreationCommandCanExecuteChangedCount = 0;
+            vm.StartLatestCreationCommand.CanExecuteChanged += (sender,
+                                                                args) => startLatestCreationCommandCanExecuteChangedCount++;
+            var startVersionedCreationCommandCanExecuteChangedCount = 0;
+            vm.StartVersionedCreationCommand.CanExecuteChanged += (sender,
+                                                                   args) => startVersionedCreationCommandCanExecuteChangedCount++;
+
+            // Act
+            Assert.DoesNotThrow(() => vm.StartVersionedCreationCommand.Execute(null));
+            var isCreatingScriptAfterCall = vm.IsCreatingScript;
+
+            // Assert
+            csMock.Verify(m => m.GetConfigurationOrDefaultAsync(project), Times.Once);
+            scsMock.Verify(m => m.CreateAsync(project, config, new Version(4, 0), false, CancellationToken.None), Times.Once);
+            loggerMock.Verify(m => m.LogAsync(It.Is<string>(message => message.Contains(nameof(ScriptCreationViewModel.StartVersionedCreationCommand)) && message.Contains("test exception"))),
+                              Times.Once);
+            Assert.AreEqual(0, scaffoldDevelopmentVersionCommandCanExecuteChangedCount);
+            Assert.AreEqual(0, scaffoldCurrentProductionVersionCommandCanExecuteChangedCount);
+            Assert.AreEqual(0, startLatestCreationCommandCanExecuteChangedCount);
+            Assert.AreEqual(1, startVersionedCreationCommandCanExecuteChangedCount);
             Assert.IsTrue(isCreatingScriptDuringCall);
             Assert.IsFalse(isCreatingScriptAfterCall);
             Assert.AreEqual(2, invokedIsCreatingScriptCount);
