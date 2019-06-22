@@ -780,5 +780,51 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             Assert.IsTrue(loggedMessage.Contains(nameof(ConfigurationViewModel.SaveConfigurationCommand)));
             Assert.IsTrue(loggedMessage.Contains("test exception"));
         }
+
+        [Test]
+        public void SaveConfiguration_Execute_CallLoggerOnError_DoNotThrowExceptionFromLogger()
+        {
+            // Arrange
+            var model = new ConfigurationModel
+            {
+                ArtifactsPath = "foobar",
+                ReplaceUnnamedDefaultConstraintDrops = true,
+                CommentOutUnnamedDefaultConstraintDrops = false,
+                PublishProfilePath = "Test.publish.xml",
+                VersionPattern = "1.2.3.4",
+                CreateDocumentationWithScriptCreation = true,
+                CustomHeader = "awesome header",
+                CustomFooter = "lame footer",
+                BuildBeforeScriptCreation = true,
+                TrackDacpacVersion = false,
+                CommentOutReferencedProjectRefactorings = true
+            };
+            var project = new SqlProject("", "", "");
+            var csMock = new Mock<IConfigurationService>();
+            csMock.Setup(m => m.SaveConfigurationAsync(project, It.IsNotNull<ConfigurationModel>()))
+                  .ThrowsAsync(new InvalidOperationException("test exception"));
+            var fsaMock = Mock.Of<IFileSystemAccess>();
+            var ssMock = Mock.Of<IScaffoldingService>();
+            var scsMock = Mock.Of<IScriptCreationService>();
+            var loggerMock = new Mock<ILogger>();
+            loggerMock.Setup(m => m.LogAsync(It.IsNotNull<string>()))
+                      .ThrowsAsync(new Exception("logger failed"));
+            var vm = new ConfigurationViewModel(project,
+                                                csMock.Object,
+                                                fsaMock,
+                                                ssMock,
+                                                scsMock,
+                                                loggerMock.Object)
+            {
+                Model = model
+            };
+
+            // Act
+            Assert.DoesNotThrow(() => vm.SaveConfigurationCommand.Execute(null));
+
+            // Assert
+            csMock.Verify(m => m.SaveConfigurationAsync(project, It.IsNotNull<ConfigurationModel>()), Times.Once());
+            loggerMock.Verify(m => m.LogAsync(It.IsNotNull<string>()), Times.Once);
+        }
     }
 }
