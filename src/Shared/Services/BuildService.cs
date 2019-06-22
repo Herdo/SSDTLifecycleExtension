@@ -21,6 +21,21 @@
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        private async Task<bool> BuildProjectInternalAsync(SqlProject project)
+        {
+            await _logger.LogAsync("Building project ...");
+            try
+            {
+                _visualStudioAccess.BuildProject(project);
+                return true;
+            }
+            catch (Exception e)
+            {
+                await _logger.LogAsync($"ERROR: Failed to build {project.FullName} - {e.Message}");
+                return false;
+            }
+        }
+
         private async Task<bool> CopyBuildResultInternalAsync(SqlProject project,
                                                               string targetDirectory)
         {
@@ -28,7 +43,7 @@
             var directoryCreationError = _fileSystemAccess.EnsureDirectoryExists(targetDirectory);
             if (directoryCreationError != null)
             {
-                await _logger.LogAsync("ERROR: Failed to ensure the target directory exists.");
+                await _logger.LogAsync($"ERROR: Failed to ensure the target directory exists: {directoryCreationError}");
                 return false;
             }
 
@@ -40,14 +55,16 @@
             return false;
         }
 
-        async Task IBuildService.BuildProjectAsync(SqlProject project)
+        Task<bool> IBuildService.BuildProjectAsync(SqlProject project)
         {
-            await _logger.LogAsync("Building project ...");
-            _visualStudioAccess.BuildProject(project);
+            if (project == null)
+                throw new ArgumentNullException(nameof(project));
+
+            return BuildProjectInternalAsync(project);
         }
 
         Task<bool> IBuildService.CopyBuildResultAsync(SqlProject project,
-                                                            string targetDirectory)
+                                                      string targetDirectory)
         {
             if (project == null)
                 throw new ArgumentNullException(nameof(project));

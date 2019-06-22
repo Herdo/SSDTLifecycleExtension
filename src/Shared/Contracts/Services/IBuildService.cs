@@ -6,7 +6,7 @@
 
     public interface IBuildService
     {
-        Task BuildProjectAsync(SqlProject project);
+        Task<bool> BuildProjectAsync([NotNull] SqlProject project);
 
         /// <summary>
         /// Copies the build result (*.dacpac) from the <paramref name="project"/> to the <paramref name="targetDirectory"/>.

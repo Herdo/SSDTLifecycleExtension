@@ -94,7 +94,8 @@
                 if (await ShouldCancelAsync(cancellationToken))
                     return false;
 
-                await _buildService.BuildProjectAsync(project);
+                if (!await _buildService.BuildProjectAsync(project))
+                    return false;
 
                 // Cancel if requested
                 if (await ShouldCancelAsync(cancellationToken))
