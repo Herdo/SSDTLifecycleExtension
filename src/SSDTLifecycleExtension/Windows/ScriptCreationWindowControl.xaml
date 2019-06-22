@@ -68,7 +68,7 @@
         <!-- Scaffolding -->
         <GroupBox Header="Scaffolding"
                   Style="{StaticResource CenteredGroupBoxStyle}"
-                  Visibility="{Binding Scaffolding, Converter={StaticResource BoolToVisibilityConverter}}">
+                  Visibility="{Binding ScaffoldingMode, Converter={StaticResource BoolToVisibilityConverter}}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -167,7 +167,7 @@
         <!-- Creation -->
         <GroupBox Header="Creation"
                   Style="{StaticResource CenteredGroupBoxStyle}"
-                  Visibility="{Binding Scaffolding, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=invert}">
+                  Visibility="{Binding ScaffoldingMode, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=invert}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>

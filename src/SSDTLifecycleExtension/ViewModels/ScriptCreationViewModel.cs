@@ -30,7 +30,7 @@
         private ConfigurationModel _configuration;
 
         private VersionModel _selectedBaseVersion;
-        private bool _scaffolding;
+        private bool _scaffoldingMode;
         private bool _isCreatingScript;
 
         public VersionModel SelectedBaseVersion
@@ -45,14 +45,14 @@
             }
         }
 
-        public bool Scaffolding
+        public bool ScaffoldingMode
         {
-            get => _scaffolding;
+            get => _scaffoldingMode;
             private set
             {
-                if (value == _scaffolding)
+                if (value == _scaffoldingMode)
                     return;
-                _scaffolding = value;
+                _scaffoldingMode = value;
                 OnPropertyChanged();
             }
         }
@@ -196,49 +196,11 @@
             _configuration = await _configurationService.GetConfigurationOrDefaultAsync(_project);
 
             // Check for existing versions
-            var projectPath = _project.FullName;
-            var projectDirectory = Path.GetDirectoryName(projectPath);
-            if (projectDirectory == null)
-            {
-                _visualStudioAccess.ShowModalError("ERROR: Cannot determine project directory.");
+            if (!LoadAndApplyExistingVersions())
                 return false;
-            }
-            var artifactsPath = Path.Combine(projectDirectory, _configuration.ArtifactsPath);
-            string[] artifactDirectories;
-            try
-            {
-                artifactDirectories = _fileSystemAccess.GetDirectoriesIn(artifactsPath);
-            }
-            catch (Exception e)
-            {
-                _visualStudioAccess.ShowModalError($"ERROR: Failed to open script creation window: {e.Message}");
-                return false;
-            }
-            var existingVersions = new List<Version>();
-            foreach (var artifactDirectory in artifactDirectories)
-            {
-                var di = new DirectoryInfo(artifactDirectory);
-                if (Version.TryParse(di.Name, out var existingVersion))
-                    existingVersions.Add(existingVersion);
-            }
-
-            SelectedBaseVersion = null;
-            ExistingVersions.Clear();
-            foreach (var version in existingVersions.OrderByDescending(m => m))
-                ExistingVersions.Add(new VersionModel
-                {
-                    UnderlyingVersion = version
-                });
-            if (existingVersions.Any())
-            {
-                var highestVersion = existingVersions.Max();
-                var highestModel = ExistingVersions.Single(m => m.UnderlyingVersion == highestVersion);
-                highestModel.IsNewestVersion = true;
-                SelectedBaseVersion = highestModel;
-            }
 
             // Check for scaffolding or creation mode
-            Scaffolding = ExistingVersions.Count == 0;
+            ScaffoldingMode = ExistingVersions.Count == 0;
 
             // Evaluate commands
             EvaluateCommands();
@@ -249,6 +211,77 @@
                                                    "Please verify that the SSDT Lifecycle configuration for this project exists and has no errors.");
 
             return true;
+        }
+
+        private bool LoadAndApplyExistingVersions()
+        {
+            if (!TryGetArtifactDirectories(out var artifactDirectories))
+                return false;
+
+            var existingVersions = ParseExistingDirectories(artifactDirectories);
+
+            // Reset selection and UI collection
+            SelectedBaseVersion = null;
+            ExistingVersions.Clear();
+
+            // Fill UI collection
+            foreach (var version in existingVersions.OrderByDescending(m => m))
+                ExistingVersions.Add(new VersionModel
+                {
+                    UnderlyingVersion = version
+                });
+
+            if (existingVersions.Any())
+                DetermineAndSelectHighestExistingVersion(existingVersions);
+
+            return true;
+        }
+
+        private bool TryGetArtifactDirectories(out string[] artifactDirectories)
+        {
+            var projectPath = _project.FullName;
+            var projectDirectory = Path.GetDirectoryName(projectPath);
+            if (projectDirectory == null)
+            {
+                _visualStudioAccess.ShowModalError("ERROR: Cannot determine project directory.");
+                artifactDirectories = null;
+                return false;
+            }
+
+            var artifactsPath = Path.Combine(projectDirectory, _configuration.ArtifactsPath);
+            try
+            {
+                artifactDirectories = _fileSystemAccess.GetDirectoriesIn(artifactsPath);
+            }
+            catch (Exception e)
+            {
+                _visualStudioAccess.ShowModalError($"ERROR: Failed to open script creation window: {e.Message}");
+                artifactDirectories = null;
+                return false;
+            }
+
+            return true;
+        }
+
+        private static List<Version> ParseExistingDirectories(string[] artifactDirectories)
+        {
+            var existingVersions = new List<Version>();
+            foreach (var artifactDirectory in artifactDirectories)
+            {
+                var di = new DirectoryInfo(artifactDirectory);
+                if (Version.TryParse(di.Name, out var existingVersion))
+                    existingVersions.Add(existingVersion);
+            }
+
+            return existingVersions;
+        }
+
+        private void DetermineAndSelectHighestExistingVersion(List<Version> existingVersions)
+        {
+            var highestVersion = existingVersions.Max();
+            var highestModel = ExistingVersions.Single(m => m.UnderlyingVersion == highestVersion);
+            highestModel.IsNewestVersion = true;
+            SelectedBaseVersion = highestModel;
         }
 
         private void EvaluateCommands()

@@ -197,9 +197,11 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
 
             // Act
             vm.SelectedBaseVersion = version;
+            var setVersion = vm.SelectedBaseVersion;
 
             // Assert
             Assert.AreSame(vm, invokedSender);
+            Assert.AreSame(version, setVersion);
             Assert.AreEqual(nameof(ScriptCreationViewModel.SelectedBaseVersion), invokedProperty);
         }
     }
