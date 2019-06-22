@@ -30,6 +30,9 @@ steps:
     projectVersion: '$(Build.BuildId)'
     organization: 'herdo-github'
     SonarCloud: 'SonarCloud-CodeAnalysis-Server'
+    extraProperties: |
+     sonar.sources="$(Build.SourcesDirectory)\src"
+     sonar.tests="$(Build.SourcesDirectory)\src\UnitTests","$(Build.SourcesDirectory)\src\TestDatabase"
 
 - task: NuGetToolInstaller@0
   displayName: NuGet Tool Installer
