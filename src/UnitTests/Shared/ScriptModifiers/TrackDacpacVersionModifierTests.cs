@@ -3,6 +3,7 @@
 namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers
 {
     using System;
+    using System.Threading.Tasks;
     using SSDTLifecycleExtension.Shared.Contracts;
     using SSDTLifecycleExtension.Shared.Models;
     using SSDTLifecycleExtension.Shared.ScriptModifiers;
@@ -279,7 +280,7 @@ GO
 
             // Act & Assert
             // ReSharper disable AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => modifier.Modify(null, null, null, null));
+            Assert.Throws<ArgumentNullException>(() => modifier.ModifyAsync(null, null, null, null));
             // ReSharper restore AssignNullToNotNullAttribute
         }
 
@@ -291,7 +292,7 @@ GO
 
             // Act & Assert
             // ReSharper disable AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => modifier.Modify(MultiLineInputWithFinalGo, null, null, null));
+            Assert.Throws<ArgumentNullException>(() => modifier.ModifyAsync(MultiLineInputWithFinalGo, null, null, null));
             // ReSharper restore AssignNullToNotNullAttribute
         }
 
@@ -304,7 +305,7 @@ GO
 
             // Act & Assert
             // ReSharper disable AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => modifier.Modify(MultiLineInputWithFinalGo, project, null, null));
+            Assert.Throws<ArgumentNullException>(() => modifier.ModifyAsync(MultiLineInputWithFinalGo, project, null, null));
             // ReSharper restore AssignNullToNotNullAttribute
         }
 
@@ -318,7 +319,7 @@ GO
 
             // Act & Assert
             // ReSharper disable AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => modifier.Modify(MultiLineInputWithFinalGo, project, configuration, null));
+            Assert.Throws<ArgumentNullException>(() => modifier.ModifyAsync(MultiLineInputWithFinalGo, project, configuration, null));
             // ReSharper restore AssignNullToNotNullAttribute
         }
 
@@ -332,7 +333,7 @@ GO
             var paths = new PathCollection("", "", "", "", "", "");
 
             // Act
-            var e = Assert.Throws<ArgumentException>(() => modifier.Modify(MultiLineInputWithFinalGo, project, configuration, paths));
+            var e = Assert.Throws<ArgumentException>(() => modifier.ModifyAsync(MultiLineInputWithFinalGo, project, configuration, paths));
 
             // Assert
             Assert.IsNotNull(e);
@@ -350,7 +351,7 @@ GO
             var paths = new PathCollection("", "", "", "", "", "");
 
             // Act
-            var e = Assert.Throws<ArgumentException>(() => modifier.Modify(MultiLineInputWithFinalGo, project, configuration, paths));
+            var e = Assert.Throws<ArgumentException>(() => modifier.ModifyAsync(MultiLineInputWithFinalGo, project, configuration, paths));
 
             // Assert
             Assert.IsNotNull(e);
@@ -362,7 +363,7 @@ GO
         [TestCase(MultiLineInputWithFinalGoAndNewLine, TestName = nameof(MultiLineInputWithFinalGoAndNewLine))]
         [TestCase(MultiLineInputWithoutFinalGo, TestName = nameof(MultiLineInputWithoutFinalGo))]
         [TestCase(MultiLineInputWithoutFinalGoButWithNewLine, TestName = nameof(MultiLineInputWithoutFinalGoButWithNewLine))]
-        public void Modify_CorrectModification_FullVersion(string input)
+        public async Task Modify_CorrectModification_FullVersion_Async(string input)
         {
             // Arrange
             IScriptModifier modifier = new TrackDacpacVersionModifier();
@@ -373,7 +374,7 @@ GO
             var paths = new PathCollection("", "", "", "", "", "");
 
             // Act
-            var modified = modifier.Modify(input, project, configuration, paths);
+            var modified = await modifier.ModifyAsync(input, project, configuration, paths);
 
             // Assert
             Assert.AreEqual(FinalMultilineStatementFullVersion, modified);
@@ -384,7 +385,7 @@ GO
         [TestCase(MultiLineInputWithFinalGoAndNewLine, TestName = nameof(MultiLineInputWithFinalGoAndNewLine))]
         [TestCase(MultiLineInputWithoutFinalGo, TestName = nameof(MultiLineInputWithoutFinalGo))]
         [TestCase(MultiLineInputWithoutFinalGoButWithNewLine, TestName = nameof(MultiLineInputWithoutFinalGoButWithNewLine))]
-        public void Modify_CorrectModification_MajorMinorBuildVersion(string input)
+        public async Task Modify_CorrectModification_MajorMinorBuildVersion_Async(string input)
         {
             // Arrange
             IScriptModifier modifier = new TrackDacpacVersionModifier();
@@ -395,7 +396,7 @@ GO
             var paths = new PathCollection("", "", "", "", "", "");
 
             // Act
-            var modified = modifier.Modify(input, project, configuration, paths);
+            var modified = await modifier.ModifyAsync(input, project, configuration, paths);
 
             // Assert
             Assert.AreEqual(FinalMultilineStatementMajorMinorBuildVersion, modified);
@@ -406,7 +407,7 @@ GO
         [TestCase(MultiLineInputWithFinalGoAndNewLine, TestName = nameof(MultiLineInputWithFinalGoAndNewLine))]
         [TestCase(MultiLineInputWithoutFinalGo, TestName = nameof(MultiLineInputWithoutFinalGo))]
         [TestCase(MultiLineInputWithoutFinalGoButWithNewLine, TestName = nameof(MultiLineInputWithoutFinalGoButWithNewLine))]
-        public void Modify_CorrectModification_MajorMinorVersion(string input)
+        public async Task Modify_CorrectModification_MajorMinorVersion_Async(string input)
         {
             // Arrange
             IScriptModifier modifier = new TrackDacpacVersionModifier();
@@ -417,7 +418,7 @@ GO
             var paths = new PathCollection("", "", "", "", "", "");
 
             // Act
-            var modified = modifier.Modify(input, project, configuration, paths);
+            var modified = await modifier.ModifyAsync(input, project, configuration, paths);
 
             // Assert
             Assert.AreEqual(FinalMultilineStatementMajorMinorVersion, modified);

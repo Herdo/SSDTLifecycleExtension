@@ -132,10 +132,10 @@
             {
                 await _logger.LogAsync($"Modifying script: {m.Key}");
 
-                scriptContent = m.Value.Modify(scriptContent,
-                                               project,
-                                               configuration,
-                                               paths);
+                scriptContent = await m.Value.ModifyAsync(scriptContent,
+                                                          project,
+                                                          configuration,
+                                                          paths);
 
                 // Cancel if requested
                 if (await ShouldCancelAsync(cancellationToken))

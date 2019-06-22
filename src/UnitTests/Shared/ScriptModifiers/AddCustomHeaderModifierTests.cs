@@ -3,6 +3,7 @@
 namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers
 {
     using System;
+    using System.Threading.Tasks;
     using SSDTLifecycleExtension.Shared.Contracts;
     using SSDTLifecycleExtension.Shared.Models;
     using SSDTLifecycleExtension.Shared.ScriptModifiers;
@@ -17,7 +18,9 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers
             IScriptModifier s = new AddCustomHeaderModifier();
 
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => s.Modify(null, null, null, null));
+            // ReSharper disable AssignNullToNotNullAttribute
+            Assert.Throws<ArgumentNullException>(() => s.ModifyAsync(null, null, null, null));
+            // ReSharper restore AssignNullToNotNullAttribute
         }
 
         [Test]
@@ -28,7 +31,9 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers
             const string input = "foobar";
 
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => s.Modify(input, null, null, null));
+            // ReSharper disable AssignNullToNotNullAttribute
+            Assert.Throws<ArgumentNullException>(() => s.ModifyAsync(input, null, null, null));
+            // ReSharper restore AssignNullToNotNullAttribute
         }
 
         [Test]
@@ -40,7 +45,9 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers
             var project = new SqlProject("a", "b", "c");
 
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => s.Modify(input, project, null, null));
+            // ReSharper disable AssignNullToNotNullAttribute
+            Assert.Throws<ArgumentNullException>(() => s.ModifyAsync(input, project, null, null));
+            // ReSharper restore AssignNullToNotNullAttribute
         }
 
         [Test]
@@ -53,11 +60,13 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers
             var configuration = new ConfigurationModel();
 
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => s.Modify(input, project, configuration, null));
+            // ReSharper disable AssignNullToNotNullAttribute
+            Assert.Throws<ArgumentNullException>(() => s.ModifyAsync(input, project, configuration, null));
+            // ReSharper restore AssignNullToNotNullAttribute
         }
 
         [Test]
-        public void Modify_CustomHeaderAdded()
+        public async Task Modify_CustomHeaderAdded_Async()
         {
             // Arrange
             IScriptModifier s = new AddCustomHeaderModifier();
@@ -70,7 +79,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers
             var paths = new PathCollection("a", "b", "c", "d", "e", "f");
 
             // Act
-            var modified = s.Modify(input, project, configuration, paths);
+            var modified = await s.ModifyAsync(input, project, configuration, paths);
 
             // Assert
             Assert.IsNotNull(modified);
@@ -82,7 +91,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers
         [TestCase("", TestName = "<empty string>")]
         [TestCase("    ", TestName = "<4 whitespaces>")]
         [TestCase(" ", TestName = "<1 tabulator>")]
-        public void Modify_NoLeadingNewLineWhenNullOrWhiteSpace(string customHeader)
+        public async Task Modify_NoLeadingNewLineWhenNullOrWhiteSpace_Async(string customHeader)
         {
             // Arrange
             IScriptModifier s = new AddCustomHeaderModifier();
@@ -95,7 +104,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers
             var paths = new PathCollection("a", "b", "c", "d", "e", "f");
 
             // Act
-            var modified = s.Modify(input, project, configuration, paths);
+            var modified = await s.ModifyAsync(input, project, configuration, paths);
 
             // Assert
             Assert.IsNotNull(modified);

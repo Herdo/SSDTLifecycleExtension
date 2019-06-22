@@ -3,6 +3,7 @@
 namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers
 {
     using System;
+    using System.Threading.Tasks;
     using SSDTLifecycleExtension.Shared.Contracts;
     using SSDTLifecycleExtension.Shared.Models;
     using SSDTLifecycleExtension.Shared.ScriptModifiers;
@@ -64,7 +65,7 @@ GO";
 
             // Act & Assert
             // ReSharper disable AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => modifier.Modify(null, null, null, null));
+            Assert.Throws<ArgumentNullException>(() => modifier.ModifyAsync(null, null, null, null));
             // ReSharper restore AssignNullToNotNullAttribute
         }
 
@@ -76,7 +77,7 @@ GO";
 
             // Act & Assert
             // ReSharper disable AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => modifier.Modify(MultipleDropDefaultConstraintStatements, null, null, null));
+            Assert.Throws<ArgumentNullException>(() => modifier.ModifyAsync(MultipleDropDefaultConstraintStatements, null, null, null));
             // ReSharper restore AssignNullToNotNullAttribute
         }
 
@@ -89,7 +90,7 @@ GO";
 
             // Act & Assert
             // ReSharper disable AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => modifier.Modify(MultipleDropDefaultConstraintStatements, project, null, null));
+            Assert.Throws<ArgumentNullException>(() => modifier.ModifyAsync(MultipleDropDefaultConstraintStatements, project, null, null));
             // ReSharper restore AssignNullToNotNullAttribute
         }
 
@@ -103,12 +104,12 @@ GO";
 
             // Act & Assert
             // ReSharper disable AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => modifier.Modify(MultipleDropDefaultConstraintStatements, project, configuration, null));
+            Assert.Throws<ArgumentNullException>(() => modifier.ModifyAsync(MultipleDropDefaultConstraintStatements, project, configuration, null));
             // ReSharper restore AssignNullToNotNullAttribute
         }
 
         [Test]
-        public void Modify_CorrectModification()
+        public async Task Modify_CorrectModification_Async()
         {
             // Arrange
             IScriptModifier modifier = new CommentOutUnnamedDefaultConstraintDropsModifier();
@@ -117,7 +118,7 @@ GO";
             var paths = new PathCollection("", "", "", "", "", "");
 
             // Act
-            var modified = modifier.Modify(MultipleDropDefaultConstraintStatements, project, configuration, paths);
+            var modified = await modifier.ModifyAsync(MultipleDropDefaultConstraintStatements, project, configuration, paths);
 
             // Assert
             Assert.AreEqual(MultipleDropDefaultConstraintStatementsCommented, modified);

@@ -1,6 +1,7 @@
 ﻿namespace SSDTLifecycleExtension.Shared.Contracts
 {
     using System;
+    using System.Threading.Tasks;
     using JetBrains.Annotations;
     using Models;
 
@@ -15,9 +16,9 @@
         /// <param name="paths">The <see cref="PathCollection"/> used as data source for certain modifiers.</param>
         /// <exception cref="ArgumentNullException"><paramref name="input"/>, <paramref name="project"/> or <paramref name="configuration"/> are <b>null</b>.</exception>
         /// <returns>The modified <see cref="string"/>.</returns>
-        string Modify([NotNull] string input,
-                      [NotNull] SqlProject project,
-                      [NotNull] ConfigurationModel configuration,
-                      [NotNull] PathCollection paths);
+        Task<string> ModifyAsync([NotNull] string input,
+                                 [NotNull] SqlProject project,
+                                 [NotNull] ConfigurationModel configuration,
+                                 [NotNull] PathCollection paths);
     }
 }

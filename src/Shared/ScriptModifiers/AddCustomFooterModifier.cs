@@ -2,15 +2,16 @@
 {
     using System;
     using System.Text;
+    using System.Threading.Tasks;
     using Contracts;
     using Models;
 
     internal class AddCustomFooterModifier : IScriptModifier
     {
-        string IScriptModifier.Modify(string input,
-                                      SqlProject project,
-                                      ConfigurationModel configuration,
-                                      PathCollection paths)
+        Task<string> IScriptModifier.ModifyAsync(string input,
+                                                 SqlProject project,
+                                                 ConfigurationModel configuration,
+                                                 PathCollection paths)
         {
             if (input == null)
                 throw new ArgumentNullException(nameof(input));
@@ -22,12 +23,12 @@
                 throw new ArgumentNullException(nameof(paths));
 
             if (string.IsNullOrWhiteSpace(configuration.CustomFooter))
-                return input;
+                return Task.FromResult(input);
 
             var sb = new StringBuilder(input);
             sb.AppendLine();
             sb.Append(configuration.CustomFooter);
-            return sb.ToString();
+            return Task.FromResult(sb.ToString());
         }
     }
 }

@@ -2,6 +2,7 @@
 {
     using System;
     using System.Text;
+    using System.Threading.Tasks;
     using Contracts;
     using Models;
 
@@ -73,10 +74,10 @@ GO
                 update = Environment.NewLine + update;
         }
 
-        string IScriptModifier.Modify(string input,
-                                      SqlProject project,
-                                      ConfigurationModel configuration,
-                                      PathCollection paths)
+        Task<string> IScriptModifier.ModifyAsync(string input,
+                                                 SqlProject project,
+                                                 ConfigurationModel configuration,
+                                                 PathCollection paths)
         {
             if (input == null)
                 throw new ArgumentNullException(nameof(input));
@@ -122,7 +123,7 @@ GO
             // Update existing entry
             sb.Append(update);
 
-            return sb.ToString();
+            return Task.FromResult(sb.ToString());
         }
     }
 }
