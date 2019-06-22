@@ -15,6 +15,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deployment", "Deployment", 
 		..\deployment\publish-vsix.ps1 = ..\deployment\publish-vsix.ps1
 	EndProjectSection
 EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "TestDatabase", "TestDatabase\TestDatabase.sqlproj", "{75DBDF92-497E-4FD9-801D-F54171507D29}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,12 @@ Global
 		{BF5937A9-8E34-4E88-9B7D-3ADA04C5D1B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BF5937A9-8E34-4E88-9B7D-3ADA04C5D1B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BF5937A9-8E34-4E88-9B7D-3ADA04C5D1B6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75DBDF92-497E-4FD9-801D-F54171507D29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75DBDF92-497E-4FD9-801D-F54171507D29}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75DBDF92-497E-4FD9-801D-F54171507D29}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{75DBDF92-497E-4FD9-801D-F54171507D29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75DBDF92-497E-4FD9-801D-F54171507D29}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75DBDF92-497E-4FD9-801D-F54171507D29}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,6 @@
+﻿CREATE TABLE [dbo].[Author]
+(
+	[AuthorID] INT NOT NULL IDENTITY(1, 1),
+	[Name] NVARCHAR(200) NOT NULL,
+	CONSTRAINT PK_Author_AuthorID PRIMARY KEY (AuthorID)
+)
