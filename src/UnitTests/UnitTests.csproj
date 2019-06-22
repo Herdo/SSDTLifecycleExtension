@@ -52,6 +52,7 @@
     <Compile Include="Extension\Converters\BoolToVisibilityConverterTests.cs" />
     <Compile Include="Extension\MVVM\TaskUtilitiesTests.cs" />
     <Compile Include="Extension\ViewModels\ConfigurationViewModelTests.cs" />
+    <Compile Include="Extension\ViewModels\ScriptCreationViewModelTests.cs" />
     <Compile Include="Extension\ViewModels\ViewModelBaseTests.cs" />
     <Compile Include="Extension\Windows\ToolWindowInitializerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

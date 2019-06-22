@@ -29,21 +29,9 @@
 
         private ConfigurationModel _configuration;
 
-        private bool _scaffolding;
         private VersionModel _selectedBaseVersion;
+        private bool _scaffolding;
         private bool _isCreatingScript;
-
-        public bool Scaffolding
-        {
-            get => _scaffolding;
-            set
-            {
-                if (value == _scaffolding)
-                    return;
-                _scaffolding = value;
-                OnPropertyChanged();
-            }
-        }
 
         public VersionModel SelectedBaseVersion
         {
@@ -53,6 +41,18 @@
                 if (Equals(value, _selectedBaseVersion))
                     return;
                 _selectedBaseVersion = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool Scaffolding
+        {
+            get => _scaffolding;
+            private set
+            {
+                if (value == _scaffolding)
+                    return;
+                _scaffolding = value;
                 OnPropertyChanged();
             }
         }
@@ -79,21 +79,21 @@
 
         public IAsyncCommand StartVersionedCreationCommand { get; }
 
-        public ScriptCreationViewModel(SqlProject project,
-                                       IConfigurationService configurationService,
-                                       IScaffoldingService scaffoldingService,
-                                       IScriptCreationService scriptCreationService,
-                                       IVisualStudioAccess visualStudioAccess,
-                                       IFileSystemAccess fileSystemAccess,
-                                       ILogger logger)
+        public ScriptCreationViewModel([NotNull] SqlProject project,
+                                       [NotNull] IConfigurationService configurationService,
+                                       [NotNull] IScaffoldingService scaffoldingService,
+                                       [NotNull] IScriptCreationService scriptCreationService,
+                                       [NotNull] IVisualStudioAccess visualStudioAccess,
+                                       [NotNull] IFileSystemAccess fileSystemAccess,
+                                       [NotNull] ILogger logger)
         {
-            _project = project;
-            _configurationService = configurationService;
-            _scaffoldingService = scaffoldingService;
-            _scriptCreationService = scriptCreationService;
-            _visualStudioAccess = visualStudioAccess;
-            _fileSystemAccess = fileSystemAccess;
-            _logger = logger;
+            _project = project ?? throw new ArgumentNullException(nameof(project));
+            _configurationService = configurationService ?? throw new ArgumentNullException(nameof(configurationService));
+            _scaffoldingService = scaffoldingService ?? throw new ArgumentNullException(nameof(scaffoldingService));
+            _scriptCreationService = scriptCreationService ?? throw new ArgumentNullException(nameof(scriptCreationService));
+            _visualStudioAccess = visualStudioAccess ?? throw new ArgumentNullException(nameof(visualStudioAccess));
+            _fileSystemAccess = fileSystemAccess ?? throw new ArgumentNullException(nameof(fileSystemAccess));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             ExistingVersions = new ObservableCollection<VersionModel>();
 
@@ -241,9 +241,7 @@
             Scaffolding = ExistingVersions.Count == 0;
 
             // Evaluate commands
-            ScaffoldDevelopmentVersionCommand.RaiseCanExecuteChanged();
-            ScaffoldCurrentProductionVersionCommand.RaiseCanExecuteChanged();
-            StartLatestCreationCommand.RaiseCanExecuteChanged();
+            EvaluateCommands();
 
             // If the configuration has errors, notify the user
             if (_configuration.HasErrors)
@@ -291,9 +289,6 @@
                 commandName = nameof(StartLatestCreationCommand);
             else if (ReferenceEquals(command, StartVersionedCreationCommand))
                 commandName = nameof(StartVersionedCreationCommand);
-
-            if (commandName == null)
-                throw new NotSupportedException();
 
             try
             {
