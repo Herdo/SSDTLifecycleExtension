@@ -21,7 +21,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             // Act & Assert
             // ReSharper disable once ObjectCreationAsStatement
             // ReSharper disable AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => new ScriptCreationViewModel(null, null, null, null, null, null, null));
+            Assert.Throws<ArgumentNullException>(() => new ScriptCreationViewModel(null, null, null, null, null, null));
             // ReSharper restore AssignNullToNotNullAttribute
         }
 
@@ -34,7 +34,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             // Act & Assert
             // ReSharper disable once ObjectCreationAsStatement
             // ReSharper disable AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => new ScriptCreationViewModel(project, null, null, null, null, null, null));
+            Assert.Throws<ArgumentNullException>(() => new ScriptCreationViewModel(project, null, null, null, null, null));
             // ReSharper restore AssignNullToNotNullAttribute
         }
 
@@ -48,7 +48,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             // Act & Assert
             // ReSharper disable once ObjectCreationAsStatement
             // ReSharper disable AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => new ScriptCreationViewModel(project, csMock, null, null, null, null, null));
+            Assert.Throws<ArgumentNullException>(() => new ScriptCreationViewModel(project, csMock, null, null, null, null));
             // ReSharper restore AssignNullToNotNullAttribute
         }
 
@@ -63,12 +63,12 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             // Act & Assert
             // ReSharper disable once ObjectCreationAsStatement
             // ReSharper disable AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => new ScriptCreationViewModel(project, csMock, ssMock, null, null, null, null));
+            Assert.Throws<ArgumentNullException>(() => new ScriptCreationViewModel(project, csMock, ssMock, null, null, null));
             // ReSharper restore AssignNullToNotNullAttribute
         }
 
         [Test]
-        public void Constructor_ArgumentNullException_VisualStudioAccess()
+        public void Constructor_ArgumentNullException_ArtifactsService()
         {
             // Arrange
             var project = new SqlProject("a", "b", "c");
@@ -79,24 +79,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             // Act & Assert
             // ReSharper disable once ObjectCreationAsStatement
             // ReSharper disable AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => new ScriptCreationViewModel(project, csMock, ssMock, scsMock, null, null, null));
-            // ReSharper restore AssignNullToNotNullAttribute
-        }
-
-        [Test]
-        public void Constructor_ArgumentNullException_FileSystemAccess()
-        {
-            // Arrange
-            var project = new SqlProject("a", "b", "c");
-            var csMock = Mock.Of<IConfigurationService>();
-            var ssMock = Mock.Of<IScaffoldingService>();
-            var scsMock = Mock.Of<IScriptCreationService>();
-            var vsaMock = Mock.Of<IVisualStudioAccess>();
-
-            // Act & Assert
-            // ReSharper disable once ObjectCreationAsStatement
-            // ReSharper disable AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => new ScriptCreationViewModel(project, csMock, ssMock, scsMock, vsaMock, null, null));
+            Assert.Throws<ArgumentNullException>(() => new ScriptCreationViewModel(project, csMock, ssMock, scsMock, null, null));
             // ReSharper restore AssignNullToNotNullAttribute
         }
 
@@ -108,13 +91,12 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             var csMock = Mock.Of<IConfigurationService>();
             var ssMock = Mock.Of<IScaffoldingService>();
             var scsMock = Mock.Of<IScriptCreationService>();
-            var vsaMock = Mock.Of<IVisualStudioAccess>();
-            var fsaMock = Mock.Of<IFileSystemAccess>();
+            var asMock = Mock.Of<IArtifactsService>();
 
             // Act & Assert
             // ReSharper disable once ObjectCreationAsStatement
             // ReSharper disable AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => new ScriptCreationViewModel(project, csMock, ssMock, scsMock, vsaMock, fsaMock, null));
+            Assert.Throws<ArgumentNullException>(() => new ScriptCreationViewModel(project, csMock, ssMock, scsMock, asMock, null));
             // ReSharper restore AssignNullToNotNullAttribute
         }
 
@@ -126,12 +108,11 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             var csMock = Mock.Of<IConfigurationService>();
             var ssMock = Mock.Of<IScaffoldingService>();
             var scsMock = Mock.Of<IScriptCreationService>();
-            var vsaMock = Mock.Of<IVisualStudioAccess>();
-            var fsaMock = Mock.Of<IFileSystemAccess>();
+            var asMock = Mock.Of<IArtifactsService>();
             var loggerMock = Mock.Of<ILogger>();
 
             // Act
-            var vm = new ScriptCreationViewModel(project, csMock, ssMock, scsMock, vsaMock, fsaMock, loggerMock);
+            var vm = new ScriptCreationViewModel(project, csMock, ssMock, scsMock, asMock, loggerMock);
 
             // Assert
             Assert.IsNotNull(vm.ExistingVersions);
@@ -150,11 +131,10 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             var csMock = Mock.Of<IConfigurationService>();
             var ssMock = Mock.Of<IScaffoldingService>();
             var scsMock = Mock.Of<IScriptCreationService>();
-            var vsaMock = Mock.Of<IVisualStudioAccess>();
-            var fsaMock = Mock.Of<IFileSystemAccess>();
+            var asMock = Mock.Of<IArtifactsService>();
             var loggerMock = Mock.Of<ILogger>();
             var version = new VersionModel();
-            var vm = new ScriptCreationViewModel(project, csMock, ssMock, scsMock, vsaMock, fsaMock, loggerMock)
+            var vm = new ScriptCreationViewModel(project, csMock, ssMock, scsMock, asMock, loggerMock)
             {
                 SelectedBaseVersion = version
             };
@@ -183,11 +163,10 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             var csMock = Mock.Of<IConfigurationService>();
             var ssMock = Mock.Of<IScaffoldingService>();
             var scsMock = Mock.Of<IScriptCreationService>();
-            var vsaMock = Mock.Of<IVisualStudioAccess>();
-            var fsaMock = Mock.Of<IFileSystemAccess>();
+            var asMock = Mock.Of<IArtifactsService>();
             var loggerMock = Mock.Of<ILogger>();
             var version = new VersionModel();
-            var vm = new ScriptCreationViewModel(project, csMock, ssMock, scsMock, vsaMock, fsaMock, loggerMock);
+            var vm = new ScriptCreationViewModel(project, csMock, ssMock, scsMock, asMock, loggerMock);
             object invokedSender = null;
             string invokedProperty = null;
             vm.PropertyChanged += (sender,
@@ -215,10 +194,9 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             var csMock = Mock.Of<IConfigurationService>();
             var ssMock = Mock.Of<IScaffoldingService>();
             var scsMock = Mock.Of<IScriptCreationService>();
-            var vsaMock = Mock.Of<IVisualStudioAccess>();
-            var fsaMock = Mock.Of<IFileSystemAccess>();
+            var asMock = Mock.Of<IArtifactsService>();
             var loggerMock = Mock.Of<ILogger>();
-            var vm = new ScriptCreationViewModel(project, csMock, ssMock, scsMock, vsaMock, fsaMock, loggerMock);
+            var vm = new ScriptCreationViewModel(project, csMock, ssMock, scsMock, asMock, loggerMock);
 
             // Act
             var canExecuteList = new[]
@@ -257,15 +235,9 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
                   .ReturnsAsync(config);
             var ssMock = Mock.Of<IScaffoldingService>();
             var scsMock = Mock.Of<IScriptCreationService>();
-            var vsaMock = Mock.Of<IVisualStudioAccess>();
-            var fsaMock = new Mock<IFileSystemAccess>();
-            fsaMock.Setup(m => m.GetDirectoriesIn(@"C:\TestProject"))
-                   .Returns(new[]
-                    {
-                        @"C:\TestProject\_Deployment\1.2.3.4"
-                    });
+            var asMock = Mock.Of<IArtifactsService>();
             var loggerMock = Mock.Of<ILogger>();
-            var vm = new ScriptCreationViewModel(project, csMock.Object, ssMock, scsMock, vsaMock, fsaMock.Object, loggerMock);
+            var vm = new ScriptCreationViewModel(project, csMock.Object, ssMock, scsMock, asMock, loggerMock);
             await vm.InitializeAsync();
 
             // Act
@@ -307,15 +279,9 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             ssMock.SetupGet(m => m.IsScaffolding)
                   .Returns(true);
             var scsMock = Mock.Of<IScriptCreationService>();
-            var vsaMock = Mock.Of<IVisualStudioAccess>();
-            var fsaMock = new Mock<IFileSystemAccess>();
-            fsaMock.Setup(m => m.GetDirectoriesIn(@"C:\TestProject"))
-                   .Returns(new[]
-                    {
-                        @"C:\TestProject\_Deployment\1.2.3.4"
-                    });
+            var asMock = Mock.Of<IArtifactsService>();
             var loggerMock = Mock.Of<ILogger>();
-            var vm = new ScriptCreationViewModel(project, csMock.Object, ssMock.Object, scsMock, vsaMock, fsaMock.Object, loggerMock);
+            var vm = new ScriptCreationViewModel(project, csMock.Object, ssMock.Object, scsMock, asMock, loggerMock);
             await vm.InitializeAsync();
 
             // Act
@@ -357,15 +323,9 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             ssMock.SetupGet(m => m.IsScaffolding)
                   .Returns(true);
             var scsMock = Mock.Of<IScriptCreationService>();
-            var vsaMock = Mock.Of<IVisualStudioAccess>();
-            var fsaMock = new Mock<IFileSystemAccess>();
-            fsaMock.Setup(m => m.GetDirectoriesIn(@"C:\TestProject"))
-                   .Returns(new[]
-                    {
-                        @"C:\TestProject\_Deployment\1.2.3.4"
-                    });
+            var asMock = Mock.Of<IArtifactsService>();
             var loggerMock = Mock.Of<ILogger>();
-            var vm = new ScriptCreationViewModel(project, csMock.Object, ssMock.Object, scsMock, vsaMock, fsaMock.Object, loggerMock);
+            var vm = new ScriptCreationViewModel(project, csMock.Object, ssMock.Object, scsMock, asMock, loggerMock);
             await vm.InitializeAsync();
 
             // Act
@@ -418,15 +378,9 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             var scsMock = new Mock<IScriptCreationService>();
             scsMock.SetupGet(m => m.IsCreating)
                    .Returns(true);
-            var vsaMock = Mock.Of<IVisualStudioAccess>();
-            var fsaMock = new Mock<IFileSystemAccess>();
-            fsaMock.Setup(m => m.GetDirectoriesIn(@"C:\TestProject"))
-                   .Returns(new[]
-                    {
-                        @"C:\TestProject\_Deployment\1.2.3.4"
-                    });
+            var asMock = Mock.Of<IArtifactsService>();
             var loggerMock = Mock.Of<ILogger>();
-            var vm = new ScriptCreationViewModel(project, csMock.Object, ssMock, scsMock.Object, vsaMock, fsaMock.Object, loggerMock);
+            var vm = new ScriptCreationViewModel(project, csMock.Object, ssMock, scsMock.Object, asMock, loggerMock);
             await vm.InitializeAsync();
 
             // Act
@@ -468,15 +422,9 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             var scsMock = new Mock<IScriptCreationService>();
             scsMock.SetupGet(m => m.IsCreating)
                    .Returns(true);
-            var vsaMock = Mock.Of<IVisualStudioAccess>();
-            var fsaMock = new Mock<IFileSystemAccess>();
-            fsaMock.Setup(m => m.GetDirectoriesIn(@"C:\TestProject"))
-                   .Returns(new[]
-                    {
-                        @"C:\TestProject\_Deployment\1.2.3.4"
-                    });
+            var asMock = Mock.Of<IArtifactsService>();
             var loggerMock = Mock.Of<ILogger>();
-            var vm = new ScriptCreationViewModel(project, csMock.Object, ssMock, scsMock.Object, vsaMock, fsaMock.Object, loggerMock);
+            var vm = new ScriptCreationViewModel(project, csMock.Object, ssMock, scsMock.Object, asMock, loggerMock);
             await vm.InitializeAsync();
 
             // Act
@@ -504,45 +452,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
         }
 
         [Test]
-        public async Task InitializeAsync_ShowModalError_NoProjectDirectory_Async()
-        {
-            var config = new ConfigurationModel
-            {
-                ArtifactsPath = "_Deployment",
-                PublishProfilePath = "TestProfile.publish.xml",
-                ReplaceUnnamedDefaultConstraintDrops = false,
-                VersionPattern = "1.2.3.4",
-                CommentOutUnnamedDefaultConstraintDrops = true,
-                CreateDocumentationWithScriptCreation = false,
-                CustomHeader = "TestHeader",
-                CustomFooter = "TestFooter",
-                BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = true,
-                CommentOutReferencedProjectRefactorings = true
-            };
-            var project = new SqlProject("a", @"C:\", "c");
-            var csMock = new Mock<IConfigurationService>();
-            csMock.Setup(m => m.GetConfigurationOrDefaultAsync(project))
-                  .ReturnsAsync(config);
-            var ssMock = Mock.Of<IScaffoldingService>();
-            var scsMock = new Mock<IScriptCreationService>();
-            scsMock.SetupGet(m => m.IsCreating)
-                   .Returns(true);
-            var vsaMock = new Mock<IVisualStudioAccess>();
-            var fsaMock = new Mock<IFileSystemAccess>();
-            var loggerMock = Mock.Of<ILogger>();
-            var vm = new ScriptCreationViewModel(project, csMock.Object, ssMock, scsMock.Object, vsaMock.Object, fsaMock.Object, loggerMock);
-
-            // Act
-            var initialized = await vm.InitializeAsync();
-
-            // Assert
-            Assert.IsFalse(initialized);
-            vsaMock.Verify(m => m.ShowModalError("ERROR: Cannot determine project directory."), Times.Once);
-        }
-
-        [Test]
-        public async Task InitializeAsync_ShowModalError_ExceptionGettingDirectories_Async()
+        public async Task InitializeAsync_NoExistingVersions_Async()
         {
             var config = new ConfigurationModel
             {
@@ -566,55 +476,11 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             var scsMock = new Mock<IScriptCreationService>();
             scsMock.SetupGet(m => m.IsCreating)
                    .Returns(true);
-            var vsaMock = new Mock<IVisualStudioAccess>();
-            var fsaMock = new Mock<IFileSystemAccess>();
-            fsaMock.Setup(m => m.GetDirectoriesIn(@"C:\TestProject\_Deployment"))
-                   .Throws(new InvalidOperationException("test exception"));
+            var asMock = new Mock<IArtifactsService>();
+            asMock.Setup(m => m.GetExistingArtifactVersions(project, config))
+                  .Returns(new VersionModel[0]);
             var loggerMock = Mock.Of<ILogger>();
-            var vm = new ScriptCreationViewModel(project, csMock.Object, ssMock, scsMock.Object, vsaMock.Object, fsaMock.Object, loggerMock);
-
-            // Act
-            var initialized = await vm.InitializeAsync();
-
-            // Assert
-            Assert.IsFalse(initialized);
-            vsaMock.Verify(m => m.ShowModalError("ERROR: Failed to open script creation window: test exception"), Times.Once);
-        }
-
-        [Test]
-        public async Task InitializeAsync_NoValidDirectories_Async()
-        {
-            var config = new ConfigurationModel
-            {
-                ArtifactsPath = "_Deployment",
-                PublishProfilePath = "TestProfile.publish.xml",
-                ReplaceUnnamedDefaultConstraintDrops = false,
-                VersionPattern = "1.2.3.4",
-                CommentOutUnnamedDefaultConstraintDrops = true,
-                CreateDocumentationWithScriptCreation = false,
-                CustomHeader = "TestHeader",
-                CustomFooter = "TestFooter",
-                BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = true,
-                CommentOutReferencedProjectRefactorings = true
-            };
-            var project = new SqlProject("a", @"C:\TestProject\TestProject.sqlproj", "c");
-            var csMock = new Mock<IConfigurationService>();
-            csMock.Setup(m => m.GetConfigurationOrDefaultAsync(project))
-                  .ReturnsAsync(config);
-            var ssMock = Mock.Of<IScaffoldingService>();
-            var scsMock = new Mock<IScriptCreationService>();
-            scsMock.SetupGet(m => m.IsCreating)
-                   .Returns(true);
-            var vsaMock = new Mock<IVisualStudioAccess>();
-            var fsaMock = new Mock<IFileSystemAccess>();
-            fsaMock.Setup(m => m.GetDirectoriesIn(@"C:\TestProject\_Deployment"))
-                   .Returns(new []
-                    {
-                        @"C:\TestProject\_Deployment\foo"
-                    });
-            var loggerMock = Mock.Of<ILogger>();
-            var vm = new ScriptCreationViewModel(project, csMock.Object, ssMock, scsMock.Object, vsaMock.Object, fsaMock.Object, loggerMock);
+            var vm = new ScriptCreationViewModel(project, csMock.Object, ssMock, scsMock.Object, asMock.Object, loggerMock);
 
             // Act
             var initialized = await vm.InitializeAsync();
@@ -650,16 +516,22 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             var scsMock = new Mock<IScriptCreationService>();
             scsMock.SetupGet(m => m.IsCreating)
                    .Returns(true);
-            var vsaMock = new Mock<IVisualStudioAccess>();
-            var fsaMock = new Mock<IFileSystemAccess>();
-            fsaMock.Setup(m => m.GetDirectoriesIn(@"C:\TestProject\_Deployment"))
-                   .Returns(new[]
-                    {
-                        @"C:\TestProject\_Deployment\4.0.0",
-                        @"C:\TestProject\_Deployment\5.0"
-                    });
+            var asMock = new Mock<IArtifactsService>();
+            asMock.Setup(m => m.GetExistingArtifactVersions(project, config))
+                  .Returns(new[]
+                   {
+                      new VersionModel
+                      {
+                          IsNewestVersion = true,
+                          UnderlyingVersion = new Version(5, 0)
+                      },
+                      new VersionModel
+                      {
+                          UnderlyingVersion = new Version(4, 0, 0)
+                      }
+                   });
             var loggerMock = Mock.Of<ILogger>();
-            var vm = new ScriptCreationViewModel(project, csMock.Object, ssMock, scsMock.Object, vsaMock.Object, fsaMock.Object, loggerMock);
+            var vm = new ScriptCreationViewModel(project, csMock.Object, ssMock, scsMock.Object, asMock.Object, loggerMock);
 
             // Act
             var initialized = await vm.InitializeAsync();
@@ -673,47 +545,6 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             Assert.AreEqual(new Version(5, 0), vm.ExistingVersions[0].UnderlyingVersion);
             Assert.IsFalse(vm.ExistingVersions[1].IsNewestVersion);
             Assert.AreEqual(new Version(4, 0, 0), vm.ExistingVersions[1].UnderlyingVersion);
-        }
-
-        [Test]
-        public async Task InitializeAsync_ShowModalError_InvalidConfig_Async()
-        {
-            var config = new ConfigurationModel
-            {
-                ArtifactsPath = "_Deployment",
-                PublishProfilePath = "TestProfile.publish.xml",
-                ReplaceUnnamedDefaultConstraintDrops = true,
-                VersionPattern = "1.2.3.4",
-                CommentOutUnnamedDefaultConstraintDrops = true,
-                CreateDocumentationWithScriptCreation = false,
-                CustomHeader = "TestHeader",
-                CustomFooter = "TestFooter",
-                BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = true,
-                CommentOutReferencedProjectRefactorings = true
-            };
-            var project = new SqlProject("a", @"C:\TestProject\TestProject.sqlproj", "c");
-            var csMock = new Mock<IConfigurationService>();
-            csMock.Setup(m => m.GetConfigurationOrDefaultAsync(project))
-                  .ReturnsAsync(config);
-            var ssMock = Mock.Of<IScaffoldingService>();
-            var scsMock = new Mock<IScriptCreationService>();
-            scsMock.SetupGet(m => m.IsCreating)
-                   .Returns(true);
-            var vsaMock = new Mock<IVisualStudioAccess>();
-            var fsaMock = new Mock<IFileSystemAccess>();
-            fsaMock.Setup(m => m.GetDirectoriesIn(@"C:\TestProject\_Deployment"))
-                   .Returns(new string[0]);
-            var loggerMock = Mock.Of<ILogger>();
-            var vm = new ScriptCreationViewModel(project, csMock.Object, ssMock, scsMock.Object, vsaMock.Object, fsaMock.Object, loggerMock);
-
-            // Act
-            var initialized = await vm.InitializeAsync();
-
-            // Assert
-            Assert.IsTrue(initialized);
-            vsaMock.Verify(m => m.ShowModalError("The SSDT Lifecycle configuration for this project is not correct. " +
-                                                 "Please verify that the SSDT Lifecycle configuration for this project exists and has no errors."), Times.Once);
         }
     }
 }

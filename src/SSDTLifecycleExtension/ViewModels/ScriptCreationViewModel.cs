@@ -1,9 +1,7 @@
 ﻿namespace SSDTLifecycleExtension.ViewModels
 {
     using System;
-    using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.IO;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -23,8 +21,7 @@
         private readonly IConfigurationService _configurationService;
         private readonly IScaffoldingService _scaffoldingService;
         private readonly IScriptCreationService _scriptCreationService;
-        private readonly IVisualStudioAccess _visualStudioAccess;
-        private readonly IFileSystemAccess _fileSystemAccess;
+        private readonly IArtifactsService _artifactsService;
         private readonly ILogger _logger;
 
         private ConfigurationModel _configuration;
@@ -83,16 +80,14 @@
                                        [NotNull] IConfigurationService configurationService,
                                        [NotNull] IScaffoldingService scaffoldingService,
                                        [NotNull] IScriptCreationService scriptCreationService,
-                                       [NotNull] IVisualStudioAccess visualStudioAccess,
-                                       [NotNull] IFileSystemAccess fileSystemAccess,
+                                       [NotNull] IArtifactsService artifactsService,
                                        [NotNull] ILogger logger)
         {
             _project = project ?? throw new ArgumentNullException(nameof(project));
             _configurationService = configurationService ?? throw new ArgumentNullException(nameof(configurationService));
             _scaffoldingService = scaffoldingService ?? throw new ArgumentNullException(nameof(scaffoldingService));
             _scriptCreationService = scriptCreationService ?? throw new ArgumentNullException(nameof(scriptCreationService));
-            _visualStudioAccess = visualStudioAccess ?? throw new ArgumentNullException(nameof(visualStudioAccess));
-            _fileSystemAccess = fileSystemAccess ?? throw new ArgumentNullException(nameof(fileSystemAccess));
+            _artifactsService = artifactsService ?? throw new ArgumentNullException(nameof(artifactsService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             ExistingVersions = new ObservableCollection<VersionModel>();
@@ -170,8 +165,14 @@
             _configuration = await _configurationService.GetConfigurationOrDefaultAsync(_project);
 
             // Check for existing versions
-            if (!LoadAndApplyExistingVersions())
-                return false;
+            ResetExistingVersionsAndSelection();
+            var existingVersions = _artifactsService.GetExistingArtifactVersions(_project, _configuration);
+            if (existingVersions.Any())
+            {
+                foreach (var existingVersion in existingVersions)
+                    ExistingVersions.Add(existingVersion);
+                SelectedBaseVersion = existingVersions.Single(m => m.IsNewestVersion);
+            }
 
             // Check for scaffolding or creation mode
             ScaffoldingMode = ExistingVersions.Count == 0;
@@ -179,83 +180,13 @@
             // Evaluate commands
             EvaluateCommands();
 
-            // If the configuration has errors, notify the user
-            if (_configuration.HasErrors)
-                _visualStudioAccess.ShowModalError("The SSDT Lifecycle configuration for this project is not correct. " +
-                                                   "Please verify that the SSDT Lifecycle configuration for this project exists and has no errors.");
-
             return true;
         }
 
-        private bool LoadAndApplyExistingVersions()
+        private void ResetExistingVersionsAndSelection()
         {
-            if (!TryGetArtifactDirectories(out var artifactDirectories))
-                return false;
-
-            var existingVersions = ParseExistingDirectories(artifactDirectories);
-
-            // Reset selection and UI collection
             SelectedBaseVersion = null;
             ExistingVersions.Clear();
-
-            // Fill UI collection
-            foreach (var version in existingVersions.OrderByDescending(m => m))
-                ExistingVersions.Add(new VersionModel
-                {
-                    UnderlyingVersion = version
-                });
-
-            if (existingVersions.Any())
-                DetermineAndSelectHighestExistingVersion(existingVersions);
-
-            return true;
-        }
-
-        private bool TryGetArtifactDirectories(out string[] artifactDirectories)
-        {
-            var projectPath = _project.FullName;
-            var projectDirectory = Path.GetDirectoryName(projectPath);
-            if (projectDirectory == null)
-            {
-                _visualStudioAccess.ShowModalError("ERROR: Cannot determine project directory.");
-                artifactDirectories = null;
-                return false;
-            }
-
-            var artifactsPath = Path.Combine(projectDirectory, _configuration.ArtifactsPath);
-            try
-            {
-                artifactDirectories = _fileSystemAccess.GetDirectoriesIn(artifactsPath);
-            }
-            catch (Exception e)
-            {
-                _visualStudioAccess.ShowModalError($"ERROR: Failed to open script creation window: {e.Message}");
-                artifactDirectories = null;
-                return false;
-            }
-
-            return true;
-        }
-
-        private static List<Version> ParseExistingDirectories(IEnumerable<string> artifactDirectories)
-        {
-            var existingVersions = new List<Version>();
-            foreach (var artifactDirectory in artifactDirectories)
-            {
-                var di = new DirectoryInfo(artifactDirectory);
-                if (Version.TryParse(di.Name, out var existingVersion))
-                    existingVersions.Add(existingVersion);
-            }
-
-            return existingVersions;
-        }
-
-        private void DetermineAndSelectHighestExistingVersion(IEnumerable<Version> existingVersions)
-        {
-            var highestVersion = existingVersions.Max();
-            var highestModel = ExistingVersions.Single(m => m.UnderlyingVersion == highestVersion);
-            highestModel.IsNewestVersion = true;
-            SelectedBaseVersion = highestModel;
         }
 
         private void EvaluateCommands()
