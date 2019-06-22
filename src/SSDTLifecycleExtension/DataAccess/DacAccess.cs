@@ -66,13 +66,6 @@
                 }
                 catch (DacServicesException e)
                 {
-                    if (e.Messages.Any())
-                    {
-                        return (null, e.Messages
-                                       .Select(m => m.ToString())
-                                       .ToArray());
-                    }
-
                     return (null, new[] {e.Message});
                 }
 
