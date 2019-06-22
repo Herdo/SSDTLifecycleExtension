@@ -97,10 +97,10 @@
 
             ExistingVersions = new ObservableCollection<VersionModel>();
 
-            ScaffoldDevelopmentVersionCommand = new AsyncCommand(ScaffoldDevelopmentVersion_ExecutedAsync, ScaffoldDevelopmentVersion_CanExecute, this);
-            ScaffoldCurrentProductionVersionCommand = new AsyncCommand(ScaffoldCurrentProductionVersion_ExecutedAsync, ScaffoldCurrentProductionVersion_CanExecute, this);
-            StartLatestCreationCommand = new AsyncCommand(StartLatestCreation_ExecutedAsync, StartLatestCreation_CanExecute, this);
-            StartVersionedCreationCommand = new AsyncCommand(StartVersionedCreation_ExecutedAsync, StartVersionedCreation_CanExecute, this);
+            ScaffoldDevelopmentVersionCommand = new AsyncCommand(ScaffoldDevelopmentVersion_ExecutedAsync, ArtifactCommands_CanExecute, this);
+            ScaffoldCurrentProductionVersionCommand = new AsyncCommand(ScaffoldCurrentProductionVersion_ExecutedAsync, ArtifactCommands_CanExecute, this);
+            StartLatestCreationCommand = new AsyncCommand(StartLatestCreation_ExecutedAsync, ArtifactCommands_CanExecute, this);
+            StartVersionedCreationCommand = new AsyncCommand(StartVersionedCreation_ExecutedAsync, ArtifactCommands_CanExecute, this);
 
             _configurationService.ConfigurationChanged += ConfigurationService_ConfigurationChanged;
             _scaffoldingService.IsScaffoldingChanged += ScaffoldingService_IsScaffoldingChanged;
@@ -111,14 +111,9 @@
         {
             var successful = await _scaffoldingService.ScaffoldAsync(_project, _configuration, targetVersion, CancellationToken.None);
             if (successful)
-            {
                 await InitializeAsync();
-            }
             else
-            {
-                ScaffoldDevelopmentVersionCommand.RaiseCanExecuteChanged();
-                ScaffoldCurrentProductionVersionCommand.RaiseCanExecuteChanged();
-            }
+                EvaluateCommands();
         }
 
         private async Task CreateScriptInternalAsync(bool latest)
@@ -128,14 +123,9 @@
             {
                 var successful = await _scriptCreationService.CreateAsync(_project, _configuration, SelectedBaseVersion.UnderlyingVersion, latest, CancellationToken.None);
                 if (successful)
-                {
                     await InitializeAsync();
-                }
                 else
-                {
-                    StartLatestCreationCommand.RaiseCanExecuteChanged();
-                    StartVersionedCreationCommand.RaiseCanExecuteChanged();
-                }
+                    EvaluateCommands();
             }
             finally
             {
@@ -143,44 +133,28 @@
             }
         }
 
-        private bool ScaffoldDevelopmentVersion_CanExecute() =>
-            _configuration != null
-            && !_configuration.HasErrors
-            && !_scaffoldingService.IsScaffolding
-            && !_scriptCreationService.IsCreating;
+        private bool ArtifactCommands_CanExecute()
+        {
+            return _configuration != null
+                   && !_configuration.HasErrors
+                   && !_scaffoldingService.IsScaffolding
+                   && !_scriptCreationService.IsCreating;
+        }
 
         private async Task ScaffoldDevelopmentVersion_ExecutedAsync()
         {
             await ScaffoldInternalAsync(new Version(0, 0, 0, 0));
         }
 
-        private bool ScaffoldCurrentProductionVersion_CanExecute() =>
-            _configuration != null
-            && !_configuration.HasErrors
-            && !_scaffoldingService.IsScaffolding
-            && !_scriptCreationService.IsCreating;
-
         private async Task ScaffoldCurrentProductionVersion_ExecutedAsync()
         {
             await ScaffoldInternalAsync(new Version(1, 0, 0, 0));
         }
 
-        private bool StartLatestCreation_CanExecute() =>
-            _configuration != null
-            && !_configuration.HasErrors
-            && !_scaffoldingService.IsScaffolding
-            && !_scriptCreationService.IsCreating;
-
         private async Task StartLatestCreation_ExecutedAsync()
         {
             await CreateScriptInternalAsync(true);
         }
-
-        private bool StartVersionedCreation_CanExecute() =>
-            _configuration != null
-            && !_configuration.HasErrors
-            && !_scaffoldingService.IsScaffolding
-            && !_scriptCreationService.IsCreating;
 
         private async Task StartVersionedCreation_ExecutedAsync()
         {
@@ -263,7 +237,7 @@
             return true;
         }
 
-        private static List<Version> ParseExistingDirectories(string[] artifactDirectories)
+        private static List<Version> ParseExistingDirectories(IEnumerable<string> artifactDirectories)
         {
             var existingVersions = new List<Version>();
             foreach (var artifactDirectory in artifactDirectories)
@@ -276,7 +250,7 @@
             return existingVersions;
         }
 
-        private void DetermineAndSelectHighestExistingVersion(List<Version> existingVersions)
+        private void DetermineAndSelectHighestExistingVersion(IEnumerable<Version> existingVersions)
         {
             var highestVersion = existingVersions.Max();
             var highestModel = ExistingVersions.Single(m => m.UnderlyingVersion == highestVersion);
