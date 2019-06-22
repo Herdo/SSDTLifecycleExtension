@@ -31,8 +31,7 @@ steps:
     organization: 'herdo-github'
     SonarCloud: 'SonarCloud-CodeAnalysis-Server'
     extraProperties: |
-     sonar.sources=src\SSDTLifecycleExtension,src\Shared
-     sonar.tests=src\UnitTests,src\TestDatabase
+     sonar.exclusions=src\TestDatabase
 
 - task: NuGetToolInstaller@0
   displayName: NuGet Tool Installer
