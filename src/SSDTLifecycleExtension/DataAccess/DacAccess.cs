@@ -109,7 +109,7 @@
                     }
 
                 }
-                catch (DacServicesException e)
+                catch (DacModelException e)
                 {
                     return (null, new[] { e.GetBaseException().Message });
                 }
