@@ -64,7 +64,7 @@
         </Style>
     </UserControl.Resources>
 
-    <Grid>
+    <Grid Visibility="{Binding InitializedOnce, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
         <!-- Scaffolding -->
         <GroupBox Header="Scaffolding"
                   Style="{StaticResource CenteredGroupBoxStyle}"

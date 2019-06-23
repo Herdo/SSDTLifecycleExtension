@@ -118,6 +118,9 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
 
             // Assert
             Assert.IsNotNull(vm.ExistingVersions);
+            Assert.IsNull(vm.SelectedBaseVersion);
+            Assert.IsFalse(vm.InitializedOnce);
+            Assert.IsFalse(vm.ScaffoldingMode);
             Assert.AreEqual(0, vm.ExistingVersions.Count);
             Assert.IsNotNull(vm.ScaffoldDevelopmentVersionCommand);
             Assert.IsNotNull(vm.ScaffoldCurrentProductionVersionCommand);
@@ -521,6 +524,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
 
             // Assert
             Assert.IsTrue(initialized);
+            Assert.IsTrue(vm.InitializedOnce);
             Assert.AreEqual(0, vm.ExistingVersions.Count);
             Assert.IsNull(vm.SelectedBaseVersion);
             Assert.IsTrue(vm.ScaffoldingMode);
@@ -573,6 +577,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
 
             // Assert
             Assert.IsTrue(initialized);
+            Assert.IsTrue(vm.InitializedOnce);
             Assert.AreEqual(2, vm.ExistingVersions.Count);
             Assert.IsNotNull(vm.SelectedBaseVersion);
             Assert.AreSame(vm.SelectedBaseVersion, vm.ExistingVersions[0]);

@@ -29,6 +29,7 @@
         private VersionModel _selectedBaseVersion;
         private bool _scaffoldingMode;
         private bool _isCreatingScript;
+        private bool _initializedOnce;
 
         public VersionModel SelectedBaseVersion
         {
@@ -38,6 +39,18 @@
                 if (Equals(value, _selectedBaseVersion))
                     return;
                 _selectedBaseVersion = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool InitializedOnce
+        {
+            get => _initializedOnce;
+            private set
+            {
+                if (value == _initializedOnce)
+                    return;
+                _initializedOnce = value;
                 OnPropertyChanged();
             }
         }
@@ -178,6 +191,7 @@
             // Evaluate commands
             EvaluateCommands();
 
+            InitializedOnce = true;
             return true;
         }
 
