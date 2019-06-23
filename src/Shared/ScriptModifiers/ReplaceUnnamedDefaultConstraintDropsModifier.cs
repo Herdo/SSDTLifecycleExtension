@@ -54,7 +54,11 @@ EXECUTE (@command)";
                                                                   .Except(currentDefaultConstraints)
                                                                   .ToDictionary(constraint => constraint, constraint => false);
 
-            return ReplaceUnnamedDefaultConstraintStatements(input, defaultConstraintsToRemove);
+            var (resultText, regexMatchTimeouts) = ReplaceUnnamedDefaultConstraintStatements(input, defaultConstraintsToRemove);
+            if (regexMatchTimeouts > 0)
+                await _logger.LogAsync($"WARNING: Regular expression matching in {nameof(ReplaceUnnamedDefaultConstraintDropsModifier)} timed out {regexMatchTimeouts} time(s).");
+
+            return resultText;
         }
 
         private async Task<(bool ErrorsWhileLoading, DefaultConstraint[] OldDefaultConstraints, DefaultConstraint[] CurrentDefaultConstraints)> GetDefaultConstraints(PathCollection paths)
@@ -80,33 +84,73 @@ EXECUTE (@command)";
                     currentDefaultConstraints.DefaultConstraints);
         }
 
-        private string ReplaceUnnamedDefaultConstraintStatements(string input,
-                                                                 Dictionary<DefaultConstraint, bool> defaultConstraintsToRemove)
+        private (string ResultText, int RegexMatchTimeouts) ReplaceUnnamedDefaultConstraintStatements(string input,
+                                                                                                      Dictionary<DefaultConstraint, bool> defaultConstraintsToRemove)
         {
-            var tableRegex = new Regex(@"ALTER TABLE \[(?<schemaName>\w+)\]\.\[(?<tableName>\w+)\] DROP CONSTRAINT ;");
-            return ForEachMatch(input,
-                                "DROP CONSTRAINT ;",
-                                1,
-                                range =>
-                                {
-                                    var lines = range.Split(new[] {Environment.NewLine}, StringSplitOptions.None);
-                                    string replacement = null;
-                                    for (var index = 0; index < lines.Length; index++)
-                                    {
-                                        var line = lines[index];
-                                        var match = tableRegex.Match(line);
-                                        if (!match.Success)
-                                            continue;
+            var tableRegex = new Regex(@"ALTER TABLE \[(?<schemaName>\w+)\]\.\[(?<tableName>\w+)\] DROP CONSTRAINT ;", RegexOptions.Compiled, TimeSpan.FromMilliseconds(10));
+            var regexMatchTimeouts = 0;
+            return (ForEachMatch(input,
+                                 "DROP CONSTRAINT ;",
+                                 1,
+                                 range =>
+                                 {
+                                     var lines = range.Split(new[] {Environment.NewLine}, StringSplitOptions.None);
+                                     string replacement = null;
+                                     for (var index = 0; index < lines.Length; index++)
+                                     {
+                                         var line = lines[index];
+                                         var isMatch = IsMatch(line, tableRegex, out var schemaName, out var tableName, out var regexMatchTimeout);
+                                         if (regexMatchTimeout)
+                                             regexMatchTimeouts++;
+                                         if (!isMatch)
+                                             continue;
 
-                                        var schemaName = match.Groups["schemaName"].Value;
-                                        var tableName = match.Groups["tableName"].Value;
+                                         replacement = ReplaceDropAtLine(defaultConstraintsToRemove, schemaName, tableName, lines, index);
+                                         break;
+                                     }
 
-                                        replacement = ReplaceDropAtLine(defaultConstraintsToRemove, schemaName, tableName, lines, index);
-                                        break;
-                                    }
+                                     return replacement ?? range;
+                                 }),
+                    regexMatchTimeouts);
+        }
 
-                                    return replacement ?? range;
-                                });
+        private static bool IsMatch(string line,
+                                    Regex tableRegex,
+                                    out string schemaName,
+                                    out string tableName,
+                                    out bool regexMatchTimeout)
+        {
+            schemaName = null;
+            tableName = null;
+            regexMatchTimeout = false;
+
+            // Basic checks before executing the regular expression
+            if (string.IsNullOrWhiteSpace(line))
+                return false;
+
+            if (line.StartsWith("GO"))
+                return false;
+
+            if (line.StartsWith("PRINT"))
+                return false;
+
+            // Finally execute the regular expression.
+            Match match;
+            try
+            {
+                match = tableRegex.Match(line);
+            }
+            catch (RegexMatchTimeoutException)
+            {
+                regexMatchTimeout = true;
+                return false;
+            }
+            if (!match.Success)
+                return false;
+
+            schemaName = match.Groups["schemaName"].Value;
+            tableName = match.Groups["tableName"].Value;
+            return true;
         }
 
         private static string ReplaceDropAtLine(Dictionary<DefaultConstraint, bool> defaultConstraintsToRemove,
