@@ -396,6 +396,29 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
         }
 
         [Test]
+        public async Task GetDefaultConstraintsAsync_Errors_ReadFromStreamReturnedNull_Async()
+        {
+            // Arrange
+            const string dacpacPath = "pathToDacpac";
+            var xfsMock = Mock.Of<IXmlFormatService>();
+
+            var fileOpenException = new Exception("Test exception");
+            var fsaMock = new Mock<IFileSystemAccess>();
+            fsaMock.Setup(m => m.ReadFromStream(dacpacPath, It.IsNotNull<Func<Stream, TSqlModel>>()))
+                   .Returns(new SecureStreamResult<TSqlModel>(null, null, fileOpenException));
+            IDacAccess da = new DacAccess(xfsMock, fsaMock.Object);
+
+            // Act
+            var (defaultConstraints, errors) = await da.GetDefaultConstraintsAsync(dacpacPath);
+
+            // Assert
+            Assert.IsNull(defaultConstraints);
+            Assert.IsNotNull(errors);
+            Assert.AreEqual(1, errors.Length);
+            Assert.AreEqual("Error reading DACPAC: Test exception", errors[0]);
+        }
+
+        [Test]
         public async Task GetDefaultConstraintsAsync_CorrectCreation_MoreConstraints_Async()
         {
             // Arrange
