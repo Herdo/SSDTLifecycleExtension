@@ -27,7 +27,7 @@ steps:
   inputs:
     projectName: 'SSDT Lifecycle Extension'
     projectKey: 'SSDTLifecycleExtension'
-    projectVersion: '$(Build.BuildId)'
+    projectVersion: '$(Build.BuildNumber)'
     organization: 'herdo-github'
     SonarCloud: 'SonarCloud-CodeAnalysis-Server'
     extraProperties: |
