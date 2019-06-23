@@ -15,7 +15,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers
     {
         private const string MultipleDropDefaultConstraintStatements =
 @"PRINT 'Dropping unnamed DEFAULT constraint on dbo.Author ...';
-
+--
 GO
 ALTER TABLE [dbo].[Author] DROP CONSTRAINT ;
 
@@ -38,7 +38,7 @@ GO";
 
         private const string MultipleDropDefaultConstraintStatementsReplaced =
 @"PRINT 'Dropping unnamed DEFAULT constraint on dbo.Author ...';
-
+--
 GO
 DECLARE @schema_name sysname
 DECLARE @table_name  sysname
@@ -95,7 +95,7 @@ GO";
 
         private const string MultipleDropDefaultConstraintStatementsReplacedPartially =
 @"PRINT 'Dropping unnamed DEFAULT constraint on dbo.Author ...';
-
+--
 GO
 DECLARE @schema_name sysname
 DECLARE @table_name  sysname
