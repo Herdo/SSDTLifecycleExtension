@@ -7,6 +7,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
     using System.Linq;
     using System.Threading.Tasks;
     using Microsoft.SqlServer.Dac;
+    using Microsoft.SqlServer.Dac.Model;
     using Moq;
     using SSDTLifecycleExtension.DataAccess;
     using SSDTLifecycleExtension.Shared.Contracts;
@@ -238,7 +239,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
             var publishProfilePath = "path3";
             var xfsMock = Mock.Of<IXmlFormatService>();
 
-            Stream CreateEmptyStream()
+            Stream CreateCorruptStream()
             {
                 return new MemoryStream(new byte[]
                 {
@@ -268,7 +269,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
                    .Returns((string path,
                              Func<Stream, DacDeployOptions> consumer) =>
                     {
-                        var stream = CreateEmptyStream();
+                        var stream = CreateCorruptStream();
                         return new SecureStreamResult<DacDeployOptions>(stream, consumer(stream), null);
                     });
             IDacAccess da = new DacAccess(xfsMock, fsaMock.Object);
@@ -354,6 +355,117 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
             // ReSharper disable AssignNullToNotNullAttribute
             Assert.Throws<ArgumentNullException>(() => da.GetDefaultConstraintsAsync(null));
             // ReSharper restore AssignNullToNotNullAttribute
+        }
+
+        [Test]
+        public async Task GetDefaultConstraintsAsync_Errors_ReadFromStreamReturnedCorruptStream_Async()
+        {
+            // Arrange
+            const string dacpacPath = "pathToDacpac";
+            var xfsMock = Mock.Of<IXmlFormatService>();
+
+            Stream CreateCorruptStream()
+            {
+                return new MemoryStream(new byte[]
+                {
+                    1,
+                    2,
+                    234,
+                    14
+                });
+            }
+
+            var fsaMock = new Mock<IFileSystemAccess>();
+            fsaMock.Setup(m => m.ReadFromStream(dacpacPath, It.IsNotNull<Func<Stream, TSqlModel>>()))
+                   .Returns((string path,
+                             Func<Stream, TSqlModel> consumer) =>
+                   {
+                       var stream = CreateCorruptStream();
+                       return new SecureStreamResult<TSqlModel>(stream, consumer(stream), null);
+                   });
+            IDacAccess da = new DacAccess(xfsMock, fsaMock.Object);
+
+            // Act
+            var (defaultConstraints, errors) = await da.GetDefaultConstraintsAsync(dacpacPath);
+
+            // Assert
+            Assert.IsNull(defaultConstraints);
+            Assert.IsNotNull(errors);
+            Assert.AreEqual(1, errors.Length);
+            Assert.IsNotEmpty(errors[0]);
+        }
+
+        [Test]
+        public async Task GetDefaultConstraintsAsync_CorrectCreation_MoreConstraints_Async()
+        {
+            // Arrange
+            const string dacpacPath = "pathToDacpac";
+            var xfsMock = Mock.Of<IXmlFormatService>();
+
+            var fsaMock = new Mock<IFileSystemAccess>();
+            fsaMock.Setup(m => m.ReadFromStream(dacpacPath, It.IsNotNull<Func<Stream, TSqlModel>>()))
+                   .Returns((string path,
+                             Func<Stream, TSqlModel> consumer) =>
+                    {
+                        var stream = GetEmbeddedResourceStream("TestDatabase_AuthorWithDefaultConstraints.dacpac");
+                        return new SecureStreamResult<TSqlModel>(stream, consumer(stream), null);
+                    });
+            IDacAccess da = new DacAccess(xfsMock, fsaMock.Object);
+
+            // Act
+            var (defaultConstraints, errors) = await da.GetDefaultConstraintsAsync(dacpacPath);
+
+            // Assert
+            Assert.IsNotNull(defaultConstraints);
+            Assert.IsNull(errors);
+            Assert.AreEqual(3, defaultConstraints.Length);
+            var orderedConstraints = defaultConstraints.OrderBy(m => m.ColumnName)
+                                                       .ToArray();
+            // First constraint
+            Assert.AreEqual("dbo", orderedConstraints[0].TableSchema);
+            Assert.AreEqual("Author", orderedConstraints[0].TableName);
+            Assert.AreEqual("Birthday", orderedConstraints[0].ColumnName);
+            Assert.AreEqual("DF_Birthday_Today", orderedConstraints[0].ConstraintName);
+            // Second constraint
+            Assert.AreEqual("dbo", orderedConstraints[1].TableSchema);
+            Assert.AreEqual("Author", orderedConstraints[1].TableName);
+            Assert.AreEqual("FirstName", orderedConstraints[1].ColumnName);
+            Assert.AreEqual("DF_FirstName_Empty", orderedConstraints[1].ConstraintName);
+            // Third constraint
+            Assert.AreEqual("dbo", orderedConstraints[2].TableSchema);
+            Assert.AreEqual("Author", orderedConstraints[2].TableName);
+            Assert.AreEqual("LastName", orderedConstraints[2].ColumnName);
+            Assert.AreEqual(null, orderedConstraints[2].ConstraintName);
+        }
+
+        [Test]
+        public async Task GetDefaultConstraintsAsync_CorrectCreation_SingleConstraints_Async()
+        {
+            // Arrange
+            const string dacpacPath = "pathToDacpac";
+            var xfsMock = Mock.Of<IXmlFormatService>();
+
+            var fsaMock = new Mock<IFileSystemAccess>();
+            fsaMock.Setup(m => m.ReadFromStream(dacpacPath, It.IsNotNull<Func<Stream, TSqlModel>>()))
+                   .Returns((string path,
+                             Func<Stream, TSqlModel> consumer) =>
+                    {
+                        var stream = GetEmbeddedResourceStream("TestDatabase_AuthorWithLessDefaultConstraints.dacpac");
+                        return new SecureStreamResult<TSqlModel>(stream, consumer(stream), null);
+                    });
+            IDacAccess da = new DacAccess(xfsMock, fsaMock.Object);
+
+            // Act
+            var (defaultConstraints, errors) = await da.GetDefaultConstraintsAsync(dacpacPath);
+
+            // Assert
+            Assert.IsNotNull(defaultConstraints);
+            Assert.IsNull(errors);
+            Assert.AreEqual(1, defaultConstraints.Length);
+            Assert.AreEqual("dbo", defaultConstraints[0].TableSchema);
+            Assert.AreEqual("Author", defaultConstraints[0].TableName);
+            Assert.AreEqual("Birthday", defaultConstraints[0].ColumnName);
+            Assert.AreEqual("DF_Birthday_Today", defaultConstraints[0].ConstraintName);
         }
     }
 }

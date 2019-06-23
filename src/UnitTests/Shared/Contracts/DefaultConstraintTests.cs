@@ -64,6 +64,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Contracts
             Assert.AreEqual(tableName, dc.TableName);
             Assert.AreEqual(columnName, dc.ColumnName);
             Assert.AreEqual(constraintName, dc.ConstraintName);
+            Assert.AreEqual($"[dbo].[Author].[Name].[{(constraintName ?? "<UNNAMED>")}]", dc.DisplayName);
         }
 
         [Test]

@@ -1,8 +1,10 @@
 ﻿namespace SSDTLifecycleExtension.Shared.Contracts
 {
     using System;
+    using System.Diagnostics;
     using JetBrains.Annotations;
 
+    [DebuggerDisplay("{" + nameof(DisplayName) + ",nq}")]
     public sealed class DefaultConstraint : IEquatable<DefaultConstraint>
     {
         [NotNull]
@@ -16,6 +18,9 @@
 
         [CanBeNull]
         public string ConstraintName { get; }
+
+        [NotNull]
+        public string DisplayName => $"[{TableSchema}].[{TableName}].[{ColumnName}].[{(ConstraintName ?? "<UNNAMED>")}]";
 
         public DefaultConstraint([NotNull] string tableSchema,
                                  [NotNull] string tableName,

@@ -109,7 +109,7 @@
                     }
 
                 }
-                catch (DacModelException e)
+                catch (Exception e) when (e is DacServicesException || e is DacModelException)
                 {
                     return (null, new[] { e.GetBaseException().Message });
                 }
@@ -125,16 +125,20 @@
         private static DefaultConstraint[] GetDefaultConstraintsFromModel(TSqlModel sqlModel)
         {
             var defaultConstraints = sqlModel.GetObjects(DacQueryScopes.UserDefined, ModelSchema.DefaultConstraint);
-            return (from defaultConstraint in defaultConstraints
-                    let targetColumn = defaultConstraint.GetReferenced(Microsoft.SqlServer.Dac.Model.DefaultConstraint.TargetColumn)?.SingleOrDefault()
-                    where targetColumn != null && targetColumn.Name.Parts.Count == 3
-                    select new DefaultConstraint(targetColumn.Name.Parts[0],
-                                                 targetColumn.Name.Parts[1],
-                                                 targetColumn.Name.Parts[2],
-                                                 defaultConstraint.Name.HasName
-                                                     ? defaultConstraint.Name.Parts[0]
-                                                     : null))
-               .ToArray();
+            var result = new List<DefaultConstraint>();
+            foreach (var defaultConstraint in defaultConstraints)
+            {
+                var targetColumn = defaultConstraint.GetReferenced(Microsoft.SqlServer.Dac.Model.DefaultConstraint.TargetColumn)?.SingleOrDefault();
+                if (targetColumn != null && targetColumn.Name.Parts.Count == 3)
+                    result.Add(new DefaultConstraint(targetColumn.Name.Parts[0],
+                                                     targetColumn.Name.Parts[1],
+                                                     targetColumn.Name.Parts[2],
+                                                     defaultConstraint.Name.HasName
+                                                         ? defaultConstraint.Name.Parts[1] // Part[0] is the schema of the constraint
+                                                         : null));
+            }
+
+            return result.ToArray();
         }
 
         Task<(string DeployScriptContent, string DeployReportContent, string[] Errors)> IDacAccess.CreateDeployFilesAsync(string previousVersionDacpacPath,
