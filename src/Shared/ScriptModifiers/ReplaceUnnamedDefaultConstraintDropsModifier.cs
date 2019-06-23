@@ -1,6 +1,7 @@
 ﻿namespace SSDTLifecycleExtension.Shared.ScriptModifiers
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Text.RegularExpressions;
     using System.Threading.Tasks;
@@ -45,6 +46,19 @@ EXECUTE (@command)";
         private async Task<string> ModifyInternalAsync(string input,
                                                        PathCollection paths)
         {
+            var (errorsWhileLoading, oldDefaultConstraints, currentDefaultConstraints) = await GetDefaultConstraints(paths);
+            if (errorsWhileLoading)
+                return input;
+
+            var defaultConstraintsToRemove = oldDefaultConstraints.Where(m => m.ConstraintName == null)
+                                                                  .Except(currentDefaultConstraints)
+                                                                  .ToDictionary(constraint => constraint, constraint => false);
+
+            return ReplaceUnnamedDefaultConstraintStatements(input, defaultConstraintsToRemove);
+        }
+
+        private async Task<(bool ErrorsWhileLoading, DefaultConstraint[] OldDefaultConstraints, DefaultConstraint[] CurrentDefaultConstraints)> GetDefaultConstraints(PathCollection paths)
+        {
             var oldDefaultConstraints = await _dacAccess.GetDefaultConstraintsAsync(paths.PreviousDacpacPath);
             if (oldDefaultConstraints.Errors != null)
             {
@@ -52,6 +66,7 @@ EXECUTE (@command)";
                 foreach (var error in oldDefaultConstraints.Errors)
                     await _logger.LogAsync(error);
             }
+
             var currentDefaultConstraints = await _dacAccess.GetDefaultConstraintsAsync(paths.NewDacpacPath);
             if (currentDefaultConstraints.Errors != null)
             {
@@ -60,14 +75,14 @@ EXECUTE (@command)";
                     await _logger.LogAsync(error);
             }
 
-            if (oldDefaultConstraints.Errors != null || currentDefaultConstraints.Errors != null)
-                return input;
+            return (oldDefaultConstraints.Errors != null || currentDefaultConstraints.Errors != null,
+                    oldDefaultConstraints.DefaultConstraints,
+                    currentDefaultConstraints.DefaultConstraints);
+        }
 
-            var defaultConstraintsToRemove = oldDefaultConstraints.DefaultConstraints
-                                                                  .Where(m => m.ConstraintName == null)
-                                                                  .Except(currentDefaultConstraints.DefaultConstraints)
-                                                                  .ToDictionary(constraint => constraint, constraint => false);
-
+        private string ReplaceUnnamedDefaultConstraintStatements(string input,
+                                                                 Dictionary<DefaultConstraint, bool> defaultConstraintsToRemove)
+        {
             var tableRegex = new Regex(@"ALTER TABLE \[(?<schemaName>\w+)\]\.\[(?<tableName>\w+)\] DROP CONSTRAINT ;");
             return ForEachMatch(input,
                                 "DROP CONSTRAINT ;",
@@ -85,38 +100,56 @@ EXECUTE (@command)";
 
                                         var schemaName = match.Groups["schemaName"].Value;
                                         var tableName = match.Groups["tableName"].Value;
-                                        var toRemove = defaultConstraintsToRemove.Where(m => m.Key.TableSchema == schemaName
-                                                                                             && m.Key.TableName == tableName
-                                                                                             && m.Value == false // Not used for any replacement yet.
-                                                                                       )
-                                                                                 .Select(m => m.Key)
-                                                                                 .FirstOrDefault();
-                                        if (toRemove != null)
-                                        {
-                                            // Flag as already used for a replacement.
-                                            defaultConstraintsToRemove[toRemove] = true;
 
-                                            // Prepare template
-                                            var dropConstraint = string.Format(DropScriptTemplate,
-                                                                               toRemove.TableSchema,
-                                                                               toRemove.TableName,
-                                                                               toRemove.ColumnName);
-
-                                            // Keep lines before and after
-                                            var linesBefore = lines.Take(index).ToArray();
-                                            var linesAfter = lines.Skip(index + 1).ToArray();
-                                            var combined = new string[linesBefore.Length + 1 + linesAfter.Length];
-                                            linesBefore.CopyTo(combined, 0);
-                                            combined[linesBefore.Length] = dropConstraint;
-                                            linesAfter.CopyTo(combined, linesBefore.Length + 1);
-                                            replacement = string.Join(Environment.NewLine, combined);
-                                        }
-
+                                        replacement = ReplaceDropAtLine(defaultConstraintsToRemove, schemaName, tableName, lines, index);
                                         break;
                                     }
 
                                     return replacement ?? range;
                                 });
+        }
+
+        private static string ReplaceDropAtLine(Dictionary<DefaultConstraint, bool> defaultConstraintsToRemove,
+                                                string schemaName,
+                                                string tableName,
+                                                string[] lines,
+                                                int index)
+        {
+            var toRemove = defaultConstraintsToRemove.Where(m => m.Key.TableSchema == schemaName
+                                                                 && m.Key.TableName == tableName
+                                                                 && m.Value == false // Not used for any replacement yet.
+                                                           )
+                                                     .Select(m => m.Key)
+                                                     .FirstOrDefault();
+
+            if (toRemove == null)
+                return null;
+
+            // Flag as already used for a replacement.
+            defaultConstraintsToRemove[toRemove] = true;
+
+            // Prepare template
+            var dropConstraint = string.Format(DropScriptTemplate,
+                                               toRemove.TableSchema,
+                                               toRemove.TableName,
+                                               toRemove.ColumnName);
+
+            // Keep lines before and after
+            var combined = CombineLinesBeforeStatementAndLinesAfter(lines, index, dropConstraint);
+            return string.Join(Environment.NewLine, combined);
+        }
+
+        private static string[] CombineLinesBeforeStatementAndLinesAfter(string[] lines,
+                                                                         int index,
+                                                                         string dropConstraint)
+        {
+            var linesBefore = lines.Take(index).ToArray();
+            var linesAfter = lines.Skip(index + 1).ToArray();
+            var combined = new string[linesBefore.Length + 1 + linesAfter.Length];
+            linesBefore.CopyTo(combined, 0);
+            combined[linesBefore.Length] = dropConstraint;
+            linesAfter.CopyTo(combined, linesBefore.Length + 1);
+            return combined;
         }
 
         Task<string> IScriptModifier.ModifyAsync(string input,
