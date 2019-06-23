@@ -6,7 +6,6 @@
     using System.Windows.Input;
     using JetBrains.Annotations;
     using Microsoft.VisualStudio.PlatformUI;
-    using Microsoft.VisualStudio.Threading;
     using MVVM;
     using Shared.Contracts;
     using Shared.Contracts.DataAccess;

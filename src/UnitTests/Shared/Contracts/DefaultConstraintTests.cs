@@ -3,7 +3,6 @@
 namespace SSDTLifecycleExtension.UnitTests.Shared.Contracts
 {
     using System;
-    using Microsoft.VisualStudio.Settings;
     using SSDTLifecycleExtension.Shared.Contracts;
 
     [TestFixture]

@@ -6,7 +6,6 @@ namespace SSDTLifecycleExtension.UnitTests.Extension
     using System.Threading.Tasks;
     using JetBrains.Annotations;
     using Microsoft.VisualStudio.Shell;
-    using Microsoft.VisualStudio.Threading;
     using Moq;
     using SSDTLifecycleExtension.Shared.Contracts;
     using SSDTLifecycleExtension.Shared.Contracts.DataAccess;
