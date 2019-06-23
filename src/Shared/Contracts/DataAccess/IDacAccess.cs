@@ -10,5 +10,7 @@
                                                                                                                [NotNull] string publishProfilePath,
                                                                                                                bool createDeployScript,
                                                                                                                bool createDeployReport);
+
+        Task<(DefaultConstraint[] DefaultConstraints, string[] Errors)> GetDefaultConstraintsAsync([NotNull] string dacpacPath);
     }
 }

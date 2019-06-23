@@ -341,5 +341,19 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
             Assert.AreEqual(@"<?xml version=""1.0"" encoding=""utf-8""?><DeploymentReport xmlns=""http://schemas.microsoft.com/sqlserver/dac/DeployReport/2012/02""><Alerts /><Operations><Operation Name=""Create""><Item Value=""[dbo].[Author]"" Type=""SqlTable"" /></Operation></Operations></DeploymentReport>",
                             deployReportContent);
         }
+
+        [Test]
+        public void GetDefaultConstraintsAsync_ArgumentNullException_DacpacPath()
+        {
+            // Arrange
+            var xfsMock = Mock.Of<IXmlFormatService>();
+            var fsaMock = Mock.Of<IFileSystemAccess>();
+            IDacAccess da = new DacAccess(xfsMock, fsaMock);
+
+            // Act & Assert
+            // ReSharper disable AssignNullToNotNullAttribute
+            Assert.Throws<ArgumentNullException>(() => da.GetDefaultConstraintsAsync(null));
+            // ReSharper restore AssignNullToNotNullAttribute
+        }
     }
 }
