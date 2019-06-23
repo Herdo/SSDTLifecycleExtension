@@ -120,11 +120,11 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
             var fileOpenException3 = new Exception("Test exception3");
             var fsaMock = new Mock<IFileSystemAccess>();
             fsaMock.Setup(m => m.ReadFromStream(previousVersionDacpacPath, It.IsNotNull<Func<Stream, DacPackage>>()))
-                   .Returns(new SecureResult<DacPackage>(null, fileOpenException1));
+                   .Returns(new SecureStreamResult<DacPackage>(null, null, fileOpenException1));
             fsaMock.Setup(m => m.ReadFromStream(newVersionDacpacPath, It.IsNotNull<Func<Stream, DacPackage>>()))
-                   .Returns(new SecureResult<DacPackage>(null, fileOpenException2));
+                   .Returns(new SecureStreamResult<DacPackage>(null, null, fileOpenException2));
             fsaMock.Setup(m => m.ReadFromStream(publishProfilePath, It.IsNotNull<Func<Stream, DacDeployOptions>>()))
-                   .Returns(new SecureResult<DacDeployOptions>(null, fileOpenException3));
+                   .Returns(new SecureStreamResult<DacDeployOptions>(null, null, fileOpenException3));
             IDacAccess da = new DacAccess(xfsMock, fsaMock.Object);
 
             // Act
@@ -141,7 +141,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
         }
 
         [Test]
-        public async Task CreateDeployFilesAsync_Errors_ReadFromStreamReturnedEmptyStream_PreviousDacpac_Async()
+        public async Task CreateDeployFilesAsync_Errors_ReadFromStreamReturnedCorruptStream_PreviousDacpac_Async()
         {
             // Arrange
             var previousVersionDacpacPath = "path1";
@@ -151,13 +151,23 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
 
             Stream CreateEmptyStream()
             {
-                return new MemoryStream();
+                return new MemoryStream(new byte[]
+                {
+                    1,
+                    2,
+                    234,
+                    14
+                });
             }
 
             var fsaMock = new Mock<IFileSystemAccess>();
             fsaMock.Setup(m => m.ReadFromStream(previousVersionDacpacPath, It.IsNotNull<Func<Stream, DacPackage>>()))
                    .Returns((string path,
-                             Func<Stream, DacPackage> consumer) => new SecureResult<DacPackage>(consumer(CreateEmptyStream()), null));
+                             Func<Stream, DacPackage> consumer) =>
+                    {
+                        var stream = CreateEmptyStream();
+                        return new SecureStreamResult<DacPackage>(stream, consumer(stream), null);
+                    });
             IDacAccess da = new DacAccess(xfsMock, fsaMock.Object);
 
             // Act
@@ -168,11 +178,11 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
             Assert.IsNull(deployReportContent);
             Assert.IsNotNull(errors);
             Assert.AreEqual(1, errors.Length);
-            Assert.AreEqual("Could not load package.", errors[0]);
+            Assert.IsNotEmpty(errors[0]);
         }
 
         [Test]
-        public async Task CreateDeployFilesAsync_Errors_ReadFromStreamReturnedEmptyStream_NewDacpac_Async()
+        public async Task CreateDeployFilesAsync_Errors_ReadFromStreamReturnedCorruptStream_NewDacpac_Async()
         {
             // Arrange
             var previousVersionDacpacPath = "path1";
@@ -180,18 +190,32 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
             var publishProfilePath = "path3";
             var xfsMock = Mock.Of<IXmlFormatService>();
 
-            Stream CreateEmptyStream()
+            Stream CreateCorruptStream()
             {
-                return new MemoryStream();
+                return new MemoryStream(new byte[]
+                {
+                    1,
+                    2,
+                    234,
+                    14
+                });
             }
 
             var fsaMock = new Mock<IFileSystemAccess>();
             fsaMock.Setup(m => m.ReadFromStream(previousVersionDacpacPath, It.IsNotNull<Func<Stream, DacPackage>>()))
                    .Returns((string path,
-                             Func<Stream, DacPackage> consumer) => new SecureResult<DacPackage>(consumer(GetEmbeddedResourceStream("TestDatabase_Empty.dacpac")), null));
+                             Func<Stream, DacPackage> consumer) =>
+                    {
+                        var stream = GetEmbeddedResourceStream("TestDatabase_Empty.dacpac");
+                        return new SecureStreamResult<DacPackage>(stream, consumer(stream), null);
+                    });
             fsaMock.Setup(m => m.ReadFromStream(newVersionDacpacPath, It.IsNotNull<Func<Stream, DacPackage>>()))
                    .Returns((string path,
-                             Func<Stream, DacPackage> consumer) => new SecureResult<DacPackage>(consumer(CreateEmptyStream()), null));
+                             Func<Stream, DacPackage> consumer) =>
+                    {
+                        var stream = CreateCorruptStream();
+                        return new SecureStreamResult<DacPackage>(stream, consumer(stream), null);
+                    });
             IDacAccess da = new DacAccess(xfsMock, fsaMock.Object);
 
             // Act
@@ -202,11 +226,11 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
             Assert.IsNull(deployReportContent);
             Assert.IsNotNull(errors);
             Assert.AreEqual(1, errors.Length);
-            Assert.AreEqual("Could not load package.", errors[0]);
+            Assert.IsNotEmpty(errors[0]);
         }
 
         [Test]
-        public async Task CreateDeployFilesAsync_Errors_ReadFromStreamReturnedEmptyStream_PublishProfile_Async()
+        public async Task CreateDeployFilesAsync_Errors_ReadFromStreamReturnedCorruptStream_PublishProfile_Async()
         {
             // Arrange
             var previousVersionDacpacPath = "path1";
@@ -216,19 +240,37 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
 
             Stream CreateEmptyStream()
             {
-                return new MemoryStream();
+                return new MemoryStream(new byte[]
+                {
+                    1,
+                    2,
+                    234,
+                    14
+                });
             }
 
             var fsaMock = new Mock<IFileSystemAccess>();
             fsaMock.Setup(m => m.ReadFromStream(previousVersionDacpacPath, It.IsNotNull<Func<Stream, DacPackage>>()))
                    .Returns((string path,
-                             Func<Stream, DacPackage> consumer) => new SecureResult<DacPackage>(consumer(GetEmbeddedResourceStream("TestDatabase_Empty.dacpac")), null));
+                             Func<Stream, DacPackage> consumer) =>
+                    {
+                        var stream = GetEmbeddedResourceStream("TestDatabase_Empty.dacpac");
+                        return new SecureStreamResult<DacPackage>(stream, consumer(stream), null);
+                    });
             fsaMock.Setup(m => m.ReadFromStream(newVersionDacpacPath, It.IsNotNull<Func<Stream, DacPackage>>()))
                    .Returns((string path,
-                             Func<Stream, DacPackage> consumer) => new SecureResult<DacPackage>(consumer(GetEmbeddedResourceStream("TestDatabase_WithAuthorTable.dacpac")), null));
+                             Func<Stream, DacPackage> consumer) =>
+                    {
+                        var stream = GetEmbeddedResourceStream("TestDatabase_WithAuthorTable.dacpac");
+                        return new SecureStreamResult<DacPackage>(stream, consumer(stream), null);
+                    });
             fsaMock.Setup(m => m.ReadFromStream(publishProfilePath, It.IsNotNull<Func<Stream, DacDeployOptions>>()))
                    .Returns((string path,
-                             Func<Stream, DacDeployOptions> consumer) => new SecureResult<DacDeployOptions>(consumer(CreateEmptyStream()), null));
+                             Func<Stream, DacDeployOptions> consumer) =>
+                    {
+                        var stream = CreateEmptyStream();
+                        return new SecureStreamResult<DacDeployOptions>(stream, consumer(stream), null);
+                    });
             IDacAccess da = new DacAccess(xfsMock, fsaMock.Object);
 
             // Act
@@ -239,7 +281,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
             Assert.IsNull(deployReportContent);
             Assert.IsNotNull(errors);
             Assert.AreEqual(1, errors.Length);
-            Assert.AreEqual("Could not read profile xml.", errors[0]);
+            Assert.IsNotEmpty(errors[0]);
         }
 
         [Test]
@@ -255,13 +297,25 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
             var fsaMock = new Mock<IFileSystemAccess>();
             fsaMock.Setup(m => m.ReadFromStream(previousVersionDacpacPath, It.IsNotNull<Func<Stream, DacPackage>>()))
                    .Returns((string path,
-                             Func<Stream, DacPackage> consumer) => new SecureResult<DacPackage>(consumer(GetEmbeddedResourceStream("TestDatabase_Empty.dacpac")), null));
+                             Func<Stream, DacPackage> consumer) =>
+                    {
+                        var stream = GetEmbeddedResourceStream("TestDatabase_Empty.dacpac");
+                        return new SecureStreamResult<DacPackage>(stream, consumer(stream), null);
+                    });
             fsaMock.Setup(m => m.ReadFromStream(newVersionDacpacPath, It.IsNotNull<Func<Stream, DacPackage>>()))
                    .Returns((string path,
-                             Func<Stream, DacPackage> consumer) => new SecureResult<DacPackage>(consumer(GetEmbeddedResourceStream("TestDatabase_WithAuthorTable.dacpac")), null));
+                             Func<Stream, DacPackage> consumer) =>
+                    {
+                        var stream = GetEmbeddedResourceStream("TestDatabase_WithAuthorTable.dacpac");
+                        return new SecureStreamResult<DacPackage>(stream, consumer(stream), null);
+                    });
             fsaMock.Setup(m => m.ReadFromStream(publishProfilePath, It.IsNotNull<Func<Stream, DacDeployOptions>>()))
                    .Returns((string path,
-                             Func<Stream, DacDeployOptions> consumer) => new SecureResult<DacDeployOptions>(consumer(GetEmbeddedResourceStream("TestDatabase.publish.xml")), null));
+                             Func<Stream, DacDeployOptions> consumer) =>
+                    {
+                        var stream = GetEmbeddedResourceStream("TestDatabase.publish.xml");
+                        return new SecureStreamResult<DacDeployOptions>(stream, consumer(stream), null);
+                    });
             IDacAccess da = new DacAccess(xfsMock.Object, fsaMock.Object);
 
             // Act

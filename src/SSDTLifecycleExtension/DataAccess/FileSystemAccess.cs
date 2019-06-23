@@ -51,8 +51,8 @@
             return ReadFileInternalAsync(sourcePath);
         }
 
-        SecureResult<TResult> IFileSystemAccess.ReadFromStream<TResult>(string sourcePath,
-                                                                        Func<Stream, TResult> streamConsumer)
+        SecureStreamResult<TResult> IFileSystemAccess.ReadFromStream<TResult>(string sourcePath,
+                                                                              Func<Stream, TResult> streamConsumer)
         {
             if (sourcePath == null)
                 throw new ArgumentNullException(nameof(sourcePath));
@@ -62,22 +62,15 @@
             Stream stream = null;
             try
             {
-                stream = new FileStream(sourcePath, FileMode.Open);
+                stream = new FileStream(sourcePath, FileMode.OpenOrCreate, FileAccess.Read);
             }
             catch (Exception e)
             {
                 stream?.Dispose();
-                return new SecureResult<TResult>(null, e);
+                return new SecureStreamResult<TResult>(null, null, e);
             }
 
-            try
-            {
-                return new SecureResult<TResult>(streamConsumer(stream), null);
-            }
-            finally
-            {
-                stream.Dispose();
-            }
+            return new SecureStreamResult<TResult>(stream, streamConsumer(stream), null);
         }
 
         Task IFileSystemAccess.WriteFileAsync(string targetPath,

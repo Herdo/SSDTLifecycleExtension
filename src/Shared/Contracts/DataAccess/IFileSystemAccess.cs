@@ -17,9 +17,10 @@
         /// <param name="streamConsumer">The consumer who will transform the stream to the result.</param>
         /// <exception cref="ArgumentNullException"><paramref name="sourcePath"/> or <paramref name="streamConsumer"/> are <b>null</b>.</exception>
         /// <returns>The <typeparamref name="TResult"/>, when the stream consumer was called, otherwise null.</returns>
+        /// <remarks>The result should be disposed when no longer needed.</remarks>
         [NotNull]
-        SecureResult<TResult> ReadFromStream<TResult>([NotNull] string sourcePath,
-                                                      [NotNull] Func<Stream, TResult> streamConsumer)
+        SecureStreamResult<TResult> ReadFromStream<TResult>([NotNull] string sourcePath,
+                                                            [NotNull] Func<Stream, TResult> streamConsumer)
             where TResult : class;
 
         Task WriteFileAsync([NotNull] string targetPath,

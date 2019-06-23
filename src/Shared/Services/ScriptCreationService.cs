@@ -1,4 +1,6 @@
-﻿namespace SSDTLifecycleExtension.Shared.Services
+﻿
+
+namespace SSDTLifecycleExtension.Shared.Services
 {
     using System;
     using System.Collections.Generic;
