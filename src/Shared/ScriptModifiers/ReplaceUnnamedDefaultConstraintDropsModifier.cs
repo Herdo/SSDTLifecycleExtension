@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using System.Text.RegularExpressions;
     using System.Threading.Tasks;
@@ -149,6 +150,8 @@ EXECUTE (@command)";
 
             // Finally execute the regular expression.
             Match match;
+            var sw = new Stopwatch();
+            sw.Start();
             try
             {
                 match = tableRegex.Match(line);
@@ -157,6 +160,11 @@ EXECUTE (@command)";
             {
                 regexMatchTimeout = true;
                 return false;
+            }
+            finally
+            {
+                sw.Stop();
+                Console.WriteLine(sw.ElapsedMilliseconds);
             }
             if (!match.Success)
                 return false;

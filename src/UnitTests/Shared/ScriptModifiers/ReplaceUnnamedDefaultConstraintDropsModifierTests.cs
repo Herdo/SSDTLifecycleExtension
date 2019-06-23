@@ -385,7 +385,7 @@ GO";
         public async Task ModifyAsync_CorrectReplacement_OneRegexTimeout_Async()
         {
             // Arrange
-            var schemaName = new string('a', 500_000_000);
+            var schemaName = new string('a', 1_000_000) + '.';
             var input = string.Format(MultipleDropDefaultConstraintStatementsWithPlaceholder, schemaName);
             var expectedOutput = string.Format(MultipleDropDefaultConstraintStatementsReplacedPartiallyWithPlaceholder, schemaName);
             var daMock = new Mock<IDacAccess>();
