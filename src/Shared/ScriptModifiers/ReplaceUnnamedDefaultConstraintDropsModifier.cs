@@ -150,8 +150,6 @@ EXECUTE (@command)";
 
             // Finally execute the regular expression.
             Match match;
-            var sw = new Stopwatch();
-            sw.Start();
             try
             {
                 match = tableRegex.Match(line);
@@ -160,11 +158,6 @@ EXECUTE (@command)";
             {
                 regexMatchTimeout = true;
                 return false;
-            }
-            finally
-            {
-                sw.Stop();
-                Console.WriteLine(sw.ElapsedMilliseconds);
             }
             if (!match.Success)
                 return false;
