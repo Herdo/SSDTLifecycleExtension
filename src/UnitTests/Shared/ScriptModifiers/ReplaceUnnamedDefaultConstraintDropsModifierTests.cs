@@ -37,18 +37,52 @@ PRINT 'Update complete'
 GO";
 
         private const string MultipleDropDefaultConstraintStatementsReplaced =
-@"-- PRINT 'Dropping unnamed DEFAULT constraint on dbo.Author ...';
+@"PRINT 'Dropping unnamed DEFAULT constraint on dbo.Author ...';
 
--- GO
--- ALTER TABLE [dbo].[Author] DROP CONSTRAINT ;
+GO
+DECLARE @schema_name sysname
+DECLARE @table_name  sysname
+DECLARE @column_name sysname
+DECLARE @command     nvarchar(1000)
 
--- GO
--- PRINT 'Dropping unnamed DEFAULT constraint on dbo.Book ...'
+SET @schema_name = N'dbo'
+SET @table_name = N'Author'
+SET @column_name = N'LastName'
 
--- GO
--- ALTER TABLE [dbo].[Book] DROP CONSTRAINT ;
+SELECT @command = 'ALTER TABLE [' + @schema_name + '].[' + @table_name + '] DROP CONSTRAINT ' + d.name
+ FROM sys.tables t
+ JOIN sys.default_constraints d ON d.parent_object_id = t.object_id
+ JOIN sys.columns c ON c.object_id = t.object_id AND c.column_id = d.parent_column_id
+WHERE t.name = @table_name
+  AND t.schema_id = schema_id(@schema_name)
+  AND c.name = column_name
 
--- GO
+EXECUTE (@command)
+
+GO
+PRINT 'Dropping unnamed DEFAULT constraint on dbo.Book ...'
+
+GO
+DECLARE @schema_name sysname
+DECLARE @table_name  sysname
+DECLARE @column_name sysname
+DECLARE @command     nvarchar(1000)
+
+SET @schema_name = N'dbo'
+SET @table_name = N'Book'
+SET @column_name = N'Title'
+
+SELECT @command = 'ALTER TABLE [' + @schema_name + '].[' + @table_name + '] DROP CONSTRAINT ' + d.name
+ FROM sys.tables t
+ JOIN sys.default_constraints d ON d.parent_object_id = t.object_id
+ JOIN sys.columns c ON c.object_id = t.object_id AND c.column_id = d.parent_column_id
+WHERE t.name = @table_name
+  AND t.schema_id = schema_id(@schema_name)
+  AND c.name = column_name
+
+EXECUTE (@command)
+
+GO
 PRINT 'Dropping DEFAULT constraint DF_RegisteredDate_Today on dbo.Book ...'
 
 GO
@@ -156,12 +190,23 @@ GO";
         }
 
         [Test]
-        public async Task ModifyAsync_CorrectReplacement_Async()
+        public async Task ModifyAsync_ErrorsGettingDacpacConstraints_Async()
         {
             // Arrange
             var daMock = new Mock<IDacAccess>();
             var loggerMock = new Mock<ILogger>();
-            // TODO: daMock.Setup(m => m.)
+            daMock.Setup(m => m.GetDefaultConstraintsAsync("old"))
+                  .ReturnsAsync(() => (new DefaultConstraint[0], new []
+                                          {
+                                              "oldError1",
+                                              "oldError2"
+                                          }));
+            daMock.Setup(m => m.GetDefaultConstraintsAsync("new"))
+                  .ReturnsAsync(() => (new DefaultConstraint[0], new[]
+                                          {
+                                              "newError1",
+                                              "newError2"
+                                          }));
             var project = new SqlProject("a", "b", "c");
             var config = new ConfigurationModel
             {
@@ -177,7 +222,53 @@ GO";
                 TrackDacpacVersion = false,
                 CommentOutReferencedProjectRefactorings = true
             };
-            var paths = new PathCollection("a", "b", "c", "d", null, null);
+            var paths = new PathCollection("a", "b", "new", "old", "e", "f");
+            IScriptModifier modifier = new ReplaceUnnamedDefaultConstraintDropsModifier(daMock.Object, loggerMock.Object);
+
+            // Act
+            var result = await modifier.ModifyAsync(MultipleDropDefaultConstraintStatements, project, config, paths);
+
+            // Assert
+            Assert.AreEqual(MultipleDropDefaultConstraintStatements, result);
+            loggerMock.Verify(m => m.LogAsync("ERROR: Failed to load the default constraints of the previous DACPAC:"), Times.Once);
+            loggerMock.Verify(m => m.LogAsync("oldError1"), Times.Once);
+            loggerMock.Verify(m => m.LogAsync("oldError2"), Times.Once);
+            loggerMock.Verify(m => m.LogAsync("ERROR: Failed to load the default constraints of the current DACPAC:"), Times.Once);
+            loggerMock.Verify(m => m.LogAsync("newError1"), Times.Once);
+            loggerMock.Verify(m => m.LogAsync("newError2"), Times.Once);
+        }
+
+        [Test]
+        public async Task ModifyAsync_CorrectReplacement_Async()
+        {
+            // Arrange
+            var daMock = new Mock<IDacAccess>();
+            var loggerMock = new Mock<ILogger>();
+            daMock.Setup(m => m.GetDefaultConstraintsAsync("old"))
+                  .ReturnsAsync(() => (new[]
+                                          {
+                                              new DefaultConstraint("dbo", "Author", "LastName", null),
+                                              new DefaultConstraint("dbo", "Book", "Title", null),
+                                              new DefaultConstraint("dbo", "Book", "RegisteredDate", "DF_RegisteredDate_Today")
+                                          }, null));
+            daMock.Setup(m => m.GetDefaultConstraintsAsync("new"))
+                  .ReturnsAsync(() => (new DefaultConstraint[0], null));
+            var project = new SqlProject("a", "b", "c");
+            var config = new ConfigurationModel
+            {
+                ArtifactsPath = "foobar",
+                ReplaceUnnamedDefaultConstraintDrops = true,
+                CommentOutUnnamedDefaultConstraintDrops = false,
+                PublishProfilePath = "Test.publish.xml",
+                VersionPattern = "1.2.3.4",
+                CreateDocumentationWithScriptCreation = true,
+                CustomHeader = "awesome header",
+                CustomFooter = "lame footer",
+                BuildBeforeScriptCreation = true,
+                TrackDacpacVersion = false,
+                CommentOutReferencedProjectRefactorings = true
+            };
+            var paths = new PathCollection("a", "b", "new", "old", "e", "f");
             IScriptModifier modifier = new ReplaceUnnamedDefaultConstraintDropsModifier(daMock.Object, loggerMock.Object);
 
             // Act

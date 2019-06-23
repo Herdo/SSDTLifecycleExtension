@@ -48,14 +48,14 @@ EXECUTE (@command)";
             var oldDefaultConstraints = await _dacAccess.GetDefaultConstraintsAsync(paths.PreviousDacpacPath);
             if (oldDefaultConstraints.Errors != null)
             {
-                await _logger.LogAsync($"ERROR: Failed to load the default constraints of the previous DACPAC:");
+                await _logger.LogAsync("ERROR: Failed to load the default constraints of the previous DACPAC:");
                 foreach (var error in oldDefaultConstraints.Errors)
                     await _logger.LogAsync(error);
             }
             var currentDefaultConstraints = await _dacAccess.GetDefaultConstraintsAsync(paths.NewDacpacPath);
             if (currentDefaultConstraints.Errors != null)
             {
-                await _logger.LogAsync($"ERROR: Failed to load the default constraints of the current DACPAC:");
+                await _logger.LogAsync("ERROR: Failed to load the default constraints of the current DACPAC:");
                 foreach (var error in currentDefaultConstraints.Errors)
                     await _logger.LogAsync(error);
             }
