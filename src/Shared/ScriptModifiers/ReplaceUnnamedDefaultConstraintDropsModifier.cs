@@ -93,7 +93,8 @@ EXECUTE (@command)";
                                                                                  .FirstOrDefault();
                                         if (toRemove != null)
                                         {
-                                            defaultConstraintsToRemove[toRemove] = true; // Flag as already used for a replacement;
+                                            // Flag as already used for a replacement.
+                                            defaultConstraintsToRemove[toRemove] = true;
 
                                             // Prepare template
                                             var dropConstraint = string.Format(DropScriptTemplate,

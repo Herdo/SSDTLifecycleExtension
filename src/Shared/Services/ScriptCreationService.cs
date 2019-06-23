@@ -229,9 +229,9 @@ namespace SSDTLifecycleExtension.Shared.Services
                 if (await ShouldCancelAsync(cancellationToken))
                     return false;
 
-                if (configuration.BuildBeforeScriptCreation)
-                    if (!await _buildService.BuildProjectAsync(project))
-                        return false;
+                if (configuration.BuildBeforeScriptCreation
+                    && !await _buildService.BuildProjectAsync(project))
+                    return false;
 
                 // Cancel if requested
                 if (await ShouldCancelAsync(cancellationToken))

@@ -3,7 +3,7 @@
     using System;
     using JetBrains.Annotations;
 
-    public class DefaultConstraint : IEquatable<DefaultConstraint>
+    public sealed class DefaultConstraint : IEquatable<DefaultConstraint>
     {
         [NotNull]
         public string TableSchema { get; }
