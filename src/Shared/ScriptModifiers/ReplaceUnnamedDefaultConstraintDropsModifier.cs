@@ -89,7 +89,7 @@ EXECUTE (@command)";
         private (string ResultText, int RegexMatchTimeouts, int FailedReplacements) ReplaceUnnamedDefaultConstraintStatements(string input,
                                                                                                                               IDictionary<DefaultConstraint, bool> defaultConstraintsToRemove)
         {
-            var tableRegex = new Regex(@"ALTER TABLE \[(?<schemaName>\w+)\]\.\[(?<tableName>\w+)\] DROP CONSTRAINT ;", RegexOptions.Compiled, TimeSpan.FromMilliseconds(10));
+            var tableRegex = new Regex(@"^ALTER TABLE \[(?<schemaName>\w+)\]\.\[(?<tableName>\w+)\] DROP CONSTRAINT ;$", RegexOptions.Compiled, TimeSpan.FromMilliseconds(10));
             var regexMatchTimeouts = 0;
             var failedReplacements = 0;
             return (ForEachMatch(input,
