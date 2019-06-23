@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Threading.Tasks;
     using JetBrains.Annotations;
@@ -26,7 +25,6 @@
             _fileSystemAccess = fileSystemAccess ?? throw new ArgumentNullException(nameof(fileSystemAccess));
         }
 
-        [ExcludeFromCodeCoverage] // We're not testing the DacServices and other components in that namespace.
         private async Task<(string DeployScriptContent, string DeployReportContent, string[] Errors)> CreateDeployFilesInternalAsync(string previousVersionDacpacPath,
                                                                                                                                      string newVersionDacpacPath,
                                                                                                                                      string publishProfilePath,
@@ -93,7 +91,6 @@
         {
             var (constraints, errors) = await Task.Run<(DefaultConstraint[] Result, string[] Errors)>(() =>
             {
-                var result = new List<DefaultConstraint>();
                 SecureStreamResult<TSqlModel> sqlModel = null;
                 try
                 {
@@ -108,20 +105,7 @@
                             return (null, fileOpenErrors.ToArray());
 
                         // Process the input
-                        var defaultConstraints = sqlModel.Result.GetObjects(DacQueryScopes.UserDefined, ModelSchema.DefaultConstraint);
-                        foreach (var defaultConstraint in defaultConstraints)
-                        {
-                            var targetColumn = defaultConstraint.GetReferenced(Microsoft.SqlServer.Dac.Model.DefaultConstraint.TargetColumn)?.SingleOrDefault();
-                            if (targetColumn != null && targetColumn.Name.Parts.Count == 3)
-                            {
-                                result.Add(new DefaultConstraint(targetColumn.Name.Parts[0],
-                                                                 targetColumn.Name.Parts[1],
-                                                                 targetColumn.Name.Parts[2],
-                                                                 defaultConstraint.Name.HasName
-                                                                     ? defaultConstraint.Name.Parts[0]
-                                                                     : null));
-                            }
-                        }
+                        return (GetDefaultConstraintsFromModel(sqlModel.Result), null);
                     }
 
                 }
@@ -133,11 +117,24 @@
                 {
                     sqlModel?.Dispose();
                 }
-
-                return (result.ToArray(), null);
             });
 
             return (constraints, errors);
+        }
+
+        private static DefaultConstraint[] GetDefaultConstraintsFromModel(TSqlModel sqlModel)
+        {
+            var defaultConstraints = sqlModel.GetObjects(DacQueryScopes.UserDefined, ModelSchema.DefaultConstraint);
+            return (from defaultConstraint in defaultConstraints
+                    let targetColumn = defaultConstraint.GetReferenced(Microsoft.SqlServer.Dac.Model.DefaultConstraint.TargetColumn)?.SingleOrDefault()
+                    where targetColumn != null && targetColumn.Name.Parts.Count == 3
+                    select new DefaultConstraint(targetColumn.Name.Parts[0],
+                                                 targetColumn.Name.Parts[1],
+                                                 targetColumn.Name.Parts[2],
+                                                 defaultConstraint.Name.HasName
+                                                     ? defaultConstraint.Name.Parts[0]
+                                                     : null))
+               .ToArray();
         }
 
         Task<(string DeployScriptContent, string DeployReportContent, string[] Errors)> IDacAccess.CreateDeployFilesAsync(string previousVersionDacpacPath,
