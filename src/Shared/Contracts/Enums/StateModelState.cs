@@ -5,6 +5,7 @@
         Initialized = 0,
         SqlProjectPropertiesLoaded = 10,
         FormattedTargetVersionLoaded = 20,
+        FormattedTargetVersionValidated = 25,
         PathsLoaded = 30,
         PathsVerified = 40,
         TriedToBuildProject = 50,

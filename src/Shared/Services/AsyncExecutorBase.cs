@@ -4,6 +4,7 @@
     using System.Diagnostics;
     using System.Threading;
     using System.Threading.Tasks;
+    using Contracts;
     using Contracts.DataAccess;
     using Contracts.Models;
     using JetBrains.Annotations;
@@ -11,11 +12,11 @@
     public abstract class AsyncExecutorBase<TStateModel>
         where TStateModel : IStateModel
     {
-        protected readonly ILogger Logger;
+        private readonly ILogger _logger;
 
         protected AsyncExecutorBase([NotNull] ILogger logger)
         {
-            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         private async Task<bool> ShouldCancelAsync(CancellationToken cancellationToken)
@@ -23,11 +24,11 @@
             if (!cancellationToken.IsCancellationRequested)
                 return false;
 
-            await Logger.LogAsync("Creation was canceled by the user.");
+            await _logger.LogAsync("Creation was canceled by the user.");
             return true;
         }
 
-        private Func<TStateModel, CancellationToken, Task> GetNextWorkUnit(TStateModel stateModel)
+        private IWorkUnit<TStateModel> GetNextWorkUnit(TStateModel stateModel)
         {
             if (stateModel.Result == false)
                 return null; // If the previous work unit set the total result to false, don't provide any further steps.
@@ -49,9 +50,9 @@
             try
             {
                 await stateModel.HandleWorkInProgressChanged.Invoke(true);
-                await Logger.LogAsync(GetOperationStartedMessage());
+                await _logger.LogAsync(GetOperationStartedMessage());
 
-                Func<TStateModel, CancellationToken, Task> workUnit;
+                IWorkUnit<TStateModel> workUnit;
                 do
                 {
                     if (await ShouldCancelAsync(cancellationToken))
@@ -59,19 +60,19 @@
 
                     workUnit = GetNextWorkUnit(stateModel);
                     if (workUnit != null)
-                        await workUnit(stateModel, cancellationToken);
+                        await workUnit.Work(stateModel, cancellationToken);
 
                 } while (workUnit != null);
 
                 sw.Stop();
-                await Logger.LogAsync(GetOperationCompletedMessage(stateModel, sw.ElapsedMilliseconds));
+                await _logger.LogAsync(GetOperationCompletedMessage(stateModel, sw.ElapsedMilliseconds));
             }
             catch (Exception e)
             {
                 sw.Stop();
                 try
                 {
-                    await Logger.LogAsync(GetOperationFailedMessage(e));
+                    await _logger.LogAsync(GetOperationFailedMessage(e));
                 }
                 catch
                 {
@@ -97,6 +98,6 @@
 
         protected abstract string GetOperationFailedMessage(Exception exception);
 
-        protected abstract Func<TStateModel, CancellationToken, Task> GetNextWorkUnitForStateModel(TStateModel stateModel);
+        protected abstract IWorkUnit<TStateModel> GetNextWorkUnitForStateModel(TStateModel stateModel);
     }
 }
