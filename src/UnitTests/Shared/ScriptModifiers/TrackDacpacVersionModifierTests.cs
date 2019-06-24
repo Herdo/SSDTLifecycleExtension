@@ -12,7 +12,19 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers
     public class TrackDacpacVersionModifierTests
     {
         private const string MultiLineInputWithFinalGo =
-@"PRINT 'First statement';
+@"
+GO
+SET ANSI_NULLS, ANSI_PADDING, ANSI_WARNINGS, ARITHABORT, CONCAT_NULL_YIELDS_NULL, QUOTED_IDENTIFIER ON;
+
+SET NUMERIC_ROUNDABORT OFF;
+
+
+GO
+USE [$(DatabaseName)];
+
+
+GO
+PRINT 'First statement';
 
 GO
 ALTER TABLE [dbo].[Author] ADD COLUMN Birthday DATE NULL;
@@ -22,6 +34,10 @@ PRINT 'Second statement'
 
 GO
 ALTER TABLE [dbo].[Author] DROP COLUMN Birthday;
+
+GO
+USE [$(DatabaseName)];
+
 
 GO
 PRINT 'Update complete'
@@ -29,7 +45,19 @@ PRINT 'Update complete'
 GO";
 
         private const string MultiLineInputWithFinalGoAndNewLine =
-            @"PRINT 'First statement';
+@"
+GO
+SET ANSI_NULLS, ANSI_PADDING, ANSI_WARNINGS, ARITHABORT, CONCAT_NULL_YIELDS_NULL, QUOTED_IDENTIFIER ON;
+
+SET NUMERIC_ROUNDABORT OFF;
+
+
+GO
+USE [$(DatabaseName)];
+
+
+GO
+PRINT 'First statement';
 
 GO
 ALTER TABLE [dbo].[Author] ADD COLUMN Birthday DATE NULL;
@@ -39,6 +67,10 @@ PRINT 'Second statement'
 
 GO
 ALTER TABLE [dbo].[Author] DROP COLUMN Birthday;
+
+GO
+USE [$(DatabaseName)];
+
 
 GO
 PRINT 'Update complete'
@@ -47,7 +79,19 @@ GO
 ";
 
         private const string MultiLineInputWithoutFinalGo =
-            @"PRINT 'First statement';
+@"
+GO
+SET ANSI_NULLS, ANSI_PADDING, ANSI_WARNINGS, ARITHABORT, CONCAT_NULL_YIELDS_NULL, QUOTED_IDENTIFIER ON;
+
+SET NUMERIC_ROUNDABORT OFF;
+
+
+GO
+USE [$(DatabaseName)];
+
+
+GO
+PRINT 'First statement';
 
 GO
 ALTER TABLE [dbo].[Author] ADD COLUMN Birthday DATE NULL;
@@ -57,12 +101,28 @@ PRINT 'Second statement'
 
 GO
 ALTER TABLE [dbo].[Author] DROP COLUMN Birthday;
+
+GO
+USE [$(DatabaseName)];
+
 
 GO
 PRINT 'Update complete'";
 
         private const string MultiLineInputWithoutFinalGoButWithNewLine =
-            @"PRINT 'First statement';
+@"
+GO
+SET ANSI_NULLS, ANSI_PADDING, ANSI_WARNINGS, ARITHABORT, CONCAT_NULL_YIELDS_NULL, QUOTED_IDENTIFIER ON;
+
+SET NUMERIC_ROUNDABORT OFF;
+
+
+GO
+USE [$(DatabaseName)];
+
+
+GO
+PRINT 'First statement';
 
 GO
 ALTER TABLE [dbo].[Author] ADD COLUMN Birthday DATE NULL;
@@ -72,13 +132,29 @@ PRINT 'Second statement'
 
 GO
 ALTER TABLE [dbo].[Author] DROP COLUMN Birthday;
+
+GO
+USE [$(DatabaseName)];
+
 
 GO
 PRINT 'Update complete'
 ";
 
         private const string FinalMultilineStatementFullVersion =
-@"IF OBJECT_ID(N'[dbo].[__DacpacVersion]', N'U') IS NULL
+@"
+GO
+SET ANSI_NULLS, ANSI_PADDING, ANSI_WARNINGS, ARITHABORT, CONCAT_NULL_YIELDS_NULL, QUOTED_IDENTIFIER ON;
+
+SET NUMERIC_ROUNDABORT OFF;
+
+
+GO
+USE [$(DatabaseName)];
+
+
+GO
+IF OBJECT_ID(N'[dbo].[__DacpacVersion]', N'U') IS NULL
 BEGIN
 	PRINT 'Creating table dbo.__DacpacVersion'
 	CREATE TABLE [dbo].[__DacpacVersion]
@@ -124,6 +200,10 @@ GO
 ALTER TABLE [dbo].[Author] DROP COLUMN Birthday;
 
 GO
+USE [$(DatabaseName)];
+
+
+GO
 PRINT 'Update complete'
 
 GO
@@ -143,7 +223,19 @@ GO
 ";
 
         private const string FinalMultilineStatementMajorMinorBuildVersion =
-            @"IF OBJECT_ID(N'[dbo].[__DacpacVersion]', N'U') IS NULL
+@"
+GO
+SET ANSI_NULLS, ANSI_PADDING, ANSI_WARNINGS, ARITHABORT, CONCAT_NULL_YIELDS_NULL, QUOTED_IDENTIFIER ON;
+
+SET NUMERIC_ROUNDABORT OFF;
+
+
+GO
+USE [$(DatabaseName)];
+
+
+GO
+IF OBJECT_ID(N'[dbo].[__DacpacVersion]', N'U') IS NULL
 BEGIN
 	PRINT 'Creating table dbo.__DacpacVersion'
 	CREATE TABLE [dbo].[__DacpacVersion]
@@ -189,6 +281,10 @@ GO
 ALTER TABLE [dbo].[Author] DROP COLUMN Birthday;
 
 GO
+USE [$(DatabaseName)];
+
+
+GO
 PRINT 'Update complete'
 
 GO
@@ -208,7 +304,19 @@ GO
 ";
 
         private const string FinalMultilineStatementMajorMinorVersion =
-            @"IF OBJECT_ID(N'[dbo].[__DacpacVersion]', N'U') IS NULL
+@"
+GO
+SET ANSI_NULLS, ANSI_PADDING, ANSI_WARNINGS, ARITHABORT, CONCAT_NULL_YIELDS_NULL, QUOTED_IDENTIFIER ON;
+
+SET NUMERIC_ROUNDABORT OFF;
+
+
+GO
+USE [$(DatabaseName)];
+
+
+GO
+IF OBJECT_ID(N'[dbo].[__DacpacVersion]', N'U') IS NULL
 BEGIN
 	PRINT 'Creating table dbo.__DacpacVersion'
 	CREATE TABLE [dbo].[__DacpacVersion]
@@ -252,6 +360,10 @@ PRINT 'Second statement'
 
 GO
 ALTER TABLE [dbo].[Author] DROP COLUMN Birthday;
+
+GO
+USE [$(DatabaseName)];
+
 
 GO
 PRINT 'Update complete'

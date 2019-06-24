@@ -6,7 +6,7 @@
     using Contracts;
     using Models;
 
-    internal class TrackDacpacVersionModifier : IScriptModifier
+    internal class TrackDacpacVersionModifier : StringSearchModifierBase, IScriptModifier
     {
         private const string CreateAndInsertScriptTemplate =
 @"IF OBJECT_ID(N'[dbo].[__DacpacVersion]', N'U') IS NULL
@@ -63,6 +63,30 @@ UPDATE [dv]
 GO
 ";
 
+        private static (string CreateAndInsertStatement, string UpdateStatement) GetFinalStatementsFromTemplate(string input,
+                                                                                                                SqlProject project)
+        {
+            var newVersion = project.ProjectProperties.DacVersion;
+            var majorVersion = newVersion.Major.ToString();
+            var minorVersion = newVersion.Minor.ToString();
+            var buildVersion = newVersion.Build.ToString();
+            var revisionVersion = newVersion.Revision.ToString();
+            var createAndInsertStatement = string.Format(CreateAndInsertScriptTemplate,
+                                                         project.ProjectProperties.SqlTargetName,
+                                                         majorVersion,
+                                                         minorVersion,
+                                                         buildVersion,
+                                                         revisionVersion);
+            var updateStatement = string.Format(UpdateScriptTemplate,
+                                                project.ProjectProperties.SqlTargetName,
+                                                majorVersion,
+                                                minorVersion,
+                                                buildVersion,
+                                                revisionVersion);
+            ChangeUpdateStatementDependingOnInputEnd(ref updateStatement, input);
+            return (createAndInsertStatement, updateStatement);
+        }
+
         private static void ChangeUpdateStatementDependingOnInputEnd(ref string update,
                                                                      string input)
         {
@@ -93,37 +117,21 @@ GO
                 throw new ArgumentException($"{nameof(SqlProjectProperties)}.{nameof(SqlProjectProperties.DacVersion)} must be set.", nameof(project));
 
             // Prepare format string
-            var newVersion = project.ProjectProperties.DacVersion;
-            var majorVersion = newVersion.Major.ToString();
-            var minorVersion = newVersion.Minor.ToString();
-            var buildVersion = newVersion.Build.ToString();
-            var revisionVersion = newVersion.Revision.ToString();
-            var createAndInsert = string.Format(CreateAndInsertScriptTemplate,
-                                                project.ProjectProperties.SqlTargetName,
-                                                majorVersion,
-                                                minorVersion,
-                                                buildVersion,
-                                                revisionVersion);
-            var update = string.Format(UpdateScriptTemplate,
-                                       project.ProjectProperties.SqlTargetName,
-                                       majorVersion,
-                                       minorVersion,
-                                       buildVersion,
-                                       revisionVersion);
-            ChangeUpdateStatementDependingOnInputEnd(ref update, input);
+            var (createAndInsertStatement, updateStatement) = GetFinalStatementsFromTemplate(input, project);
 
-            var sb = new StringBuilder();
+            var createAndInsertStatementSet = false;
+            var modifiedWithInsertAndCreateStatement = ForEachMatch(input,
+                                                                    "USE [$(DatabaseName)];",
+                                                                    0,
+                                                                    s =>
+                                                                    {
+                                                                        if (createAndInsertStatementSet)
+                                                                            return s;
+                                                                        createAndInsertStatementSet = true;
+                                                                        return s + createAndInsertStatement;
+                                                                    });
 
-            // Create table and insert
-            sb.Append(createAndInsert);
-
-            // Input
-            sb.Append(input);
-
-            // Update existing entry
-            sb.Append(update);
-
-            return Task.FromResult(sb.ToString());
+            return Task.FromResult(modifiedWithInsertAndCreateStatement + updateStatement);
         }
     }
 }
