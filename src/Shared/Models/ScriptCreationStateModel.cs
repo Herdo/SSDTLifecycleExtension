@@ -3,10 +3,9 @@
     using System;
     using System.Threading.Tasks;
     using Contracts;
-    using Contracts.Models;
     using JetBrains.Annotations;
 
-    public class ScriptCreationStateModel : BaseModel, IStateModel
+    public class ScriptCreationStateModel : BaseStateModel
     {
         [NotNull]
         public SqlProject Project { get; }
@@ -40,16 +39,12 @@
                                         [NotNull] Version previousVersion,
                                         bool createLatest,
                                         [NotNull] Func<bool, Task> handleWorkInProgressChanged)
+            : base(handleWorkInProgressChanged)
         {
             Project = project ?? throw new ArgumentNullException(nameof(project));
             Configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             PreviousVersion = previousVersion ?? throw new ArgumentNullException(nameof(previousVersion));
             CreateLatest = createLatest;
-            HandleWorkInProgressChanged = handleWorkInProgressChanged ?? throw new ArgumentNullException(nameof(handleWorkInProgressChanged));
         }
-
-        public Func<bool, Task> HandleWorkInProgressChanged { get; }
-
-        public bool? Result { get; set; }
     }
 }
