@@ -2,7 +2,6 @@
 {
     using System;
     using Contracts;
-    using Contracts.DataAccess;
     using Contracts.Enums;
     using Contracts.Factories;
     using JetBrains.Annotations;
@@ -10,14 +9,11 @@
     [UsedImplicitly]
     public class ScriptModifierFactory : IScriptModifierFactory
     {
-        private readonly IDacAccess _dacAccess;
-        private readonly ILogger _logger;
+        [NotNull] private readonly IDependencyResolver _dependencyResolver;
 
-        public ScriptModifierFactory([NotNull] IDacAccess dacAccess,
-                                     [NotNull] ILogger logger)
+        public ScriptModifierFactory([NotNull] IDependencyResolver dependencyResolver)
         {
-            _dacAccess = dacAccess ?? throw new ArgumentNullException(nameof(dacAccess));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _dependencyResolver = dependencyResolver ?? throw new ArgumentNullException(nameof(dependencyResolver));
         }
 
         IScriptModifier IScriptModifierFactory.CreateScriptModifier(ScriptModifier scriptModifier)
@@ -25,15 +21,15 @@
             switch (scriptModifier)
             {
                 case ScriptModifier.AddCustomHeader:
-                    return new AddCustomHeaderModifier();
+                    return _dependencyResolver.Get<AddCustomHeaderModifier>();
                 case ScriptModifier.AddCustomFooter:
-                    return new AddCustomFooterModifier();
+                    return _dependencyResolver.Get<AddCustomFooterModifier>();
                 case ScriptModifier.TrackDacpacVersion:
-                    return new TrackDacpacVersionModifier();
+                    return _dependencyResolver.Get<TrackDacpacVersionModifier>();
                 case ScriptModifier.CommentOutUnnamedDefaultConstraintDrops:
-                    return new CommentOutUnnamedDefaultConstraintDropsModifier();
+                    return _dependencyResolver.Get<CommentOutUnnamedDefaultConstraintDropsModifier>();
                 case ScriptModifier.ReplaceUnnamedDefaultConstraintDrops:
-                    return new ReplaceUnnamedDefaultConstraintDropsModifier(_dacAccess, _logger);
+                    return _dependencyResolver.Get<ReplaceUnnamedDefaultConstraintDropsModifier>();
                 default:
                     throw new ArgumentOutOfRangeException(nameof(scriptModifier), scriptModifier, null);
             }
