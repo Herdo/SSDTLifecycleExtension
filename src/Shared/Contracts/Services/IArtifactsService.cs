@@ -1,7 +1,7 @@
 ﻿namespace SSDTLifecycleExtension.Shared.Contracts.Services
 {
     using JetBrains.Annotations;
-    using Models;
+    using Shared.Models;
 
     public interface IArtifactsService
     {

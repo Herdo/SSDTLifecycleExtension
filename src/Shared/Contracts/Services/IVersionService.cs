@@ -2,7 +2,7 @@
 {
     using System;
     using JetBrains.Annotations;
-    using Models;
+    using Shared.Models;
 
     public interface IVersionService
     {

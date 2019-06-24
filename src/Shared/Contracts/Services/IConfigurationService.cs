@@ -5,7 +5,7 @@
     using Contracts;
     using Events;
     using JetBrains.Annotations;
-    using Models;
+    using Shared.Models;
 
     public interface IConfigurationService
     {

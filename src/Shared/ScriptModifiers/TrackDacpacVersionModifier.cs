@@ -1,7 +1,6 @@
 ﻿namespace SSDTLifecycleExtension.Shared.ScriptModifiers
 {
     using System;
-    using System.Text;
     using System.Threading.Tasks;
     using Contracts;
     using Models;

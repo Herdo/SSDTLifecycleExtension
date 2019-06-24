@@ -3,7 +3,7 @@
     using System;
     using System.Threading.Tasks;
     using JetBrains.Annotations;
-    using Models;
+    using Shared.Models;
 
     public interface ISqlProjectService
     {
@@ -16,11 +16,11 @@
         Task<bool> TryLoadSqlProjectPropertiesAsync([NotNull] SqlProject project);
 
         Task<PathCollection> TryLoadPathsForScaffoldingAsync([NotNull] SqlProject project,
-                                               [NotNull] ConfigurationModel configuration);
+                                                             [NotNull] ConfigurationModel configuration);
 
         Task<PathCollection> TryLoadPathsForScriptCreationAsync([NotNull] SqlProject project,
-                                               [NotNull] ConfigurationModel configuration,
-                                               [NotNull] Version previousVersion,
-                                               bool createLatest);
+                                                                [NotNull] ConfigurationModel configuration,
+                                                                [NotNull] Version previousVersion,
+                                                                bool createLatest);
     }
 }

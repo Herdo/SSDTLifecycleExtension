@@ -4,7 +4,6 @@ namespace SSDTLifecycleExtension.Shared.Services
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -17,7 +16,7 @@ namespace SSDTLifecycleExtension.Shared.Services
     using Models;
 
     [UsedImplicitly]
-    public class ScriptCreationService : IScriptCreationService
+    public class ScriptCreationService : AsyncExecutorBase<ScriptCreationStateModel>, IScriptCreationService
     {
         private readonly ISqlProjectService _sqlProjectService;
         private readonly IBuildService _buildService;
@@ -26,7 +25,6 @@ namespace SSDTLifecycleExtension.Shared.Services
         private readonly IVisualStudioAccess _visualStudioAccess;
         private readonly IFileSystemAccess _fileSystemAccess;
         private readonly IDacAccess _dacAccess;
-        private readonly ILogger _logger;
 
         private bool _isCreating;
 
@@ -38,6 +36,7 @@ namespace SSDTLifecycleExtension.Shared.Services
                                      IFileSystemAccess fileSystemAccess,
                                      IDacAccess dacAccess,
                                      ILogger logger)
+            : base(logger)
         {
             _sqlProjectService = sqlProjectService ?? throw new ArgumentNullException(nameof(sqlProjectService));
             _buildService = buildService ?? throw new ArgumentNullException(nameof(buildService));
@@ -46,35 +45,12 @@ namespace SSDTLifecycleExtension.Shared.Services
             _visualStudioAccess = visualStudioAccess ?? throw new ArgumentNullException(nameof(visualStudioAccess));
             _fileSystemAccess = fileSystemAccess ?? throw new ArgumentNullException(nameof(fileSystemAccess));
             _dacAccess = dacAccess ?? throw new ArgumentNullException(nameof(dacAccess));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
-
-        private async Task<bool> ShouldCancelAsync(CancellationToken cancellationToken)
-        {
-            if (!cancellationToken.IsCancellationRequested)
-                return false;
-
-            await _logger.LogAsync("Creation was canceled by the user.");
-            return true;
-        }
-
-        private async Task<bool> VerifyPathsAsync(PathCollection paths)
-        {
-            await _logger.LogAsync("Verifying paths ...");
-
-            if (!_fileSystemAccess.CheckIfFileExists(paths.PublishProfilePath))
-            {
-                await _logger.LogAsync("ERROR: Failed to find publish profile.");
-                return false;
-            }
-
-            return true;
         }
 
         private async Task<bool> CreateScriptAsync(PathCollection paths,
                                                    bool createDocumentation)
         {
-            await _logger.LogAsync("Creating diff files ...");
+            await Logger.LogAsync("Creating diff files ...");
             var result = await _dacAccess.CreateDeployFilesAsync(paths.PreviousDacpacPath,
                                                                  paths.NewDacpacPath,
                                                                  paths.PublishProfilePath,
@@ -83,9 +59,9 @@ namespace SSDTLifecycleExtension.Shared.Services
 
             if (result.Errors != null)
             {
-                await _logger.LogAsync("ERROR: Failed to create script:");
+                await Logger.LogAsync("ERROR: Failed to create script:");
                 foreach (var s in result.Errors)
-                    await _logger.LogAsync(s);
+                    await Logger.LogAsync(s);
 
                 return false;
             }
@@ -93,12 +69,12 @@ namespace SSDTLifecycleExtension.Shared.Services
             var success = true;
             try
             {
-                await _logger.LogAsync($"Writing deploy script to {paths.DeployScriptPath} ...");
+                await Logger.LogAsync($"Writing deploy script to {paths.DeployScriptPath} ...");
                 await _fileSystemAccess.WriteFileAsync(paths.DeployScriptPath, result.DeployScriptContent);
             }
             catch (Exception e)
             {
-                await _logger.LogAsync($"ERROR: Failed to write deploy script: {e.Message}");
+                await Logger.LogAsync($"ERROR: Failed to write deploy script: {e.Message}");
                 success = false;
             }
 
@@ -107,46 +83,39 @@ namespace SSDTLifecycleExtension.Shared.Services
 
             try
             {
-                await _logger.LogAsync($"Writing deploy report to {paths.DeployReportPath} ...");
+                await Logger.LogAsync($"Writing deploy report to {paths.DeployReportPath} ...");
                 await _fileSystemAccess.WriteFileAsync(paths.DeployReportPath, result.DeployReportContent);
             }
             catch (Exception e)
             {
-                await _logger.LogAsync($"ERROR: Failed to write deploy report: {e.Message}");
+                await Logger.LogAsync($"ERROR: Failed to write deploy report: {e.Message}");
                 success = false;
             }
 
             return success;
         }
 
-        private async Task<bool> ModifyCreatedScriptAsync(SqlProject project,
-                                                          ConfigurationModel configuration,
-                                                          PathCollection paths,
-                                                          CancellationToken cancellationToken)
+        private async Task ModifyCreatedScriptAsync(SqlProject project,
+                                                    ConfigurationModel configuration,
+                                                    PathCollection paths)
         {
             var modifiers = GetScriptModifiers(configuration);
             if (!modifiers.Any())
-                return true;
+                return;
 
             var scriptContent = await _fileSystemAccess.ReadFileAsync(paths.DeployScriptPath);
 
             foreach (var m in modifiers.OrderBy(m => m.Key))
             {
-                await _logger.LogAsync($"Modifying script: {m.Key}");
+                await Logger.LogAsync($"Modifying script: {m.Key}");
 
                 scriptContent = await m.Value.ModifyAsync(scriptContent,
                                                           project,
                                                           configuration,
                                                           paths);
-
-                // Cancel if requested
-                if (await ShouldCancelAsync(cancellationToken))
-                    return false;
             }
 
             await _fileSystemAccess.WriteFileAsync(paths.DeployScriptPath, scriptContent);
-
-            return true;
         }
 
         private IReadOnlyDictionary<ScriptModifier, IScriptModifier> GetScriptModifiers(ConfigurationModel configuration)
@@ -172,111 +141,134 @@ namespace SSDTLifecycleExtension.Shared.Services
         }
 
         private async Task<bool> CreateInternalAsync(SqlProject project,
-                                               ConfigurationModel configuration,
-                                               Version previousVersion,
-                                               bool latest,
-                                               CancellationToken cancellationToken)
+                                                     ConfigurationModel configuration,
+                                                     Version previousVersion,
+                                                     bool latest,
+                                                     CancellationToken cancellationToken)
         {
-            IsCreating = true;
-            try
+            var stateModel = new ScriptCreationStateModel(project, configuration, previousVersion, latest, StateModelHandleWorkInProgressChanged);
+            await DoWorkAsync(stateModel, cancellationToken);
+            return stateModel.Result ?? false;
+        }
+
+        private async Task TryLoadSqlProjectProperties(ScriptCreationStateModel stateModel, CancellationToken cancellationToken)
+        {
+            var loaded = await _sqlProjectService.TryLoadSqlProjectPropertiesAsync(stateModel.Project);
+            if (!loaded)
+                stateModel.Result = false;
+        }
+
+        private async Task FormatTargetVersion(ScriptCreationStateModel stateModel, CancellationToken cancellationToken)
+        {
+            if (stateModel.CreateLatest)
+            {
+                stateModel.FormattedTargetVersion = new Version(0, 0);
+                return;
+            }
+
+            stateModel.FormattedTargetVersion = Version.Parse(_versionService.FormatVersion(stateModel.Project.ProjectProperties.DacVersion, stateModel.Configuration));
+
+            // Check DacVersion against base version, if not running latest creation
+            if (stateModel.FormattedTargetVersion > stateModel.PreviousVersion)
+                return;
+
+            stateModel.Result = false;
+            await Logger.LogAsync($"ERROR: DacVersion of SQL project ({stateModel.FormattedTargetVersion}) is equal to or smaller than the previous version ({stateModel.PreviousVersion}).");
+            _visualStudioAccess.ShowModalError("Please change the DAC version in the SQL project settings (see output window).");
+        }
+
+        private async Task TryLoadPathsForScriptCreation(ScriptCreationStateModel stateModel, CancellationToken cancellationToken)
+        {
+            stateModel.Paths = await _sqlProjectService.TryLoadPathsForScriptCreationAsync(stateModel.Project, stateModel.Configuration, stateModel.PreviousVersion, stateModel.CreateLatest);
+            if (stateModel.Paths == null)
+                stateModel.Result = false;
+        }
+
+        private async Task VerifyPaths(ScriptCreationStateModel stateModel, CancellationToken cancellationToken)
+        {
+            await Logger.LogAsync("Verifying paths ...");
+
+            stateModel.ArePathsVerified = true;
+            if (_fileSystemAccess.CheckIfFileExists(stateModel.Paths.PublishProfilePath))
+                return;
+
+            stateModel.Result = false;
+            await Logger.LogAsync("ERROR: Failed to find publish profile.");
+        }
+
+        private async Task TryBuildProject(ScriptCreationStateModel stateModel, CancellationToken cancellationToken)
+        {
+            if (stateModel.Configuration.BuildBeforeScriptCreation
+                && !await _buildService.BuildProjectAsync(stateModel.Project))
+                stateModel.Result = false;
+            stateModel.HasTriedToBuildProject = true;
+        }
+
+        private async Task TryCopyBuildResult(ScriptCreationStateModel stateModel, CancellationToken cancellationToken)
+        {
+            if (!await _buildService.CopyBuildResultAsync(stateModel.Project, stateModel.Paths.NewDacpacDirectory))
+                stateModel.Result = false;
+            stateModel.HasTriedToCopyBuildResult = true;
+        }
+
+        private async Task TryToCreateDeploymentFiles(ScriptCreationStateModel stateModel, CancellationToken cancellationToken)
+        {
+            var success = await CreateScriptAsync(stateModel.Paths, stateModel.Configuration.CreateDocumentationWithScriptCreation);
+            if (!success)
+            {
+                await Logger.LogAsync("ERROR: Script creation aborted.");
+                stateModel.Result = false;
+            }
+
+            stateModel.HasTriedToCreateDeploymentFiles = true;
+        }
+
+        private async Task ModifyDeploymentScript(ScriptCreationStateModel stateModel, CancellationToken cancellationToken)
+        {
+            await ModifyCreatedScriptAsync(stateModel.Project, stateModel.Configuration, stateModel.Paths);
+            stateModel.HasModifiedDeploymentScript = true;
+        }
+
+        protected override string GetOperationStartedMessage() => "Initializing script creation ...";
+
+        protected override string GetOperationCompletedMessage(ScriptCreationStateModel stateModel, long elapsedMilliseconds)
+        {
+            return $"========== Script creation finished after {elapsedMilliseconds} milliseconds. ==========";
+        }
+
+        protected override string GetOperationFailedMessage(Exception exception) => $"ERROR: Script creation failed: {exception.Message}";
+
+        protected override Func<ScriptCreationStateModel, CancellationToken, Task> GetNextWorkUnitForStateModel(ScriptCreationStateModel stateModel)
+        {
+            if (stateModel.Project.ProjectProperties.SqlTargetName == null)
+                return TryLoadSqlProjectProperties;
+            if (stateModel.FormattedTargetVersion == null)
+                return FormatTargetVersion;
+            if (stateModel.Paths == null)
+                return TryLoadPathsForScriptCreation;
+            if (!stateModel.ArePathsVerified)
+                return VerifyPaths;
+            if (!stateModel.HasTriedToBuildProject)
+                return TryBuildProject;
+            if (!stateModel.HasTriedToCopyBuildResult)
+                return TryCopyBuildResult;
+            if (!stateModel.HasTriedToCreateDeploymentFiles)
+                return TryToCreateDeploymentFiles;
+            if (!stateModel.HasModifiedDeploymentScript)
+                return ModifyDeploymentScript;
+
+            return null;
+        }
+
+        private async Task StateModelHandleWorkInProgressChanged(bool workInProgress)
+        {
+            IsCreating = workInProgress;
+            if (IsCreating)
             {
                 await _visualStudioAccess.StartLongRunningTaskIndicatorAsync();
                 await _visualStudioAccess.ClearSSDTLifecycleOutputAsync();
-                await _logger.LogAsync("Initializing script creation ...");
-                var sw = new Stopwatch();
-                sw.Start();
-
-                // Cancel if requested
-                if (await ShouldCancelAsync(cancellationToken))
-                    return false;
-
-                if (!await _sqlProjectService.TryLoadSqlProjectPropertiesAsync(project))
-                    return false;
-
-                // Cancel if requested
-                if (await ShouldCancelAsync(cancellationToken))
-                    return false;
-
-                // Check DacVersion against base version, if not running latest creation
-                if (!latest)
-                {
-                    var formattedTargetVersion = Version.Parse(_versionService.FormatVersion(project.ProjectProperties.DacVersion, configuration));
-                    if (formattedTargetVersion <= previousVersion)
-                    {
-                        await _logger.LogAsync($"ERROR: DacVersion of SQL project ({formattedTargetVersion}) is equal to or smaller than the previous version ({previousVersion}).");
-                        _visualStudioAccess.ShowModalError("Please change the DAC version in the SQL project settings (see output window).");
-                        return false;
-                    }
-                }
-
-                // Cancel if requested
-                if (await ShouldCancelAsync(cancellationToken))
-                    return false;
-
-                // Create paths required for script creation
-                var paths = await _sqlProjectService.TryLoadPathsForScriptCreationAsync(project, configuration, previousVersion, latest);
-                if (paths == null)
-                    return false;
-
-                // Cancel if requested
-                if (await ShouldCancelAsync(cancellationToken))
-                    return false;
-
-                if (!await VerifyPathsAsync(paths))
-                    return false;
-
-                // Cancel if requested
-                if (await ShouldCancelAsync(cancellationToken))
-                    return false;
-
-                if (configuration.BuildBeforeScriptCreation
-                    && !await _buildService.BuildProjectAsync(project))
-                    return false;
-
-                // Cancel if requested
-                if (await ShouldCancelAsync(cancellationToken))
-                    return false;
-
-                if (!await _buildService.CopyBuildResultAsync(project, paths.NewDacpacDirectory))
-                    return false;
-
-                // Cancel if requested
-                if (await ShouldCancelAsync(cancellationToken))
-                    return false;
-
-                var success = await CreateScriptAsync(paths, configuration.CreateDocumentationWithScriptCreation);
-                if (!success)
-                {
-                    sw.Stop();
-                    await _logger.LogAsync($"ERROR: Script creation aborted after {sw.ElapsedMilliseconds / 1000} seconds.");
-                    return false;
-                }
-
-                // Cancel if requested
-                if (await ShouldCancelAsync(cancellationToken))
-                    return false;
-
-                // Modify the script
-                if (!await ModifyCreatedScriptAsync(project, configuration, paths, cancellationToken))
-                    return false;
-
-                // No check for the cancellation token after the last action.
-                // Completion
-                sw.Stop();
-                await _logger.LogAsync($"========== Script creation finished after {sw.ElapsedMilliseconds} milliseconds. ==========");
             }
-            catch (Exception e)
-            {
-                try
-                {
-                    await _logger.LogAsync($"ERROR: Script creation failed: {e.Message}");
-                }
-                catch
-                {
-                    // ignored
-                }
-            }
-            finally
+            else
             {
                 try
                 {
@@ -286,11 +278,7 @@ namespace SSDTLifecycleExtension.Shared.Services
                 {
                     // ignored
                 }
-
-                IsCreating = false;
             }
-
-            return true;
         }
 
         public event EventHandler IsCreatingChanged;

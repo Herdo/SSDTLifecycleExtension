@@ -5,10 +5,11 @@
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
+    using Contracts.Models;
     using JetBrains.Annotations;
     using Newtonsoft.Json;
 
-    public abstract class BaseModel : INotifyPropertyChanged, INotifyDataErrorInfo
+    public abstract class BaseModel : IBaseModel
     {
         #region Fields
 
