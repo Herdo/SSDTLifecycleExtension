@@ -16,7 +16,7 @@
     using Unity.Resolution;
     using ViewModels;
 
-    internal sealed class DependencyResolver : IDisposable
+    internal sealed class DependencyResolver : IDependencyResolver
     {
         private readonly IUnityContainer _container;
         private bool _disposed;
@@ -37,11 +37,14 @@
                                          commandService);
         }
 
-        private static IUnityContainer CreateContainer(IVisualStudioAccess visualStudioAccess,
-                                                       ILogger logger,
-                                                       OleMenuCommandService commandService)
+        private IUnityContainer CreateContainer(IVisualStudioAccess visualStudioAccess,
+                                                ILogger logger,
+                                                OleMenuCommandService commandService)
         {
             return new UnityContainer()
+
+                   // Register self
+                  .RegisterInstance(typeof(IDependencyResolver), this, new ContainerControlledLifetimeManager())
 
                    // Visual Studio dependencies
                   .RegisterInstance(commandService, new ContainerControlledLifetimeManager()) // The command service
@@ -87,7 +90,7 @@
             _container.RegisterInstance(package, new ContainerControlledLifetimeManager());
         }
 
-        internal T Get<T>()
+        public T Get<T>()
         {
             if (_disposed)
                 throw new ObjectDisposedException(nameof(DependencyResolver));
