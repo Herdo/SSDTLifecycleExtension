@@ -23,6 +23,9 @@
         Task IWorkUnit<ScaffoldingStateModel>.Work(ScaffoldingStateModel stateModel,
                                                    CancellationToken cancellationToken)
         {
+            if (stateModel == null)
+                throw new ArgumentNullException(nameof(stateModel));
+
             stateModel.FormattedTargetVersion = Version.Parse(_versionService.FormatVersion(stateModel.TargetVersion, stateModel.Configuration));
             stateModel.CurrentState = StateModelState.FormattedTargetVersionLoaded;
             return Task.CompletedTask;
@@ -31,6 +34,9 @@
         Task IWorkUnit<ScriptCreationStateModel>.Work(ScriptCreationStateModel stateModel,
                                                       CancellationToken cancellationToken)
         {
+            if (stateModel == null)
+                throw new ArgumentNullException(nameof(stateModel));
+
             if (!stateModel.CreateLatest)
                 stateModel.FormattedTargetVersion = Version.Parse(_versionService.FormatVersion(stateModel.Project.ProjectProperties.DacVersion, stateModel.Configuration));
             stateModel.CurrentState = StateModelState.FormattedTargetVersionLoaded;
