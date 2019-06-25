@@ -13,7 +13,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
     using SSDTLifecycleExtension.Shared.WorkUnits;
 
     [TestFixture]
-    public class LoadSqlProjectPropertiesUnitTests
+    public class LoadPathsUnitTests
     {
         [Test]
         public void Constructor_ArgumentNullException_SqlProjectService()
@@ -21,7 +21,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             // Act & Assert
             // ReSharper disable once ObjectCreationAsStatement
             // ReSharper disable once AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => new LoadSqlProjectPropertiesUnit(null));
+            Assert.Throws<ArgumentNullException>(() => new LoadPathsUnit(null));
         }
 
         [Test]
@@ -29,7 +29,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
         {
             // Arrange
             var spsMock = new Mock<ISqlProjectService>();
-            IWorkUnit<ScaffoldingStateModel> unit = new LoadSqlProjectPropertiesUnit(spsMock.Object);
+            IWorkUnit<ScaffoldingStateModel> unit = new LoadPathsUnit(spsMock.Object);
 
             // Act & Assert
             // ReSharper disable once AssignNullToNotNullAttribute
@@ -45,15 +45,16 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             var targetVersion = new Version(1, 2, 3);
             Task HandleWorkInProgressChanged(bool arg) => Task.CompletedTask;
             var model = new ScaffoldingStateModel(project, configuration, targetVersion, HandleWorkInProgressChanged);
+            var paths = new PathCollection("a", "b", "c", "d", "e", "f");
             var spsMock = new Mock<ISqlProjectService>();
-            spsMock.Setup(m => m.TryLoadSqlProjectPropertiesAsync(project)).ReturnsAsync(true);
-            IWorkUnit<ScaffoldingStateModel> unit = new LoadSqlProjectPropertiesUnit(spsMock.Object);
+            spsMock.Setup(m => m.TryLoadPathsForScaffoldingAsync(project, configuration)).ReturnsAsync(paths);
+            IWorkUnit<ScaffoldingStateModel> unit = new LoadPathsUnit(spsMock.Object);
 
             // Act
             await unit.Work(model, CancellationToken.None);
 
             // Assert
-            Assert.AreEqual(StateModelState.SqlProjectPropertiesLoaded, model.CurrentState);
+            Assert.AreEqual(StateModelState.PathsLoaded, model.CurrentState);
             Assert.IsNull(model.Result);
         }
 
@@ -67,14 +68,14 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             Task HandleWorkInProgressChanged(bool arg) => Task.CompletedTask;
             var model = new ScaffoldingStateModel(project, configuration, targetVersion, HandleWorkInProgressChanged);
             var spsMock = new Mock<ISqlProjectService>();
-            spsMock.Setup(m => m.TryLoadSqlProjectPropertiesAsync(project)).ReturnsAsync(false);
-            IWorkUnit<ScaffoldingStateModel> unit = new LoadSqlProjectPropertiesUnit(spsMock.Object);
+            spsMock.Setup(m => m.TryLoadPathsForScaffoldingAsync(project, configuration)).ReturnsAsync(null as PathCollection);
+            IWorkUnit<ScaffoldingStateModel> unit = new LoadPathsUnit(spsMock.Object);
 
             // Act
             await unit.Work(model, CancellationToken.None);
 
             // Assert
-            Assert.AreEqual(StateModelState.SqlProjectPropertiesLoaded, model.CurrentState);
+            Assert.AreEqual(StateModelState.PathsLoaded, model.CurrentState);
             Assert.IsFalse(model.Result);
         }
 
@@ -83,7 +84,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
         {
             // Arrange
             var spsMock = new Mock<ISqlProjectService>();
-            IWorkUnit<ScriptCreationStateModel> unit = new LoadSqlProjectPropertiesUnit(spsMock.Object);
+            IWorkUnit<ScriptCreationStateModel> unit = new LoadPathsUnit(spsMock.Object);
 
             // Act & Assert
             // ReSharper disable once AssignNullToNotNullAttribute
@@ -99,15 +100,16 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             var previousVersion = new Version(1, 2, 3);
             Task HandleWorkInProgressChanged(bool arg) => Task.CompletedTask;
             var model = new ScriptCreationStateModel(project, configuration, previousVersion, true, HandleWorkInProgressChanged);
+            var paths = new PathCollection("a", "b", "c", "d", "e", "f");
             var spsMock = new Mock<ISqlProjectService>();
-            spsMock.Setup(m => m.TryLoadSqlProjectPropertiesAsync(project)).ReturnsAsync(true);
-            IWorkUnit<ScriptCreationStateModel> unit = new LoadSqlProjectPropertiesUnit(spsMock.Object);
+            spsMock.Setup(m => m.TryLoadPathsForScriptCreationAsync(project, configuration, previousVersion, true)).ReturnsAsync(paths);
+            IWorkUnit<ScriptCreationStateModel> unit = new LoadPathsUnit(spsMock.Object);
 
             // Act
             await unit.Work(model, CancellationToken.None);
 
             // Assert
-            Assert.AreEqual(StateModelState.SqlProjectPropertiesLoaded, model.CurrentState);
+            Assert.AreEqual(StateModelState.PathsLoaded, model.CurrentState);
             Assert.IsNull(model.Result);
         }
 
@@ -121,14 +123,14 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             Task HandleWorkInProgressChanged(bool arg) => Task.CompletedTask;
             var model = new ScriptCreationStateModel(project, configuration, previousVersion, true, HandleWorkInProgressChanged);
             var spsMock = new Mock<ISqlProjectService>();
-            spsMock.Setup(m => m.TryLoadSqlProjectPropertiesAsync(project)).ReturnsAsync(false);
-            IWorkUnit<ScriptCreationStateModel> unit = new LoadSqlProjectPropertiesUnit(spsMock.Object);
+            spsMock.Setup(m => m.TryLoadPathsForScriptCreationAsync(project, configuration, previousVersion, true)).ReturnsAsync(null as PathCollection);
+            IWorkUnit<ScriptCreationStateModel> unit = new LoadPathsUnit(spsMock.Object);
 
             // Act
             await unit.Work(model, CancellationToken.None);
 
             // Assert
-            Assert.AreEqual(StateModelState.SqlProjectPropertiesLoaded, model.CurrentState);
+            Assert.AreEqual(StateModelState.PathsLoaded, model.CurrentState);
             Assert.IsFalse(model.Result);
         }
     }

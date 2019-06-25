@@ -5,6 +5,7 @@
     using System.Threading.Tasks;
     using Contracts;
     using Contracts.Enums;
+    using Contracts.Models;
     using Contracts.Services;
     using JetBrains.Annotations;
     using Models;
@@ -20,22 +21,40 @@
             _sqlProjectService = sqlProjectService ?? throw new ArgumentNullException(nameof(sqlProjectService));
         }
 
-        async Task IWorkUnit<ScaffoldingStateModel>.Work(ScaffoldingStateModel stateModel,
-                                                         CancellationToken cancellationToken)
+        private static async Task LoadPathsInternal<TStateModel>(TStateModel stateModel,
+                                                                 Func<TStateModel, Task> setter,
+                                                                 Func<TStateModel, PathCollection> getter)
+            where TStateModel : IStateModel
         {
-            stateModel.Paths = await _sqlProjectService.TryLoadPathsForScaffoldingAsync(stateModel.Project, stateModel.Configuration);
-            if (stateModel.Paths == null)
+            await setter(stateModel);
+            if (getter(stateModel) == null)
                 stateModel.Result = false;
             stateModel.CurrentState = StateModelState.PathsLoaded;
         }
 
-        async Task IWorkUnit<ScriptCreationStateModel>.Work(ScriptCreationStateModel stateModel,
-                                                            CancellationToken cancellationToken)
+        Task IWorkUnit<ScaffoldingStateModel>.Work(ScaffoldingStateModel stateModel,
+                                                   CancellationToken cancellationToken)
         {
-            stateModel.Paths = await _sqlProjectService.TryLoadPathsForScriptCreationAsync(stateModel.Project, stateModel.Configuration, stateModel.PreviousVersion, stateModel.CreateLatest);
-            if (stateModel.Paths == null)
-                stateModel.Result = false;
-            stateModel.CurrentState = StateModelState.PathsLoaded;
+            if (stateModel == null)
+                throw new ArgumentNullException(nameof(stateModel));
+
+            return LoadPathsInternal(stateModel,
+                                     async sm => sm.Paths = await _sqlProjectService.TryLoadPathsForScaffoldingAsync(sm.Project, sm.Configuration),
+                                     sm => sm.Paths);
+        }
+
+        Task IWorkUnit<ScriptCreationStateModel>.Work(ScriptCreationStateModel stateModel,
+                                                      CancellationToken cancellationToken)
+        {
+            if (stateModel == null)
+                throw new ArgumentNullException(nameof(stateModel));
+
+            return LoadPathsInternal(stateModel,
+                                     async sm => sm.Paths = await _sqlProjectService.TryLoadPathsForScriptCreationAsync(stateModel.Project,
+                                                                                                                        stateModel.Configuration,
+                                                                                                                        stateModel.PreviousVersion,
+                                                                                                                        stateModel.CreateLatest),
+                                     sm => sm.Paths);
         }
     }
 }
