@@ -65,6 +65,7 @@
     <Compile Include="Shared\Models\BaseStateModelTests.cs" />
     <Compile Include="Shared\Models\ConfigurationModelTests.cs" />
     <Compile Include="Shared\Models\ScaffoldingStateModelTests.cs" />
+    <Compile Include="Shared\Models\ScriptCreationStateModelTests.cs" />
     <Compile Include="Shared\Models\VersionModelTests.cs" />
     <Compile Include="Shared\ModelValidations\ConfigurationModelValidationsTests.cs" />
     <Compile Include="Shared\ScriptModifiers\AddCustomHeaderModifierTests.cs" />
