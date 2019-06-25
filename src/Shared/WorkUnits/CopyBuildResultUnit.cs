@@ -27,20 +27,25 @@
         {
             if (!await _buildService.CopyBuildResultAsync(project, newDacpacDirectory))
                 stateModel.Result = false;
-        }
-
-        async Task IWorkUnit<ScaffoldingStateModel>.Work(ScaffoldingStateModel stateModel,
-                                                         CancellationToken cancellationToken)
-        {
-            await TryCopyInternal(stateModel, stateModel.Project, stateModel.Paths.NewDacpacDirectory);
             stateModel.CurrentState = StateModelState.TriedToCopyBuildResult;
         }
 
-        async Task IWorkUnit<ScriptCreationStateModel>.Work(ScriptCreationStateModel stateModel,
-                                                            CancellationToken cancellationToken)
+        Task IWorkUnit<ScaffoldingStateModel>.Work(ScaffoldingStateModel stateModel,
+                                                   CancellationToken cancellationToken)
         {
-            await TryCopyInternal(stateModel, stateModel.Project, stateModel.Paths.NewDacpacDirectory);
-            stateModel.CurrentState = StateModelState.TriedToCopyBuildResult;
+            if (stateModel == null)
+                throw new ArgumentNullException(nameof(stateModel));
+
+            return TryCopyInternal(stateModel, stateModel.Project, stateModel.Paths.NewDacpacDirectory);
+        }
+
+        Task IWorkUnit<ScriptCreationStateModel>.Work(ScriptCreationStateModel stateModel,
+                                                      CancellationToken cancellationToken)
+        {
+            if (stateModel == null)
+                throw new ArgumentNullException(nameof(stateModel));
+
+            return TryCopyInternal(stateModel, stateModel.Project, stateModel.Paths.NewDacpacDirectory);
         }
     }
 }
