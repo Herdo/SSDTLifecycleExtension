@@ -24,16 +24,6 @@
         [CanBeNull]
         public PathCollection Paths { get; set; }
 
-        public bool ArePathsVerified { get; set; }
-
-        public bool HasTriedToBuildProject { get; set; }
-
-        public bool HasTriedToCopyBuildResult { get; set; }
-
-        public bool HasTriedToCreateDeploymentFiles { get; set; }
-
-        public bool HasModifiedDeploymentScript { get; set; }
-
         public ScriptCreationStateModel([NotNull] SqlProject project,
                                         [NotNull] ConfigurationModel configuration,
                                         [NotNull] Version previousVersion,

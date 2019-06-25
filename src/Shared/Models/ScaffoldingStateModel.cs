@@ -22,10 +22,6 @@
         [CanBeNull]
         public PathCollection Paths { get; set; }
 
-        public bool HasTriedToBuildProject { get; set; }
-
-        public bool HasTriedToCopyBuildResult { get; set; }
-
         public ScaffoldingStateModel([NotNull] SqlProject project,
                                      [NotNull] ConfigurationModel configuration,
                                      [NotNull] Version targetVersion,
