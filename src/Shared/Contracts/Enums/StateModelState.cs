@@ -2,7 +2,8 @@
 {
     public enum StateModelState
     {
-        Initialized = 0,
+        Undefined = 0,
+        Initialized = 1,
         SqlProjectPropertiesLoaded = 10,
         FormattedTargetVersionLoaded = 20,
         FormattedTargetVersionValidated = 25,

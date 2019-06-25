@@ -30,6 +30,8 @@
                 case StateModelState.SqlProjectPropertiesLoaded:
                     return _dependencyResolver.Get<FormatTargetVersionUnit>();
                 case StateModelState.FormattedTargetVersionLoaded:
+                    return _dependencyResolver.Get<ValidateTargetVersionUnit>();
+                case StateModelState.FormattedTargetVersionValidated:
                     return _dependencyResolver.Get<LoadPathsUnit>();
                 case StateModelState.PathsLoaded:
                     return _dependencyResolver.Get<BuildProjectUnit>();
