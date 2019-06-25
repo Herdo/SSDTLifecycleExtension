@@ -6,6 +6,7 @@
     using Contracts;
     using Contracts.DataAccess;
     using Contracts.Enums;
+    using Contracts.Models;
     using JetBrains.Annotations;
     using Models;
 
@@ -23,11 +24,13 @@
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        async Task IWorkUnit<ScaffoldingStateModel>.Work(ScaffoldingStateModel stateModel,
-                                                         CancellationToken cancellationToken)
+        private async Task ValidateTargetVersionInternal<TStateModel>(TStateModel stateModel,
+                                                                      Func<TStateModel, bool> isValid,
+                                                                      Func<TStateModel, string> getLogMessage)
+            where TStateModel : IStateModel
         {
-            // Check DacVersion against planned target version
-            if (stateModel.Project.ProjectProperties.DacVersion == stateModel.FormattedTargetVersion)
+            // Check version
+            if (isValid(stateModel))
             {
                 stateModel.CurrentState = StateModelState.FormattedTargetVersionValidated;
                 return;
@@ -35,25 +38,30 @@
 
             stateModel.Result = false;
             stateModel.CurrentState = StateModelState.FormattedTargetVersionValidated;
-            await _logger.LogAsync($"ERROR: DacVersion of SQL project ({stateModel.Project.ProjectProperties.DacVersion}) doesn't match target version ({stateModel.FormattedTargetVersion}).");
+            await _logger.LogAsync(getLogMessage(stateModel));
             _visualStudioAccess.ShowModalError("Please change the DAC version in the SQL project settings (see output window).");
         }
 
-        async Task IWorkUnit<ScriptCreationStateModel>.Work(ScriptCreationStateModel stateModel,
+        Task IWorkUnit<ScaffoldingStateModel>.Work(ScaffoldingStateModel stateModel,
+                                                         CancellationToken cancellationToken)
+        {
+            if (stateModel == null)
+                throw new ArgumentNullException(nameof(stateModel));
+
+            return ValidateTargetVersionInternal(stateModel,
+                                                 sm => sm.Project.ProjectProperties.DacVersion == sm.FormattedTargetVersion,
+                                                 sm => $"ERROR: DacVersion of SQL project ({sm.Project.ProjectProperties.DacVersion}) doesn't match target version ({sm.FormattedTargetVersion}).");
+        }
+
+        Task IWorkUnit<ScriptCreationStateModel>.Work(ScriptCreationStateModel stateModel,
                                                             CancellationToken cancellationToken)
         {
+            if (stateModel == null)
+                throw new ArgumentNullException(nameof(stateModel));
 
-            // Check DacVersion against base version, if not running latest creation
-            if (stateModel.FormattedTargetVersion > stateModel.PreviousVersion)
-            {
-                stateModel.CurrentState = StateModelState.FormattedTargetVersionValidated;
-                return;
-            }
-
-            stateModel.Result = false;
-            stateModel.CurrentState = StateModelState.FormattedTargetVersionValidated;
-            await _logger.LogAsync($"ERROR: DacVersion of SQL project ({stateModel.FormattedTargetVersion}) is equal to or smaller than the previous version ({stateModel.PreviousVersion}).");
-            _visualStudioAccess.ShowModalError("Please change the DAC version in the SQL project settings (see output window).");
+            return ValidateTargetVersionInternal(stateModel,
+                                                 sm => sm.FormattedTargetVersion > sm.PreviousVersion,
+                                                 sm => $"ERROR: DacVersion of SQL project ({sm.FormattedTargetVersion}) is equal to or smaller than the previous version ({sm.PreviousVersion}).");
         }
     }
 }
