@@ -27,20 +27,25 @@
             var loaded = await _sqlProjectService.TryLoadSqlProjectPropertiesAsync(project);
             if (!loaded)
                 stateModel.Result = false;
-        }
-
-        async Task IWorkUnit<ScaffoldingStateModel>.Work(ScaffoldingStateModel stateModel,
-                                                         CancellationToken cancellationToken)
-        {
-            await TryLoadSqlProjectPropertiesInternal(stateModel, stateModel.Project);
             stateModel.CurrentState = StateModelState.SqlProjectPropertiesLoaded;
         }
 
-        async Task IWorkUnit<ScriptCreationStateModel>.Work(ScriptCreationStateModel stateModel,
-                                                            CancellationToken cancellationToken)
+        Task IWorkUnit<ScaffoldingStateModel>.Work(ScaffoldingStateModel stateModel,
+                                                   CancellationToken cancellationToken)
         {
-            await TryLoadSqlProjectPropertiesInternal(stateModel, stateModel.Project);
-            stateModel.CurrentState = StateModelState.SqlProjectPropertiesLoaded;
+            if (stateModel == null)
+                throw new ArgumentNullException(nameof(stateModel));
+
+            return TryLoadSqlProjectPropertiesInternal(stateModel, stateModel.Project);
+        }
+
+        Task IWorkUnit<ScriptCreationStateModel>.Work(ScriptCreationStateModel stateModel,
+                                                      CancellationToken cancellationToken)
+        {
+            if (stateModel == null)
+                throw new ArgumentNullException(nameof(stateModel));
+
+            return TryLoadSqlProjectPropertiesInternal(stateModel, stateModel.Project);
         }
     }
 }

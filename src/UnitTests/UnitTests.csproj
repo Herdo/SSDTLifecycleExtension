@@ -86,6 +86,7 @@
     <Compile Include="Shared\Services\XmlFormatServiceTests.cs" />
     <Compile Include="Shared\WorkUnits\CopyBuildResultUnitTests.cs" />
     <Compile Include="Shared\WorkUnits\FormatTargetVersionUnitTests.cs" />
+    <Compile Include="Shared\WorkUnits\LoadSqlProjectPropertiesUnitTests.cs" />
     <Compile Include="Shared\WorkUnits\VerifyPathsUnitTests.cs" />
     <Compile Include="Shared\WorkUnits\WorkUnitFactoryTests.cs" />
   </ItemGroup>
