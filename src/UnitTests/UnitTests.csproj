@@ -84,6 +84,7 @@
     <Compile Include="Shared\Services\SqlProjectServiceTests.cs" />
     <Compile Include="Shared\Services\VersionServiceTests.cs" />
     <Compile Include="Shared\Services\XmlFormatServiceTests.cs" />
+    <Compile Include="Shared\WorkUnits\VerifyPathsUnitTests.cs" />
     <Compile Include="Shared\WorkUnits\WorkUnitFactoryTests.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -6,6 +6,7 @@
     using Contracts;
     using Contracts.DataAccess;
     using Contracts.Enums;
+    using Contracts.Models;
     using JetBrains.Annotations;
     using Models;
 
@@ -22,11 +23,11 @@
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        async Task IWorkUnit<ScriptCreationStateModel>.Work(ScriptCreationStateModel stateModel,
-                                                            CancellationToken cancellationToken)
+        private async Task VerifyPathsInternal(IStateModel stateModel,
+                                               PathCollection paths)
         {
             await _logger.LogAsync("Verifying paths ...");
-            if (_fileSystemAccess.CheckIfFileExists(stateModel.Paths.PublishProfilePath))
+            if (_fileSystemAccess.CheckIfFileExists(paths.PublishProfilePath))
             {
                 stateModel.CurrentState = StateModelState.PathsVerified;
                 return;
@@ -35,6 +36,15 @@
             stateModel.Result = false;
             stateModel.CurrentState = StateModelState.PathsVerified;
             await _logger.LogAsync("ERROR: Failed to find publish profile.");
+        }
+
+        Task IWorkUnit<ScriptCreationStateModel>.Work(ScriptCreationStateModel stateModel,
+                                                      CancellationToken cancellationToken)
+        {
+            if (stateModel == null)
+                throw new ArgumentNullException(nameof(stateModel));
+
+            return VerifyPathsInternal(stateModel, stateModel.Paths);
         }
     }
 }
