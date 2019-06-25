@@ -22,25 +22,30 @@
         }
 
         private async Task TryBuildInternal(IStateModel stateModel,
-                                            SqlProject project)
+                                            SqlProject project,
+                                            bool doBuild)
         {
-            if (!await _buildService.BuildProjectAsync(project))
+            if (doBuild && !await _buildService.BuildProjectAsync(project))
                 stateModel.Result = false;
-        }
-
-        async Task IWorkUnit<ScaffoldingStateModel>.Work(ScaffoldingStateModel stateModel,
-                                                         CancellationToken cancellationToken)
-        {
-            await TryBuildInternal(stateModel, stateModel.Project);
             stateModel.CurrentState = StateModelState.TriedToBuildProject;
         }
 
-        async Task IWorkUnit<ScriptCreationStateModel>.Work(ScriptCreationStateModel stateModel,
-                                                            CancellationToken cancellationToken)
+        Task IWorkUnit<ScaffoldingStateModel>.Work(ScaffoldingStateModel stateModel,
+                                                   CancellationToken cancellationToken)
         {
-            if (stateModel.Configuration.BuildBeforeScriptCreation)
-                await TryBuildInternal(stateModel, stateModel.Project);
-            stateModel.CurrentState = StateModelState.TriedToBuildProject;
+            if (stateModel == null)
+                throw new ArgumentNullException(nameof(stateModel));
+
+            return TryBuildInternal(stateModel, stateModel.Project, true);
+        }
+
+        Task IWorkUnit<ScriptCreationStateModel>.Work(ScriptCreationStateModel stateModel,
+                                                      CancellationToken cancellationToken)
+        {
+            if (stateModel == null)
+                throw new ArgumentNullException(nameof(stateModel));
+
+            return TryBuildInternal(stateModel, stateModel.Project, stateModel.Configuration.BuildBeforeScriptCreation);
         }
     }
 }
