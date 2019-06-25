@@ -230,7 +230,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             Task HandlerFunc(bool b) => Task.CompletedTask;
             var model = new ScaffoldingStateModel(project, configuration, targetVersion, HandlerFunc)
             {
-                CurrentState = StateModelState.TriedToBuildProject
+                CurrentState = StateModelState.TriedToCopyBuildResult
             };
 
             // Act
