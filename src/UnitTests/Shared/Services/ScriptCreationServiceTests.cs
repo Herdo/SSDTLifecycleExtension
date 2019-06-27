@@ -178,6 +178,39 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
         }
 
         [Test]
+        public async Task CreateAsync_CompleteRun_ExceptionInStopLongRunningTask_Async()
+        {
+            // Arrange
+            var wufMock = Mock.Of<IWorkUnitFactory>();
+            var vsaMock = new Mock<IVisualStudioAccess>();
+            vsaMock.Setup(m => m.StopLongRunningTaskIndicatorAsync())
+                   .ThrowsAsync(new Exception("test exception"));
+            var loggerMock = Mock.Of<ILogger>();
+            IScriptCreationService service = new ScriptCreationService(wufMock, vsaMock.Object, loggerMock);
+            var project = new SqlProject("a", "b", "c");
+            var configuration = ConfigurationModel.GetDefault();
+            var previousVersion = new Version(1, 0);
+            var isCreatingList = new List<bool>();
+            service.IsCreatingChanged += (sender,
+                                          args) =>
+            {
+                isCreatingList.Add(service.IsCreating);
+            };
+
+            // Act
+            var result = await service.CreateAsync(project, configuration, previousVersion, false, CancellationToken.None);
+
+            // Assert
+            Assert.IsTrue(result);
+            Assert.AreEqual(2, isCreatingList.Count);
+            Assert.IsTrue(isCreatingList[0]);
+            Assert.IsFalse(isCreatingList[1]);
+            vsaMock.Verify(m => m.StartLongRunningTaskIndicatorAsync(), Times.Once);
+            vsaMock.Verify(m => m.ClearSSDTLifecycleOutputAsync(), Times.Once);
+            vsaMock.Verify(m => m.StopLongRunningTaskIndicatorAsync(), Times.Once);
+        }
+
+        [Test]
         public async Task CreateAsync_CompleteRun_WithCorrectWorkUnit_Async()
         {
             // Arrange

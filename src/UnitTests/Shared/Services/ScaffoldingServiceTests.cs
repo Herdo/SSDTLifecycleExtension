@@ -178,6 +178,39 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
         }
 
         [Test]
+        public async Task ScaffoldAsync_CompleteRun_ExceptionInStopLongRunningTask_Async()
+        {
+            // Arrange
+            var wufMock = Mock.Of<IWorkUnitFactory>();
+            var vsaMock = new Mock<IVisualStudioAccess>();
+            vsaMock.Setup(m => m.StopLongRunningTaskIndicatorAsync())
+                   .ThrowsAsync(new Exception("test exception"));
+            var loggerMock = Mock.Of<ILogger>();
+            IScaffoldingService service = new ScaffoldingService(wufMock, vsaMock.Object, loggerMock);
+            var project = new SqlProject("a", "b", "c");
+            var configuration = ConfigurationModel.GetDefault();
+            var targetVersion = new Version(1, 0);
+            var isCreatingList = new List<bool>();
+            service.IsScaffoldingChanged += (sender,
+                                             args) =>
+            {
+                isCreatingList.Add(service.IsScaffolding);
+            };
+
+            // Act
+            var result = await service.ScaffoldAsync(project, configuration, targetVersion, CancellationToken.None);
+
+            // Assert
+            Assert.IsTrue(result);
+            Assert.AreEqual(2, isCreatingList.Count);
+            Assert.IsTrue(isCreatingList[0]);
+            Assert.IsFalse(isCreatingList[1]);
+            vsaMock.Verify(m => m.StartLongRunningTaskIndicatorAsync(), Times.Once);
+            vsaMock.Verify(m => m.ClearSSDTLifecycleOutputAsync(), Times.Once);
+            vsaMock.Verify(m => m.StopLongRunningTaskIndicatorAsync(), Times.Once);
+        }
+
+        [Test]
         public async Task ScaffoldAsync_CompleteRun_WithCorrectWorkUnit_Async()
         {
             // Arrange
