@@ -14,24 +14,34 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
         [Test]
         public void Constructor_ArgumentNullException_WorkUnitFactory()
         {
-            // Act & Assert
+            // Arrange
+            var loggerMock = Mock.Of<ILogger>();
+
+            // Act
             // ReSharper disable once ObjectCreationAsStatement
             // ReSharper disable AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => new ScaffoldingService(null, null, null));
+            var e = Assert.Throws<ArgumentNullException>(() => new ScaffoldingService(null, null, loggerMock));
             // ReSharper restore AssignNullToNotNullAttribute
+
+            // Assert
+            Assert.AreEqual("workUnitFactory", e.ParamName);
         }
 
         [Test]
         public void Constructor_ArgumentNullException_VisualStudioAccess()
         {
             // Arrange
+            var loggerMock = Mock.Of<ILogger>();
             var wufMock = Mock.Of<IWorkUnitFactory>();
 
-            // Act & Assert
+            // Act
             // ReSharper disable once ObjectCreationAsStatement
             // ReSharper disable AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => new ScaffoldingService(wufMock, null, null));
+            var e = Assert.Throws<ArgumentNullException>(() => new ScaffoldingService(wufMock, null, loggerMock));
             // ReSharper restore AssignNullToNotNullAttribute
+
+            // Assert
+            Assert.AreEqual("visualStudioAccess", e.ParamName);
         }
 
         [Test]
@@ -41,11 +51,14 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             var wufMock = Mock.Of<IWorkUnitFactory>();
             var vsaMock = Mock.Of<IVisualStudioAccess>();
 
-            // Act & Assert
+            // Act
             // ReSharper disable once ObjectCreationAsStatement
             // ReSharper disable AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => new ScaffoldingService(wufMock, vsaMock, null));
+            var e = Assert.Throws<ArgumentNullException>(() => new ScaffoldingService(wufMock, vsaMock, null));
             // ReSharper restore AssignNullToNotNullAttribute
+
+            // Assert
+            Assert.AreEqual("logger", e.ParamName);
         }
     }
 }
