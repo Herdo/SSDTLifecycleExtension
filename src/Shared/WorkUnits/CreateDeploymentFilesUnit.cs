@@ -6,6 +6,7 @@
     using Contracts;
     using Contracts.DataAccess;
     using Contracts.Enums;
+    using Contracts.Models;
     using JetBrains.Annotations;
     using Models;
 
@@ -25,58 +26,11 @@
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        private async Task<bool> CreateScriptAsync(PathCollection paths,
-                                                   bool createDocumentation)
+        private async Task CreateDeploymentFilesInternal(IStateModel stateModel,
+                                                         PathCollection paths,
+                                                         bool createDocumentationWithScriptCreation)
         {
-            await _logger.LogAsync("Creating diff files ...");
-            var result = await _dacAccess.CreateDeployFilesAsync(paths.PreviousDacpacPath,
-                                                                 paths.NewDacpacPath,
-                                                                 paths.PublishProfilePath,
-                                                                 true,
-                                                                 createDocumentation);
-
-            if (result.Errors != null)
-            {
-                await _logger.LogAsync("ERROR: Failed to create script:");
-                foreach (var s in result.Errors)
-                    await _logger.LogAsync(s);
-
-                return false;
-            }
-
-            var success = true;
-            try
-            {
-                await _logger.LogAsync($"Writing deploy script to {paths.DeployScriptPath} ...");
-                await _fileSystemAccess.WriteFileAsync(paths.DeployScriptPath, result.DeployScriptContent);
-            }
-            catch (Exception e)
-            {
-                await _logger.LogAsync($"ERROR: Failed to write deploy script: {e.Message}");
-                success = false;
-            }
-
-            if (!createDocumentation)
-                return success;
-
-            try
-            {
-                await _logger.LogAsync($"Writing deploy report to {paths.DeployReportPath} ...");
-                await _fileSystemAccess.WriteFileAsync(paths.DeployReportPath, result.DeployReportContent);
-            }
-            catch (Exception e)
-            {
-                await _logger.LogAsync($"ERROR: Failed to write deploy report: {e.Message}");
-                success = false;
-            }
-
-            return success;
-        }
-
-        async Task IWorkUnit<ScriptCreationStateModel>.Work(ScriptCreationStateModel stateModel,
-                                                            CancellationToken cancellationToken)
-        {
-            var success = await CreateScriptAsync(stateModel.Paths, stateModel.Configuration.CreateDocumentationWithScriptCreation);
+            var success = await CreateAndPersistDeployFiles(paths, createDocumentationWithScriptCreation);
             if (!success)
             {
                 await _logger.LogAsync("ERROR: Script creation aborted.");
@@ -84,6 +38,82 @@
             }
 
             stateModel.CurrentState = StateModelState.TriedToCreateDeploymentFiles;
+        }
+
+        private async Task<bool> CreateAndPersistDeployFiles(PathCollection paths,
+                                                             bool createDocumentation)
+        {
+            await _logger.LogAsync("Creating diff files ...");
+            var result = await CreateDeployContent(paths, createDocumentation);
+            if (!result.Success)
+                return false;
+
+            var success = await PersistDeployScript(paths.DeployScriptPath, result.DeployScriptContent);
+
+            if (!success || !createDocumentation)
+                return success;
+
+            return await PersistDeployReport(paths.DeployReportPath, result.DeployReportContent);
+        }
+
+        private async Task<(bool Success, string DeployScriptContent, string DeployReportContent)> CreateDeployContent(PathCollection paths,
+                                                                                                                       bool createDocumentation)
+        {
+            var (deployScriptContent, deployReportContent, errors) = await _dacAccess.CreateDeployFilesAsync(paths.PreviousDacpacPath,
+                                                                                                             paths.NewDacpacPath,
+                                                                                                             paths.PublishProfilePath,
+                                                                                                             true,
+                                                                                                             createDocumentation);
+
+            if (errors == null)
+                return (true, deployScriptContent, deployReportContent);
+
+            await _logger.LogAsync("ERROR: Failed to create script:");
+            foreach (var s in errors)
+                await _logger.LogAsync(s);
+
+            return (false, null, null);
+        }
+
+        private async Task<bool> PersistDeployScript(string deployScriptPath,
+                                                     string deployScriptContent)
+        {
+            try
+            {
+                await _logger.LogAsync($"Writing deploy script to {deployScriptPath} ...");
+                await _fileSystemAccess.WriteFileAsync(deployScriptPath, deployScriptContent);
+                return true;
+            }
+            catch (Exception e)
+            {
+                await _logger.LogAsync($"ERROR: Failed to write deploy script: {e.Message}");
+                return false;
+            }
+        }
+
+        private async Task<bool> PersistDeployReport(string deployReportPath,
+                                                     string deployReportContent)
+        {
+            try
+            {
+                await _logger.LogAsync($"Writing deploy report to {deployReportPath} ...");
+                await _fileSystemAccess.WriteFileAsync(deployReportPath, deployReportContent);
+                return true;
+            }
+            catch (Exception e)
+            {
+                await _logger.LogAsync($"ERROR: Failed to write deploy report: {e.Message}");
+                return false;
+            }
+        }
+
+        Task IWorkUnit<ScriptCreationStateModel>.Work(ScriptCreationStateModel stateModel,
+                                                      CancellationToken cancellationToken)
+        {
+            if (stateModel == null)
+                throw new ArgumentNullException(nameof(stateModel));
+
+            return CreateDeploymentFilesInternal(stateModel, stateModel.Paths, stateModel.Configuration.CreateDocumentationWithScriptCreation);
         }
     }
 }
