@@ -76,6 +76,7 @@
     <Compile Include="Shared\ScriptModifiers\StringSearchModifierBaseTests.cs" />
     <Compile Include="Shared\ScriptModifiers\TrackDacpacVersionModifierTests.cs" />
     <Compile Include="Shared\Services\ArtifactsServiceTests.cs" />
+    <Compile Include="Shared\Services\AsyncExecutorBaseTests.cs" />
     <Compile Include="Shared\Services\BuildServiceTests.cs" />
     <Compile Include="Shared\Services\CommandAvailabilityServiceTests.cs" />
     <Compile Include="Shared\Services\ConfigurationServiceTests.cs" />

@@ -56,7 +56,7 @@
                 do
                 {
                     if (await ShouldCancelAsync(cancellationToken))
-                        return;
+                        break;
 
                     workUnit = GetNextWorkUnit(stateModel);
                     if (workUnit != null)
