@@ -177,6 +177,45 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
         }
 
         [Test]
+        public async Task DoWorkAsync_ExceptionInWorkUnitWithExceptionInCatch_Async()
+        {
+            // Arrange
+            var loggerMock = new Mock<ILogger>();
+            loggerMock.Setup(m => m.LogAsync("Failed: test exception"))
+                      .ThrowsAsync(new Exception("catch exception"));
+            var wuMock = new Mock<IWorkUnit<ScaffoldingStateModel>>();
+            var instance = new AsyncExecutorBaseTestImplementation(loggerMock.Object, () => wuMock.Object);
+            var project = new SqlProject("a", "b", "c");
+            var configuration = ConfigurationModel.GetDefault();
+            var targetVersion = new Version(1, 0);
+            var stateList = new List<bool>();
+            Task HandlerFunc(bool b)
+            {
+                stateList.Add(b);
+                return Task.CompletedTask;
+            }
+
+            var model = new ScaffoldingStateModel(project, configuration, targetVersion, HandlerFunc);
+            var cts = new CancellationTokenSource();
+            wuMock.Setup(m => m.Work(model, cts.Token))
+                  .ThrowsAsync(new Exception("test exception"));
+
+            // Act
+            await instance.CallDoWorkAsync(model, cts.Token);
+
+            // Assert
+            Assert.IsNull(model.Result);
+            Assert.AreEqual(2, stateList.Count);
+            Assert.IsTrue(stateList[0]);
+            Assert.IsFalse(stateList[1]);
+            wuMock.Verify(m => m.Work(model, cts.Token), Times.Once);
+            loggerMock.Verify(m => m.LogAsync("started"), Times.Once);
+            loggerMock.Verify(m => m.LogAsync("Creation was canceled by the user."), Times.Never);
+            loggerMock.Verify(m => m.LogAsync(It.Is<string>(s => s.StartsWith("completed stateModel in"))), Times.Never);
+            loggerMock.Verify(m => m.LogAsync("Failed: test exception"), Times.Once);
+        }
+
+        [Test]
         public async Task DoWorkAsync_ExceptionInFinally_Async()
         {
             // Arrange
