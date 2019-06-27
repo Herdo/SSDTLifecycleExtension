@@ -9,33 +9,48 @@
     using Contracts.DataAccess;
     using Contracts.Enums;
     using Contracts.Factories;
+    using Contracts.Models;
+    using Contracts.Services;
     using JetBrains.Annotations;
     using Models;
 
     [UsedImplicitly]
     public class ModifyDeploymentScriptUnit : IWorkUnit<ScriptCreationStateModel>
     {
-        [NotNull] private readonly IScriptModifierFactory _scriptModifierFactory;
+        [NotNull] private readonly IScriptModifierProviderService _scriptModifierProviderService;
         [NotNull] private readonly IFileSystemAccess _fileSystemAccess;
         [NotNull] private readonly ILogger _logger;
 
-        public ModifyDeploymentScriptUnit([NotNull] IScriptModifierFactory scriptModifierFactory,
+        public ModifyDeploymentScriptUnit([NotNull] IScriptModifierProviderService scriptModifierProviderService,
                                           [NotNull] IFileSystemAccess fileSystemAccess,
                                           [NotNull] ILogger logger)
         {
-            _scriptModifierFactory = scriptModifierFactory ?? throw new ArgumentNullException(nameof(scriptModifierFactory));
+            _scriptModifierProviderService = scriptModifierProviderService ?? throw new ArgumentNullException(nameof(scriptModifierProviderService));
             _fileSystemAccess = fileSystemAccess ?? throw new ArgumentNullException(nameof(fileSystemAccess));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        private async Task ModifyCreatedScriptAsync(SqlProject project,
-                                                    ConfigurationModel configuration,
-                                                    PathCollection paths)
+        private async Task ModifyCreatedScriptInternal(IStateModel stateModel,
+                                                       SqlProject project,
+                                                       ConfigurationModel configuration,
+                                                       PathCollection paths)
         {
-            var modifiers = GetScriptModifiers(configuration);
+            var modifiers = _scriptModifierProviderService.GetScriptModifiers(configuration);
             if (!modifiers.Any())
+            {
+                stateModel.CurrentState = StateModelState.ModifiedDeploymentScript;
                 return;
+            }
 
+            await ApplyAllModifiers(project, configuration, paths, modifiers);
+            stateModel.CurrentState = StateModelState.ModifiedDeploymentScript;
+        }
+
+        private async Task ApplyAllModifiers(SqlProject project,
+                                             ConfigurationModel configuration,
+                                             PathCollection paths,
+                                             IReadOnlyDictionary<ScriptModifier, IScriptModifier> modifiers)
+        {
             var scriptContent = await _fileSystemAccess.ReadFileAsync(paths.DeployScriptPath);
 
             foreach (var m in modifiers.OrderBy(m => m.Key))
@@ -51,33 +66,13 @@
             await _fileSystemAccess.WriteFileAsync(paths.DeployScriptPath, scriptContent);
         }
 
-        private IReadOnlyDictionary<ScriptModifier, IScriptModifier> GetScriptModifiers(ConfigurationModel configuration)
+        Task IWorkUnit<ScriptCreationStateModel>.Work(ScriptCreationStateModel stateModel,
+                                                      CancellationToken cancellationToken)
         {
-            var result = new Dictionary<ScriptModifier, IScriptModifier>();
+            if (stateModel == null)
+                throw new ArgumentNullException(nameof(stateModel));
 
-            if (configuration.CommentOutUnnamedDefaultConstraintDrops)
-                result[ScriptModifier.CommentOutUnnamedDefaultConstraintDrops] = _scriptModifierFactory.CreateScriptModifier(ScriptModifier.CommentOutUnnamedDefaultConstraintDrops);
-
-            if (configuration.ReplaceUnnamedDefaultConstraintDrops)
-                result[ScriptModifier.ReplaceUnnamedDefaultConstraintDrops] = _scriptModifierFactory.CreateScriptModifier(ScriptModifier.ReplaceUnnamedDefaultConstraintDrops);
-
-            if (!string.IsNullOrWhiteSpace(configuration.CustomHeader))
-                result[ScriptModifier.AddCustomHeader] = _scriptModifierFactory.CreateScriptModifier(ScriptModifier.AddCustomHeader);
-
-            if (!string.IsNullOrWhiteSpace(configuration.CustomFooter))
-                result[ScriptModifier.AddCustomFooter] = _scriptModifierFactory.CreateScriptModifier(ScriptModifier.AddCustomFooter);
-
-            if (configuration.TrackDacpacVersion)
-                result[ScriptModifier.TrackDacpacVersion] = _scriptModifierFactory.CreateScriptModifier(ScriptModifier.TrackDacpacVersion);
-
-            return result;
-        }
-
-        async Task IWorkUnit<ScriptCreationStateModel>.Work(ScriptCreationStateModel stateModel,
-                                                            CancellationToken cancellationToken)
-        {
-            await ModifyCreatedScriptAsync(stateModel.Project, stateModel.Configuration, stateModel.Paths);
-            stateModel.CurrentState = StateModelState.ModifiedDeploymentScript;
+            return ModifyCreatedScriptInternal(stateModel, stateModel.Project, stateModel.Configuration, stateModel.Paths);
         }
     }
 }

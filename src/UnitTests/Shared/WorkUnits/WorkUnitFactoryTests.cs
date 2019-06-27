@@ -489,10 +489,10 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
         public void GetNextWorkUnit_ScriptCreationStateModel_CorrectWorkUnitForTriedToCreateDeploymentFiles()
         {
             // Arrange
-            var smfMock = Mock.Of<IScriptModifierFactory>();
+            var mpsMock = Mock.Of<IScriptModifierProviderService>();
             var fsaMock = Mock.Of<IFileSystemAccess>();
             var loggerMock = Mock.Of<ILogger>();
-            var expectedWorkUnit = new ModifyDeploymentScriptUnit(smfMock, fsaMock, loggerMock);
+            var expectedWorkUnit = new ModifyDeploymentScriptUnit(mpsMock, fsaMock, loggerMock);
             var drMock = new Mock<IDependencyResolver>();
             drMock.Setup(m => m.Get<ModifyDeploymentScriptUnit>()).Returns(expectedWorkUnit);
             IWorkUnitFactory wuf = new WorkUnitFactory(drMock.Object);

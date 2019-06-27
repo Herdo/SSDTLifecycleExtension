@@ -81,6 +81,7 @@
     <Compile Include="Shared\Services\ConfigurationServiceTests.cs" />
     <Compile Include="Shared\Services\ScaffoldingServiceTests.cs" />
     <Compile Include="Shared\Services\ScriptCreationServiceTests.cs" />
+    <Compile Include="Shared\Services\ScriptModifierProviderServiceTests.cs" />
     <Compile Include="Shared\Services\SqlProjectServiceTests.cs" />
     <Compile Include="Shared\Services\VersionServiceTests.cs" />
     <Compile Include="Shared\Services\XmlFormatServiceTests.cs" />
@@ -89,6 +90,7 @@
     <Compile Include="Shared\WorkUnits\FormatTargetVersionUnitTests.cs" />
     <Compile Include="Shared\WorkUnits\LoadPathsUnitTests.cs" />
     <Compile Include="Shared\WorkUnits\LoadSqlProjectPropertiesUnitTests.cs" />
+    <Compile Include="Shared\WorkUnits\ModifyDeploymentScriptUnitTests.cs" />
     <Compile Include="Shared\WorkUnits\ValidateTargetVersionUnitTests.cs" />
     <Compile Include="Shared\WorkUnits\VerifyPathsUnitTests.cs" />
     <Compile Include="Shared\WorkUnits\WorkUnitFactoryTests.cs" />
