@@ -11,6 +11,7 @@
     using Shared.Contracts.Services;
     using Shared.ScriptModifiers;
     using Shared.Services;
+    using Shared.WorkUnits;
     using Unity;
     using Unity.Lifetime;
     using Unity.Resolution;
@@ -78,7 +79,8 @@
                   .RegisterType<IDacAccess, DacAccess>()
 
                    // Factories
-                  .RegisterSingleton<IScriptModifierFactory, ScriptModifierFactory>();
+                  .RegisterSingleton<IScriptModifierFactory, ScriptModifierFactory>()
+                  .RegisterSingleton<IWorkUnitFactory, WorkUnitFactory>();
         }
 
         internal void RegisterPackage<TImplementation>([NotNull] TImplementation package)

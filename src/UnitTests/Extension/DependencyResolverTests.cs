@@ -3,12 +3,15 @@
 namespace SSDTLifecycleExtension.UnitTests.Extension
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Threading.Tasks;
     using JetBrains.Annotations;
     using Microsoft.VisualStudio.Shell;
     using Moq;
     using SSDTLifecycleExtension.Shared.Contracts;
     using SSDTLifecycleExtension.Shared.Contracts.DataAccess;
+    using SSDTLifecycleExtension.Shared.Contracts.Models;
     using SSDTLifecycleExtension.ViewModels;
 
     [TestFixture]
@@ -262,7 +265,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension
 
             // Act & Assert
             // ReSharper disable once AssignNullToNotNullAttribute
-            Assert.Throws<ObjectDisposedException>(() => dr.RegisterPackage<AsyncPackageTestImplementaton>(null));
+            Assert.Throws<ObjectDisposedException>(() => dr.RegisterPackage<AsyncPackageTestImplementation>(null));
         }
 
         [Test]
@@ -277,7 +280,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension
 
             // Act & Assert
             // ReSharper disable once AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => dr.RegisterPackage<AsyncPackageTestImplementaton>(null));
+            Assert.Throws<ArgumentNullException>(() => dr.RegisterPackage<AsyncPackageTestImplementation>(null));
         }
 
         [Test]
@@ -289,14 +292,63 @@ namespace SSDTLifecycleExtension.UnitTests.Extension
             var spMock = Mock.Of<IServiceProvider>();
             var cs = new OleMenuCommandService(spMock);
             var dr = new DependencyResolver(vsaMock, loggerMock, cs);
-            var package = new AsyncPackageTestImplementaton();
+            var package = new AsyncPackageTestImplementation();
 
             // Act
             dr.RegisterPackage(package);
 
             // Assert
-            var registeredPackage = dr.Get<AsyncPackageTestImplementaton>();
+            var registeredPackage = dr.Get<AsyncPackageTestImplementation>();
             Assert.AreSame(package, registeredPackage);
+        }
+
+        [Test]
+        public void DependencyResolver_AllSharedInterfacesShouldBeConstructable()
+        {
+            // Arrange
+            var vsaMock = Mock.Of<IVisualStudioAccess>();
+            var loggerMock = Mock.Of<ILogger>();
+            var spMock = Mock.Of<IServiceProvider>();
+            var cs = new OleMenuCommandService(spMock);
+            var dr = new DependencyResolver(vsaMock, loggerMock, cs);
+            var package = new AsyncPackageTestImplementation();
+            dr.RegisterPackage(package);
+            var interfacesToConstruct = GetInterfacesToConstruct();
+            var getMethod = typeof(DependencyResolver).GetMethod("Get");
+            Assert.IsNotNull(getMethod);
+            var failedConstructions = new List<string>();
+
+            // Act
+            foreach (var interfaceToConstruct in interfacesToConstruct)
+            {
+                var getRef = getMethod.MakeGenericMethod(interfaceToConstruct);
+                try
+                {
+                    getRef.Invoke(dr, null);
+                }
+                catch
+                {
+                    failedConstructions.Add(interfaceToConstruct.FullName);
+                }
+            }
+
+            // Assert
+            Assert.AreEqual(0, failedConstructions.Count, $"Failed to construct the following interfaces:{Environment.NewLine}{string.Join(Environment.NewLine, failedConstructions)}");
+        }
+
+        private static IEnumerable<Type> GetInterfacesToConstruct()
+        {
+            var sharedAssembly = typeof(SSDTLifecycleExtension.Shared.Constants).Assembly;
+            var interfacesToExclude = new []
+            {
+                typeof(IScriptModifier),
+                typeof(IWorkUnit<>),
+                typeof(IBaseModel),
+                typeof(IStateModel)
+            };
+            return sharedAssembly.GetTypes()
+                                 .Where(m => m.IsInterface && !interfacesToExclude.Contains(m))
+                                 .ToArray();
         }
 
         [UsedImplicitly]
@@ -315,7 +367,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension
             }
         }
 
-        private class AsyncPackageTestImplementaton : IAsyncPackage
+        private class AsyncPackageTestImplementation : IAsyncPackage
         {
 
         }
