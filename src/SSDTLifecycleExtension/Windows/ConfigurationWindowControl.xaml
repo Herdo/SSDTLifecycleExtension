@@ -61,6 +61,10 @@
             <Setter Property="Width" Value="250"/>
             <Setter Property="Margin" Value="5, 5, 10, 15"/>
         </Style>
+        <Style TargetType="Run" x:Key="HighlightRunStyle">
+            <Setter Property="FontStyle" Value="Italic"/>
+            <Setter Property="Foreground" Value="Navy"/>
+        </Style>
 
         <!-- CheckBox Styles -->
         <Style x:Key="FocusVisual">
@@ -296,8 +300,7 @@
                                 <LineBreak/>
                                 <Run Text="or the special keyword"/>
                                 <Run Text="{}{SINGLE_PROFILE}"
-                                     FontStyle="Italic"
-                                     Foreground="Navy"/><Run Text="."/>
+                                     Style="{StaticResource HighlightRunStyle}"/><Run Text="."/>
                             </TextBlock>
                             <Grid Grid.Row="1"
                                   Grid.Column="1"
@@ -434,16 +437,16 @@
                                      FontStyle="Italic"/>
                                 <LineBreak/>
                                 <Run Text="{}{MAJOR}"
-                                     FontStyle="Italic"/>
+                                     Style="{StaticResource HighlightRunStyle}"/>
                                 <LineBreak/>
                                 <Run Text="{}{MINOR}"
-                                     FontStyle="Italic"/>
+                                     Style="{StaticResource HighlightRunStyle}"/>
                                 <LineBreak/>
                                 <Run Text="{}{BUILD}"
-                                     FontStyle="Italic"/>
+                                     Style="{StaticResource HighlightRunStyle}"/>
                                 <LineBreak/>
                                 <Run Text="{}{REVISION}"
-                                     FontStyle="Italic"/>
+                                     Style="{StaticResource HighlightRunStyle}"/>
                             </TextBlock>
                             <TextBox Grid.Row="0"
                                      Grid.Column="1"
@@ -467,8 +470,7 @@
                                      FontStyle="Italic"/>
                                 <LineBreak/>
                                 <Run Text="[dbo].[__DacpacVersion]"
-                                     FontStyle="Italic"
-                                     Foreground="Navy"/>
+                                     Style="{StaticResource HighlightRunStyle}"/>
                                 <Run Text="if it doesn't exist,"
                                      FontStyle="Italic"/>
                                 <LineBreak/>
