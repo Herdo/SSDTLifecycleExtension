@@ -504,8 +504,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
                 CustomHeader = "awesome header",
                 CustomFooter = "lame footer",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = false,
-                CommentOutReferencedProjectRefactorings = true
+                TrackDacpacVersion = false
             };
             var project = new SqlProject("", "", "");
             var csMock = Mock.Of<IConfigurationService>();
@@ -546,8 +545,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
                 CustomHeader = "awesome header",
                 CustomFooter = "lame footer",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = false,
-                CommentOutReferencedProjectRefactorings = true
+                TrackDacpacVersion = false
             };
             var project = new SqlProject("", "", "");
             var csMock = Mock.Of<IConfigurationService>();
@@ -592,8 +590,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
                 CustomHeader = "awesome header",
                 CustomFooter = "lame footer",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = false,
-                CommentOutReferencedProjectRefactorings = true
+                TrackDacpacVersion = false
             };
             var project = new SqlProject("", "", "");
             var csMock = Mock.Of<IConfigurationService>();
@@ -634,8 +631,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
                 CustomHeader = "awesome header",
                 CustomFooter = "lame footer",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = false,
-                CommentOutReferencedProjectRefactorings = true
+                TrackDacpacVersion = false
             };
             var project = new SqlProject("", "", "");
             var csMock = Mock.Of<IConfigurationService>();
@@ -680,8 +676,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
                 CustomHeader = "awesome header",
                 CustomFooter = "lame footer",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = false,
-                CommentOutReferencedProjectRefactorings = true
+                TrackDacpacVersion = false
             };
             var project = new SqlProject("", "", "");
             ConfigurationModel savedModel = null;
@@ -733,8 +728,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
                 CustomHeader = "awesome header",
                 CustomFooter = "lame footer",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = false,
-                CommentOutReferencedProjectRefactorings = true
+                TrackDacpacVersion = false
             };
             var project = new SqlProject("", "", "");
             ConfigurationModel savedModel = null;
@@ -796,8 +790,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
                 CustomHeader = "awesome header",
                 CustomFooter = "lame footer",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = false,
-                CommentOutReferencedProjectRefactorings = true
+                TrackDacpacVersion = false
             };
             var project = new SqlProject("", "", "");
             var csMock = new Mock<IConfigurationService>();

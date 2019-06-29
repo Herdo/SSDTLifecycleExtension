@@ -81,8 +81,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
                 CustomHeader = "TestHeader",
                 CustomFooter = "TestFooter",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = true,
-                CommentOutReferencedProjectRefactorings = true
+                TrackDacpacVersion = true
             };
             var vsaMock = new Mock<IVisualStudioAccess>();
             var fsaMock = new Mock<IFileSystemAccess>();
@@ -113,8 +112,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
                 CustomHeader = "TestHeader",
                 CustomFooter = "TestFooter",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = true,
-                CommentOutReferencedProjectRefactorings = true
+                TrackDacpacVersion = true
             };
             var vsaMock = new Mock<IVisualStudioAccess>();
             var fsaMock = new Mock<IFileSystemAccess>();
@@ -145,8 +143,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
                 CustomHeader = "TestHeader",
                 CustomFooter = "TestFooter",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = true,
-                CommentOutReferencedProjectRefactorings = true
+                TrackDacpacVersion = true
             };
             var vsaMock = new Mock<IVisualStudioAccess>();
             var fsaMock = new Mock<IFileSystemAccess>();
@@ -179,8 +176,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
                 CustomHeader = "TestHeader",
                 CustomFooter = "TestFooter",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = true,
-                CommentOutReferencedProjectRefactorings = true
+                TrackDacpacVersion = true
             };
             var vsaMock = new Mock<IVisualStudioAccess>();
             var fsaMock = new Mock<IFileSystemAccess>();
@@ -213,8 +209,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
                 CustomHeader = "TestHeader",
                 CustomFooter = "TestFooter",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = true,
-                CommentOutReferencedProjectRefactorings = true
+                TrackDacpacVersion = true
             };
             var vsaMock = new Mock<IVisualStudioAccess>();
             var fsaMock = new Mock<IFileSystemAccess>();
@@ -250,8 +245,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
                 CustomHeader = "TestHeader",
                 CustomFooter = "TestFooter",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = true,
-                CommentOutReferencedProjectRefactorings = true
+                TrackDacpacVersion = true
             };
             var vsaMock = new Mock<IVisualStudioAccess>();
             var fsaMock = new Mock<IFileSystemAccess>();

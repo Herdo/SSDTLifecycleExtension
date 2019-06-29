@@ -102,7 +102,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
                    .ReturnsAsync(() =>
                                      "{  \"ArtifactsPath\": \"__Deployment\",  \"PublishProfilePath\": \"Test.publish.xml\",  " +
                                      "\"BuildBeforeScriptCreation\": false,  \"CreateDocumentationWithScriptCreation\": true,  " +
-                                     "\"CommentOutReferencedProjectRefactorings\": true,  \"CommentOutUnnamedDefaultConstraintDrops\": true,  " +
+                                     "\"CommentOutUnnamedDefaultConstraintDrops\": true,  " +
                                      "\"ReplaceUnnamedDefaultConstraintDrops\": true,  \"VersionPattern\": \"{MAJOR}.0.{BUILD}\",  " +
                                      "\"TrackDacpacVersion\": true,  \"CustomHeader\": \"header\",  \"CustomFooter\": \"footer\"}");
             var vsaMock = Mock.Of<IVisualStudioAccess>();
@@ -120,7 +120,6 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             Assert.AreEqual("Test.publish.xml", configuration.PublishProfilePath);
             Assert.IsFalse(configuration.BuildBeforeScriptCreation);
             Assert.IsTrue(configuration.CreateDocumentationWithScriptCreation);
-            Assert.IsTrue(configuration.CommentOutReferencedProjectRefactorings);
             Assert.IsTrue(configuration.CommentOutUnnamedDefaultConstraintDrops);   // This must be true to cause an validation error for the last assert.
             Assert.IsTrue(configuration.ReplaceUnnamedDefaultConstraintDrops);      // This must be true to cause an validation error for the last assert.
             Assert.AreEqual("{MAJOR}.0.{BUILD}", configuration.VersionPattern);

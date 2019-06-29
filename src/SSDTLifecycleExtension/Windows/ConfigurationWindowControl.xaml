@@ -326,7 +326,6 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
@@ -357,23 +356,8 @@
                                       Style="{StaticResource ConfigurationCheckBoxStyle}"
                                       IsChecked="{Binding Model.CreateDocumentationWithScriptCreation, Mode=TwoWay}"/>
 
-                            <!-- Comment out referenced project refactorings -->
-                            <TextBlock Grid.Row="2"
-                                       Grid.Column="0"
-                                       Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
-                                <Run Text="Comment out referenced project"
-                                     FontWeight="Bold"/>
-                                <LineBreak/>
-                                <Run Text="refactorings"
-                                     FontWeight="Bold"/>
-                            </TextBlock>
-                            <CheckBox Grid.Row="2"
-                                      Grid.Column="1"
-                                      Style="{StaticResource ConfigurationCheckBoxStyle}"
-                                      IsChecked="{Binding Model.CommentOutReferencedProjectRefactorings, Mode=TwoWay}"/>
-
                             <!-- Comment out unnamed default constraint drops -->
-                            <TextBlock Grid.Row="3"
+                            <TextBlock Grid.Row="2"
                                        Grid.Column="0"
                                        Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
                                 <Run Text="Comment out unnamed default constraint"
@@ -382,13 +366,13 @@
                                 <Run Text="drops"
                                      FontWeight="Bold"/>
                             </TextBlock>
-                            <CheckBox Grid.Row="3"
+                            <CheckBox Grid.Row="2"
                                       Grid.Column="1"
                                       Style="{StaticResource ConfigurationCheckBoxStyle}"
                                       IsChecked="{Binding Model.CommentOutUnnamedDefaultConstraintDrops, Mode=TwoWay}"/>
 
                             <!-- Replace unnamed default constraint drops -->
-                            <TextBlock Grid.Row="4"
+                            <TextBlock Grid.Row="3"
                                        Grid.Column="0"
                                        Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
                                 <Run Text="Replace unnamed default constraint drops"
@@ -406,7 +390,7 @@
                                 <Run Text="name when executing."
                                      FontStyle="Italic"/>
                             </TextBlock>
-                            <CheckBox Grid.Row="4"
+                            <CheckBox Grid.Row="3"
                                       Grid.Column="1"
                                       Style="{StaticResource ConfigurationCheckBoxStyle}"
                                       IsChecked="{Binding Model.ReplaceUnnamedDefaultConstraintDrops, Mode=TwoWay}"/>

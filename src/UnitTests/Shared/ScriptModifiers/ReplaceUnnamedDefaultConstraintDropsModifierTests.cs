@@ -281,8 +281,7 @@ GO";
                 CustomHeader = "awesome header",
                 CustomFooter = "lame footer",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = false,
-                CommentOutReferencedProjectRefactorings = true
+                TrackDacpacVersion = false
             };
             IScriptModifier modifier = new ReplaceUnnamedDefaultConstraintDropsModifier(daMock, loggerMock);
 
@@ -322,8 +321,7 @@ GO";
                 CustomHeader = "awesome header",
                 CustomFooter = "lame footer",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = false,
-                CommentOutReferencedProjectRefactorings = true
+                TrackDacpacVersion = false
             };
             var paths = new PathCollection("a", "b", "new", "old", "e", "f");
             IScriptModifier modifier = new ReplaceUnnamedDefaultConstraintDropsModifier(daMock.Object, loggerMock.Object);
@@ -367,8 +365,7 @@ GO";
                 CustomHeader = "awesome header",
                 CustomFooter = "lame footer",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = false,
-                CommentOutReferencedProjectRefactorings = true
+                TrackDacpacVersion = false
             };
             var paths = new PathCollection("a", "b", "new", "old", "e", "f");
             IScriptModifier modifier = new ReplaceUnnamedDefaultConstraintDropsModifier(daMock.Object, loggerMock.Object);
@@ -411,8 +408,7 @@ GO";
                 CustomHeader = "awesome header",
                 CustomFooter = "lame footer",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = false,
-                CommentOutReferencedProjectRefactorings = true
+                TrackDacpacVersion = false
             };
             var paths = new PathCollection("a", "b", "new", "old", "e", "f");
             IScriptModifier modifier = new ReplaceUnnamedDefaultConstraintDropsModifier(daMock.Object, loggerMock.Object);
@@ -452,8 +448,7 @@ GO";
                 CustomHeader = "awesome header",
                 CustomFooter = "lame footer",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = false,
-                CommentOutReferencedProjectRefactorings = true
+                TrackDacpacVersion = false
             };
             var paths = new PathCollection("a", "b", "new", "old", "e", "f");
             IScriptModifier modifier = new ReplaceUnnamedDefaultConstraintDropsModifier(daMock.Object, loggerMock.Object);

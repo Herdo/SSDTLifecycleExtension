@@ -15,7 +15,6 @@
         private string _publishProfilePath;
         private bool _buildBeforeScriptCreation;
         private bool _createDocumentationWithScriptCreation;
-        private bool _commentOutReferencedProjectRefactorings;
         private bool _commentOutUnnamedDefaultConstraintDrops;
         private bool _replaceUnnamedDefaultConstraintDrops;
         private string _versionPattern;
@@ -79,20 +78,6 @@
             {
                 if (value == _createDocumentationWithScriptCreation) return;
                 _createDocumentationWithScriptCreation = value;
-                OnPropertyChanged();
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets whether to comment out refactorings of referenced projects, or not.
-        /// </summary>
-        public bool CommentOutReferencedProjectRefactorings
-        {
-            get => _commentOutReferencedProjectRefactorings;
-            set
-            {
-                if (value == _commentOutReferencedProjectRefactorings) return;
-                _commentOutReferencedProjectRefactorings = value;
                 OnPropertyChanged();
             }
         }
@@ -199,7 +184,6 @@
                 PublishProfilePath = null,
                 BuildBeforeScriptCreation = true,
                 CreateDocumentationWithScriptCreation = true,
-                CommentOutReferencedProjectRefactorings = false,
                 CommentOutUnnamedDefaultConstraintDrops = false,
                 ReplaceUnnamedDefaultConstraintDrops = false,
                 VersionPattern = "{MAJOR}.{MINOR}.{BUILD}",
@@ -228,7 +212,6 @@
                 PublishProfilePath = PublishProfilePath,
                 BuildBeforeScriptCreation = BuildBeforeScriptCreation,
                 CreateDocumentationWithScriptCreation = CreateDocumentationWithScriptCreation,
-                CommentOutReferencedProjectRefactorings = CommentOutReferencedProjectRefactorings,
                 CommentOutUnnamedDefaultConstraintDrops = CommentOutUnnamedDefaultConstraintDrops,
                 ReplaceUnnamedDefaultConstraintDrops = ReplaceUnnamedDefaultConstraintDrops,
                 VersionPattern = VersionPattern,
@@ -250,7 +233,6 @@
                    && string.Equals(_publishProfilePath, other._publishProfilePath)
                    && _buildBeforeScriptCreation == other._buildBeforeScriptCreation
                    && _createDocumentationWithScriptCreation == other._createDocumentationWithScriptCreation
-                   && _commentOutReferencedProjectRefactorings == other._commentOutReferencedProjectRefactorings
                    && _commentOutUnnamedDefaultConstraintDrops == other._commentOutUnnamedDefaultConstraintDrops
                    && _replaceUnnamedDefaultConstraintDrops == other._replaceUnnamedDefaultConstraintDrops
                    && string.Equals(_versionPattern, other._versionPattern)

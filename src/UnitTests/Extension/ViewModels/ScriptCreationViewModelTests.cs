@@ -231,8 +231,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
                 CustomHeader = "TestHeader",
                 CustomFooter = "TestFooter",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = true,
-                CommentOutReferencedProjectRefactorings = true
+                TrackDacpacVersion = true
             };
             var project = new SqlProject("a", @"C:\TestProject\TestProject.sqlproj", "c");
             var csMock = new Mock<IConfigurationService>();
@@ -273,8 +272,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
                 CustomHeader = "TestHeader",
                 CustomFooter = "TestFooter",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = true,
-                CommentOutReferencedProjectRefactorings = true
+                TrackDacpacVersion = true
             };
             var project = new SqlProject("a", @"C:\TestProject\TestProject.sqlproj", "c");
             var csMock = new Mock<IConfigurationService>();
@@ -317,8 +315,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
                 CustomHeader = "TestHeader",
                 CustomFooter = "TestFooter",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = true,
-                CommentOutReferencedProjectRefactorings = true
+                TrackDacpacVersion = true
             };
             var project = new SqlProject("a", @"C:\TestProject\TestProject.sqlproj", "c");
             var csMock = new Mock<IConfigurationService>();
@@ -388,8 +385,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
                 CustomHeader = "TestHeader",
                 CustomFooter = "TestFooter",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = true,
-                CommentOutReferencedProjectRefactorings = true
+                TrackDacpacVersion = true
             };
             var project = new SqlProject("a", @"C:\TestProject\TestProject.sqlproj", "c");
             var csMock = new Mock<IConfigurationService>();
@@ -432,8 +428,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
                 CustomHeader = "TestHeader",
                 CustomFooter = "TestFooter",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = true,
-                CommentOutReferencedProjectRefactorings = true
+                TrackDacpacVersion = true
             };
             var project = new SqlProject("a", @"C:\TestProject\TestProject.sqlproj", "c");
             var csMock = new Mock<IConfigurationService>();
@@ -502,8 +497,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
                 CustomHeader = "TestHeader",
                 CustomFooter = "TestFooter",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = true,
-                CommentOutReferencedProjectRefactorings = true
+                TrackDacpacVersion = true
             };
             var project = new SqlProject("a", @"C:\TestProject\TestProject.sqlproj", "c");
             var csMock = new Mock<IConfigurationService>();
@@ -544,8 +538,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
                 CustomHeader = "TestHeader",
                 CustomFooter = "TestFooter",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = true,
-                CommentOutReferencedProjectRefactorings = true
+                TrackDacpacVersion = true
             };
             var project = new SqlProject("a", @"C:\TestProject\TestProject.sqlproj", "c");
             var csMock = new Mock<IConfigurationService>();
@@ -602,8 +595,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
                 CustomHeader = "TestHeader",
                 CustomFooter = "TestFooter",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = true,
-                CommentOutReferencedProjectRefactorings = true
+                TrackDacpacVersion = true
             };
             var project = new SqlProject("a", @"C:\TestProject\TestProject.sqlproj", "c");
             var csMock = new Mock<IConfigurationService>();
@@ -657,8 +649,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
                 CustomHeader = "TestHeader",
                 CustomFooter = "TestFooter",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = true,
-                CommentOutReferencedProjectRefactorings = true
+                TrackDacpacVersion = true
             };
             var project = new SqlProject("a", @"C:\TestProject\TestProject.sqlproj", "c");
             var differentProject = new SqlProject("a", @"C:\TestProject\TestProject.sqlproj", "d");
@@ -715,8 +706,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
                 CustomHeader = "TestHeader",
                 CustomFooter = "TestFooter",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = true,
-                CommentOutReferencedProjectRefactorings = true
+                TrackDacpacVersion = true
             };
             var project = new SqlProject("a", @"C:\TestProject\TestProject.sqlproj", "c");
             var csMock = new Mock<IConfigurationService>();
@@ -781,8 +771,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
                 CustomHeader = "TestHeader",
                 CustomFooter = "TestFooter",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = true,
-                CommentOutReferencedProjectRefactorings = true
+                TrackDacpacVersion = true
             };
             var project = new SqlProject("a", @"C:\TestProject\TestProject.sqlproj", "c");
             var csMock = new Mock<IConfigurationService>();
@@ -847,8 +836,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
                 CustomHeader = "TestHeader",
                 CustomFooter = "TestFooter",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = true,
-                CommentOutReferencedProjectRefactorings = true
+                TrackDacpacVersion = true
             };
             var project = new SqlProject("a", @"C:\TestProject\TestProject.sqlproj", "c");
             var csMock = new Mock<IConfigurationService>();
@@ -926,8 +914,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
                 CustomHeader = "TestHeader",
                 CustomFooter = "TestFooter",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = true,
-                CommentOutReferencedProjectRefactorings = true
+                TrackDacpacVersion = true
             };
             var project = new SqlProject("a", @"C:\TestProject\TestProject.sqlproj", "c");
             var csMock = new Mock<IConfigurationService>();
@@ -1005,8 +992,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
                 CustomHeader = "TestHeader",
                 CustomFooter = "TestFooter",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = true,
-                CommentOutReferencedProjectRefactorings = true
+                TrackDacpacVersion = true
             };
             var project = new SqlProject("a", @"C:\TestProject\TestProject.sqlproj", "c");
             var csMock = new Mock<IConfigurationService>();
@@ -1078,8 +1064,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
                 CustomHeader = "TestHeader",
                 CustomFooter = "TestFooter",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = true,
-                CommentOutReferencedProjectRefactorings = true
+                TrackDacpacVersion = true
             };
             var project = new SqlProject("a", @"C:\TestProject\TestProject.sqlproj", "c");
             var csMock = new Mock<IConfigurationService>();
@@ -1151,8 +1136,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
                 CustomHeader = "TestHeader",
                 CustomFooter = "TestFooter",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = true,
-                CommentOutReferencedProjectRefactorings = true
+                TrackDacpacVersion = true
             };
             var project = new SqlProject("a", @"C:\TestProject\TestProject.sqlproj", "c");
             var csMock = new Mock<IConfigurationService>();
@@ -1237,8 +1221,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
                 CustomHeader = "TestHeader",
                 CustomFooter = "TestFooter",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = true,
-                CommentOutReferencedProjectRefactorings = true
+                TrackDacpacVersion = true
             };
             var project = new SqlProject("a", @"C:\TestProject\TestProject.sqlproj", "c");
             var csMock = new Mock<IConfigurationService>();
