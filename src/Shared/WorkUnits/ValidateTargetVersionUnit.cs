@@ -60,7 +60,7 @@
                 throw new ArgumentNullException(nameof(stateModel));
 
             return ValidateTargetVersionInternal(stateModel,
-                                                 sm => sm.FormattedTargetVersion > sm.PreviousVersion,
+                                                 sm => sm.CreateLatest || sm.FormattedTargetVersion > sm.PreviousVersion,
                                                  sm => $"ERROR: DacVersion of SQL project ({sm.FormattedTargetVersion}) is equal to or smaller than the previous version ({sm.PreviousVersion}).");
         }
     }

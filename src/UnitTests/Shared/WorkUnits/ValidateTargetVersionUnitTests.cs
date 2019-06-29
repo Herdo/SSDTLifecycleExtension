@@ -125,7 +125,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
         }
 
         [Test]
-        public async Task Work_ScriptCreationStateModel_ValidVersion_Async()
+        public async Task Work_ScriptCreationStateModel_ValidVersion_SpecificVersion_Async()
         {
             // Arrange
             var formattedTargetVersion = new Version(1, 2, 4);
@@ -133,9 +133,35 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             var configuration = ConfigurationModel.GetDefault();
             var previousVersion = new Version(1, 2, 3);
             Task HandleWorkInProgressChanged(bool arg) => Task.CompletedTask;
-            var model = new ScriptCreationStateModel(project, configuration, previousVersion, true, HandleWorkInProgressChanged)
+            var model = new ScriptCreationStateModel(project, configuration, previousVersion, false, HandleWorkInProgressChanged)
             {
                 FormattedTargetVersion = formattedTargetVersion
+            };
+            var vsaMock = new Mock<IVisualStudioAccess>();
+            var loggerMock = new Mock<ILogger>();
+            IWorkUnit<ScriptCreationStateModel> unit = new ValidateTargetVersionUnit(vsaMock.Object, loggerMock.Object);
+
+            // Act
+            await unit.Work(model, CancellationToken.None);
+
+            // Assert
+            Assert.AreEqual(StateModelState.FormattedTargetVersionValidated, model.CurrentState);
+            Assert.IsNull(model.Result);
+            vsaMock.Verify(m => m.ShowModalError(It.IsAny<string>()), Times.Never);
+            loggerMock.Verify(m => m.LogAsync(It.Is<string>(str => str.StartsWith("ERROR"))), Times.Never);
+        }
+
+        [Test]
+        public async Task Work_ScriptCreationStateModel_ValidVersion_Latest_Async()
+        {
+            // Arrange
+            var project = new SqlProject("a", "b", "c");
+            var configuration = ConfigurationModel.GetDefault();
+            var previousVersion = new Version(1, 2, 3);
+            Task HandleWorkInProgressChanged(bool arg) => Task.CompletedTask;
+            var model = new ScriptCreationStateModel(project, configuration, previousVersion, true, HandleWorkInProgressChanged)
+            {
+                FormattedTargetVersion = null
             };
             var vsaMock = new Mock<IVisualStudioAccess>();
             var loggerMock = new Mock<ILogger>();
@@ -162,7 +188,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             var configuration = ConfigurationModel.GetDefault();
             var previousVersion = Version.Parse(previousVersionString);
             Task HandleWorkInProgressChanged(bool arg) => Task.CompletedTask;
-            var model = new ScriptCreationStateModel(project, configuration, previousVersion, true, HandleWorkInProgressChanged)
+            var model = new ScriptCreationStateModel(project, configuration, previousVersion, false, HandleWorkInProgressChanged)
             {
                 FormattedTargetVersion = formattedTargetVersion
             };
