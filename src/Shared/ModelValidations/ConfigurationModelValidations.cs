@@ -60,24 +60,34 @@
             {
                 errors.Add("Path cannot be empty.");
             }
+            else if (model.PublishProfilePath == ConfigurationModel.UseSinglePublishProfileSpecialKeyword)
+            {
+                return errors;
+            }
             else
             {
-                const string publishProfileExtension = ".publish.xml";
-                if (!model.PublishProfilePath.EndsWith(publishProfileExtension) || model.PublishProfilePath.Length == publishProfileExtension.Length)
-                    errors.Add($"Profile file name must end with *{publishProfileExtension}.");
-
-                try
-                {
-                    if (Path.IsPathRooted(model.PublishProfilePath))
-                        errors.Add("Path must be a relative path.");
-                }
-                catch (ArgumentException)
-                {
-                    errors.Add("Path contains invalid characters.");
-                }
+                ValidateActualPublishProfilePath(model, errors);
             }
 
             return errors;
+        }
+
+        private static void ValidateActualPublishProfilePath(ConfigurationModel model,
+                                                             List<string> errors)
+        {
+            const string publishProfileExtension = ".publish.xml";
+            if (!model.PublishProfilePath.EndsWith(publishProfileExtension) || model.PublishProfilePath.Length == publishProfileExtension.Length)
+                errors.Add($"Profile file name must end with *{publishProfileExtension}.");
+
+            try
+            {
+                if (Path.IsPathRooted(model.PublishProfilePath))
+                    errors.Add("Path must be a relative path.");
+            }
+            catch (ArgumentException)
+            {
+                errors.Add("Path contains invalid characters.");
+            }
         }
 
         /// <summary>

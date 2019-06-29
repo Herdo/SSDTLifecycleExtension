@@ -35,10 +35,16 @@
             {
                 if (Equals(value, _model)) return;
                 if (_model != null)
+                {
                     _model.PropertyChanged -= Model_PropertyChanged;
+                    _model.ErrorsChanged -= Model_ErrorsChanged;
+                }
                 _model = value;
                 if (_model != null)
+                {
                     _model.PropertyChanged += Model_PropertyChanged;
+                    _model.ErrorsChanged += Model_ErrorsChanged;
+                }
                 OnPropertyChanged();
                 CheckIfModelIsDirty();
             }
@@ -155,6 +161,11 @@
         private void Model_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             CheckIfModelIsDirty();
+        }
+
+        private void Model_ErrorsChanged(object sender, DataErrorsChangedEventArgs e)
+        {
+            SaveConfigurationCommand.RaiseCanExecuteChanged();
         }
 
         async Task IErrorHandler.HandleErrorAsync(IAsyncCommand command, Exception exception)

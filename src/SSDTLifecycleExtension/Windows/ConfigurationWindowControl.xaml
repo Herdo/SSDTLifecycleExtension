@@ -291,8 +291,13 @@
                                      FontStyle="Italic"/>
                                 <LineBreak/>
                                 <LineBreak/>
-                                <Run Text="Relative path to the *.sqlproj file."
+                                <Run Text="Relative path to the *.sqlproj file,"
                                      FontStyle="Italic"/>
+                                <LineBreak/>
+                                <Run Text="or the special keyword"/>
+                                <Run Text="{}{SINGLE_PROFILE}"
+                                     FontStyle="Italic"
+                                     Foreground="Navy"/><Run Text="."/>
                             </TextBlock>
                             <Grid Grid.Row="1"
                                   Grid.Column="1"

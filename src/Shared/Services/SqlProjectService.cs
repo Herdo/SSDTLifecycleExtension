@@ -84,7 +84,7 @@
             var newVersionString = createLatest ? "latest" : _versionService.FormatVersion(project.ProjectProperties.DacVersion, configuration);
 
             // DACPAC paths
-            var profilePath = Path.Combine(projectDirectory, configuration.PublishProfilePath);
+            var profilePath = DeterminePublishProfilePath(configuration, projectDirectory);
             var artifactsPath = Path.Combine(projectDirectory, configuration.ArtifactsPath);
             var previousVersionDirectory = previousVersion == null ? null : Path.Combine(artifactsPath, previousVersionString);
             var previousVersionPath = previousVersion == null ? null : Path.Combine(previousVersionDirectory, $"{project.ProjectProperties.SqlTargetName}.dacpac");
@@ -104,6 +104,18 @@
                                       previousVersionPath,
                                       deployScriptPath,
                                       deployReportPath);
+        }
+
+        private string DeterminePublishProfilePath(ConfigurationModel configuration,
+                                                          string projectDirectory)
+        {
+            if (configuration.PublishProfilePath != ConfigurationModel.UseSinglePublishProfileSpecialKeyword)
+                return Path.Combine(projectDirectory, configuration.PublishProfilePath);
+
+            var publishProfiles = _fileSystemAccess.GetFilesIn(projectDirectory, "*.publish.xml");
+            return publishProfiles.Length == 1
+                       ? Path.Combine(projectDirectory, publishProfiles[0])
+                       : string.Empty;
         }
 
         private async Task<bool> TryLoadSqlProjectPropertiesInternalAsync(SqlProject project)

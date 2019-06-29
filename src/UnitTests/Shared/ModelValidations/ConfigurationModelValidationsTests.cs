@@ -178,12 +178,14 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.ModelValidations
         }
 
         [Test]
-        public void ValidatePublishProfilePath_NoErrors()
+        [TestCase(@"..\Database.publish.xml")]
+        [TestCase(ConfigurationModel.UseSinglePublishProfileSpecialKeyword)]
+        public void ValidatePublishProfilePath_NoErrors(string publishProfilePath)
         {
             // Arrange
             var model = new ConfigurationModel
             {
-                PublishProfilePath = @"..\Database.publish.xml"
+                PublishProfilePath = publishProfilePath
             };
 
             // Act

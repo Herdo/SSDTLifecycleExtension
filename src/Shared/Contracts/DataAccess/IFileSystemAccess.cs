@@ -40,5 +40,8 @@
                          [NotNull] string searchPattern);
 
         string[] GetDirectoriesIn([NotNull] string directory);
+
+        string[] GetFilesIn([NotNull] string directory,
+                            [NotNull] string filter);
     }
 }

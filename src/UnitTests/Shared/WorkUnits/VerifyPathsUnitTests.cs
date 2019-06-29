@@ -79,7 +79,34 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
         }
 
         [Test]
-        public async Task Work_ScriptCreationStateModel_VerificationFailed_Async()
+        public async Task Work_ScriptCreationStateModel_VerificationFailed_PublishProfilePathIsNotFilled_Async()
+        {
+            // Arrange
+            var project = new SqlProject("a", "b", "c");
+            var configuration = ConfigurationModel.GetDefault();
+            var previousVersion = new Version(1, 0);
+            Task HandleWorkInProgressChanged(bool arg) => Task.CompletedTask;
+            var paths = new PathCollection("", "b", "c", "d", "e", "f");
+            var model = new ScriptCreationStateModel(project, configuration, previousVersion, true, HandleWorkInProgressChanged)
+            {
+                Paths = paths
+            };
+            var fsaMock = new Mock<IFileSystemAccess>();
+            var loggerMock = new Mock<ILogger>();
+            IWorkUnit<ScriptCreationStateModel> unit = new VerifyPathsUnit(fsaMock.Object, loggerMock.Object);
+
+            // Act
+            await unit.Work(model, CancellationToken.None);
+
+            // Assert
+            Assert.AreEqual(StateModelState.PathsVerified, model.CurrentState);
+            Assert.IsFalse(model.Result);
+            loggerMock.Verify(m => m.LogAsync(It.Is<string>(str => str.StartsWith("ERROR"))), Times.Once);
+            fsaMock.Verify(m => m.CheckIfFileExists(It.IsAny<string>()), Times.Never);
+        }
+
+        [Test]
+        public async Task Work_ScriptCreationStateModel_VerificationFailed_PublishProfileDoesNotExist_Async()
         {
             // Arrange
             var project = new SqlProject("a", "b", "c");

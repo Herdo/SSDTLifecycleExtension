@@ -19,6 +19,19 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Models
         }
 
         [Test]
+        public void GetDefault_DefaultInstanceShouldBeValid()
+        {
+            // Arrange
+            var model = ConfigurationModel.GetDefault();
+
+            // Act
+            model.ValidateAll();
+
+            // Assert
+            Assert.IsFalse(model.HasErrors);
+        }
+
+        [Test]
         public void ArtifactsPath_Get_Set_PropertyChanged_ErrorsChanged()
         {
             // Arrange

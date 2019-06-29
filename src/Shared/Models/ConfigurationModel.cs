@@ -6,6 +6,7 @@
     public sealed class ConfigurationModel : BaseModel,
                                              IEquatable<ConfigurationModel>
     {
+        public const string UseSinglePublishProfileSpecialKeyword = "{SINGLE_PROFILE}";
         public const string MajorVersionSpecialKeyword = "{MAJOR}";
         public const string MinorVersionSpecialKeyword = "{MINOR}";
         public const string BuildVersionSpecialKeyword = "{BUILD}";
@@ -181,12 +182,12 @@
             new ConfigurationModel
             {
                 ArtifactsPath = "_Deployment",
-                PublishProfilePath = null,
+                PublishProfilePath = UseSinglePublishProfileSpecialKeyword,
                 BuildBeforeScriptCreation = true,
                 CreateDocumentationWithScriptCreation = true,
                 CommentOutUnnamedDefaultConstraintDrops = false,
                 ReplaceUnnamedDefaultConstraintDrops = false,
-                VersionPattern = "{MAJOR}.{MINOR}.{BUILD}",
+                VersionPattern = $"{MajorVersionSpecialKeyword}.{MinorVersionSpecialKeyword}.{BuildVersionSpecialKeyword}",
                 TrackDacpacVersion = false,
                 CustomHeader = null,
                 CustomFooter = null

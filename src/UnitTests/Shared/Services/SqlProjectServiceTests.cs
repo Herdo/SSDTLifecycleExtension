@@ -360,7 +360,9 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
         }
 
         [Test]
-        public async Task TryLoadPathsForScaffoldingAsync_SuccessfullyCreated_Async()
+        [TestCase("TestProfile.publish.xml")]
+        [TestCase(ConfigurationModel.UseSinglePublishProfileSpecialKeyword)]
+        public async Task TryLoadPathsForScaffoldingAsync_SuccessfullyCreated_Async(string publishProfileConfiguration)
         {
             // Arrange
             var project = new SqlProject("a", @"C:\TestProject\TestProject.sqlproj", "c");
@@ -369,15 +371,17 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             var configuration = new ConfigurationModel
             {
                 ArtifactsPath = "_TestDeployment",
-                PublishProfilePath = "TestProfile.publish.xml"
+                PublishProfilePath = publishProfileConfiguration
             };
             var vsMock = new Mock<IVersionService>();
             vsMock.Setup(m => m.FormatVersion(It.IsNotNull<Version>(), configuration))
                   .Returns((Version version,
                             ConfigurationModel c) => version.ToString());
-            var fsaMock = Mock.Of<IFileSystemAccess>();
+            var fsaMock = new Mock<IFileSystemAccess>();
+            fsaMock.Setup(m => m.GetFilesIn(@"C:\TestProject", "*.publish.xml"))
+                   .Returns(new[] {"TestProfile.publish.xml"});
             var loggerMock = new Mock<ILogger>();
-            ISqlProjectService service = new SqlProjectService(vsMock.Object, fsaMock, loggerMock.Object);
+            ISqlProjectService service = new SqlProjectService(vsMock.Object, fsaMock.Object, loggerMock.Object);
 
             // Act
             var paths = await service.TryLoadPathsForScaffoldingAsync(project, configuration);
@@ -386,6 +390,42 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             Assert.IsNotNull(paths);
             loggerMock.Verify(m => m.LogAsync(It.IsAny<string>()), Times.Never);
             Assert.AreEqual(@"C:\TestProject\TestProfile.publish.xml", paths.PublishProfilePath);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948", paths.NewDacpacDirectory);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948\TestSqlTarget.dacpac", paths.NewDacpacPath);
+            Assert.IsNull(paths.PreviousDacpacPath);
+            Assert.IsNull(paths.DeployScriptPath);
+            Assert.IsNull(paths.DeployReportPath);
+        }
+
+        [Test]
+        public async Task TryLoadPathsForScaffoldingAsync_SuccessfullyCreated_NoPublishProfile_Async()
+        {
+            // Arrange
+            var project = new SqlProject("a", @"C:\TestProject\TestProject.sqlproj", "c");
+            project.ProjectProperties.SqlTargetName = "TestSqlTarget";
+            project.ProjectProperties.DacVersion = new Version(40, 23, 4, 4948);
+            var configuration = new ConfigurationModel
+            {
+                ArtifactsPath = "_TestDeployment",
+                PublishProfilePath = ConfigurationModel.UseSinglePublishProfileSpecialKeyword
+            };
+            var vsMock = new Mock<IVersionService>();
+            vsMock.Setup(m => m.FormatVersion(It.IsNotNull<Version>(), configuration))
+                  .Returns((Version version,
+                            ConfigurationModel c) => version.ToString());
+            var fsaMock = new Mock<IFileSystemAccess>();
+            fsaMock.Setup(m => m.GetFilesIn(@"C:\TestProject", "*.publish.xml"))
+                   .Returns(new string[0]);
+            var loggerMock = new Mock<ILogger>();
+            ISqlProjectService service = new SqlProjectService(vsMock.Object, fsaMock.Object, loggerMock.Object);
+
+            // Act
+            var paths = await service.TryLoadPathsForScaffoldingAsync(project, configuration);
+
+            // Assert
+            Assert.IsNotNull(paths);
+            loggerMock.Verify(m => m.LogAsync(It.IsAny<string>()), Times.Never);
+            Assert.AreEqual(string.Empty, paths.PublishProfilePath);
             Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948", paths.NewDacpacDirectory);
             Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948\TestSqlTarget.dacpac", paths.NewDacpacPath);
             Assert.IsNull(paths.PreviousDacpacPath);
@@ -466,7 +506,9 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
         }
 
         [Test]
-        public async Task TryLoadPathsForScriptCreationAsync_SuccessfullyCreated_Latest_Async()
+        [TestCase("TestProfile.publish.xml")]
+        [TestCase(ConfigurationModel.UseSinglePublishProfileSpecialKeyword)]
+        public async Task TryLoadPathsForScriptCreationAsync_SuccessfullyCreated_Latest_Async(string publishProfileConfiguration)
         {
             // Arrange
             var project = new SqlProject("a", @"C:\TestProject\TestProject.sqlproj", "c");
@@ -475,16 +517,18 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             var configuration = new ConfigurationModel
             {
                 ArtifactsPath = "_TestDeployment",
-                PublishProfilePath = "TestProfile.publish.xml",
+                PublishProfilePath = publishProfileConfiguration,
                 CreateDocumentationWithScriptCreation = true
             };
             var vsMock = new Mock<IVersionService>();
             vsMock.Setup(m => m.FormatVersion(It.IsNotNull<Version>(), configuration))
                   .Returns((Version version,
                             ConfigurationModel c) => version.ToString());
-            var fsaMock = Mock.Of<IFileSystemAccess>();
+            var fsaMock = new Mock<IFileSystemAccess>();
+            fsaMock.Setup(m => m.GetFilesIn(@"C:\TestProject", "*.publish.xml"))
+                   .Returns(new[] { "TestProfile.publish.xml" });
             var loggerMock = new Mock<ILogger>();
-            ISqlProjectService service = new SqlProjectService(vsMock.Object, fsaMock, loggerMock.Object);
+            ISqlProjectService service = new SqlProjectService(vsMock.Object, fsaMock.Object, loggerMock.Object);
 
             // Act
             var paths = await service.TryLoadPathsForScriptCreationAsync(project, configuration, new Version(40, 23, 3, 4932), true);
@@ -501,7 +545,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
         }
 
         [Test]
-        public async Task TryLoadPathsForScriptCreationAsync_SuccessfullyCreated_SpecificVersion_Async()
+        public async Task TryLoadPathsForScriptCreationAsync_SuccessfullyCreated_Latest_NoPublishProfile_Async()
         {
             // Arrange
             var project = new SqlProject("a", @"C:\TestProject\TestProject.sqlproj", "c");
@@ -510,16 +554,57 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             var configuration = new ConfigurationModel
             {
                 ArtifactsPath = "_TestDeployment",
-                PublishProfilePath = "TestProfile.publish.xml",
+                PublishProfilePath = ConfigurationModel.UseSinglePublishProfileSpecialKeyword,
                 CreateDocumentationWithScriptCreation = true
             };
             var vsMock = new Mock<IVersionService>();
             vsMock.Setup(m => m.FormatVersion(It.IsNotNull<Version>(), configuration))
                   .Returns((Version version,
                             ConfigurationModel c) => version.ToString());
-            var fsaMock = Mock.Of<IFileSystemAccess>();
+            var fsaMock = new Mock<IFileSystemAccess>();
+            fsaMock.Setup(m => m.GetFilesIn(@"C:\TestProject", "*.publish.xml"))
+                   .Returns(new string[0]);
             var loggerMock = new Mock<ILogger>();
-            ISqlProjectService service = new SqlProjectService(vsMock.Object, fsaMock, loggerMock.Object);
+            ISqlProjectService service = new SqlProjectService(vsMock.Object, fsaMock.Object, loggerMock.Object);
+
+            // Act
+            var paths = await service.TryLoadPathsForScriptCreationAsync(project, configuration, new Version(40, 23, 3, 4932), true);
+
+            // Assert
+            Assert.IsNotNull(paths);
+            loggerMock.Verify(m => m.LogAsync(It.IsAny<string>()), Times.Never);
+            Assert.AreEqual(string.Empty, paths.PublishProfilePath);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest", paths.NewDacpacDirectory);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest\TestSqlTarget.dacpac", paths.NewDacpacPath);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.3.4932\TestSqlTarget.dacpac", paths.PreviousDacpacPath);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest\TestSqlTarget_40.23.3.4932_latest.sql", paths.DeployScriptPath);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest\TestSqlTarget_40.23.3.4932_latest.xml", paths.DeployReportPath);
+        }
+
+        [Test]
+        [TestCase("TestProfile.publish.xml")]
+        [TestCase(ConfigurationModel.UseSinglePublishProfileSpecialKeyword)]
+        public async Task TryLoadPathsForScriptCreationAsync_SuccessfullyCreated_SpecificVersion_Async(string publishProfileConfiguration)
+        {
+            // Arrange
+            var project = new SqlProject("a", @"C:\TestProject\TestProject.sqlproj", "c");
+            project.ProjectProperties.SqlTargetName = "TestSqlTarget";
+            project.ProjectProperties.DacVersion = new Version(40, 23, 4, 4948);
+            var configuration = new ConfigurationModel
+            {
+                ArtifactsPath = "_TestDeployment",
+                PublishProfilePath = publishProfileConfiguration,
+                CreateDocumentationWithScriptCreation = true
+            };
+            var vsMock = new Mock<IVersionService>();
+            vsMock.Setup(m => m.FormatVersion(It.IsNotNull<Version>(), configuration))
+                  .Returns((Version version,
+                            ConfigurationModel c) => version.ToString());
+            var fsaMock = new Mock<IFileSystemAccess>();
+            fsaMock.Setup(m => m.GetFilesIn(@"C:\TestProject", "*.publish.xml"))
+                   .Returns(new[] { "TestProfile.publish.xml" });
+            var loggerMock = new Mock<ILogger>();
+            ISqlProjectService service = new SqlProjectService(vsMock.Object, fsaMock.Object, loggerMock.Object);
 
             // Act
             var paths = await service.TryLoadPathsForScriptCreationAsync(project, configuration, new Version(40, 23, 3, 4932), false);
@@ -528,6 +613,43 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             Assert.IsNotNull(paths);
             loggerMock.Verify(m => m.LogAsync(It.IsAny<string>()), Times.Never);
             Assert.AreEqual(@"C:\TestProject\TestProfile.publish.xml", paths.PublishProfilePath);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948", paths.NewDacpacDirectory);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948\TestSqlTarget.dacpac", paths.NewDacpacPath);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.3.4932\TestSqlTarget.dacpac", paths.PreviousDacpacPath);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948\TestSqlTarget_40.23.3.4932_40.23.4.4948.sql", paths.DeployScriptPath);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948\TestSqlTarget_40.23.3.4932_40.23.4.4948.xml", paths.DeployReportPath);
+        }
+
+        [Test]
+        public async Task TryLoadPathsForScriptCreationAsync_SuccessfullyCreated_SpecificVersion_NoPublishProfile_Async()
+        {
+            // Arrange
+            var project = new SqlProject("a", @"C:\TestProject\TestProject.sqlproj", "c");
+            project.ProjectProperties.SqlTargetName = "TestSqlTarget";
+            project.ProjectProperties.DacVersion = new Version(40, 23, 4, 4948);
+            var configuration = new ConfigurationModel
+            {
+                ArtifactsPath = "_TestDeployment",
+                PublishProfilePath = ConfigurationModel.UseSinglePublishProfileSpecialKeyword,
+                CreateDocumentationWithScriptCreation = true
+            };
+            var vsMock = new Mock<IVersionService>();
+            vsMock.Setup(m => m.FormatVersion(It.IsNotNull<Version>(), configuration))
+                  .Returns((Version version,
+                            ConfigurationModel c) => version.ToString());
+            var fsaMock = new Mock<IFileSystemAccess>();
+            fsaMock.Setup(m => m.GetFilesIn(@"C:\TestProject", "*.publish.xml"))
+                   .Returns(new string[0]);
+            var loggerMock = new Mock<ILogger>();
+            ISqlProjectService service = new SqlProjectService(vsMock.Object, fsaMock.Object, loggerMock.Object);
+
+            // Act
+            var paths = await service.TryLoadPathsForScriptCreationAsync(project, configuration, new Version(40, 23, 3, 4932), false);
+
+            // Assert
+            Assert.IsNotNull(paths);
+            loggerMock.Verify(m => m.LogAsync(It.IsAny<string>()), Times.Never);
+            Assert.AreEqual(string.Empty, paths.PublishProfilePath);
             Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948", paths.NewDacpacDirectory);
             Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948\TestSqlTarget.dacpac", paths.NewDacpacPath);
             Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.3.4932\TestSqlTarget.dacpac", paths.PreviousDacpacPath);

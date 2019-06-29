@@ -208,5 +208,18 @@
                        ? Directory.GetDirectories(directory, "*", SearchOption.TopDirectoryOnly)
                        : new string[0];
         }
+
+        string[] IFileSystemAccess.GetFilesIn(string directory,
+                                              string filter)
+        {
+            if (directory == null)
+                throw new ArgumentNullException(nameof(directory));
+            if (filter == null)
+                throw new ArgumentNullException(nameof(filter));
+
+            return Directory.Exists(directory)
+                       ? Directory.GetFiles(directory, filter, SearchOption.TopDirectoryOnly)
+                       : new string[0];
+        }
     }
 }

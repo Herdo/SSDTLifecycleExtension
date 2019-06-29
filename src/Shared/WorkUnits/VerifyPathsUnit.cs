@@ -27,7 +27,7 @@
                                                PathCollection paths)
         {
             await _logger.LogAsync("Verifying paths ...");
-            if (_fileSystemAccess.CheckIfFileExists(paths.PublishProfilePath))
+            if (!string.IsNullOrWhiteSpace(paths.PublishProfilePath) && _fileSystemAccess.CheckIfFileExists(paths.PublishProfilePath))
             {
                 stateModel.CurrentState = StateModelState.PathsVerified;
                 return;
