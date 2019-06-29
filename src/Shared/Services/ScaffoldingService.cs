@@ -56,7 +56,7 @@
             IsScaffolding = workInProgress;
             if (IsScaffolding)
             {
-                _visualStudioAccess.StartLongRunningTaskIndicatorAsync().Wait();
+                await _visualStudioAccess.StartLongRunningTaskIndicatorAsync();
                 await _visualStudioAccess.ClearSSDTLifecycleOutputAsync();
             }
             else
