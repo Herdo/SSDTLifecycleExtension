@@ -33,6 +33,8 @@
 
         string EnsureDirectoryExists([NotNull] string path);
 
+        void TryToCleanDirectory([NotNull] string path);
+
         string CopyFiles([NotNull] string sourceDirectory,
                          [NotNull] string targetDirectory,
                          [NotNull] string searchPattern);

@@ -10,6 +10,7 @@
         PathsLoaded = 30,
         PathsVerified = 40,
         TriedToBuildProject = 50,
+        TriedToCleanArtifactsDirectory = 55,
         TriedToCopyBuildResult = 60,
         TriedToCreateDeploymentFiles = 70,
         ModifiedDeploymentScript = 80

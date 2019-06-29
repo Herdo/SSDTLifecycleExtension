@@ -42,7 +42,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
         [TestCase(StateModelState.PathsVerified)]
         [TestCase(StateModelState.TriedToCreateDeploymentFiles)]
         [TestCase(StateModelState.ModifiedDeploymentScript)]
-        public void GetNextWorkUnit_ScaffoldingStateModel_ArgumentOutOfException_StateModel(StateModelState state)
+        public void GetNextWorkUnit_ScaffoldingStateModel_ArgumentOutOfRangeException_StateModel(StateModelState state)
         {
             // Arrange
             var drMock = new Mock<IDependencyResolver>();
@@ -196,6 +196,33 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
         public void GetNextWorkUnit_ScaffoldingStateModel_CorrectWorkUnitForTriedToBuildProject()
         {
             // Arrange
+            var fsaMock = Mock.Of<IFileSystemAccess>();
+            var loggerMock = Mock.Of<ILogger>();
+            var expectedWorkUnit = new CleanArtifactsDirectoryUnit(fsaMock, loggerMock);
+            var drMock = new Mock<IDependencyResolver>();
+            drMock.Setup(m => m.Get<CleanArtifactsDirectoryUnit>()).Returns(expectedWorkUnit);
+            IWorkUnitFactory wuf = new WorkUnitFactory(drMock.Object);
+            var project = new SqlProject("a", "b", "c");
+            var configuration = ConfigurationModel.GetDefault();
+            var targetVersion = new Version(1, 0);
+            Task HandlerFunc(bool b) => Task.CompletedTask;
+            var model = new ScaffoldingStateModel(project, configuration, targetVersion, HandlerFunc)
+            {
+                CurrentState = StateModelState.TriedToBuildProject
+            };
+
+            // Act
+            var workUnit = wuf.GetNextWorkUnit(model);
+
+            // Assert
+            Assert.AreSame(expectedWorkUnit, workUnit);
+            drMock.Verify(m => m.Get<CleanArtifactsDirectoryUnit>(), Times.Once);
+        }
+
+        [Test]
+        public void GetNextWorkUnit_ScaffoldingStateModel_CorrectWorkUnitTriedToCleanArtifactsDirectory()
+        {
+            // Arrange
             var bsMock = Mock.Of<IBuildService>();
             var expectedWorkUnit = new CopyBuildResultUnit(bsMock);
             var drMock = new Mock<IDependencyResolver>();
@@ -207,7 +234,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             Task HandlerFunc(bool b) => Task.CompletedTask;
             var model = new ScaffoldingStateModel(project, configuration, targetVersion, HandlerFunc)
             {
-                CurrentState = StateModelState.TriedToBuildProject
+                CurrentState = StateModelState.TriedToCleanArtifactsDirectory
             };
 
             // Act
@@ -254,7 +281,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
 
         [Test]
         [TestCase(StateModelState.Undefined)]
-        public void GetNextWorkUnit_ScriptCreationStateModel_ArgumentOutOfException_StateModel(StateModelState state)
+        public void GetNextWorkUnit_ScriptCreationStateModel_ArgumentOutOfRangeException_StateModel(StateModelState state)
         {
             // Arrange
             var drMock = new Mock<IDependencyResolver>();
@@ -435,6 +462,33 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
         public void GetNextWorkUnit_ScriptCreationStateModel_CorrectWorkUnitForTriedToBuildProject()
         {
             // Arrange
+            var fsaMock = Mock.Of<IFileSystemAccess>();
+            var loggerMock = Mock.Of<ILogger>();
+            var expectedWorkUnit = new CleanArtifactsDirectoryUnit(fsaMock, loggerMock);
+            var drMock = new Mock<IDependencyResolver>();
+            drMock.Setup(m => m.Get<CleanArtifactsDirectoryUnit>()).Returns(expectedWorkUnit);
+            IWorkUnitFactory wuf = new WorkUnitFactory(drMock.Object);
+            var project = new SqlProject("a", "b", "c");
+            var configuration = ConfigurationModel.GetDefault();
+            var previousVersion = new Version(1, 0);
+            Task HandlerFunc(bool b) => Task.CompletedTask;
+            var model = new ScriptCreationStateModel(project, configuration, previousVersion, false, HandlerFunc)
+            {
+                CurrentState = StateModelState.TriedToBuildProject
+            };
+
+            // Act
+            var workUnit = wuf.GetNextWorkUnit(model);
+
+            // Assert
+            Assert.AreSame(expectedWorkUnit, workUnit);
+            drMock.Verify(m => m.Get<CleanArtifactsDirectoryUnit>(), Times.Once);
+        }
+
+        [Test]
+        public void GetNextWorkUnit_ScriptCreationStateModel_CorrectWorkUnitTriedToCleanArtifactsDirectory()
+        {
+            // Arrange
             var bsMock = Mock.Of<IBuildService>();
             var expectedWorkUnit = new CopyBuildResultUnit(bsMock);
             var drMock = new Mock<IDependencyResolver>();
@@ -446,7 +500,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             Task HandlerFunc(bool b) => Task.CompletedTask;
             var model = new ScriptCreationStateModel(project, configuration, previousVersion, false, HandlerFunc)
             {
-                CurrentState = StateModelState.TriedToBuildProject
+                CurrentState = StateModelState.TriedToCleanArtifactsDirectory
             };
 
             // Act

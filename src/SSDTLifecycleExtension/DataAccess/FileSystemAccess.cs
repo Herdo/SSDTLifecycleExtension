@@ -3,6 +3,7 @@
     using System;
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
+    using System.Linq;
     using System.Threading.Tasks;
     using JetBrains.Annotations;
     using Microsoft.Win32;
@@ -135,6 +136,38 @@
             catch (Exception e)
             {
                 return e.Message;
+            }
+        }
+
+        void IFileSystemAccess.TryToCleanDirectory(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+                throw new ArgumentException("Value cannot be null or white space.", nameof(path));
+
+            try
+            {
+                var di = new DirectoryInfo(path);
+                if (!di.Exists)
+                    return;
+                var children = di.EnumerateFileSystemInfos().ToArray();
+                if (children.Length == 0)
+                    return;
+                foreach (var child in children)
+                {
+                    // Inner try-catch to delete as much as possible
+                    try
+                    {
+                        child.Delete();
+                    }
+                    catch
+                    {
+                        // ignored
+                    }
+                }
+            }
+            catch
+            {
+                // ignored
             }
         }
 
