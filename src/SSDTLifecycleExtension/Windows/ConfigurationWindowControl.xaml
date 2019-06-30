@@ -512,6 +512,16 @@
                                 <LineBreak/>
                                 <Run Text="Leave blank to not use the custom header."
                                      FontStyle="Italic"/>
+                                <LineBreak/>
+                                <LineBreak/>
+                                <Run Text="Use these special keywords:"
+                                     FontStyle="Italic"/>
+                                <LineBreak/>
+                                <Run Text="{}{PREVIOUS_VERSION}"
+                                     Style="{StaticResource HighlightRunStyle}"/>
+                                <LineBreak/>
+                                <Run Text="{}{NEXT_VERSION}"
+                                     Style="{StaticResource HighlightRunStyle}"/>
                             </TextBlock>
                             <TextBox Grid.Row="0"
                                      Grid.Column="1"
@@ -534,6 +544,16 @@
                                 <LineBreak/>
                                 <Run Text="Leave blank to not use the custom footer."
                                      FontStyle="Italic"/>
+                                <LineBreak/>
+                                <LineBreak/>
+                                <Run Text="Use these special keywords:"
+                                     FontStyle="Italic"/>
+                                <LineBreak/>
+                                <Run Text="{}{PREVIOUS_VERSION}"
+                                     Style="{StaticResource HighlightRunStyle}"/>
+                                <LineBreak/>
+                                <Run Text="{}{NEXT_VERSION}"
+                                     Style="{StaticResource HighlightRunStyle}"/>
                             </TextBlock>
                             <TextBox Grid.Row="1"
                                      Grid.Column="1"

@@ -385,53 +385,14 @@ GO
 ";
 
         [Test]
-        public void Modify_ArgumentNullException_Input()
+        public void Modify_ArgumentNullException_Model()
         {
             // Arrange
             IScriptModifier modifier = new TrackDacpacVersionModifier();
 
             // Act & Assert
             // ReSharper disable AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => modifier.ModifyAsync(null, null, null, null));
-            // ReSharper restore AssignNullToNotNullAttribute
-        }
-
-        [Test]
-        public void Modify_ArgumentNullException_Project()
-        {
-            // Arrange
-            IScriptModifier modifier = new TrackDacpacVersionModifier();
-
-            // Act & Assert
-            // ReSharper disable AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => modifier.ModifyAsync(MultiLineInputWithFinalGo, null, null, null));
-            // ReSharper restore AssignNullToNotNullAttribute
-        }
-
-        [Test]
-        public void Modify_ArgumentNullException_Configuration()
-        {
-            // Arrange
-            IScriptModifier modifier = new TrackDacpacVersionModifier();
-            var project = new SqlProject("", "", "");
-
-            // Act & Assert
-            // ReSharper disable AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => modifier.ModifyAsync(MultiLineInputWithFinalGo, project, null, null));
-            // ReSharper restore AssignNullToNotNullAttribute
-        }
-
-        [Test]
-        public void Modify_ArgumentNullException_Paths()
-        {
-            // Arrange
-            IScriptModifier modifier = new TrackDacpacVersionModifier();
-            var project = new SqlProject("", "", "");
-            var configuration = new ConfigurationModel();
-
-            // Act & Assert
-            // ReSharper disable AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => modifier.ModifyAsync(MultiLineInputWithFinalGo, project, configuration, null));
+            Assert.Throws<ArgumentNullException>(() => modifier.ModifyAsync(null));
             // ReSharper restore AssignNullToNotNullAttribute
         }
 
@@ -443,9 +404,10 @@ GO
             var project = new SqlProject("", "", "");
             var configuration = new ConfigurationModel();
             var paths = new PathCollection("", "", "", "", "", "");
+            var model = new ScriptModificationModel(MultiLineInputWithFinalGo, project, configuration, paths, new Version(1, 0, 0), false);
 
             // Act
-            var e = Assert.Throws<ArgumentException>(() => modifier.ModifyAsync(MultiLineInputWithFinalGo, project, configuration, paths));
+            var e = Assert.Throws<ArgumentException>(() => modifier.ModifyAsync(model));
 
             // Assert
             Assert.IsNotNull(e);
@@ -461,9 +423,10 @@ GO
             project.ProjectProperties.SqlTargetName = "Database.TestProject";
             var configuration = new ConfigurationModel();
             var paths = new PathCollection("", "", "", "", "", "");
+            var model = new ScriptModificationModel(MultiLineInputWithFinalGo, project, configuration, paths, new Version(1, 0, 0), false);
 
             // Act
-            var e = Assert.Throws<ArgumentException>(() => modifier.ModifyAsync(MultiLineInputWithFinalGo, project, configuration, paths));
+            var e = Assert.Throws<ArgumentException>(() => modifier.ModifyAsync(model));
 
             // Assert
             Assert.IsNotNull(e);
@@ -484,12 +447,13 @@ GO
             project.ProjectProperties.DacVersion = new Version(500, 30, 44, 80);
             var configuration = new ConfigurationModel();
             var paths = new PathCollection("", "", "", "", "", "");
+            var model = new ScriptModificationModel(input, project, configuration, paths, new Version(1, 0, 0), false);
 
             // Act
-            var modified = await modifier.ModifyAsync(input, project, configuration, paths);
+            await modifier.ModifyAsync(model);
 
             // Assert
-            Assert.AreEqual(FinalMultilineStatementFullVersion, modified);
+            Assert.AreEqual(FinalMultilineStatementFullVersion, model.CurrentScript);
         }
 
         [Test]
@@ -506,12 +470,13 @@ GO
             project.ProjectProperties.DacVersion = new Version(500, 30, 44);
             var configuration = new ConfigurationModel();
             var paths = new PathCollection("", "", "", "", "", "");
+            var model = new ScriptModificationModel(input, project, configuration, paths, new Version(1, 0, 0), false);
 
             // Act
-            var modified = await modifier.ModifyAsync(input, project, configuration, paths);
+            await modifier.ModifyAsync(model);
 
             // Assert
-            Assert.AreEqual(FinalMultilineStatementMajorMinorBuildVersion, modified);
+            Assert.AreEqual(FinalMultilineStatementMajorMinorBuildVersion, model.CurrentScript);
         }
 
         [Test]
@@ -528,12 +493,13 @@ GO
             project.ProjectProperties.DacVersion = new Version(500, 30);
             var configuration = new ConfigurationModel();
             var paths = new PathCollection("", "", "", "", "", "");
+            var model = new ScriptModificationModel(input, project, configuration, paths, new Version(1, 0, 0), false);
 
             // Act
-            var modified = await modifier.ModifyAsync(input, project, configuration, paths);
+            await modifier.ModifyAsync(model);
 
             // Assert
-            Assert.AreEqual(FinalMultilineStatementMajorMinorVersion, modified);
+            Assert.AreEqual(FinalMultilineStatementMajorMinorVersion, model.CurrentScript);
         }
     }
 }

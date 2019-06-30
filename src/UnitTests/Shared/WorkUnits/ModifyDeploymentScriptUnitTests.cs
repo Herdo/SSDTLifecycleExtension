@@ -112,9 +112,10 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             var project = new SqlProject("a", "b", "c");
             var configuration = ConfigurationModel.GetDefault();
             var previousVersion = new Version(1, 0);
+            const bool createLatest = false;
             Task HandlerFunc(bool b) => Task.CompletedTask;
             var paths = new PathCollection("a", "b", "c", "d", "e", "f");
-            var model = new ScriptCreationStateModel(project, configuration, previousVersion, false, HandlerFunc)
+            var model = new ScriptCreationStateModel(project, configuration, previousVersion, createLatest, HandlerFunc)
             {
                 Paths = paths
             };
@@ -123,16 +124,12 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
                 {ScriptModifier.AddCustomFooter, smFooterMock.Object},
                 {ScriptModifier.AddCustomHeader, smHeaderMock.Object}
             });
-            smHeaderMock.Setup(m => m.ModifyAsync(It.IsNotNull<string>(), project, configuration, paths))
-                        .ReturnsAsync((string input,
-                                       SqlProject p,
-                                       ConfigurationModel c,
-                                       PathCollection pc) => input + " a");
-            smFooterMock.Setup(m => m.ModifyAsync(It.IsNotNull<string>(), project, configuration, paths))
-                        .ReturnsAsync((string input,
-                                       SqlProject p,
-                                       ConfigurationModel c,
-                                       PathCollection pc) => input + "b");
+            smHeaderMock.Setup(m => m.ModifyAsync(It.IsNotNull<ScriptModificationModel>()))
+                        .Callback((ScriptModificationModel modificationModel) => modificationModel.CurrentScript += " a")
+                        .Returns(Task.CompletedTask);
+            smFooterMock.Setup(m => m.ModifyAsync(It.IsNotNull<ScriptModificationModel>()))
+                        .Callback((ScriptModificationModel modificationModel) => modificationModel.CurrentScript += "b")
+                        .Returns(Task.CompletedTask);
 
             // Act
             await unit.Work(model, CancellationToken.None);
@@ -144,8 +141,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             fsaMock.Verify(m => m.ReadFileAsync(paths.DeployScriptPath), Times.Once);
             fsaMock.Verify(m => m.WriteFileAsync(paths.DeployScriptPath, expectedResultScript), Times.Once);
             loggerMock.Verify(m => m.LogAsync(It.IsAny<string>()), Times.Exactly(2));
-            smHeaderMock.Verify(m => m.ModifyAsync(It.IsNotNull<string>(), project, configuration, paths), Times.Once);
-            smFooterMock.Verify(m => m.ModifyAsync(It.IsNotNull<string>(), project, configuration, paths), Times.Once);
+            smHeaderMock.Verify(m => m.ModifyAsync(It.IsNotNull<ScriptModificationModel>()), Times.Once);
+            smFooterMock.Verify(m => m.ModifyAsync(It.IsNotNull<ScriptModificationModel>()), Times.Once);
         }
     }
 }

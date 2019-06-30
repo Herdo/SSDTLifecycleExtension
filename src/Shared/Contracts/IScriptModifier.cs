@@ -8,17 +8,11 @@
     public interface IScriptModifier
     {
         /// <summary>
-        /// Modifies the <paramref name="input"/>.
+        /// Modifies the <see cref="ScriptModificationModel.CurrentScript"/> of the <paramref name="model"/>.
         /// </summary>
-        /// <param name="input">The <see cref="string"/> to modify.</param>
-        /// <param name="project">The <see cref="SqlProject"/> used as data source for certain modifiers.</param>
-        /// <param name="configuration">The <see cref="ConfigurationModel"/> used as data source for certain modifiers.</param>
-        /// <param name="paths">The <see cref="PathCollection"/> used as data source for certain modifiers.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="input"/>, <paramref name="project"/> or <paramref name="configuration"/> are <b>null</b>.</exception>
-        /// <returns>The modified <see cref="string"/>.</returns>
-        Task<string> ModifyAsync([NotNull] string input,
-                                 [NotNull] SqlProject project,
-                                 [NotNull] ConfigurationModel configuration,
-                                 [NotNull] PathCollection paths);
+        /// <param name="model">The <see cref="ScriptModificationModel"/> containing all relevant data..</param>
+        /// <exception cref="ArgumentNullException"><paramref name="model"/> is <b>null</b>.</exception>
+        /// <returns>An awaitable task.</returns>
+        Task ModifyAsync([NotNull] ScriptModificationModel model);
     }
 }

@@ -218,7 +218,7 @@ GO";
         }
 
         [Test]
-        public void ModifyAsync_ArgumentNullException_Input()
+        public void ModifyAsync_ArgumentNullException_Model()
         {
             // Arrange
             var daMock = Mock.Of<IDacAccess>();
@@ -227,67 +227,7 @@ GO";
             
             // Act & Assert
             // ReSharper disable AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => modifier.ModifyAsync(null, null, null, null));
-            // ReSharper restore AssignNullToNotNullAttribute
-        }
-
-        [Test]
-        public void ModifyAsync_ArgumentNullException_Project()
-        {
-            // Arrange
-            var daMock = Mock.Of<IDacAccess>();
-            var loggerMock = Mock.Of<ILogger>();
-            var input = "";
-            IScriptModifier modifier = new ReplaceUnnamedDefaultConstraintDropsModifier(daMock, loggerMock);
-
-            // Act & Assert
-            // ReSharper disable AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => modifier.ModifyAsync(input, null, null, null));
-            // ReSharper restore AssignNullToNotNullAttribute
-        }
-
-        [Test]
-        public void ModifyAsync_ArgumentNullException_Configuration()
-        {
-            // Arrange
-            var daMock = Mock.Of<IDacAccess>();
-            var loggerMock = Mock.Of<ILogger>();
-            var input = "";
-            var project = new SqlProject("a", "b", "c");
-            IScriptModifier modifier = new ReplaceUnnamedDefaultConstraintDropsModifier(daMock, loggerMock);
-
-            // Act & Assert
-            // ReSharper disable AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => modifier.ModifyAsync(input, project, null, null));
-            // ReSharper restore AssignNullToNotNullAttribute
-        }
-
-        [Test]
-        public void ModifyAsync_ArgumentNullException_Paths()
-        {
-            // Arrange
-            var daMock = Mock.Of<IDacAccess>();
-            var loggerMock = Mock.Of<ILogger>();
-            var input = "";
-            var project = new SqlProject("a", "b", "c");
-            var config = new ConfigurationModel
-            {
-                ArtifactsPath = "foobar",
-                ReplaceUnnamedDefaultConstraintDrops = true,
-                CommentOutUnnamedDefaultConstraintDrops = false,
-                PublishProfilePath = "Test.publish.xml",
-                VersionPattern = "1.2.3.4",
-                CreateDocumentationWithScriptCreation = true,
-                CustomHeader = "awesome header",
-                CustomFooter = "lame footer",
-                BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = false
-            };
-            IScriptModifier modifier = new ReplaceUnnamedDefaultConstraintDropsModifier(daMock, loggerMock);
-
-            // Act & Assert
-            // ReSharper disable AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => modifier.ModifyAsync(input, project, config, null));
+            Assert.Throws<ArgumentNullException>(() => modifier.ModifyAsync(null));
             // ReSharper restore AssignNullToNotNullAttribute
         }
 
@@ -325,12 +265,13 @@ GO";
             };
             var paths = new PathCollection("a", "b", "new", "old", "e", "f");
             IScriptModifier modifier = new ReplaceUnnamedDefaultConstraintDropsModifier(daMock.Object, loggerMock.Object);
+            var model = new ScriptModificationModel(MultipleDropDefaultConstraintStatements, project, config, paths, new Version(1, 0, 0), false);
 
             // Act
-            var result = await modifier.ModifyAsync(MultipleDropDefaultConstraintStatements, project, config, paths);
+            await modifier.ModifyAsync(model);
 
             // Assert
-            Assert.AreEqual(MultipleDropDefaultConstraintStatements, result);
+            Assert.AreEqual(MultipleDropDefaultConstraintStatements, model.CurrentScript);
             loggerMock.Verify(m => m.LogAsync("ERROR: Failed to load the default constraints of the previous DACPAC:"), Times.Once);
             loggerMock.Verify(m => m.LogAsync("oldError1"), Times.Once);
             loggerMock.Verify(m => m.LogAsync("oldError2"), Times.Once);
@@ -369,12 +310,13 @@ GO";
             };
             var paths = new PathCollection("a", "b", "new", "old", "e", "f");
             IScriptModifier modifier = new ReplaceUnnamedDefaultConstraintDropsModifier(daMock.Object, loggerMock.Object);
+            var model = new ScriptModificationModel(MultipleDropDefaultConstraintStatements, project, config, paths, new Version(1, 0, 0), false);
 
             // Act
-            var result = await modifier.ModifyAsync(MultipleDropDefaultConstraintStatements, project, config, paths);
+            await modifier.ModifyAsync(model);
 
             // Assert
-            Assert.AreEqual(MultipleDropDefaultConstraintStatementsReplacedPartially, result);
+            Assert.AreEqual(MultipleDropDefaultConstraintStatementsReplacedPartially, model.CurrentScript);
             loggerMock.Verify(m => m.LogAsync($"WARNING - {nameof(ReplaceUnnamedDefaultConstraintDropsModifier)}: Script defines 1 unnamed default constraint(s) more to drop than the DACPAC models provide."), Times.Once);
         }
 
@@ -412,12 +354,13 @@ GO";
             };
             var paths = new PathCollection("a", "b", "new", "old", "e", "f");
             IScriptModifier modifier = new ReplaceUnnamedDefaultConstraintDropsModifier(daMock.Object, loggerMock.Object);
+            var model = new ScriptModificationModel(input, project, config, paths, new Version(1, 0, 0), false);
 
             // Act
-            var result = await modifier.ModifyAsync(input, project, config, paths);
+            await modifier.ModifyAsync(model);
 
             // Assert
-            Assert.AreEqual(expectedOutput, result);
+            Assert.AreEqual(expectedOutput, model.CurrentScript);
             loggerMock.Verify(m => m.LogAsync($"WARNING - {nameof(ReplaceUnnamedDefaultConstraintDropsModifier)}: Regular expression matching timed out 1 time(s)."), Times.Once);
         }
 
@@ -452,12 +395,13 @@ GO";
             };
             var paths = new PathCollection("a", "b", "new", "old", "e", "f");
             IScriptModifier modifier = new ReplaceUnnamedDefaultConstraintDropsModifier(daMock.Object, loggerMock.Object);
+            var model = new ScriptModificationModel(MultipleDropDefaultConstraintStatements, project, config, paths, new Version(1, 0, 0), false);
 
             // Act
-            var result = await modifier.ModifyAsync(MultipleDropDefaultConstraintStatements, project, config, paths);
+            await modifier.ModifyAsync(model);
 
             // Assert
-            Assert.AreEqual(MultipleDropDefaultConstraintStatementsReplaced, result);
+            Assert.AreEqual(MultipleDropDefaultConstraintStatementsReplaced, model.CurrentScript);
         }
     }
 }

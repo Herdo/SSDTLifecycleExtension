@@ -58,53 +58,14 @@ PRINT 'Update complete'
 GO";
 
         [Test]
-        public void Modify_ArgumentNullException_Input()
+        public void Modify_ArgumentNullException_Model()
         {
             // Arrange
             IScriptModifier modifier = new CommentOutUnnamedDefaultConstraintDropsModifier();
 
             // Act & Assert
             // ReSharper disable AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => modifier.ModifyAsync(null, null, null, null));
-            // ReSharper restore AssignNullToNotNullAttribute
-        }
-
-        [Test]
-        public void Modify_ArgumentNullException_Project()
-        {
-            // Arrange
-            IScriptModifier modifier = new CommentOutUnnamedDefaultConstraintDropsModifier();
-
-            // Act & Assert
-            // ReSharper disable AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => modifier.ModifyAsync(MultipleDropDefaultConstraintStatements, null, null, null));
-            // ReSharper restore AssignNullToNotNullAttribute
-        }
-
-        [Test]
-        public void Modify_ArgumentNullException_Configuration()
-        {
-            // Arrange
-            IScriptModifier modifier = new CommentOutUnnamedDefaultConstraintDropsModifier();
-            var project = new SqlProject("", "", "");
-
-            // Act & Assert
-            // ReSharper disable AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => modifier.ModifyAsync(MultipleDropDefaultConstraintStatements, project, null, null));
-            // ReSharper restore AssignNullToNotNullAttribute
-        }
-
-        [Test]
-        public void Modify_ArgumentNullException_Paths()
-        {
-            // Arrange
-            IScriptModifier modifier = new CommentOutUnnamedDefaultConstraintDropsModifier();
-            var project = new SqlProject("", "", "");
-            var configuration = new ConfigurationModel();
-
-            // Act & Assert
-            // ReSharper disable AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => modifier.ModifyAsync(MultipleDropDefaultConstraintStatements, project, configuration, null));
+            Assert.Throws<ArgumentNullException>(() => modifier.ModifyAsync(null));
             // ReSharper restore AssignNullToNotNullAttribute
         }
 
@@ -116,12 +77,13 @@ GO";
             var project = new SqlProject("", "", "");
             var configuration = new ConfigurationModel();
             var paths = new PathCollection("", "", "", "", "", "");
+            var model = new ScriptModificationModel(MultipleDropDefaultConstraintStatements, project, configuration, paths, new Version(1, 0, 0), false);
 
             // Act
-            var modified = await modifier.ModifyAsync(MultipleDropDefaultConstraintStatements, project, configuration, paths);
+            await modifier.ModifyAsync(model);
 
             // Assert
-            Assert.AreEqual(MultipleDropDefaultConstraintStatementsCommented, modified);
+            Assert.AreEqual(MultipleDropDefaultConstraintStatementsCommented, model.CurrentScript);
         }
     }
 }

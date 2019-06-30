@@ -33,7 +33,9 @@
         private async Task ModifyCreatedScriptInternal(IStateModel stateModel,
                                                        SqlProject project,
                                                        ConfigurationModel configuration,
-                                                       PathCollection paths)
+                                                       PathCollection paths,
+                                                       Version previousVersion,
+                                                       bool createLatest)
         {
             var modifiers = _scriptModifierProviderService.GetScriptModifiers(configuration);
             if (!modifiers.Any())
@@ -42,28 +44,27 @@
                 return;
             }
 
-            await ApplyAllModifiers(project, configuration, paths, modifiers);
+            await ApplyAllModifiers(project, configuration, paths, previousVersion, createLatest, modifiers);
             stateModel.CurrentState = StateModelState.ModifiedDeploymentScript;
         }
 
         private async Task ApplyAllModifiers(SqlProject project,
                                              ConfigurationModel configuration,
                                              PathCollection paths,
+                                             Version previousVersion,
+                                             bool createLatest,
                                              IReadOnlyDictionary<ScriptModifier, IScriptModifier> modifiers)
         {
-            var scriptContent = await _fileSystemAccess.ReadFileAsync(paths.DeployScriptPath);
+            var initialScript = await _fileSystemAccess.ReadFileAsync(paths.DeployScriptPath);
+            var model = new ScriptModificationModel(initialScript, project, configuration, paths, previousVersion, createLatest);
 
             foreach (var m in modifiers.OrderBy(m => m.Key))
             {
                 await _logger.LogAsync($"Modifying script: {m.Key}");
-
-                scriptContent = await m.Value.ModifyAsync(scriptContent,
-                                                          project,
-                                                          configuration,
-                                                          paths);
+                await m.Value.ModifyAsync(model);
             }
 
-            await _fileSystemAccess.WriteFileAsync(paths.DeployScriptPath, scriptContent);
+            await _fileSystemAccess.WriteFileAsync(paths.DeployScriptPath, model.CurrentScript);
         }
 
         Task IWorkUnit<ScriptCreationStateModel>.Work(ScriptCreationStateModel stateModel,
@@ -72,7 +73,7 @@
             if (stateModel == null)
                 throw new ArgumentNullException(nameof(stateModel));
 
-            return ModifyCreatedScriptInternal(stateModel, stateModel.Project, stateModel.Configuration, stateModel.Paths);
+            return ModifyCreatedScriptInternal(stateModel, stateModel.Project, stateModel.Configuration, stateModel.Paths, stateModel.PreviousVersion, stateModel.CreateLatest);
         }
     }
 }

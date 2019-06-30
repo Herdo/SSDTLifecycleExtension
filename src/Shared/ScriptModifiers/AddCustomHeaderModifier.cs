@@ -8,27 +8,22 @@
 
     internal class AddCustomHeaderModifier : IScriptModifier
     {
-        Task<string> IScriptModifier.ModifyAsync(string input,
-                                                 SqlProject project,
-                                                 ConfigurationModel configuration,
-                                                 PathCollection paths)
+        Task IScriptModifier.ModifyAsync(ScriptModificationModel model)
         {
-            if (input == null)
-                throw new ArgumentNullException(nameof(input));
-            if (project == null)
-                throw new ArgumentNullException(nameof(project));
-            if (configuration == null)
-                throw new ArgumentNullException(nameof(configuration));
-            if (paths == null)
-                throw new ArgumentNullException(nameof(paths));
+            if (model == null)
+                throw new ArgumentNullException(nameof(model));
 
-            if (string.IsNullOrWhiteSpace(configuration.CustomHeader))
-                return Task.FromResult(input);
+            if (string.IsNullOrWhiteSpace(model.Configuration.CustomHeader))
+                return Task.CompletedTask;
 
-            var sb = new StringBuilder(configuration.CustomHeader);
+            var header = model.Configuration.CustomHeader;
+            header = header.Replace(Constants.ScriptModificationSpecialKeywordPreviousVersion, model.PreviousVersion.ToString());
+            header = header.Replace(Constants.ScriptModificationSpecialKeywordNextVersion, model.CreateLatest ? "latest" : model.Project.ProjectProperties.DacVersion.ToString());
+            var sb = new StringBuilder(header);
             sb.AppendLine();
-            sb.Append(input);
-            return Task.FromResult(sb.ToString());
+            sb.Append(model.CurrentScript);
+            model.CurrentScript = sb.ToString();
+            return Task.CompletedTask;
         }
     }
 }

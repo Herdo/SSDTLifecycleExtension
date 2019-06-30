@@ -43,24 +43,23 @@ EXECUTE (@command)";
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        private async Task<string> ModifyInternalAsync(string input,
-                                                       PathCollection paths)
+        private async Task ModifyInternalAsync(ScriptModificationModel model)
         {
-            var (errorsWhileLoading, oldDefaultConstraints, currentDefaultConstraints) = await GetDefaultConstraints(paths);
+            var (errorsWhileLoading, oldDefaultConstraints, currentDefaultConstraints) = await GetDefaultConstraints(model.Paths);
             if (errorsWhileLoading)
-                return input;
+                return;
 
             var defaultConstraintsToRemove = oldDefaultConstraints.Where(m => m.ConstraintName == null)
                                                                   .Except(currentDefaultConstraints)
                                                                   .ToDictionary(constraint => constraint, constraint => false);
 
-            var (resultText, regexMatchTimeouts, failedReplacements) = ReplaceUnnamedDefaultConstraintStatements(input, defaultConstraintsToRemove);
+            var (resultText, regexMatchTimeouts, failedReplacements) = ReplaceUnnamedDefaultConstraintStatements(model.CurrentScript, defaultConstraintsToRemove);
             if (regexMatchTimeouts > 0)
                 await _logger.LogAsync($"WARNING - {nameof(ReplaceUnnamedDefaultConstraintDropsModifier)}: Regular expression matching timed out {regexMatchTimeouts} time(s).");
             if (failedReplacements > 0)
                 await _logger.LogAsync($"WARNING - {nameof(ReplaceUnnamedDefaultConstraintDropsModifier)}: Script defines {failedReplacements} unnamed default constraint(s) more to drop than the DACPAC models provide.");
 
-            return resultText;
+            model.CurrentScript = resultText;
         }
 
         private async Task<(bool ErrorsWhileLoading, DefaultConstraint[] OldDefaultConstraints, DefaultConstraint[] CurrentDefaultConstraints)> GetDefaultConstraints(PathCollection paths)
@@ -214,21 +213,12 @@ EXECUTE (@command)";
             return combined;
         }
 
-        Task<string> IScriptModifier.ModifyAsync(string input,
-                                                 SqlProject project,
-                                                 ConfigurationModel configuration,
-                                                 PathCollection paths)
+        Task IScriptModifier.ModifyAsync(ScriptModificationModel model)
         {
-            if (input == null)
-                throw new ArgumentNullException(nameof(input));
-            if (project == null)
-                throw new ArgumentNullException(nameof(project));
-            if (configuration == null)
-                throw new ArgumentNullException(nameof(configuration));
-            if (paths == null)
-                throw new ArgumentNullException(nameof(paths));
+            if (model == null)
+                throw new ArgumentNullException(nameof(model));
 
-            return ModifyInternalAsync(input, paths);
+            return ModifyInternalAsync(model);
         }
     }
 }

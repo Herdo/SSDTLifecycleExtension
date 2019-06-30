@@ -97,29 +97,20 @@ GO
                 update = Environment.NewLine + update;
         }
 
-        Task<string> IScriptModifier.ModifyAsync(string input,
-                                                 SqlProject project,
-                                                 ConfigurationModel configuration,
-                                                 PathCollection paths)
+        Task IScriptModifier.ModifyAsync(ScriptModificationModel model)
         {
-            if (input == null)
-                throw new ArgumentNullException(nameof(input));
-            if (project == null)
-                throw new ArgumentNullException(nameof(project));
-            if (configuration == null)
-                throw new ArgumentNullException(nameof(configuration));
-            if (paths == null)
-                throw new ArgumentNullException(nameof(paths));
-            if (project.ProjectProperties.SqlTargetName == null)
-                throw new ArgumentException($"{nameof(SqlProjectProperties)}.{nameof(SqlProjectProperties.SqlTargetName)} must be set.", nameof(project));
-            if (project.ProjectProperties.DacVersion == null)
-                throw new ArgumentException($"{nameof(SqlProjectProperties)}.{nameof(SqlProjectProperties.DacVersion)} must be set.", nameof(project));
+            if (model == null)
+                throw new ArgumentNullException(nameof(model));
+            if (model.Project.ProjectProperties.SqlTargetName == null)
+                throw new ArgumentException($"{nameof(SqlProjectProperties)}.{nameof(SqlProjectProperties.SqlTargetName)} must be set.", nameof(model.Project));
+            if (model.Project.ProjectProperties.DacVersion == null)
+                throw new ArgumentException($"{nameof(SqlProjectProperties)}.{nameof(SqlProjectProperties.DacVersion)} must be set.", nameof(model.Project));
 
             // Prepare format string
-            var (createAndInsertStatement, updateStatement) = GetFinalStatementsFromTemplate(input, project);
+            var (createAndInsertStatement, updateStatement) = GetFinalStatementsFromTemplate(model.CurrentScript, model.Project);
 
             var createAndInsertStatementSet = false;
-            var modifiedWithInsertAndCreateStatement = ForEachMatch(input,
+            var modifiedWithInsertAndCreateStatement = ForEachMatch(model.CurrentScript,
                                                                     "USE [$(DatabaseName)];",
                                                                     0,
                                                                     s =>
@@ -129,8 +120,9 @@ GO
                                                                         createAndInsertStatementSet = true;
                                                                         return s + createAndInsertStatement;
                                                                     });
+            model.CurrentScript = modifiedWithInsertAndCreateStatement + updateStatement;
 
-            return Task.FromResult(modifiedWithInsertAndCreateStatement + updateStatement);
+            return Task.CompletedTask;
         }
     }
 }

@@ -8,27 +8,22 @@
 
     internal class AddCustomFooterModifier : IScriptModifier
     {
-        Task<string> IScriptModifier.ModifyAsync(string input,
-                                                 SqlProject project,
-                                                 ConfigurationModel configuration,
-                                                 PathCollection paths)
+        Task IScriptModifier.ModifyAsync(ScriptModificationModel model)
         {
-            if (input == null)
-                throw new ArgumentNullException(nameof(input));
-            if (project == null)
-                throw new ArgumentNullException(nameof(project));
-            if (configuration == null)
-                throw new ArgumentNullException(nameof(configuration));
-            if (paths == null)
-                throw new ArgumentNullException(nameof(paths));
+            if (model == null)
+                throw new ArgumentNullException(nameof(model));
 
-            if (string.IsNullOrWhiteSpace(configuration.CustomFooter))
-                return Task.FromResult(input);
+            if (string.IsNullOrWhiteSpace(model.Configuration.CustomFooter))
+                return Task.CompletedTask;
 
-            var sb = new StringBuilder(input);
+            var footer = model.Configuration.CustomFooter;
+            footer = footer.Replace(Constants.ScriptModificationSpecialKeywordPreviousVersion, model.PreviousVersion.ToString());
+            footer = footer.Replace(Constants.ScriptModificationSpecialKeywordNextVersion, model.CreateLatest ? "latest" : model.Project.ProjectProperties.DacVersion.ToString());
+            var sb = new StringBuilder(model.CurrentScript);
             sb.AppendLine();
-            sb.Append(configuration.CustomFooter);
-            return Task.FromResult(sb.ToString());
+            sb.Append(footer);
+            model.CurrentScript = sb.ToString();
+            return Task.CompletedTask;
         }
     }
 }
