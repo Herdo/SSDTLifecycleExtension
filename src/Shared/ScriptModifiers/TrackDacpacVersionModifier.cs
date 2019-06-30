@@ -102,9 +102,9 @@ GO
             if (model == null)
                 throw new ArgumentNullException(nameof(model));
             if (model.Project.ProjectProperties.SqlTargetName == null)
-                throw new ArgumentException($"{nameof(SqlProjectProperties)}.{nameof(SqlProjectProperties.SqlTargetName)} must be set.", nameof(model.Project));
+                throw new ArgumentException($"{nameof(ScriptModificationModel.Project)}.{nameof(SqlProject.ProjectProperties)}.{nameof(SqlProjectProperties.SqlTargetName)} must be set.", nameof(model));
             if (model.Project.ProjectProperties.DacVersion == null)
-                throw new ArgumentException($"{nameof(SqlProjectProperties)}.{nameof(SqlProjectProperties.DacVersion)} must be set.", nameof(model.Project));
+                throw new ArgumentException($"{nameof(ScriptModificationModel.Project)}.{nameof(SqlProject.ProjectProperties)}.{nameof(SqlProjectProperties.DacVersion)} must be set.", nameof(model));
 
             // Prepare format string
             var (createAndInsertStatement, updateStatement) = GetFinalStatementsFromTemplate(model.CurrentScript, model.Project);
