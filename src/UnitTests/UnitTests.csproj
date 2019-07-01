@@ -61,6 +61,7 @@
     <Compile Include="Shared\Contracts\SecureResultTests.cs" />
     <Compile Include="Shared\Contracts\SqlProjectPropertiesTests.cs" />
     <Compile Include="Shared\Contracts\SqlProjectTests.cs" />
+    <Compile Include="Shared\Enums\ScriptModifierTest.cs" />
     <Compile Include="Shared\Models\BaseModelTests.cs" />
     <Compile Include="Shared\Models\BaseStateModelTests.cs" />
     <Compile Include="Shared\Models\ConfigurationModelTests.cs" />
