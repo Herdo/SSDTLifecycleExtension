@@ -4,6 +4,13 @@
 
     public abstract class StringSearchModifierBase
     {
+        // ReSharper disable once EmptyConstructor
+        protected StringSearchModifierBase()
+        {
+            // Don't allow public initialization.
+            // Only modifiers which derive from this class should be able to use the methods defined here.
+        }
+
         private static int SearchStartIndex(string input,
                                             int statementIndex,
                                             byte numberOfLeadingStatementsToInclude)
