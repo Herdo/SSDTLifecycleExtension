@@ -72,6 +72,7 @@
     <Compile Include="Shared\ScriptModifiers\AddCustomHeaderModifierTests.cs" />
     <Compile Include="Shared\ScriptModifiers\AddCustomFooterModifierTests.cs" />
     <Compile Include="Shared\ScriptModifiers\CommentOutUnnamedDefaultConstraintDropsModifierTests.cs" />
+    <Compile Include="Shared\ScriptModifiers\RemoveSqlCmdStatementsModifierTests.cs" />
     <Compile Include="Shared\ScriptModifiers\ReplaceUnnamedDefaultConstraintDropsModifierTests.cs" />
     <Compile Include="Shared\ScriptModifiers\ScriptModifierFactoryTests.cs" />
     <Compile Include="Shared\ScriptModifiers\StringSearchModifierBaseTests.cs" />

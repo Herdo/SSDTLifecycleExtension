@@ -30,6 +30,8 @@
                     return _dependencyResolver.Get<CommentOutUnnamedDefaultConstraintDropsModifier>();
                 case ScriptModifier.ReplaceUnnamedDefaultConstraintDrops:
                     return _dependencyResolver.Get<ReplaceUnnamedDefaultConstraintDropsModifier>();
+                case ScriptModifier.RemoveSqlCmdStatements:
+                    return _dependencyResolver.Get<RemoveSqlCmdStatementsModifier>();
                 default:
                     throw new ArgumentOutOfRangeException(nameof(scriptModifier), scriptModifier, null);
             }

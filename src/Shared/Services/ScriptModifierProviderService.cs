@@ -41,6 +41,9 @@
             if (configuration.TrackDacpacVersion)
                 result[ScriptModifier.TrackDacpacVersion] = _scriptModifierFactory.CreateScriptModifier(ScriptModifier.TrackDacpacVersion);
 
+            if (configuration.RemoveSqlCmdStatements)
+                result[ScriptModifier.RemoveSqlCmdStatements] = _scriptModifierFactory.CreateScriptModifier(ScriptModifier.RemoveSqlCmdStatements);
+
             return result;
         }
     }

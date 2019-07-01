@@ -68,12 +68,14 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             var sm3 = Mock.Of<IScriptModifier>();
             var sm4 = Mock.Of<IScriptModifier>();
             var sm5 = Mock.Of<IScriptModifier>();
+            var sm6 = Mock.Of<IScriptModifier>();
             var smfMock = new Mock<IScriptModifierFactory>();
             smfMock.Setup(m => m.CreateScriptModifier(ScriptModifier.CommentOutUnnamedDefaultConstraintDrops)).Returns(sm1);
             smfMock.Setup(m => m.CreateScriptModifier(ScriptModifier.ReplaceUnnamedDefaultConstraintDrops)).Returns(sm2);
             smfMock.Setup(m => m.CreateScriptModifier(ScriptModifier.AddCustomHeader)).Returns(sm3);
             smfMock.Setup(m => m.CreateScriptModifier(ScriptModifier.AddCustomFooter)).Returns(sm4);
             smfMock.Setup(m => m.CreateScriptModifier(ScriptModifier.TrackDacpacVersion)).Returns(sm5);
+            smfMock.Setup(m => m.CreateScriptModifier(ScriptModifier.RemoveSqlCmdStatements)).Returns(sm6);
             IScriptModifierProviderService service = new ScriptModifierProviderService(smfMock.Object);
             var config = new ConfigurationModel
             {
@@ -81,7 +83,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
                 ReplaceUnnamedDefaultConstraintDrops = true,
                 CustomHeader = "foo",
                 CustomFooter = "bar",
-                TrackDacpacVersion = true
+                TrackDacpacVersion = true,
+                RemoveSqlCmdStatements = true
             };
 
             // Act
@@ -89,13 +92,14 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
 
             // Assert
             Assert.IsNotNull(modifiers);
-            Assert.AreEqual(5, modifiers.Count);
-            smfMock.Verify(m => m.CreateScriptModifier(It.IsAny<ScriptModifier>()), Times.Exactly(5));
+            Assert.AreEqual(6, modifiers.Count);
+            smfMock.Verify(m => m.CreateScriptModifier(It.IsAny<ScriptModifier>()), Times.Exactly(6));
             Assert.AreSame(modifiers[ScriptModifier.CommentOutUnnamedDefaultConstraintDrops], sm1);
             Assert.AreSame(modifiers[ScriptModifier.ReplaceUnnamedDefaultConstraintDrops], sm2);
             Assert.AreSame(modifiers[ScriptModifier.AddCustomHeader], sm3);
             Assert.AreSame(modifiers[ScriptModifier.AddCustomFooter], sm4);
             Assert.AreSame(modifiers[ScriptModifier.TrackDacpacVersion], sm5);
+            Assert.AreSame(modifiers[ScriptModifier.RemoveSqlCmdStatements], sm6);
         }
     }
 }

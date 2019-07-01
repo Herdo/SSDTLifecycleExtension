@@ -18,6 +18,7 @@
         private bool _createDocumentationWithScriptCreation;
         private bool _commentOutUnnamedDefaultConstraintDrops;
         private bool _replaceUnnamedDefaultConstraintDrops;
+        private bool _removeSqlCmdStatements;
         private string _versionPattern;
         private bool _trackDacpacVersion;
         private string _customHeader;
@@ -118,6 +119,20 @@
         }
 
         /// <summary>
+        /// Gets or sets whether to remove all SQLCMD related statements.
+        /// </summary>
+        public bool RemoveSqlCmdStatements
+        {
+            get => _removeSqlCmdStatements;
+            set
+            {
+                if (value == _removeSqlCmdStatements) return;
+                _removeSqlCmdStatements = value;
+                OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the version pattern.
         /// </summary>
         public string VersionPattern
@@ -187,6 +202,7 @@
                 CreateDocumentationWithScriptCreation = true,
                 CommentOutUnnamedDefaultConstraintDrops = false,
                 ReplaceUnnamedDefaultConstraintDrops = false,
+                RemoveSqlCmdStatements = false,
                 VersionPattern = $"{MajorVersionSpecialKeyword}.{MinorVersionSpecialKeyword}.{BuildVersionSpecialKeyword}",
                 TrackDacpacVersion = false,
                 CustomHeader = null,
@@ -215,6 +231,7 @@
                 CreateDocumentationWithScriptCreation = CreateDocumentationWithScriptCreation,
                 CommentOutUnnamedDefaultConstraintDrops = CommentOutUnnamedDefaultConstraintDrops,
                 ReplaceUnnamedDefaultConstraintDrops = ReplaceUnnamedDefaultConstraintDrops,
+                RemoveSqlCmdStatements = RemoveSqlCmdStatements,
                 VersionPattern = VersionPattern,
                 TrackDacpacVersion = TrackDacpacVersion,
                 CustomHeader = CustomHeader,
@@ -236,6 +253,7 @@
                    && _createDocumentationWithScriptCreation == other._createDocumentationWithScriptCreation
                    && _commentOutUnnamedDefaultConstraintDrops == other._commentOutUnnamedDefaultConstraintDrops
                    && _replaceUnnamedDefaultConstraintDrops == other._replaceUnnamedDefaultConstraintDrops
+                   && _removeSqlCmdStatements == other._removeSqlCmdStatements
                    && string.Equals(_versionPattern, other._versionPattern)
                    && _trackDacpacVersion == other._trackDacpacVersion
                    && string.Equals(_customHeader, other._customHeader)

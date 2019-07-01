@@ -102,7 +102,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
                    .ReturnsAsync(() =>
                                      "{  \"ArtifactsPath\": \"__Deployment\",  \"PublishProfilePath\": \"Test.publish.xml\",  " +
                                      "\"BuildBeforeScriptCreation\": false,  \"CreateDocumentationWithScriptCreation\": true,  " +
-                                     "\"CommentOutUnnamedDefaultConstraintDrops\": true,  " +
+                                     "\"CommentOutUnnamedDefaultConstraintDrops\": true, \"RemoveSqlCmdStatements\": true, " +
                                      "\"ReplaceUnnamedDefaultConstraintDrops\": true,  \"VersionPattern\": \"{MAJOR}.0.{BUILD}\",  " +
                                      "\"TrackDacpacVersion\": true,  \"CustomHeader\": \"header\",  \"CustomFooter\": \"footer\"}");
             var vsaMock = Mock.Of<IVisualStudioAccess>();
@@ -126,6 +126,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             Assert.IsTrue(configuration.TrackDacpacVersion);
             Assert.AreEqual("header", configuration.CustomHeader);
             Assert.AreEqual("footer", configuration.CustomFooter);
+            Assert.IsTrue(configuration.RemoveSqlCmdStatements);
             Assert.IsTrue(configuration.HasErrors); // This will check if ValidateAll is called correctly.
         }
 

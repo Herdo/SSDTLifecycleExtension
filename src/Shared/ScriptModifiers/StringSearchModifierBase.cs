@@ -89,10 +89,10 @@
         /// 7:    PRINT 'Bye world'
         /// <paramref name="numberOfLeadingStatementsToInclude"/> = 0 would include the beginning of line 4 until the beginning of line 7.
         /// <paramref name="numberOfLeadingStatementsToInclude"/> = 1 or higher would include the beginning of line 1 until the beginning of line 7.</example>
-        protected (int StartIndex, int EndIndex) SearchStatementRange(string input,
-                                                                      string statement,
-                                                                      int startAfterIndex,
-                                                                      byte numberOfLeadingStatementsToInclude)
+        protected static (int StartIndex, int EndIndex) SearchStatementRange(string input,
+                                                                             string statement,
+                                                                             int startAfterIndex,
+                                                                             byte numberOfLeadingStatementsToInclude)
         {
             if (input == null)
                 throw new ArgumentNullException(nameof(input));
@@ -129,10 +129,10 @@
         /// <exception cref="ArgumentException"><paramref name="statement"/> contains only white spaces.</exception>
         /// <exception cref="InvalidOperationException">The result returned from the <paramref name="modifier"/> is <b>null</b>.</exception>
         /// <returns>The <paramref name="input"/> string, if no match is found, otherwise the result after applying the modifications.</returns>
-        protected string ForEachMatch(string input,
-                                      string statement,
-                                      byte numberOfLeadingStatementsToInclude,
-                                      Func<string, string> modifier)
+        protected static string ForEachMatch(string input,
+                                             string statement,
+                                             byte numberOfLeadingStatementsToInclude,
+                                             Func<string, string> modifier)
         {
             if (input == null)
                 throw new ArgumentNullException(nameof(input));

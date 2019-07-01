@@ -334,6 +334,7 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
@@ -402,6 +403,31 @@
                                       Grid.Column="1"
                                       Style="{StaticResource ConfigurationCheckBoxStyle}"
                                       IsChecked="{Binding Model.ReplaceUnnamedDefaultConstraintDrops, Mode=TwoWay}"/>
+
+                            <!-- Remove SQLCMD statements -->
+                            <TextBlock Grid.Row="4"
+                                       Grid.Column="0"
+                                       Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
+                                <Run Text="Remove SQLCMD statements"
+                                     FontWeight="Bold"/>
+                                <LineBreak/>
+                                <Run Text="Removes all SQLCMD related statements"
+                                     FontStyle="Italic"/>
+                                <LineBreak/>
+                                <Run Text="from the script."
+                                     FontStyle="Italic"/>
+                                <LineBreak/>
+                                <LineBreak/>
+                                <Run Text="Only check this option if you want to"
+                                     FontStyle="Italic"/>
+                                <LineBreak/>
+                                <Run Text="execute the script without SQLCMD mode."
+                                     FontStyle="Italic"/>
+                            </TextBlock>
+                            <CheckBox Grid.Row="4"
+                                      Grid.Column="1"
+                                      Style="{StaticResource ConfigurationCheckBoxStyle}"
+                                      IsChecked="{Binding Model.RemoveSqlCmdStatements, Mode=TwoWay}"/>
                         </Grid>
                     </GroupBox>
                 </StackPanel>

@@ -394,6 +394,41 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Models
         }
 
         [Test]
+        public void RemoveSqlCmdStatements_Get_Set_PropertyChanged()
+        {
+            // Arrange
+            const bool testValue = true;
+            var model = new ConfigurationModel();
+            object invokedPropertyChangedSender = null;
+            string invokedPropertyChangedProperty = null;
+            model.PropertyChanged += (sender,
+                                      args) =>
+            {
+                invokedPropertyChangedSender = sender;
+                invokedPropertyChangedProperty = args?.PropertyName;
+            };
+            object invokedErrorsChangedSender = null;
+            string invokedErrorsChangedProperty = null;
+            model.ErrorsChanged += (sender,
+                                    args) =>
+            {
+                invokedErrorsChangedSender = sender;
+                invokedErrorsChangedProperty = args?.PropertyName;
+            };
+
+            // Act
+            model.RemoveSqlCmdStatements = testValue;
+            var returnedValue = model.RemoveSqlCmdStatements;
+
+            // Assert
+            Assert.AreEqual(testValue, returnedValue);
+            Assert.AreSame(model, invokedPropertyChangedSender);
+            Assert.AreEqual(nameof(ConfigurationModel.RemoveSqlCmdStatements), invokedPropertyChangedProperty);
+            Assert.IsNull(invokedErrorsChangedSender);
+            Assert.IsNull(invokedErrorsChangedProperty);
+        }
+
+        [Test]
         public void Copy_DifferentInstanceWithSameValues()
         {
             // Arrange
@@ -408,7 +443,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Models
                 CustomHeader = "TestHeader",
                 CustomFooter = "TestFooter",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = true
+                TrackDacpacVersion = true,
+                RemoveSqlCmdStatements = true
             };
 
             // Act
@@ -427,6 +463,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Models
             Assert.AreEqual(model.CustomFooter, copy.CustomFooter);
             Assert.AreEqual(model.BuildBeforeScriptCreation, copy.BuildBeforeScriptCreation);
             Assert.AreEqual(model.TrackDacpacVersion, copy.TrackDacpacVersion);
+            Assert.AreEqual(model.RemoveSqlCmdStatements, copy.RemoveSqlCmdStatements);
         }
 
         [Test]
@@ -444,7 +481,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Models
                 CustomHeader = "TestHeader",
                 CustomFooter = "TestFooter",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = true
+                TrackDacpacVersion = true,
+                RemoveSqlCmdStatements = true
             };
 
             // Act
@@ -469,7 +507,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Models
                 CustomHeader = "TestHeader",
                 CustomFooter = "TestFooter",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = true
+                TrackDacpacVersion = true,
+                RemoveSqlCmdStatements = true
             };
 
             // Act
@@ -494,7 +533,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Models
                 CustomHeader = "TestHeader",
                 CustomFooter = "TestFooter",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = true
+                TrackDacpacVersion = true,
+                RemoveSqlCmdStatements = true
             };
             var model2 = new ConfigurationModel
             {
@@ -507,7 +547,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Models
                 CustomHeader = "TestHeader",
                 CustomFooter = "TestFooter",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = true
+                TrackDacpacVersion = true,
+                RemoveSqlCmdStatements = true
             };
 
             // Act
@@ -532,7 +573,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Models
                 CustomHeader = "TestHeader",
                 CustomFooter = "TestFooter",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = true
+                TrackDacpacVersion = true,
+                RemoveSqlCmdStatements = true
             };
             var model2 = new ConfigurationModel
             {
@@ -545,7 +587,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Models
                 CustomHeader = "TestHeader",
                 CustomFooter = "TestFooter",
                 BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = true
+                TrackDacpacVersion = true,
+                RemoveSqlCmdStatements = true
             };
 
             // Act

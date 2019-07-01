@@ -41,6 +41,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers
         [TestCase(ScriptModifier.TrackDacpacVersion, typeof(TrackDacpacVersionModifier))]
         [TestCase(ScriptModifier.CommentOutUnnamedDefaultConstraintDrops, typeof(CommentOutUnnamedDefaultConstraintDropsModifier))]
         [TestCase(ScriptModifier.ReplaceUnnamedDefaultConstraintDrops, typeof(ReplaceUnnamedDefaultConstraintDropsModifier))]
+        [TestCase(ScriptModifier.RemoveSqlCmdStatements, typeof(RemoveSqlCmdStatementsModifier))]
         public void CreateScriptModifier_CorrectCreation(ScriptModifier scriptModifier,
                                                          Type implementingType)
         {
@@ -53,6 +54,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers
             drMock.Setup(m => m.Get<TrackDacpacVersionModifier>()).Returns(new TrackDacpacVersionModifier());
             drMock.Setup(m => m.Get<CommentOutUnnamedDefaultConstraintDropsModifier>()).Returns(new CommentOutUnnamedDefaultConstraintDropsModifier());
             drMock.Setup(m => m.Get<ReplaceUnnamedDefaultConstraintDropsModifier>()).Returns(new ReplaceUnnamedDefaultConstraintDropsModifier(daMock, loggerMock));
+            drMock.Setup(m => m.Get<RemoveSqlCmdStatementsModifier>()).Returns(new RemoveSqlCmdStatementsModifier());
             IScriptModifierFactory f = new ScriptModifierFactory(drMock.Object);
 
             // Act
