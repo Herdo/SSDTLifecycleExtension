@@ -12,6 +12,6 @@
         TrackDacpacVersion = 1000,
         AddCustomHeader = 2000,
         AddCustomFooter = 3000,
-        RemoveSqlCmdStatements = int.MaxValue
+        RemoveSqlCmdStatements = 2_147_483_647
     }
 }
