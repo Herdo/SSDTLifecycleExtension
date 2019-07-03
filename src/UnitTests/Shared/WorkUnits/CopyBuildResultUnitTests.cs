@@ -50,7 +50,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
                 Paths = paths
             };
             var bsMock = new Mock<IBuildService>();
-            bsMock.Setup(m => m.CopyBuildResultAsync(project, paths.NewDacpacDirectory)).ReturnsAsync(true);
+            bsMock.Setup(m => m.CopyBuildResultAsync(project, paths.NewArtifactsDirectory)).ReturnsAsync(true);
             IWorkUnit<ScaffoldingStateModel> unit = new CopyBuildResultUnit(bsMock.Object);
 
             // Act
@@ -75,7 +75,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
                 Paths = paths
             };
             var bsMock = new Mock<IBuildService>();
-            bsMock.Setup(m => m.CopyBuildResultAsync(project, paths.NewDacpacDirectory)).ReturnsAsync(false);
+            bsMock.Setup(m => m.CopyBuildResultAsync(project, paths.NewArtifactsDirectory)).ReturnsAsync(false);
             IWorkUnit<ScaffoldingStateModel> unit = new CopyBuildResultUnit(bsMock.Object);
 
             // Act
@@ -112,7 +112,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
                 Paths = paths
             };
             var bsMock = new Mock<IBuildService>();
-            bsMock.Setup(m => m.CopyBuildResultAsync(project, paths.NewDacpacDirectory)).ReturnsAsync(true);
+            bsMock.Setup(m => m.CopyBuildResultAsync(project, paths.NewArtifactsDirectory)).ReturnsAsync(true);
             IWorkUnit<ScriptCreationStateModel> unit = new CopyBuildResultUnit(bsMock.Object);
 
             // Act
@@ -137,7 +137,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
                 Paths = paths
             };
             var bsMock = new Mock<IBuildService>();
-            bsMock.Setup(m => m.CopyBuildResultAsync(project, paths.NewDacpacDirectory)).ReturnsAsync(false);
+            bsMock.Setup(m => m.CopyBuildResultAsync(project, paths.NewArtifactsDirectory)).ReturnsAsync(false);
             IWorkUnit<ScriptCreationStateModel> unit = new CopyBuildResultUnit(bsMock.Object);
 
             // Act

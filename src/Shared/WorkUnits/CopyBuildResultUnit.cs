@@ -23,9 +23,9 @@
 
         private async Task TryCopyInternal(IStateModel stateModel,
                                            SqlProject project,
-                                           string newDacpacDirectory)
+                                           string newArtifactsDirectory)
         {
-            if (!await _buildService.CopyBuildResultAsync(project, newDacpacDirectory))
+            if (!await _buildService.CopyBuildResultAsync(project, newArtifactsDirectory))
                 stateModel.Result = false;
             stateModel.CurrentState = StateModelState.TriedToCopyBuildResult;
         }
@@ -36,7 +36,7 @@
             if (stateModel == null)
                 throw new ArgumentNullException(nameof(stateModel));
 
-            return TryCopyInternal(stateModel, stateModel.Project, stateModel.Paths.NewDacpacDirectory);
+            return TryCopyInternal(stateModel, stateModel.Project, stateModel.Paths.NewArtifactsDirectory);
         }
 
         Task IWorkUnit<ScriptCreationStateModel>.Work(ScriptCreationStateModel stateModel,
@@ -45,7 +45,7 @@
             if (stateModel == null)
                 throw new ArgumentNullException(nameof(stateModel));
 
-            return TryCopyInternal(stateModel, stateModel.Project, stateModel.Paths.NewDacpacDirectory);
+            return TryCopyInternal(stateModel, stateModel.Project, stateModel.Paths.NewArtifactsDirectory);
         }
     }
 }

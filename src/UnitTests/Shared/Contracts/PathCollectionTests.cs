@@ -32,7 +32,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Contracts
         }
 
         [Test]
-        public void Constructor_ArgumentNullException_NewDacpacDirectory()
+        public void Constructor_ArgumentNullException_NewArtifactsDirectory()
         {
             // Arrange
             const string projectDirectory = "projectDirectory";
@@ -51,12 +51,12 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Contracts
             // Arrange
             const string projectDirectory = "projectDirectory";
             const string publishProfilePath = "publishProfile";
-            const string newDacpacDirectory = "_DIRECTORY_newDacpac";
+            const string newArtifactsDirectory = "_DIRECTORY_newArtifacts";
 
             // Act & Assert
             // ReSharper disable once ObjectCreationAsStatement
             // ReSharper disable AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => new PathCollection(projectDirectory, publishProfilePath, newDacpacDirectory, null, null, null, null));
+            Assert.Throws<ArgumentNullException>(() => new PathCollection(projectDirectory, publishProfilePath, newArtifactsDirectory, null, null, null, null));
             // ReSharper restore AssignNullToNotNullAttribute
         }
 
@@ -66,13 +66,13 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Contracts
             // Arrange
             const string projectDirectory = "projectDirectory";
             const string publishProfilePath = "publishProfile";
-            const string newDacpacDirectory = "_DIRECTORY_newDacpac";
+            const string newArtifactsDirectory = "_DIRECTORY_newArtifacts";
             const string newDacpacPath = "_PATH_newDacpac";
             const string previousDacpacPath = "_PATH_previousDacpac";
 
             // Act & Assert
             // ReSharper disable once ObjectCreationAsStatement
-            Assert.Throws<InvalidOperationException>(() => new PathCollection(projectDirectory, publishProfilePath, newDacpacDirectory, newDacpacPath, previousDacpacPath, null, null));
+            Assert.Throws<InvalidOperationException>(() => new PathCollection(projectDirectory, publishProfilePath, newArtifactsDirectory, newDacpacPath, previousDacpacPath, null, null));
         }
 
         [Test]
@@ -81,12 +81,12 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Contracts
             // Arrange
             const string projectDirectory = "projectDirectory";
             const string publishProfilePath = "publishProfile";
-            const string newDacpacDirectory = "_DIRECTORY_newDacpac";
+            const string newArtifactsDirectory = "_DIRECTORY_newArtifacts";
             const string newDacpacPath = "_PATH_newDacpac";
 
             // Act & Assert
             // ReSharper disable once ObjectCreationAsStatement
-            Assert.DoesNotThrow(() => new PathCollection(projectDirectory, publishProfilePath, newDacpacDirectory, newDacpacPath, null, null, null));
+            Assert.DoesNotThrow(() => new PathCollection(projectDirectory, publishProfilePath, newArtifactsDirectory, newDacpacPath, null, null, null));
         }
 
         [Test]
@@ -98,7 +98,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Contracts
             // Arrange
             const string projectDirectory = "projectDirectory";
             const string publishProfilePath = "publishProfile";
-            const string newDacpacDirectory = "_DIRECTORY_newDacpac";
+            const string newArtifactsDirectory = "_DIRECTORY_newArtifacts";
             const string newDacpacPath = "_PATH_newDacpac";
             const string previousDacpacPath = "_PATH_previousDacpac";
             const string deployScriptPath = "_PATH_deployScript";
@@ -107,7 +107,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Contracts
             // Act
             var pc = new PathCollection(projectDirectory,
                                         publishProfilePath,
-                                        newDacpacDirectory,
+                                        newArtifactsDirectory,
                                         newDacpacPath,
                                         previousDacpacPath,
                                         setDeployScriptPath ? deployScriptPath : null,
@@ -116,7 +116,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Contracts
             // Assert
             Assert.AreEqual(projectDirectory, pc.ProjectDirectory);
             Assert.AreEqual(publishProfilePath, pc.PublishProfilePath);
-            Assert.AreEqual(newDacpacDirectory, pc.NewDacpacDirectory);
+            Assert.AreEqual(newArtifactsDirectory, pc.NewArtifactsDirectory);
             Assert.AreEqual(newDacpacPath, pc.NewDacpacPath);
             Assert.AreEqual(previousDacpacPath, pc.PreviousDacpacPath);
             if (setDeployScriptPath)
