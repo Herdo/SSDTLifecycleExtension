@@ -35,5 +35,14 @@
         /// <param name="targetPath">The full path of the item to add to the properties.</param>
         void AddItemToProjectProperties([NotNull] SqlProject project,
                                         [NotNull] string targetPath);
+
+        /// <summary>
+        /// Removes the <paramref name="item"/> from the <paramref name="project"/>, if it exists within the project.
+        /// </summary>
+        /// <param name="project">The project to remove the <paramref name="item"/> from.</param>
+        /// <param name="item">The file name of the file to remove on the root level.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="project"/> or <paramref name="item"/> are <b>null</b>.</exception>
+        void RemoveItemFromProjectRoot([NotNull] SqlProject project,
+                                       [NotNull] string item);
     }
 }

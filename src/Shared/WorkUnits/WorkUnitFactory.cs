@@ -74,6 +74,10 @@
                 case StateModelState.TriedToCreateDeploymentFiles:
                     return _dependencyResolver.Get<ModifyDeploymentScriptUnit>();
                 case StateModelState.ModifiedDeploymentScript:
+                    return stateModel.CreateLatest
+                               ? null
+                               : _dependencyResolver.Get<DeleteRefactorLogUnit>();
+                case StateModelState.DeletedRefactorLog:
                     return null;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(stateModel) + '.' + nameof(IStateModel.CurrentState));

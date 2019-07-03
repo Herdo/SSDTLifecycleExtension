@@ -98,7 +98,8 @@
                                        ? Path.Combine(newVersionDirectory, $"{project.ProjectProperties.SqlTargetName}_{previousVersionString}_{newVersionString}.xml")
                                        : null;
 
-            return new PathCollection(profilePath,
+            return new PathCollection(projectDirectory,
+                                      profilePath,
                                       newVersionDirectory,
                                       newVersionPath,
                                       previousVersionPath,

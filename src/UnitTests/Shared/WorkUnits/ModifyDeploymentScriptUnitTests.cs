@@ -114,7 +114,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             var previousVersion = new Version(1, 0);
             const bool createLatest = false;
             Task HandlerFunc(bool b) => Task.CompletedTask;
-            var paths = new PathCollection("a", "b", "c", "d", "e", "f");
+            var paths = new PathCollection("p", "a", "b", "c", "d", "e", "f");
             var model = new ScriptCreationStateModel(project, configuration, previousVersion, createLatest, HandlerFunc)
             {
                 Paths = paths

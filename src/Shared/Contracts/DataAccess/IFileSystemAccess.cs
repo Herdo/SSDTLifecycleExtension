@@ -33,7 +33,24 @@
 
         string EnsureDirectoryExists([NotNull] string path);
 
-        void TryToCleanDirectory([NotNull] string path);
+        /// <summary>
+        /// Tries to clean all files in under the <paramref name="directoryPath"/>.
+        /// </summary>
+        /// <param name="directoryPath">The path of the directory to clean.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="directoryPath"/> is <b>null</b>.</exception>
+        /// <exception cref="ArgumentException"><paramref name="directoryPath"/> is empty or contains only white spaces.</exception>
+        void TryToCleanDirectory([NotNull] string directoryPath);
+
+        /// <summary>
+        /// Tries to clean the files under the <paramref name="directoryPath"/> that match the given <paramref name="filter"/>.
+        /// </summary>
+        /// <param name="directoryPath">The path of the directory to clean.</param>
+        /// <param name="filter">The filter that must match for files that should be deleted.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="directoryPath"/> or <paramref name="filter"/> are <b>null</b>.</exception>
+        /// <exception cref="ArgumentException"><paramref name="directoryPath"/> is empty or contains only white spaces.</exception>
+        /// <returns>The names of the deleted files. An empty array if no files were deleted.</returns>
+        string[] TryToCleanDirectory([NotNull] string directoryPath,
+                                     [NotNull] string filter);
 
         string CopyFiles([NotNull] string sourceDirectory,
                          [NotNull] string targetDirectory,

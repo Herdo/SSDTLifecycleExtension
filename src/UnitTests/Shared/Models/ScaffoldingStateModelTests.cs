@@ -111,7 +111,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Models
             // ReSharper disable once ConvertToLocalFunction
             Func<bool, Task> changeHandler = b => Task.CompletedTask;
             var model = new ScaffoldingStateModel(project, configuration, targetVersion, changeHandler);
-            var paths = new PathCollection("a", "b", "c", "d", "e", "f");
+            var paths = new PathCollection("p", "a", "b", "c", "d", "e", "f");
 
             // Act
             model.Paths = paths;

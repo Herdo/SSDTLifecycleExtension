@@ -35,7 +35,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers
             {
                 CustomFooter = "footer"
             };
-            var paths = new PathCollection("a", "b", "c", "d", "e", "f");
+            var paths = new PathCollection("p", "a", "b", "c", "d", "e", "f");
             var model = new ScriptModificationModel(input, project, configuration, paths, new Version(1, 2, 0), false);
 
             // Act
@@ -61,7 +61,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers
             {
                 CustomFooter = customFooter
             };
-            var paths = new PathCollection("a", "b", "c", "d", "e", "f");
+            var paths = new PathCollection("p", "a", "b", "c", "d", "e", "f");
             var model = new ScriptModificationModel(input, project, configuration, paths, new Version(1, 0, 0), false);
 
             // Act
@@ -84,7 +84,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers
             {
                 CustomFooter = "Script base version: {PREVIOUS_VERSION}"
             };
-            var paths = new PathCollection("a", "b", "c", "d", "e", "f");
+            var paths = new PathCollection("p", "a", "b", "c", "d", "e", "f");
             var model = new ScriptModificationModel(input, project, configuration, paths, new Version(1, 2, 0), false);
 
             // Act
@@ -107,7 +107,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers
             {
                 CustomFooter = "Script target version: {NEXT_VERSION}"
             };
-            var paths = new PathCollection("a", "b", "c", "d", "e", "f");
+            var paths = new PathCollection("p", "a", "b", "c", "d", "e", "f");
             var model = new ScriptModificationModel(input, project, configuration, paths, new Version(1, 2, 0), false);
 
             // Act

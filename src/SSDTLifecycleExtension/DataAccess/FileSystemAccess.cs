@@ -1,6 +1,7 @@
 ﻿namespace SSDTLifecycleExtension.DataAccess
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Linq;
@@ -41,6 +42,41 @@
             finally
             {
                 stream?.Dispose();
+            }
+        }
+
+        private static string[] TryToCleanDirectoryInternal(string directoryPath,
+                                                            string filter)
+        {
+            try
+            {
+                var di = new DirectoryInfo(directoryPath);
+                if (!di.Exists)
+                    return new string[0];
+                var children = di.EnumerateFileSystemInfos(filter).ToArray();
+                if (children.Length == 0)
+                    return new string[0];
+
+                var deletedFiles = new List<string>();
+                foreach (var child in children)
+                {
+                    // Inner try-catch to delete as much as possible
+                    try
+                    {
+                        child.Delete();
+                        deletedFiles.Add(child.Name);
+                    }
+                    catch
+                    {
+                        return new string[0];
+                    }
+                }
+
+                return deletedFiles.ToArray();
+            }
+            catch
+            {
+                return new string[0];
             }
         }
 
@@ -139,36 +175,27 @@
             }
         }
 
-        void IFileSystemAccess.TryToCleanDirectory(string path)
+        void IFileSystemAccess.TryToCleanDirectory(string directoryPath)
         {
-            if (string.IsNullOrWhiteSpace(path))
-                throw new ArgumentException("Value cannot be null or white space.", nameof(path));
+            if (directoryPath == null)
+                throw new ArgumentNullException(nameof(directoryPath));
+            if (string.IsNullOrWhiteSpace(directoryPath))
+                throw new ArgumentException("Value cannot be empty or white space.", nameof(directoryPath));
 
-            try
-            {
-                var di = new DirectoryInfo(path);
-                if (!di.Exists)
-                    return;
-                var children = di.EnumerateFileSystemInfos().ToArray();
-                if (children.Length == 0)
-                    return;
-                foreach (var child in children)
-                {
-                    // Inner try-catch to delete as much as possible
-                    try
-                    {
-                        child.Delete();
-                    }
-                    catch
-                    {
-                        // ignored
-                    }
-                }
-            }
-            catch
-            {
-                // ignored
-            }
+            TryToCleanDirectoryInternal(directoryPath, "*");
+        }
+
+        string[] IFileSystemAccess.TryToCleanDirectory(string directoryPath,
+                                                       string filter)
+        {
+            if (directoryPath == null)
+                throw new ArgumentNullException(nameof(directoryPath));
+            if (filter == null)
+                throw new ArgumentNullException(nameof(filter));
+            if (string.IsNullOrWhiteSpace(directoryPath))
+                throw new ArgumentException("Value cannot be empty or white space.", nameof(directoryPath));
+
+            return TryToCleanDirectoryInternal(directoryPath, filter);
         }
 
         string IFileSystemAccess.CopyFiles(string sourceDirectory,

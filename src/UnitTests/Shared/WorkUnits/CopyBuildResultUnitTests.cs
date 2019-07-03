@@ -44,7 +44,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             var configuration = ConfigurationModel.GetDefault();
             var targetVersion = new Version(1, 2, 3);
             Task HandleWorkInProgressChanged(bool arg) => Task.CompletedTask;
-            var paths = new PathCollection("a", "b", "c", "d", "e", "f");
+            var paths = new PathCollection("p", "a", "b", "c", "d", "e", "f");
             var model = new ScaffoldingStateModel(project, configuration, targetVersion, HandleWorkInProgressChanged)
             {
                 Paths = paths
@@ -69,7 +69,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             var configuration = ConfigurationModel.GetDefault();
             var targetVersion = new Version(1, 2, 3);
             Task HandleWorkInProgressChanged(bool arg) => Task.CompletedTask;
-            var paths = new PathCollection("a", "b", "c", "d", "e", "f");
+            var paths = new PathCollection("p", "a", "b", "c", "d", "e", "f");
             var model = new ScaffoldingStateModel(project, configuration, targetVersion, HandleWorkInProgressChanged)
             {
                 Paths = paths
@@ -106,7 +106,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             var configuration = ConfigurationModel.GetDefault();
             var targetVersion = new Version(1, 2, 3);
             Task HandleWorkInProgressChanged(bool arg) => Task.CompletedTask;
-            var paths = new PathCollection("a", "b", "c", "d", "e", "f");
+            var paths = new PathCollection("p", "a", "b", "c", "d", "e", "f");
             var model = new ScriptCreationStateModel(project, configuration, targetVersion, true, HandleWorkInProgressChanged)
             {
                 Paths = paths
@@ -131,7 +131,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             var configuration = ConfigurationModel.GetDefault();
             var targetVersion = new Version(1, 2, 3);
             Task HandleWorkInProgressChanged(bool arg) => Task.CompletedTask;
-            var paths = new PathCollection("a", "b", "c", "d", "e", "f");
+            var paths = new PathCollection("p", "a", "b", "c", "d", "e", "f");
             var model = new ScriptCreationStateModel(project, configuration, targetVersion, true, HandleWorkInProgressChanged)
             {
                 Paths = paths

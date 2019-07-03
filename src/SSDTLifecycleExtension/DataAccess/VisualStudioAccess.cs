@@ -173,6 +173,30 @@
             })) properties.ProjectItems.AddFromFile(targetPath);
         }
 
+        void IVisualStudioAccess.RemoveItemFromProjectRoot(SqlProject project,
+                                                           string item)
+        {
+            if (project == null)
+                throw new ArgumentNullException(nameof(project));
+            if (item == null)
+                throw new ArgumentNullException(nameof(item));
+
+            ThreadHelper.ThrowIfNotOnUIThread();
+            var p = _dte2.Solution.Projects.OfType<Project>().SingleOrDefault(m =>
+            {
+                ThreadHelper.ThrowIfNotOnUIThread();
+                return m.UniqueName == project.UniqueName;
+            });
+
+            var matchingItem = p?.ProjectItems.OfType<ProjectItem>().SingleOrDefault(m =>
+            {
+                ThreadHelper.ThrowIfNotOnUIThread();
+                return m.Name == item;
+            });
+
+            matchingItem?.Remove();
+        }
+
         async Task ILogger.LogAsync(string message)
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();

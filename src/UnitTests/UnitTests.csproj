@@ -93,6 +93,7 @@
     <Compile Include="Shared\WorkUnits\CleanArtifactsDirectoryUnitTests.cs" />
     <Compile Include="Shared\WorkUnits\CopyBuildResultUnitTests.cs" />
     <Compile Include="Shared\WorkUnits\CreateDeploymentFilesUnitTests.cs" />
+    <Compile Include="Shared\WorkUnits\DeleteRefactorLogUnitTests.cs" />
     <Compile Include="Shared\WorkUnits\FormatTargetVersionUnitTests.cs" />
     <Compile Include="Shared\WorkUnits\LoadPathsUnitTests.cs" />
     <Compile Include="Shared\WorkUnits\LoadSqlProjectPropertiesUnitTests.cs" />

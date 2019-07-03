@@ -6,6 +6,12 @@
     public class PathCollection
     {
         /// <summary>
+        /// Gets the absolute directory of the *.sqlproj file.
+        /// </summary>
+        [NotNull]
+        public string ProjectDirectory { get; }
+
+        /// <summary>
         /// Gets the absolute path of the publish profile (xml) used to generate the deployment script and report.
         /// </summary>
         [NotNull]
@@ -44,6 +50,7 @@
         /// <summary>
         /// Initializes a new <see cref="PathCollection"/> instance for a given set of paths.
         /// </summary>
+        /// <param name="projectDirectory">The directory that contains the SQL project file.</param>
         /// <param name="publishProfilePath">The path of the publish profile to use during script or report creation.</param>
         /// <param name="newDacpacDirectory">The directory, where the new DACPAC exists.</param>
         /// <param name="newDacpacPath">The path of the new DACPAC.</param>
@@ -53,13 +60,15 @@
         /// <exception cref="ArgumentNullException"><paramref name="publishProfilePath"/>, <paramref name="newDacpacDirectory"/> or <paramref name="newDacpacPath"/> are <b>null</b>.</exception>
         /// <exception cref="InvalidOperationException">Both <paramref name="deployScriptPath"/> and <paramref name="deployReportPath"/> are <b>null</b>,
         /// when <paramref name="previousDacpacPath"/> is not <b>null</b>.</exception>
-        public PathCollection([NotNull] string publishProfilePath,
+        public PathCollection([NotNull] string projectDirectory,
+                              [NotNull] string publishProfilePath,
                               [NotNull] string newDacpacDirectory,
                               [NotNull] string newDacpacPath,
                               [CanBeNull] string previousDacpacPath,
                               [CanBeNull] string deployScriptPath,
                               [CanBeNull] string deployReportPath)
         {
+            ProjectDirectory = projectDirectory ?? throw new ArgumentNullException(nameof(projectDirectory));
             PublishProfilePath = publishProfilePath ?? throw new ArgumentNullException(nameof(publishProfilePath));
             NewDacpacDirectory = newDacpacDirectory ?? throw new ArgumentNullException(nameof(newDacpacDirectory));
             NewDacpacPath = newDacpacPath ?? throw new ArgumentNullException(nameof(newDacpacPath));

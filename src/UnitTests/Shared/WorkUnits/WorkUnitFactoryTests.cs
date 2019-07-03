@@ -42,6 +42,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
         [TestCase(StateModelState.PathsVerified)]
         [TestCase(StateModelState.TriedToCreateDeploymentFiles)]
         [TestCase(StateModelState.ModifiedDeploymentScript)]
+        [TestCase(StateModelState.DeletedRefactorLog)]
         public void GetNextWorkUnit_ScaffoldingStateModel_ArgumentOutOfRangeException_StateModel(StateModelState state)
         {
             // Arrange
@@ -568,7 +569,45 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
         }
 
         [Test]
-        public void GetNextWorkUnit_ScriptCreationStateModel_CorrectWorkUnitForModifiedDeploymentScript()
+        [TestCase(true)]
+        [TestCase(false)]
+        public void GetNextWorkUnit_ScriptCreationStateModel_CorrectWorkUnitForModifiedDeploymentScript(bool createLatest)
+        {
+            // Arrange
+            var fsaMock = Mock.Of<IFileSystemAccess>();
+            var vsaMock = Mock.Of<IVisualStudioAccess>();
+            var loggerMock = Mock.Of<ILogger>();
+            var expectedWorkUnit = new DeleteRefactorLogUnit(fsaMock, vsaMock, loggerMock);
+            var drMock = new Mock<IDependencyResolver>();
+            drMock.Setup(m => m.Get<DeleteRefactorLogUnit>()).Returns(expectedWorkUnit);
+            IWorkUnitFactory wuf = new WorkUnitFactory(drMock.Object);
+            var project = new SqlProject("a", "b", "c");
+            var configuration = ConfigurationModel.GetDefault();
+            var previousVersion = new Version(1, 0);
+            Task HandlerFunc(bool b) => Task.CompletedTask;
+            var model = new ScriptCreationStateModel(project, configuration, previousVersion, createLatest, HandlerFunc)
+            {
+                CurrentState = StateModelState.ModifiedDeploymentScript
+            };
+
+            // Act
+            var workUnit = wuf.GetNextWorkUnit(model);
+
+            // Assert
+            if (createLatest)
+            {
+                Assert.IsNull(workUnit);
+                drMock.Verify(m => m.Get<DeleteRefactorLogUnit>(), Times.Never);
+            }
+            else
+            {
+                Assert.AreSame(expectedWorkUnit, workUnit);
+                drMock.Verify(m => m.Get<DeleteRefactorLogUnit>(), Times.Once);
+            }
+        }
+
+        [Test]
+        public void GetNextWorkUnit_ScriptCreationStateModel_CorrectWorkUnitForDeletedRefactorLog()
         {
             // Arrange
             var drMock = new Mock<IDependencyResolver>();
@@ -579,7 +618,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             Task HandlerFunc(bool b) => Task.CompletedTask;
             var model = new ScriptCreationStateModel(project, configuration, previousVersion, false, HandlerFunc)
             {
-                CurrentState = StateModelState.ModifiedDeploymentScript
+                CurrentState = StateModelState.DeletedRefactorLog
             };
 
             // Act

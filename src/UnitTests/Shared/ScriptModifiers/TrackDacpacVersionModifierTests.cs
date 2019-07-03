@@ -403,7 +403,7 @@ GO
             IScriptModifier modifier = new TrackDacpacVersionModifier();
             var project = new SqlProject("", "", "");
             var configuration = new ConfigurationModel();
-            var paths = new PathCollection("", "", "", "", "", "");
+            var paths = new PathCollection("", "", "", "", "", "", "");
             var model = new ScriptModificationModel(MultiLineInputWithFinalGo, project, configuration, paths, new Version(1, 0, 0), false);
 
             // Act
@@ -422,7 +422,7 @@ GO
             var project = new SqlProject("", "", "");
             project.ProjectProperties.SqlTargetName = "Database.TestProject";
             var configuration = new ConfigurationModel();
-            var paths = new PathCollection("", "", "", "", "", "");
+            var paths = new PathCollection("", "", "", "", "", "", "");
             var model = new ScriptModificationModel(MultiLineInputWithFinalGo, project, configuration, paths, new Version(1, 0, 0), false);
 
             // Act
@@ -446,7 +446,7 @@ GO
             project.ProjectProperties.SqlTargetName = "Database.TestProject";
             project.ProjectProperties.DacVersion = new Version(500, 30, 44, 80);
             var configuration = new ConfigurationModel();
-            var paths = new PathCollection("", "", "", "", "", "");
+            var paths = new PathCollection("", "", "", "", "", "", "");
             var model = new ScriptModificationModel(input, project, configuration, paths, new Version(1, 0, 0), false);
 
             // Act
@@ -469,7 +469,7 @@ GO
             project.ProjectProperties.SqlTargetName = "Database.TestProject";
             project.ProjectProperties.DacVersion = new Version(500, 30, 44);
             var configuration = new ConfigurationModel();
-            var paths = new PathCollection("", "", "", "", "", "");
+            var paths = new PathCollection("", "", "", "", "", "", "");
             var model = new ScriptModificationModel(input, project, configuration, paths, new Version(1, 0, 0), false);
 
             // Act
@@ -492,7 +492,7 @@ GO
             project.ProjectProperties.SqlTargetName = "Database.TestProject";
             project.ProjectProperties.DacVersion = new Version(500, 30);
             var configuration = new ConfigurationModel();
-            var paths = new PathCollection("", "", "", "", "", "");
+            var paths = new PathCollection("", "", "", "", "", "", "");
             var model = new ScriptModificationModel(input, project, configuration, paths, new Version(1, 0, 0), false);
 
             // Act

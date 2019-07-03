@@ -81,7 +81,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             configuration.CreateDocumentationWithScriptCreation = true;
             var previousVersion = new Version(1, 0);
             Task HandlerFunc(bool b) => Task.CompletedTask;
-            var paths = new PathCollection("a", "b", "c", "d", "e", "f");
+            var paths = new PathCollection("p", "a", "b", "c", "d", "e", "f");
             var model = new ScriptCreationStateModel(project, configuration, previousVersion, false, HandlerFunc)
             {
                 Paths = paths
@@ -116,7 +116,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             configuration.CreateDocumentationWithScriptCreation = true;
             var previousVersion = new Version(1, 0);
             Task HandlerFunc(bool b) => Task.CompletedTask;
-            var paths = new PathCollection("a", "b", "c", "d", "e", "f");
+            var paths = new PathCollection("p", "a", "b", "c", "d", "e", "f");
             var model = new ScriptCreationStateModel(project, configuration, previousVersion, false, HandlerFunc)
             {
                 Paths = paths
@@ -150,7 +150,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             configuration.CreateDocumentationWithScriptCreation = true;
             var previousVersion = new Version(1, 0);
             Task HandlerFunc(bool b) => Task.CompletedTask;
-            var paths = new PathCollection("a", "b", "c", "d", "e", "f");
+            var paths = new PathCollection("p", "a", "b", "c", "d", "e", "f");
             var model = new ScriptCreationStateModel(project, configuration, previousVersion, false, HandlerFunc)
             {
                 Paths = paths
@@ -182,7 +182,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             configuration.CreateDocumentationWithScriptCreation = false;
             var previousVersion = new Version(1, 0);
             Task HandlerFunc(bool b) => Task.CompletedTask;
-            var paths = new PathCollection("a", "b", "c", "d", "e", "f");
+            var paths = new PathCollection("p", "a", "b", "c", "d", "e", "f");
             var model = new ScriptCreationStateModel(project, configuration, previousVersion, false, HandlerFunc)
             {
                 Paths = paths
@@ -213,7 +213,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             configuration.CreateDocumentationWithScriptCreation = true;
             var previousVersion = new Version(1, 0);
             Task HandlerFunc(bool b) => Task.CompletedTask;
-            var paths = new PathCollection("a", "b", "c", "d", "e", "f");
+            var paths = new PathCollection("p", "a", "b", "c", "d", "e", "f");
             var model = new ScriptCreationStateModel(project, configuration, previousVersion, false, HandlerFunc)
             {
                 Paths = paths

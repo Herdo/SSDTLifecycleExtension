@@ -13,6 +13,7 @@
         TriedToCleanArtifactsDirectory = 55,
         TriedToCopyBuildResult = 60,
         TriedToCreateDeploymentFiles = 70,
-        ModifiedDeploymentScript = 80
+        ModifiedDeploymentScript = 80,
+        DeletedRefactorLog = 90
     }
 }
