@@ -177,10 +177,8 @@
 
         void IFileSystemAccess.TryToCleanDirectory(string directoryPath)
         {
-            if (directoryPath == null)
-                throw new ArgumentNullException(nameof(directoryPath));
             if (string.IsNullOrWhiteSpace(directoryPath))
-                throw new ArgumentException("Value cannot be empty or white space.", nameof(directoryPath));
+                throw new ArgumentException("Value cannot be null or white space.", nameof(directoryPath));
 
             TryToCleanDirectoryInternal(directoryPath, "*");
         }
@@ -188,12 +186,10 @@
         string[] IFileSystemAccess.TryToCleanDirectory(string directoryPath,
                                                        string filter)
         {
-            if (directoryPath == null)
-                throw new ArgumentNullException(nameof(directoryPath));
             if (filter == null)
                 throw new ArgumentNullException(nameof(filter));
             if (string.IsNullOrWhiteSpace(directoryPath))
-                throw new ArgumentException("Value cannot be empty or white space.", nameof(directoryPath));
+                throw new ArgumentException("Value cannot be null or white space.", nameof(directoryPath));
 
             return TryToCleanDirectoryInternal(directoryPath, filter);
         }
