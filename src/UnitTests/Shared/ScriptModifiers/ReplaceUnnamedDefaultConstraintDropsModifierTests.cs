@@ -263,7 +263,7 @@ GO";
                 BuildBeforeScriptCreation = true,
                 TrackDacpacVersion = false
             };
-            var paths = new PathCollection("p", "a", "b", "new", "old", "e", "f");
+            var paths = new PathCollection("p", "a", "l", "b", "new", "old", "e", "f");
             IScriptModifier modifier = new ReplaceUnnamedDefaultConstraintDropsModifier(daMock.Object, loggerMock.Object);
             var model = new ScriptModificationModel(MultipleDropDefaultConstraintStatements, project, config, paths, new Version(1, 0, 0), false);
 
@@ -308,7 +308,7 @@ GO";
                 BuildBeforeScriptCreation = true,
                 TrackDacpacVersion = false
             };
-            var paths = new PathCollection("p", "a", "b", "new", "old", "e", "f");
+            var paths = new PathCollection("p", "a", "l", "b", "new", "old", "e", "f");
             IScriptModifier modifier = new ReplaceUnnamedDefaultConstraintDropsModifier(daMock.Object, loggerMock.Object);
             var model = new ScriptModificationModel(MultipleDropDefaultConstraintStatements, project, config, paths, new Version(1, 0, 0), false);
 
@@ -352,7 +352,7 @@ GO";
                 BuildBeforeScriptCreation = true,
                 TrackDacpacVersion = false
             };
-            var paths = new PathCollection("p", "a", "b", "new", "old", "e", "f");
+            var paths = new PathCollection("p", "a", "l", "b", "new", "old", "e", "f");
             IScriptModifier modifier = new ReplaceUnnamedDefaultConstraintDropsModifier(daMock.Object, loggerMock.Object);
             var model = new ScriptModificationModel(input, project, config, paths, new Version(1, 0, 0), false);
 
@@ -393,7 +393,7 @@ GO";
                 BuildBeforeScriptCreation = true,
                 TrackDacpacVersion = false
             };
-            var paths = new PathCollection("p", "a", "b", "new", "old", "e", "f");
+            var paths = new PathCollection("p", "a", "l", "b", "new", "old", "e", "f");
             IScriptModifier modifier = new ReplaceUnnamedDefaultConstraintDropsModifier(daMock.Object, loggerMock.Object);
             var model = new ScriptModificationModel(MultipleDropDefaultConstraintStatements, project, config, paths, new Version(1, 0, 0), false);
 

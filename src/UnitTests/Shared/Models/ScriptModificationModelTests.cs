@@ -68,7 +68,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Models
             var initialScript = "script";
             var project = new SqlProject("a", "b", "c");
             var configuration = new ConfigurationModel();
-            var paths = new PathCollection("p", "a", "b", "c", "d", "e", "f");
+            var paths = new PathCollection("p", "a", "l", "b", "c", "d", "e", "f");
 
             // Act & Assert
             // ReSharper disable once ObjectCreationAsStatement
@@ -84,7 +84,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Models
             var initialScript = "script";
             var project = new SqlProject("a", "b", "c");
             var configuration = new ConfigurationModel();
-            var paths = new PathCollection("p", "a", "b", "c", "d", "e", "f");
+            var paths = new PathCollection("p", "a", "l", "b", "c", "d", "e", "f");
             var previousVersion = new Version(1, 2, 0);
 
             // Act
@@ -106,7 +106,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Models
             var initialScript = "script";
             var project = new SqlProject("a", "b", "c");
             var configuration = new ConfigurationModel();
-            var paths = new PathCollection("p", "a", "b", "c", "d", "e", "f");
+            var paths = new PathCollection("p", "a", "l", "b", "c", "d", "e", "f");
             var previousVersion = new Version(1, 2, 0);
             var model = new ScriptModificationModel(initialScript, project, configuration, paths, previousVersion, true);
 

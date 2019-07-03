@@ -80,7 +80,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             var configuration = ConfigurationModel.GetDefault();
             var previousVersion = new Version(1, 0);
             Task HandlerFunc(bool b) => Task.CompletedTask;
-            var paths = new PathCollection("p", "a", "b", "c", "d", "e", "f");
+            var paths = new PathCollection("p", "a", "l", "b", "c", "d", "e", "f");
             var model = new ScriptCreationStateModel(project, configuration, previousVersion, true, HandlerFunc)
             {
                 Paths = paths
@@ -117,7 +117,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             var configuration = ConfigurationModel.GetDefault();
             var previousVersion = new Version(1, 0);
             Task HandlerFunc(bool b) => Task.CompletedTask;
-            var paths = new PathCollection("p", "a", "b", "c", "d", "e", "f");
+            var paths = new PathCollection("p", "a", "l", "b", "c", "d", "e", "f");
             var model = new ScriptCreationStateModel(project, configuration, previousVersion, true, HandlerFunc)
             {
                 Paths = paths

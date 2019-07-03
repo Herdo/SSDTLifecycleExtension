@@ -18,6 +18,12 @@
         public string PublishProfilePath { get; }
 
         /// <summary>
+        /// Gets the absolute directory path for the "latest" artifacts.
+        /// </summary>
+        [NotNull]
+        public string LatestArtifactsDirectory { get; }
+
+        /// <summary>
         /// Gets the absolute directory path for new artifacts.
         /// </summary>
         [NotNull]
@@ -52,6 +58,7 @@
         /// </summary>
         /// <param name="projectDirectory">The directory that contains the SQL project file.</param>
         /// <param name="publishProfilePath">The path of the publish profile to use during script or report creation.</param>
+        /// <param name="latestArtifactsDirectory">The directory that contains the "latest" artifacts, if it exists and is filled.</param>
         /// <param name="newArtifactsDirectory">The directory that contains the new artifacts.</param>
         /// <param name="newDacpacPath">The path of the new DACPAC.</param>
         /// <param name="previousDacpacPath">The optional path of the previous DACPAC.</param>
@@ -62,6 +69,7 @@
         /// when <paramref name="previousDacpacPath"/> is not <b>null</b>.</exception>
         public PathCollection([NotNull] string projectDirectory,
                               [NotNull] string publishProfilePath,
+                              [NotNull] string latestArtifactsDirectory,
                               [NotNull] string newArtifactsDirectory,
                               [NotNull] string newDacpacPath,
                               [CanBeNull] string previousDacpacPath,
@@ -70,6 +78,7 @@
         {
             ProjectDirectory = projectDirectory ?? throw new ArgumentNullException(nameof(projectDirectory));
             PublishProfilePath = publishProfilePath ?? throw new ArgumentNullException(nameof(publishProfilePath));
+            LatestArtifactsDirectory = latestArtifactsDirectory ?? throw new ArgumentNullException(nameof(latestArtifactsDirectory));
             NewArtifactsDirectory = newArtifactsDirectory ?? throw new ArgumentNullException(nameof(newArtifactsDirectory));
             NewDacpacPath = newDacpacPath ?? throw new ArgumentNullException(nameof(newDacpacPath));
             PreviousDacpacPath = previousDacpacPath;

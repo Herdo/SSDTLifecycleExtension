@@ -3,6 +3,7 @@
     using System;
     using System.IO;
     using System.Linq;
+    using System.Runtime.CompilerServices;
     using System.Threading.Tasks;
     using System.Xml;
     using System.Xml.Linq;
@@ -80,14 +81,16 @@
             }
 
             // Versions
+            const string latestKeyword = "latest";
             var previousVersionString = previousVersion == null ? null : _versionService.FormatVersion(previousVersion, configuration);
-            var newVersionString = createLatest ? "latest" : _versionService.FormatVersion(project.ProjectProperties.DacVersion, configuration);
+            var newVersionString = createLatest ? latestKeyword : _versionService.FormatVersion(project.ProjectProperties.DacVersion, configuration);
 
             // DACPAC paths
             var profilePath = DeterminePublishProfilePath(configuration, projectDirectory);
             var artifactsPath = Path.Combine(projectDirectory, configuration.ArtifactsPath);
             var previousVersionDirectory = previousVersion == null ? null : Path.Combine(artifactsPath, previousVersionString);
             var previousVersionPath = previousVersion == null ? null : Path.Combine(previousVersionDirectory, $"{project.ProjectProperties.SqlTargetName}.dacpac");
+            var latestDirectory = Path.Combine(artifactsPath, latestKeyword);
             var newVersionDirectory = Path.Combine(artifactsPath, newVersionString);
             var newVersionPath = Path.Combine(newVersionDirectory, $"{project.ProjectProperties.SqlTargetName}.dacpac");
             var deployScriptPath = previousVersion == null
@@ -100,6 +103,7 @@
 
             return new PathCollection(projectDirectory,
                                       profilePath,
+                                      latestDirectory,
                                       newVersionDirectory,
                                       newVersionPath,
                                       previousVersionPath,
