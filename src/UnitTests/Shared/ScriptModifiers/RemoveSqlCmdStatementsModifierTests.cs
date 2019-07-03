@@ -58,6 +58,10 @@ GO
 ALTER TABLE [dbo].[Author] DROP COLUMN Birthday;
 
 GO
+USE [$(DatabaseName)];
+
+
+GO
 PRINT 'Update complete'
 
 GO";
@@ -105,6 +109,10 @@ PRINT 'Second statement'
 
 GO
 ALTER TABLE [dbo].[Author] DROP COLUMN Birthday;
+
+GO
+USE [$(DatabaseName)];
+
 
 GO
 PRINT 'Update complete'
