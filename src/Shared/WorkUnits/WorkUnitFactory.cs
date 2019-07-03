@@ -78,6 +78,10 @@
                                ? null
                                : _dependencyResolver.Get<DeleteRefactorLogUnit>();
                 case StateModelState.DeletedRefactorLog:
+                    return stateModel.CreateLatest
+                               ? null
+                               : _dependencyResolver.Get<CleanLatestArtifactsDirectoryUnit>();
+                case StateModelState.DeletedLatestArtifacts:
                     return null;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(stateModel) + '.' + nameof(IStateModel.CurrentState));

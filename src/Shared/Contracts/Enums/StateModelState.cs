@@ -14,6 +14,7 @@
         TriedToCopyBuildResult = 60,
         TriedToCreateDeploymentFiles = 70,
         ModifiedDeploymentScript = 80,
-        DeletedRefactorLog = 90
+        DeletedRefactorLog = 90,
+        DeletedLatestArtifacts = 100
     }
 }
