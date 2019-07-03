@@ -13,7 +13,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
     using SSDTLifecycleExtension.Shared.WorkUnits;
 
     [TestFixture]
-    public class CleanArtifactsDirectoryUnitTests
+    public class CleanNewArtifactsDirectoryUnitTests
     {
         [Test]
         public void Constructor_ArgumentNullException_FileSystemAccess()
@@ -21,7 +21,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             // Act & Assert
             // ReSharper disable once ObjectCreationAsStatement
             // ReSharper disable AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => new CleanArtifactsDirectoryUnit(null, null));
+            Assert.Throws<ArgumentNullException>(() => new CleanNewArtifactsDirectoryUnit(null, null));
             // ReSharper restore AssignNullToNotNullAttribute
         }
 
@@ -34,7 +34,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             // Act & Assert
             // ReSharper disable once ObjectCreationAsStatement
             // ReSharper disable AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => new CleanArtifactsDirectoryUnit(fsaMock.Object, null));
+            Assert.Throws<ArgumentNullException>(() => new CleanNewArtifactsDirectoryUnit(fsaMock.Object, null));
             // ReSharper restore AssignNullToNotNullAttribute
         }
 
@@ -44,7 +44,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             // Arrange
             var fsaMock = new Mock<IFileSystemAccess>();
             var loggerMock = new Mock<ILogger>();
-            IWorkUnit<ScaffoldingStateModel> unit = new CleanArtifactsDirectoryUnit(fsaMock.Object, loggerMock.Object);
+            IWorkUnit<ScaffoldingStateModel> unit = new CleanNewArtifactsDirectoryUnit(fsaMock.Object, loggerMock.Object);
 
             // Act & Assert
             // ReSharper disable once AssignNullToNotNullAttribute
@@ -57,7 +57,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             // Arrange
             var fsaMock = new Mock<IFileSystemAccess>();
             var loggerMock = new Mock<ILogger>();
-            IWorkUnit<ScaffoldingStateModel> unit = new CleanArtifactsDirectoryUnit(fsaMock.Object, loggerMock.Object);
+            IWorkUnit<ScaffoldingStateModel> unit = new CleanNewArtifactsDirectoryUnit(fsaMock.Object, loggerMock.Object);
             var project = new SqlProject("a", "b", "c");
             var configuration = ConfigurationModel.GetDefault();
             var targetVersion = new Version(1, 0);
@@ -84,7 +84,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             // Arrange
             var fsaMock = new Mock<IFileSystemAccess>();
             var loggerMock = new Mock<ILogger>();
-            IWorkUnit<ScriptCreationStateModel> unit = new CleanArtifactsDirectoryUnit(fsaMock.Object, loggerMock.Object);
+            IWorkUnit<ScriptCreationStateModel> unit = new CleanNewArtifactsDirectoryUnit(fsaMock.Object, loggerMock.Object);
 
             // Act & Assert
             // ReSharper disable once AssignNullToNotNullAttribute
@@ -97,7 +97,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             // Arrange
             var fsaMock = new Mock<IFileSystemAccess>();
             var loggerMock = new Mock<ILogger>();
-            IWorkUnit<ScriptCreationStateModel> unit = new CleanArtifactsDirectoryUnit(fsaMock.Object, loggerMock.Object);
+            IWorkUnit<ScriptCreationStateModel> unit = new CleanNewArtifactsDirectoryUnit(fsaMock.Object, loggerMock.Object);
             var project = new SqlProject("a", "b", "c");
             var configuration = ConfigurationModel.GetDefault();
             var previousVersion = new Version(1, 0);

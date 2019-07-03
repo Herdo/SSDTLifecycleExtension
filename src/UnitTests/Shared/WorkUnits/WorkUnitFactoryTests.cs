@@ -199,9 +199,9 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             // Arrange
             var fsaMock = Mock.Of<IFileSystemAccess>();
             var loggerMock = Mock.Of<ILogger>();
-            var expectedWorkUnit = new CleanArtifactsDirectoryUnit(fsaMock, loggerMock);
+            var expectedWorkUnit = new CleanNewArtifactsDirectoryUnit(fsaMock, loggerMock);
             var drMock = new Mock<IDependencyResolver>();
-            drMock.Setup(m => m.Get<CleanArtifactsDirectoryUnit>()).Returns(expectedWorkUnit);
+            drMock.Setup(m => m.Get<CleanNewArtifactsDirectoryUnit>()).Returns(expectedWorkUnit);
             IWorkUnitFactory wuf = new WorkUnitFactory(drMock.Object);
             var project = new SqlProject("a", "b", "c");
             var configuration = ConfigurationModel.GetDefault();
@@ -217,7 +217,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
 
             // Assert
             Assert.AreSame(expectedWorkUnit, workUnit);
-            drMock.Verify(m => m.Get<CleanArtifactsDirectoryUnit>(), Times.Once);
+            drMock.Verify(m => m.Get<CleanNewArtifactsDirectoryUnit>(), Times.Once);
         }
 
         [Test]
@@ -465,9 +465,9 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             // Arrange
             var fsaMock = Mock.Of<IFileSystemAccess>();
             var loggerMock = Mock.Of<ILogger>();
-            var expectedWorkUnit = new CleanArtifactsDirectoryUnit(fsaMock, loggerMock);
+            var expectedWorkUnit = new CleanNewArtifactsDirectoryUnit(fsaMock, loggerMock);
             var drMock = new Mock<IDependencyResolver>();
-            drMock.Setup(m => m.Get<CleanArtifactsDirectoryUnit>()).Returns(expectedWorkUnit);
+            drMock.Setup(m => m.Get<CleanNewArtifactsDirectoryUnit>()).Returns(expectedWorkUnit);
             IWorkUnitFactory wuf = new WorkUnitFactory(drMock.Object);
             var project = new SqlProject("a", "b", "c");
             var configuration = ConfigurationModel.GetDefault();
@@ -483,7 +483,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
 
             // Assert
             Assert.AreSame(expectedWorkUnit, workUnit);
-            drMock.Verify(m => m.Get<CleanArtifactsDirectoryUnit>(), Times.Once);
+            drMock.Verify(m => m.Get<CleanNewArtifactsDirectoryUnit>(), Times.Once);
         }
 
         [Test]

@@ -36,7 +36,7 @@
                 case StateModelState.PathsLoaded:
                     return _dependencyResolver.Get<BuildProjectUnit>();
                 case StateModelState.TriedToBuildProject:
-                    return _dependencyResolver.Get<CleanArtifactsDirectoryUnit>();
+                    return _dependencyResolver.Get<CleanNewArtifactsDirectoryUnit>();
                 case StateModelState.TriedToCleanArtifactsDirectory:
                     return _dependencyResolver.Get<CopyBuildResultUnit>();
                 case StateModelState.TriedToCopyBuildResult:
@@ -66,7 +66,7 @@
                 case StateModelState.PathsVerified:
                     return _dependencyResolver.Get<BuildProjectUnit>();
                 case StateModelState.TriedToBuildProject:
-                    return _dependencyResolver.Get<CleanArtifactsDirectoryUnit>();
+                    return _dependencyResolver.Get<CleanNewArtifactsDirectoryUnit>();
                 case StateModelState.TriedToCleanArtifactsDirectory:
                     return _dependencyResolver.Get<CopyBuildResultUnit>();
                 case StateModelState.TriedToCopyBuildResult:

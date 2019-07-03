@@ -90,7 +90,7 @@
     <Compile Include="Shared\Services\VersionServiceTests.cs" />
     <Compile Include="Shared\Services\XmlFormatServiceTests.cs" />
     <Compile Include="Shared\WorkUnits\BuildProjectUnitTests.cs" />
-    <Compile Include="Shared\WorkUnits\CleanArtifactsDirectoryUnitTests.cs" />
+    <Compile Include="Shared\WorkUnits\CleanNewArtifactsDirectoryUnitTests.cs" />
     <Compile Include="Shared\WorkUnits\CopyBuildResultUnitTests.cs" />
     <Compile Include="Shared\WorkUnits\CreateDeploymentFilesUnitTests.cs" />
     <Compile Include="Shared\WorkUnits\DeleteRefactorLogUnitTests.cs" />

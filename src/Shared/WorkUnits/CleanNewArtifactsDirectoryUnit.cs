@@ -11,13 +11,13 @@
     using Models;
 
     [UsedImplicitly]
-    public class CleanArtifactsDirectoryUnit : IWorkUnit<ScaffoldingStateModel>,
+    public class CleanNewArtifactsDirectoryUnit : IWorkUnit<ScaffoldingStateModel>,
                                                IWorkUnit<ScriptCreationStateModel>
     {
         [NotNull] private readonly IFileSystemAccess _fileSystemAccess;
         [NotNull] private readonly ILogger _logger;
 
-        public CleanArtifactsDirectoryUnit([NotNull] IFileSystemAccess fileSystemAccess,
+        public CleanNewArtifactsDirectoryUnit([NotNull] IFileSystemAccess fileSystemAccess,
                                            [NotNull] ILogger logger)
         {
             _fileSystemAccess = fileSystemAccess ?? throw new ArgumentNullException(nameof(fileSystemAccess));
