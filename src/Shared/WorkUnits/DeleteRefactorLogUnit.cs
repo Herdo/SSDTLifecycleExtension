@@ -28,8 +28,15 @@
 
         private async Task TryToDeleteRefactorLogInternal(IStateModel stateModel,
                                                           SqlProject project,
+                                                          ConfigurationModel configuration,
                                                           PathCollection paths)
         {
+            if (!configuration.DeleteRefactorlogAfterVersionedScriptGeneration)
+            {
+                stateModel.CurrentState = StateModelState.DeletedRefactorLog;
+                return;
+            }
+
             await _logger.LogAsync("Deleting refactorlog files ...");
             var deletedFiles = _fileSystemAccess.TryToCleanDirectory(paths.ProjectDirectory, "*.refactorlog");
             if (deletedFiles.Length == 0)
@@ -56,6 +63,7 @@
 
             return TryToDeleteRefactorLogInternal(stateModel,
                                                   stateModel.Project,
+                                                  stateModel.Configuration,
                                                   stateModel.Paths);
         }
     }

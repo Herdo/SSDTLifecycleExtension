@@ -78,6 +78,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             IWorkUnit<ScriptCreationStateModel> unit = new DeleteRefactorLogUnit(fsaMock.Object, vsaMock.Object, loggerMock.Object);
             var project = new SqlProject("a", "b", "c");
             var configuration = ConfigurationModel.GetDefault();
+            configuration.DeleteRefactorlogAfterVersionedScriptGeneration = true;
             var previousVersion = new Version(1, 0);
             Task HandlerFunc(bool b) => Task.CompletedTask;
             var paths = new PathCollection("p", "a", "l", "b", "c", "d", "e", "f");
@@ -115,6 +116,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             IWorkUnit<ScriptCreationStateModel> unit = new DeleteRefactorLogUnit(fsaMock.Object, vsaMock.Object, loggerMock.Object);
             var project = new SqlProject("a", "b", "c");
             var configuration = ConfigurationModel.GetDefault();
+            configuration.DeleteRefactorlogAfterVersionedScriptGeneration = true;
             var previousVersion = new Version(1, 0);
             Task HandlerFunc(bool b) => Task.CompletedTask;
             var paths = new PathCollection("p", "a", "l", "b", "c", "d", "e", "f");
@@ -136,6 +138,36 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             loggerMock.Verify(m => m.LogAsync("No files were deleted."), Times.Never);
             loggerMock.Verify(m => m.LogAsync("Deleted file file1.refactorlog ..."), Times.Once);
             loggerMock.Verify(m => m.LogAsync("Deleted file file2.refactorlog ..."), Times.Once);
+        }
+
+        [Test]
+        public async Task Work_ScriptCreationStateModel_CompleteRun_NoFilesDeleted_ConfigurationDisabled_Async()
+        {
+            // Arrange
+            var fsaMock = new Mock<IFileSystemAccess>();
+            var vsaMock = new Mock<IVisualStudioAccess>();
+            var loggerMock = new Mock<ILogger>();
+            IWorkUnit<ScriptCreationStateModel> unit = new DeleteRefactorLogUnit(fsaMock.Object, vsaMock.Object, loggerMock.Object);
+            var project = new SqlProject("a", "b", "c");
+            var configuration = ConfigurationModel.GetDefault();
+            configuration.DeleteRefactorlogAfterVersionedScriptGeneration = false;
+            var previousVersion = new Version(1, 0);
+            Task HandlerFunc(bool b) => Task.CompletedTask;
+            var paths = new PathCollection("p", "a", "l", "b", "c", "d", "e", "f");
+            var model = new ScriptCreationStateModel(project, configuration, previousVersion, true, HandlerFunc)
+            {
+                Paths = paths
+            };
+
+            // Act
+            await unit.Work(model, CancellationToken.None);
+
+            // Assert
+            Assert.AreEqual(StateModelState.DeletedRefactorLog, model.CurrentState);
+            Assert.IsNull(model.Result);
+            fsaMock.Verify(m => m.TryToCleanDirectory(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+            vsaMock.Verify(m => m.RemoveItemFromProjectRoot(project, It.IsAny<string>()), Times.Never);
+            loggerMock.Verify(m => m.LogAsync(It.IsAny<string>()), Times.Never);
         }
     }
 }

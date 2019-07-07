@@ -1,4 +1,4 @@
-<UserControl x:Class="SSDTLifecycleExtension.Windows.ConfigurationWindowControl"
+﻿<UserControl x:Class="SSDTLifecycleExtension.Windows.ConfigurationWindowControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -429,6 +429,35 @@
                                       Grid.Column="1"
                                       Style="{StaticResource ConfigurationCheckBoxStyle}"
                                       IsChecked="{Binding Model.RemoveSqlCmdStatements, Mode=TwoWay}"/>
+                        </Grid>
+                    </GroupBox>
+                    <!-- Cleanup -->
+                    <GroupBox Style="{StaticResource SettingsGroupStyle}"
+                              Header="Cleanup">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Delete refactorlog after versioned script generation -->
+                            <TextBlock Grid.Row="0"
+                                       Grid.Column="0"
+                                       Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
+                                <Run Text="Delete refactorlog after versioned script"
+                                     FontWeight="Bold"/>
+                                <LineBreak/>
+                                <Run Text="generation"
+                                     FontWeight="Bold"/>
+                            </TextBlock>
+                            <CheckBox Grid.Row="0"
+                                      Grid.Column="1"
+                                      Style="{StaticResource ConfigurationCheckBoxStyle}"
+                                      IsChecked="{Binding Model.DeleteRefactorlogAfterVersionedScriptGeneration, Mode=TwoWay}"/>
                         </Grid>
                     </GroupBox>
                 </StackPanel>

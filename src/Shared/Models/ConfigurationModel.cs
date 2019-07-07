@@ -19,6 +19,7 @@
         private bool _commentOutUnnamedDefaultConstraintDrops;
         private bool _replaceUnnamedDefaultConstraintDrops;
         private bool _removeSqlCmdStatements;
+        private bool _deleteRefactorlogAfterVersionedScriptGeneration;
         private string _versionPattern;
         private bool _trackDacpacVersion;
         private string _customHeader;
@@ -133,6 +134,20 @@
         }
 
         /// <summary>
+        /// Gets or sets whether the *.refactorlog file will be deleted after a versioned script is generated.
+        /// </summary>
+        public bool DeleteRefactorlogAfterVersionedScriptGeneration
+        {
+            get => _deleteRefactorlogAfterVersionedScriptGeneration;
+            set
+            {
+                if (value == _deleteRefactorlogAfterVersionedScriptGeneration) return;
+                _deleteRefactorlogAfterVersionedScriptGeneration = value;
+                OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the version pattern.
         /// </summary>
         public string VersionPattern
@@ -203,6 +218,7 @@
                 CommentOutUnnamedDefaultConstraintDrops = false,
                 ReplaceUnnamedDefaultConstraintDrops = false,
                 RemoveSqlCmdStatements = false,
+                DeleteRefactorlogAfterVersionedScriptGeneration = false,
                 VersionPattern = $"{MajorVersionSpecialKeyword}.{MinorVersionSpecialKeyword}.{BuildVersionSpecialKeyword}",
                 TrackDacpacVersion = false,
                 CustomHeader = null,
@@ -232,6 +248,7 @@
                 CommentOutUnnamedDefaultConstraintDrops = CommentOutUnnamedDefaultConstraintDrops,
                 ReplaceUnnamedDefaultConstraintDrops = ReplaceUnnamedDefaultConstraintDrops,
                 RemoveSqlCmdStatements = RemoveSqlCmdStatements,
+                DeleteRefactorlogAfterVersionedScriptGeneration = DeleteRefactorlogAfterVersionedScriptGeneration,
                 VersionPattern = VersionPattern,
                 TrackDacpacVersion = TrackDacpacVersion,
                 CustomHeader = CustomHeader,
@@ -255,6 +272,7 @@
                    && _replaceUnnamedDefaultConstraintDrops == other._replaceUnnamedDefaultConstraintDrops
                    && _removeSqlCmdStatements == other._removeSqlCmdStatements
                    && string.Equals(_versionPattern, other._versionPattern)
+                   && _deleteRefactorlogAfterVersionedScriptGeneration == other._deleteRefactorlogAfterVersionedScriptGeneration
                    && _trackDacpacVersion == other._trackDacpacVersion
                    && string.Equals(_customHeader, other._customHeader)
                    && string.Equals(_customFooter, other._customFooter);

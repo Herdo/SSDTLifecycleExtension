@@ -429,6 +429,41 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Models
         }
 
         [Test]
+        public void DeleteRefactorlogAfterVersionedScriptGeneration_Get_Set_PropertyChanged()
+        {
+            // Arrange
+            const bool testValue = true;
+            var model = new ConfigurationModel();
+            object invokedPropertyChangedSender = null;
+            string invokedPropertyChangedProperty = null;
+            model.PropertyChanged += (sender,
+                                      args) =>
+            {
+                invokedPropertyChangedSender = sender;
+                invokedPropertyChangedProperty = args?.PropertyName;
+            };
+            object invokedErrorsChangedSender = null;
+            string invokedErrorsChangedProperty = null;
+            model.ErrorsChanged += (sender,
+                                    args) =>
+            {
+                invokedErrorsChangedSender = sender;
+                invokedErrorsChangedProperty = args?.PropertyName;
+            };
+
+            // Act
+            model.DeleteRefactorlogAfterVersionedScriptGeneration = testValue;
+            var returnedValue = model.DeleteRefactorlogAfterVersionedScriptGeneration;
+
+            // Assert
+            Assert.AreEqual(testValue, returnedValue);
+            Assert.AreSame(model, invokedPropertyChangedSender);
+            Assert.AreEqual(nameof(ConfigurationModel.DeleteRefactorlogAfterVersionedScriptGeneration), invokedPropertyChangedProperty);
+            Assert.IsNull(invokedErrorsChangedSender);
+            Assert.IsNull(invokedErrorsChangedProperty);
+        }
+
+        [Test]
         public void Copy_DifferentInstanceWithSameValues()
         {
             // Arrange
@@ -444,7 +479,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Models
                 CustomFooter = "TestFooter",
                 BuildBeforeScriptCreation = true,
                 TrackDacpacVersion = true,
-                RemoveSqlCmdStatements = true
+                RemoveSqlCmdStatements = true,
+                DeleteRefactorlogAfterVersionedScriptGeneration = true
             };
 
             // Act
@@ -482,7 +518,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Models
                 CustomFooter = "TestFooter",
                 BuildBeforeScriptCreation = true,
                 TrackDacpacVersion = true,
-                RemoveSqlCmdStatements = true
+                RemoveSqlCmdStatements = true,
+                DeleteRefactorlogAfterVersionedScriptGeneration = true
             };
 
             // Act
@@ -508,7 +545,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Models
                 CustomFooter = "TestFooter",
                 BuildBeforeScriptCreation = true,
                 TrackDacpacVersion = true,
-                RemoveSqlCmdStatements = true
+                RemoveSqlCmdStatements = true,
+                DeleteRefactorlogAfterVersionedScriptGeneration = true
             };
 
             // Act
@@ -534,7 +572,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Models
                 CustomFooter = "TestFooter",
                 BuildBeforeScriptCreation = true,
                 TrackDacpacVersion = true,
-                RemoveSqlCmdStatements = true
+                RemoveSqlCmdStatements = true,
+                DeleteRefactorlogAfterVersionedScriptGeneration = true
             };
             var model2 = new ConfigurationModel
             {
@@ -548,7 +587,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Models
                 CustomFooter = "TestFooter",
                 BuildBeforeScriptCreation = true,
                 TrackDacpacVersion = true,
-                RemoveSqlCmdStatements = true
+                RemoveSqlCmdStatements = true,
+                DeleteRefactorlogAfterVersionedScriptGeneration = true
             };
 
             // Act
@@ -574,7 +614,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Models
                 CustomFooter = "TestFooter",
                 BuildBeforeScriptCreation = true,
                 TrackDacpacVersion = true,
-                RemoveSqlCmdStatements = true
+                RemoveSqlCmdStatements = true,
+                DeleteRefactorlogAfterVersionedScriptGeneration = true
             };
             var model2 = new ConfigurationModel
             {
@@ -588,7 +629,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Models
                 CustomFooter = "TestFooter",
                 BuildBeforeScriptCreation = true,
                 TrackDacpacVersion = true,
-                RemoveSqlCmdStatements = true
+                RemoveSqlCmdStatements = true,
+                DeleteRefactorlogAfterVersionedScriptGeneration = true
             };
 
             // Act
