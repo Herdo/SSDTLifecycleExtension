@@ -35,7 +35,10 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers
             {
                 CustomHeader = "Header"
             };
-            var paths = new PathCollection("p", "a", "l", "b", "c", "d", "e", "f");
+            var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
+            var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
+            var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
+            var paths = new PathCollection(directories, sourcePaths, targetPaths);
             var model = new ScriptModificationModel(input, project, configuration, paths, new Version(1, 0, 0), false);
 
             // Act
@@ -61,7 +64,10 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers
             {
                 CustomHeader = customHeader
             };
-            var paths = new PathCollection("p", "a", "l", "b", "c", "d", "e", "f");
+            var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
+            var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
+            var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
+            var paths = new PathCollection(directories, sourcePaths, targetPaths);
             var model = new ScriptModificationModel(input, project, configuration, paths, new Version(1, 0, 0), false);
 
             // Act
@@ -84,7 +90,10 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers
             {
                 CustomHeader = "Script base version: {PREVIOUS_VERSION}"
             };
-            var paths = new PathCollection("p", "a", "l", "b", "c", "d", "e", "f");
+            var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
+            var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
+            var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
+            var paths = new PathCollection(directories, sourcePaths, targetPaths);
             var model = new ScriptModificationModel(input, project, configuration, paths, new Version(1, 2, 0), false);
 
             // Act
@@ -107,7 +116,10 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers
             {
                 CustomHeader = "Script target version: {NEXT_VERSION}"
             };
-            var paths = new PathCollection("p", "a", "l", "b", "c", "d", "e", "f");
+            var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
+            var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
+            var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
+            var paths = new PathCollection(directories, sourcePaths, targetPaths);
             var model = new ScriptModificationModel(input, project, configuration, paths, new Version(1, 2, 0), false);
 
             // Act

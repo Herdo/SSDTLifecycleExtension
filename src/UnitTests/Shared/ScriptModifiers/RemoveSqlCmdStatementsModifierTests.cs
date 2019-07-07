@@ -166,7 +166,10 @@ GO";
             {
                 CustomFooter = "footer"
             };
-            var paths = new PathCollection("p", "a", "l", "b", "c", "d", "e", "f");
+            var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
+            var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
+            var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
+            var paths = new PathCollection(directories, sourcePaths, targetPaths);
             var model = new ScriptModificationModel(input, project, configuration, paths, new Version(1, 2, 0), false);
 
             // Act

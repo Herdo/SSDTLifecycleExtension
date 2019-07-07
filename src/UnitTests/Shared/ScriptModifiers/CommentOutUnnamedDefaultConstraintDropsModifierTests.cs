@@ -76,7 +76,10 @@ GO";
             IScriptModifier modifier = new CommentOutUnnamedDefaultConstraintDropsModifier();
             var project = new SqlProject("", "", "");
             var configuration = new ConfigurationModel();
-            var paths = new PathCollection("", "", "", "", "", "", "", "");
+            var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
+            var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
+            var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
+            var paths = new PathCollection(directories, sourcePaths, targetPaths);
             var model = new ScriptModificationModel(MultipleDropDefaultConstraintStatements, project, configuration, paths, new Version(1, 0, 0), false);
 
             // Act

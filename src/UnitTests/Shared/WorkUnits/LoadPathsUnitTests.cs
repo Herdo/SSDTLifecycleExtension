@@ -45,7 +45,10 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             var targetVersion = new Version(1, 2, 3);
             Task HandleWorkInProgressChanged(bool arg) => Task.CompletedTask;
             var model = new ScaffoldingStateModel(project, configuration, targetVersion, HandleWorkInProgressChanged);
-            var paths = new PathCollection("p", "a", "l", "b", "c", "d", "e", "f");
+            var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
+            var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
+            var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
+            var paths = new PathCollection(directories, sourcePaths, targetPaths);
             var spsMock = new Mock<ISqlProjectService>();
             spsMock.Setup(m => m.TryLoadPathsForScaffoldingAsync(project, configuration)).ReturnsAsync(paths);
             IWorkUnit<ScaffoldingStateModel> unit = new LoadPathsUnit(spsMock.Object);
@@ -100,7 +103,10 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             var previousVersion = new Version(1, 2, 3);
             Task HandleWorkInProgressChanged(bool arg) => Task.CompletedTask;
             var model = new ScriptCreationStateModel(project, configuration, previousVersion, true, HandleWorkInProgressChanged);
-            var paths = new PathCollection("p", "a", "l", "b", "c", "d", "e", "f");
+            var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
+            var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
+            var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
+            var paths = new PathCollection(directories, sourcePaths, targetPaths);
             var spsMock = new Mock<ISqlProjectService>();
             spsMock.Setup(m => m.TryLoadPathsForScriptCreationAsync(project, configuration, previousVersion, true)).ReturnsAsync(paths);
             IWorkUnit<ScriptCreationStateModel> unit = new LoadPathsUnit(spsMock.Object);

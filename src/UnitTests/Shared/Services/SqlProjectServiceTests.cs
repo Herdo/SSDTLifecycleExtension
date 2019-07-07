@@ -389,14 +389,14 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             // Assert
             Assert.IsNotNull(paths);
             loggerMock.Verify(m => m.LogAsync(It.IsAny<string>()), Times.Never);
-            Assert.AreEqual(@"C:\TestProject", paths.ProjectDirectory);
-            Assert.AreEqual(@"C:\TestProject\TestProfile.publish.xml", paths.PublishProfilePath);
-            Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest", paths.LatestArtifactsDirectory);
-            Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948", paths.NewArtifactsDirectory);
-            Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948\TestSqlTarget.dacpac", paths.NewDacpacPath);
-            Assert.IsNull(paths.PreviousDacpacPath);
-            Assert.IsNull(paths.DeployScriptPath);
-            Assert.IsNull(paths.DeployReportPath);
+            Assert.AreEqual(@"C:\TestProject", paths.Directories.ProjectDirectory);
+            Assert.AreEqual(@"C:\TestProject\TestProfile.publish.xml", paths.DeploySources.PublishProfilePath);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest", paths.Directories.LatestArtifactsDirectory);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948", paths.Directories.NewArtifactsDirectory);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948\TestSqlTarget.dacpac", paths.DeploySources.NewDacpacPath);
+            Assert.IsNull(paths.DeploySources.PreviousDacpacPath);
+            Assert.IsNull(paths.DeployTargets.DeployScriptPath);
+            Assert.IsNull(paths.DeployTargets.DeployReportPath);
         }
 
         [Test]
@@ -427,14 +427,14 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             // Assert
             Assert.IsNotNull(paths);
             loggerMock.Verify(m => m.LogAsync(It.IsAny<string>()), Times.Never);
-            Assert.AreEqual(@"C:\TestProject", paths.ProjectDirectory);
-            Assert.AreEqual(string.Empty, paths.PublishProfilePath);
-            Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest", paths.LatestArtifactsDirectory);
-            Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948", paths.NewArtifactsDirectory);
-            Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948\TestSqlTarget.dacpac", paths.NewDacpacPath);
-            Assert.IsNull(paths.PreviousDacpacPath);
-            Assert.IsNull(paths.DeployScriptPath);
-            Assert.IsNull(paths.DeployReportPath);
+            Assert.AreEqual(@"C:\TestProject", paths.Directories.ProjectDirectory);
+            Assert.AreEqual(string.Empty, paths.DeploySources.PublishProfilePath);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest", paths.Directories.LatestArtifactsDirectory);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948", paths.Directories.NewArtifactsDirectory);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948\TestSqlTarget.dacpac", paths.DeploySources.NewDacpacPath);
+            Assert.IsNull(paths.DeploySources.PreviousDacpacPath);
+            Assert.IsNull(paths.DeployTargets.DeployScriptPath);
+            Assert.IsNull(paths.DeployTargets.DeployReportPath);
         }
 
         [Test]
@@ -540,14 +540,14 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             // Assert
             Assert.IsNotNull(paths);
             loggerMock.Verify(m => m.LogAsync(It.IsAny<string>()), Times.Never);
-            Assert.AreEqual(@"C:\TestProject", paths.ProjectDirectory);
-            Assert.AreEqual(@"C:\TestProject\TestProfile.publish.xml", paths.PublishProfilePath);
-            Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest", paths.LatestArtifactsDirectory);
-            Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest", paths.NewArtifactsDirectory);
-            Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest\TestSqlTarget.dacpac", paths.NewDacpacPath);
-            Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.3.4932\TestSqlTarget.dacpac", paths.PreviousDacpacPath);
-            Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest\TestSqlTarget_40.23.3.4932_latest.sql", paths.DeployScriptPath);
-            Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest\TestSqlTarget_40.23.3.4932_latest.xml", paths.DeployReportPath);
+            Assert.AreEqual(@"C:\TestProject", paths.Directories.ProjectDirectory);
+            Assert.AreEqual(@"C:\TestProject\TestProfile.publish.xml", paths.DeploySources.PublishProfilePath);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest", paths.Directories.LatestArtifactsDirectory);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest", paths.Directories.NewArtifactsDirectory);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest\TestSqlTarget.dacpac", paths.DeploySources.NewDacpacPath);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.3.4932\TestSqlTarget.dacpac", paths.DeploySources.PreviousDacpacPath);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest\TestSqlTarget_40.23.3.4932_latest.sql", paths.DeployTargets.DeployScriptPath);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest\TestSqlTarget_40.23.3.4932_latest.xml", paths.DeployTargets.DeployReportPath);
         }
 
         [Test]
@@ -579,14 +579,14 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             // Assert
             Assert.IsNotNull(paths);
             loggerMock.Verify(m => m.LogAsync(It.IsAny<string>()), Times.Never);
-            Assert.AreEqual(@"C:\TestProject", paths.ProjectDirectory);
-            Assert.AreEqual(string.Empty, paths.PublishProfilePath);
-            Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest", paths.LatestArtifactsDirectory);
-            Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest", paths.NewArtifactsDirectory);
-            Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest\TestSqlTarget.dacpac", paths.NewDacpacPath);
-            Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.3.4932\TestSqlTarget.dacpac", paths.PreviousDacpacPath);
-            Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest\TestSqlTarget_40.23.3.4932_latest.sql", paths.DeployScriptPath);
-            Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest\TestSqlTarget_40.23.3.4932_latest.xml", paths.DeployReportPath);
+            Assert.AreEqual(@"C:\TestProject", paths.Directories.ProjectDirectory);
+            Assert.AreEqual(string.Empty, paths.DeploySources.PublishProfilePath);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest", paths.Directories.LatestArtifactsDirectory);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest", paths.Directories.NewArtifactsDirectory);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest\TestSqlTarget.dacpac", paths.DeploySources.NewDacpacPath);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.3.4932\TestSqlTarget.dacpac", paths.DeploySources.PreviousDacpacPath);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest\TestSqlTarget_40.23.3.4932_latest.sql", paths.DeployTargets.DeployScriptPath);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest\TestSqlTarget_40.23.3.4932_latest.xml", paths.DeployTargets.DeployReportPath);
         }
 
         [Test]
@@ -620,14 +620,14 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             // Assert
             Assert.IsNotNull(paths);
             loggerMock.Verify(m => m.LogAsync(It.IsAny<string>()), Times.Never);
-            Assert.AreEqual(@"C:\TestProject", paths.ProjectDirectory);
-            Assert.AreEqual(@"C:\TestProject\TestProfile.publish.xml", paths.PublishProfilePath);
-            Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest", paths.LatestArtifactsDirectory);
-            Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948", paths.NewArtifactsDirectory);
-            Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948\TestSqlTarget.dacpac", paths.NewDacpacPath);
-            Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.3.4932\TestSqlTarget.dacpac", paths.PreviousDacpacPath);
-            Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948\TestSqlTarget_40.23.3.4932_40.23.4.4948.sql", paths.DeployScriptPath);
-            Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948\TestSqlTarget_40.23.3.4932_40.23.4.4948.xml", paths.DeployReportPath);
+            Assert.AreEqual(@"C:\TestProject", paths.Directories.ProjectDirectory);
+            Assert.AreEqual(@"C:\TestProject\TestProfile.publish.xml", paths.DeploySources.PublishProfilePath);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest", paths.Directories.LatestArtifactsDirectory);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948", paths.Directories.NewArtifactsDirectory);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948\TestSqlTarget.dacpac", paths.DeploySources.NewDacpacPath);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.3.4932\TestSqlTarget.dacpac", paths.DeploySources.PreviousDacpacPath);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948\TestSqlTarget_40.23.3.4932_40.23.4.4948.sql", paths.DeployTargets.DeployScriptPath);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948\TestSqlTarget_40.23.3.4932_40.23.4.4948.xml", paths.DeployTargets.DeployReportPath);
         }
 
         [Test]
@@ -659,14 +659,14 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             // Assert
             Assert.IsNotNull(paths);
             loggerMock.Verify(m => m.LogAsync(It.IsAny<string>()), Times.Never);
-            Assert.AreEqual(@"C:\TestProject", paths.ProjectDirectory);
-            Assert.AreEqual(string.Empty, paths.PublishProfilePath);
-            Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest", paths.LatestArtifactsDirectory);
-            Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948", paths.NewArtifactsDirectory);
-            Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948\TestSqlTarget.dacpac", paths.NewDacpacPath);
-            Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.3.4932\TestSqlTarget.dacpac", paths.PreviousDacpacPath);
-            Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948\TestSqlTarget_40.23.3.4932_40.23.4.4948.sql", paths.DeployScriptPath);
-            Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948\TestSqlTarget_40.23.3.4932_40.23.4.4948.xml", paths.DeployReportPath);
+            Assert.AreEqual(@"C:\TestProject", paths.Directories.ProjectDirectory);
+            Assert.AreEqual(string.Empty, paths.DeploySources.PublishProfilePath);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest", paths.Directories.LatestArtifactsDirectory);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948", paths.Directories.NewArtifactsDirectory);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948\TestSqlTarget.dacpac", paths.DeploySources.NewDacpacPath);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.3.4932\TestSqlTarget.dacpac", paths.DeploySources.PreviousDacpacPath);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948\TestSqlTarget_40.23.3.4932_40.23.4.4948.sql", paths.DeployTargets.DeployScriptPath);
+            Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948\TestSqlTarget_40.23.3.4932_40.23.4.4948.xml", paths.DeployTargets.DeployReportPath);
         }
     }
 }

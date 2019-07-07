@@ -62,7 +62,10 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             var configuration = ConfigurationModel.GetDefault();
             var targetVersion = new Version(1, 0);
             Task HandlerFunc(bool b) => Task.CompletedTask;
-            var paths = new PathCollection("p", "a", "l", "b", "c", "d", "e", "f");
+            var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
+            var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
+            var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
+            var paths = new PathCollection(directories, sourcePaths, targetPaths);
             var model = new ScaffoldingStateModel(project, configuration, targetVersion, HandlerFunc)
             {
                 Paths = paths
@@ -74,7 +77,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             // Assert
             Assert.AreEqual(StateModelState.TriedToCleanArtifactsDirectory, model.CurrentState);
             Assert.IsNull(model.Result);
-            fsaMock.Verify(m => m.TryToCleanDirectory("b"), Times.Once);
+            fsaMock.Verify(m => m.TryToCleanDirectory("newArtifactsDirectory"), Times.Once);
             loggerMock.Verify(m => m.LogAsync(It.IsNotNull<string>()), Times.Once);
         }
 
@@ -102,7 +105,10 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             var configuration = ConfigurationModel.GetDefault();
             var previousVersion = new Version(1, 0);
             Task HandlerFunc(bool b) => Task.CompletedTask;
-            var paths = new PathCollection("p", "a", "l", "b", "c", "d", "e", "f");
+            var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
+            var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
+            var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
+            var paths = new PathCollection(directories, sourcePaths, targetPaths);
             var model = new ScriptCreationStateModel(project, configuration, previousVersion, true, HandlerFunc)
             {
                 Paths = paths
@@ -114,7 +120,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             // Assert
             Assert.AreEqual(StateModelState.TriedToCleanArtifactsDirectory, model.CurrentState);
             Assert.IsNull(model.Result);
-            fsaMock.Verify(m => m.TryToCleanDirectory("b"), Times.Once);
+            fsaMock.Verify(m => m.TryToCleanDirectory("newArtifactsDirectory"), Times.Once);
             loggerMock.Verify(m => m.LogAsync(It.IsNotNull<string>()), Times.Once);
         }
     }

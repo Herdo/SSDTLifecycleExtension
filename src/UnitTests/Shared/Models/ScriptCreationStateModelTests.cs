@@ -112,7 +112,10 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Models
             // ReSharper disable once ConvertToLocalFunction
             Func<bool, Task> changeHandler = b => Task.CompletedTask;
             var model = new ScriptCreationStateModel(project, configuration, previousVersion, true, changeHandler);
-            var paths = new PathCollection("p", "a", "l", "b", "c", "d", "e", "f");
+            var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
+            var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
+            var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
+            var paths = new PathCollection(directories, sourcePaths, targetPaths);
 
             // Act
             model.Paths = paths;

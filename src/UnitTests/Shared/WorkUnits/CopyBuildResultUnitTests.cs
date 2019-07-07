@@ -44,13 +44,16 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             var configuration = ConfigurationModel.GetDefault();
             var targetVersion = new Version(1, 2, 3);
             Task HandleWorkInProgressChanged(bool arg) => Task.CompletedTask;
-            var paths = new PathCollection("p", "a", "l", "b", "c", "d", "e", "f");
+            var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
+            var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
+            var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
+            var paths = new PathCollection(directories, sourcePaths, targetPaths);
             var model = new ScaffoldingStateModel(project, configuration, targetVersion, HandleWorkInProgressChanged)
             {
                 Paths = paths
             };
             var bsMock = new Mock<IBuildService>();
-            bsMock.Setup(m => m.CopyBuildResultAsync(project, paths.NewArtifactsDirectory)).ReturnsAsync(true);
+            bsMock.Setup(m => m.CopyBuildResultAsync(project, paths.Directories.NewArtifactsDirectory)).ReturnsAsync(true);
             IWorkUnit<ScaffoldingStateModel> unit = new CopyBuildResultUnit(bsMock.Object);
 
             // Act
@@ -69,13 +72,16 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             var configuration = ConfigurationModel.GetDefault();
             var targetVersion = new Version(1, 2, 3);
             Task HandleWorkInProgressChanged(bool arg) => Task.CompletedTask;
-            var paths = new PathCollection("p", "a", "l", "b", "c", "d", "e", "f");
+            var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
+            var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
+            var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
+            var paths = new PathCollection(directories, sourcePaths, targetPaths);
             var model = new ScaffoldingStateModel(project, configuration, targetVersion, HandleWorkInProgressChanged)
             {
                 Paths = paths
             };
             var bsMock = new Mock<IBuildService>();
-            bsMock.Setup(m => m.CopyBuildResultAsync(project, paths.NewArtifactsDirectory)).ReturnsAsync(false);
+            bsMock.Setup(m => m.CopyBuildResultAsync(project, paths.Directories.NewArtifactsDirectory)).ReturnsAsync(false);
             IWorkUnit<ScaffoldingStateModel> unit = new CopyBuildResultUnit(bsMock.Object);
 
             // Act
@@ -106,13 +112,16 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             var configuration = ConfigurationModel.GetDefault();
             var targetVersion = new Version(1, 2, 3);
             Task HandleWorkInProgressChanged(bool arg) => Task.CompletedTask;
-            var paths = new PathCollection("p", "a", "l", "b", "c", "d", "e", "f");
+            var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
+            var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
+            var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
+            var paths = new PathCollection(directories, sourcePaths, targetPaths);
             var model = new ScriptCreationStateModel(project, configuration, targetVersion, true, HandleWorkInProgressChanged)
             {
                 Paths = paths
             };
             var bsMock = new Mock<IBuildService>();
-            bsMock.Setup(m => m.CopyBuildResultAsync(project, paths.NewArtifactsDirectory)).ReturnsAsync(true);
+            bsMock.Setup(m => m.CopyBuildResultAsync(project, paths.Directories.NewArtifactsDirectory)).ReturnsAsync(true);
             IWorkUnit<ScriptCreationStateModel> unit = new CopyBuildResultUnit(bsMock.Object);
 
             // Act
@@ -131,13 +140,16 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             var configuration = ConfigurationModel.GetDefault();
             var targetVersion = new Version(1, 2, 3);
             Task HandleWorkInProgressChanged(bool arg) => Task.CompletedTask;
-            var paths = new PathCollection("p", "a", "l", "b", "c", "d", "e", "f");
+            var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
+            var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
+            var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
+            var paths = new PathCollection(directories, sourcePaths, targetPaths);
             var model = new ScriptCreationStateModel(project, configuration, targetVersion, true, HandleWorkInProgressChanged)
             {
                 Paths = paths
             };
             var bsMock = new Mock<IBuildService>();
-            bsMock.Setup(m => m.CopyBuildResultAsync(project, paths.NewArtifactsDirectory)).ReturnsAsync(false);
+            bsMock.Setup(m => m.CopyBuildResultAsync(project, paths.Directories.NewArtifactsDirectory)).ReturnsAsync(false);
             IWorkUnit<ScriptCreationStateModel> unit = new CopyBuildResultUnit(bsMock.Object);
 
             // Act

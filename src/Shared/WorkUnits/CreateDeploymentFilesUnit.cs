@@ -48,20 +48,20 @@
             if (!result.Success)
                 return false;
 
-            var success = await PersistDeployScript(paths.DeployScriptPath, result.DeployScriptContent);
+            var success = await PersistDeployScript(paths.DeployTargets.DeployScriptPath, result.DeployScriptContent);
 
             if (!success || !createDocumentation)
                 return success;
 
-            return await PersistDeployReport(paths.DeployReportPath, result.DeployReportContent);
+            return await PersistDeployReport(paths.DeployTargets.DeployReportPath, result.DeployReportContent);
         }
 
         private async Task<(bool Success, string DeployScriptContent, string DeployReportContent)> CreateDeployContent(PathCollection paths,
                                                                                                                        bool createDocumentation)
         {
-            var (deployScriptContent, deployReportContent, errors) = await _dacAccess.CreateDeployFilesAsync(paths.PreviousDacpacPath,
-                                                                                                             paths.NewDacpacPath,
-                                                                                                             paths.PublishProfilePath,
+            var (deployScriptContent, deployReportContent, errors) = await _dacAccess.CreateDeployFilesAsync(paths.DeploySources.PreviousDacpacPath,
+                                                                                                             paths.DeploySources.NewDacpacPath,
+                                                                                                             paths.DeploySources.PublishProfilePath,
                                                                                                              true,
                                                                                                              createDocumentation);
 

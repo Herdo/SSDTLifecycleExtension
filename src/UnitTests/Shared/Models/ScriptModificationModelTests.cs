@@ -68,7 +68,10 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Models
             var initialScript = "script";
             var project = new SqlProject("a", "b", "c");
             var configuration = new ConfigurationModel();
-            var paths = new PathCollection("p", "a", "l", "b", "c", "d", "e", "f");
+            var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
+            var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
+            var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
+            var paths = new PathCollection(directories, sourcePaths, targetPaths);
 
             // Act & Assert
             // ReSharper disable once ObjectCreationAsStatement
@@ -84,7 +87,10 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Models
             var initialScript = "script";
             var project = new SqlProject("a", "b", "c");
             var configuration = new ConfigurationModel();
-            var paths = new PathCollection("p", "a", "l", "b", "c", "d", "e", "f");
+            var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
+            var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
+            var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
+            var paths = new PathCollection(directories, sourcePaths, targetPaths);
             var previousVersion = new Version(1, 2, 0);
 
             // Act
@@ -106,7 +112,10 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Models
             var initialScript = "script";
             var project = new SqlProject("a", "b", "c");
             var configuration = new ConfigurationModel();
-            var paths = new PathCollection("p", "a", "l", "b", "c", "d", "e", "f");
+            var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
+            var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
+            var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
+            var paths = new PathCollection(directories, sourcePaths, targetPaths);
             var previousVersion = new Version(1, 2, 0);
             var model = new ScriptModificationModel(initialScript, project, configuration, paths, previousVersion, true);
 

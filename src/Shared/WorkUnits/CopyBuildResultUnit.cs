@@ -36,7 +36,7 @@
             if (stateModel == null)
                 throw new ArgumentNullException(nameof(stateModel));
 
-            return TryCopyInternal(stateModel, stateModel.Project, stateModel.Paths.NewArtifactsDirectory);
+            return TryCopyInternal(stateModel, stateModel.Project, stateModel.Paths.Directories.NewArtifactsDirectory);
         }
 
         Task IWorkUnit<ScriptCreationStateModel>.Work(ScriptCreationStateModel stateModel,
@@ -45,7 +45,7 @@
             if (stateModel == null)
                 throw new ArgumentNullException(nameof(stateModel));
 
-            return TryCopyInternal(stateModel, stateModel.Project, stateModel.Paths.NewArtifactsDirectory);
+            return TryCopyInternal(stateModel, stateModel.Project, stateModel.Paths.Directories.NewArtifactsDirectory);
         }
     }
 }

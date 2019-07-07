@@ -55,7 +55,7 @@
                                              bool createLatest,
                                              IReadOnlyDictionary<ScriptModifier, IScriptModifier> modifiers)
         {
-            var initialScript = await _fileSystemAccess.ReadFileAsync(paths.DeployScriptPath);
+            var initialScript = await _fileSystemAccess.ReadFileAsync(paths.DeployTargets.DeployScriptPath);
             var model = new ScriptModificationModel(initialScript, project, configuration, paths, previousVersion, createLatest);
 
             foreach (var m in modifiers.OrderBy(m => m.Key))
@@ -64,7 +64,7 @@
                 await m.Value.ModifyAsync(model);
             }
 
-            await _fileSystemAccess.WriteFileAsync(paths.DeployScriptPath, model.CurrentScript);
+            await _fileSystemAccess.WriteFileAsync(paths.DeployTargets.DeployScriptPath, model.CurrentScript);
         }
 
         Task IWorkUnit<ScriptCreationStateModel>.Work(ScriptCreationStateModel stateModel,

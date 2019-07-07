@@ -105,7 +105,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             var smFooterMock = new Mock<IScriptModifier>();
             var mpsMock = new Mock<IScriptModifierProviderService>();
             var fsaMock = new Mock<IFileSystemAccess>();
-            fsaMock.Setup(m => m.ReadFileAsync("e"))
+            fsaMock.Setup(m => m.ReadFileAsync("deployScriptPath"))
                    .ReturnsAsync(baseScript);
             var loggerMock = new Mock<ILogger>();
             IWorkUnit<ScriptCreationStateModel> unit = new ModifyDeploymentScriptUnit(mpsMock.Object, fsaMock.Object, loggerMock.Object);
@@ -114,7 +114,10 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             var previousVersion = new Version(1, 0);
             const bool createLatest = false;
             Task HandlerFunc(bool b) => Task.CompletedTask;
-            var paths = new PathCollection("p", "a", "l", "b", "c", "d", "e", "f");
+            var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
+            var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
+            var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
+            var paths = new PathCollection(directories, sourcePaths, targetPaths);
             var model = new ScriptCreationStateModel(project, configuration, previousVersion, createLatest, HandlerFunc)
             {
                 Paths = paths
@@ -138,8 +141,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             Assert.AreEqual(StateModelState.ModifiedDeploymentScript, model.CurrentState);
             Assert.IsNull(model.Result);
             mpsMock.Verify(m => m.GetScriptModifiers(It.IsAny<ConfigurationModel>()), Times.Once);
-            fsaMock.Verify(m => m.ReadFileAsync(paths.DeployScriptPath), Times.Once);
-            fsaMock.Verify(m => m.WriteFileAsync(paths.DeployScriptPath, expectedResultScript), Times.Once);
+            fsaMock.Verify(m => m.ReadFileAsync(paths.DeployTargets.DeployScriptPath), Times.Once);
+            fsaMock.Verify(m => m.WriteFileAsync(paths.DeployTargets.DeployScriptPath, expectedResultScript), Times.Once);
             loggerMock.Verify(m => m.LogAsync(It.IsAny<string>()), Times.Exactly(2));
             smHeaderMock.Verify(m => m.ModifyAsync(It.IsNotNull<ScriptModificationModel>()), Times.Once);
             smFooterMock.Verify(m => m.ModifyAsync(It.IsNotNull<ScriptModificationModel>()), Times.Once);

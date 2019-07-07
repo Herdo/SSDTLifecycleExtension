@@ -38,7 +38,7 @@
             }
 
             await _logger.LogAsync("Deleting refactorlog files ...");
-            var deletedFiles = _fileSystemAccess.TryToCleanDirectory(paths.ProjectDirectory, "*.refactorlog");
+            var deletedFiles = _fileSystemAccess.TryToCleanDirectory(paths.Directories.ProjectDirectory, "*.refactorlog");
             if (deletedFiles.Length == 0)
             {
                 await _logger.LogAsync("  => No files were deleted.");

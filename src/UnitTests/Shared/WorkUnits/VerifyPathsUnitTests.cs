@@ -59,13 +59,16 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             var configuration = ConfigurationModel.GetDefault();
             var previousVersion = new Version(1, 0);
             Task HandleWorkInProgressChanged(bool arg) => Task.CompletedTask;
-            var paths = new PathCollection("p", "a", "l", "b", "c", "d", "e", "f");
+            var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
+            var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
+            var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
+            var paths = new PathCollection(directories, sourcePaths, targetPaths);
             var model = new ScriptCreationStateModel(project, configuration, previousVersion, true, HandleWorkInProgressChanged)
             {
                 Paths = paths
             };
             var fsaMock = new Mock<IFileSystemAccess>();
-            fsaMock.Setup(m => m.CheckIfFileExists(paths.PublishProfilePath)).Returns(true);
+            fsaMock.Setup(m => m.CheckIfFileExists(paths.DeploySources.PublishProfilePath)).Returns(true);
             var loggerMock = new Mock<ILogger>();
             IWorkUnit<ScriptCreationStateModel> unit = new VerifyPathsUnit(fsaMock.Object, loggerMock.Object);
 
@@ -86,7 +89,10 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             var configuration = ConfigurationModel.GetDefault();
             var previousVersion = new Version(1, 0);
             Task HandleWorkInProgressChanged(bool arg) => Task.CompletedTask;
-            var paths = new PathCollection("p", "", "l", "b", "c", "d", "e", "f");
+            var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
+            var sourcePaths = new DeploySourcePaths("newDacpacPath", "", "previousDacpacPath");
+            var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
+            var paths = new PathCollection(directories, sourcePaths, targetPaths);
             var model = new ScriptCreationStateModel(project, configuration, previousVersion, true, HandleWorkInProgressChanged)
             {
                 Paths = paths
@@ -113,13 +119,16 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             var configuration = ConfigurationModel.GetDefault();
             var previousVersion = new Version(1, 0);
             Task HandleWorkInProgressChanged(bool arg) => Task.CompletedTask;
-            var paths = new PathCollection("p", "a", "l", "b", "c", "d", "e", "f");
+            var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
+            var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
+            var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
+            var paths = new PathCollection(directories, sourcePaths, targetPaths);
             var model = new ScriptCreationStateModel(project, configuration, previousVersion, true, HandleWorkInProgressChanged)
             {
                 Paths = paths
             };
             var fsaMock = new Mock<IFileSystemAccess>();
-            fsaMock.Setup(m => m.CheckIfFileExists(paths.PublishProfilePath)).Returns(false);
+            fsaMock.Setup(m => m.CheckIfFileExists(paths.DeploySources.PublishProfilePath)).Returns(false);
             var loggerMock = new Mock<ILogger>();
             IWorkUnit<ScriptCreationStateModel> unit = new VerifyPathsUnit(fsaMock.Object, loggerMock.Object);
 

@@ -64,7 +64,7 @@ EXECUTE (@command)";
 
         private async Task<(bool ErrorsWhileLoading, DefaultConstraint[] OldDefaultConstraints, DefaultConstraint[] CurrentDefaultConstraints)> GetDefaultConstraints(PathCollection paths)
         {
-            var oldDefaultConstraints = await _dacAccess.GetDefaultConstraintsAsync(paths.PreviousDacpacPath);
+            var oldDefaultConstraints = await _dacAccess.GetDefaultConstraintsAsync(paths.DeploySources.PreviousDacpacPath);
             if (oldDefaultConstraints.Errors != null)
             {
                 await _logger.LogAsync("ERROR: Failed to load the default constraints of the previous DACPAC:");
@@ -72,7 +72,7 @@ EXECUTE (@command)";
                     await _logger.LogAsync(error);
             }
 
-            var currentDefaultConstraints = await _dacAccess.GetDefaultConstraintsAsync(paths.NewDacpacPath);
+            var currentDefaultConstraints = await _dacAccess.GetDefaultConstraintsAsync(paths.DeploySources.NewDacpacPath);
             if (currentDefaultConstraints.Errors != null)
             {
                 await _logger.LogAsync("ERROR: Failed to load the default constraints of the current DACPAC:");

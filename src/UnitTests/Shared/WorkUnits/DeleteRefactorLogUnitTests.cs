@@ -81,7 +81,10 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             configuration.DeleteRefactorlogAfterVersionedScriptGeneration = true;
             var previousVersion = new Version(1, 0);
             Task HandlerFunc(bool b) => Task.CompletedTask;
-            var paths = new PathCollection("p", "a", "l", "b", "c", "d", "e", "f");
+            var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
+            var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
+            var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
+            var paths = new PathCollection(directories, sourcePaths, targetPaths);
             var model = new ScriptCreationStateModel(project, configuration, previousVersion, true, HandlerFunc)
             {
                 Paths = paths
@@ -93,7 +96,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             // Assert
             Assert.AreEqual(StateModelState.DeletedRefactorLog, model.CurrentState);
             Assert.IsNull(model.Result);
-            fsaMock.Verify(m => m.TryToCleanDirectory("p", "*.refactorlog"), Times.Once);
+            fsaMock.Verify(m => m.TryToCleanDirectory("projectDirectory", "*.refactorlog"), Times.Once);
             vsaMock.Verify(m => m.RemoveItemFromProjectRoot(project, It.IsAny<string>()), Times.Never);
             loggerMock.Verify(m => m.LogAsync("Deleting refactorlog files ..."), Times.Once);
             loggerMock.Verify(m => m.LogAsync("  => No files were deleted."), Times.Once);
@@ -105,7 +108,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
         {
             // Arrange
             var fsaMock = new Mock<IFileSystemAccess>();
-            fsaMock.Setup(m => m.TryToCleanDirectory("p", "*.refactorlog"))
+            fsaMock.Setup(m => m.TryToCleanDirectory("projectDirectory", "*.refactorlog"))
                    .Returns(new []
                     {
                         "file1.refactorlog",
@@ -119,7 +122,10 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             configuration.DeleteRefactorlogAfterVersionedScriptGeneration = true;
             var previousVersion = new Version(1, 0);
             Task HandlerFunc(bool b) => Task.CompletedTask;
-            var paths = new PathCollection("p", "a", "l", "b", "c", "d", "e", "f");
+            var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
+            var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
+            var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
+            var paths = new PathCollection(directories, sourcePaths, targetPaths);
             var model = new ScriptCreationStateModel(project, configuration, previousVersion, true, HandlerFunc)
             {
                 Paths = paths
@@ -131,7 +137,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             // Assert
             Assert.AreEqual(StateModelState.DeletedRefactorLog, model.CurrentState);
             Assert.IsNull(model.Result);
-            fsaMock.Verify(m => m.TryToCleanDirectory("p", "*.refactorlog"), Times.Once);
+            fsaMock.Verify(m => m.TryToCleanDirectory("projectDirectory", "*.refactorlog"), Times.Once);
             vsaMock.Verify(m => m.RemoveItemFromProjectRoot(project, "file1.refactorlog"), Times.Once);
             vsaMock.Verify(m => m.RemoveItemFromProjectRoot(project, "file2.refactorlog"), Times.Once);
             loggerMock.Verify(m => m.LogAsync("Deleting refactorlog files ..."), Times.Once);
@@ -153,7 +159,10 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             configuration.DeleteRefactorlogAfterVersionedScriptGeneration = false;
             var previousVersion = new Version(1, 0);
             Task HandlerFunc(bool b) => Task.CompletedTask;
-            var paths = new PathCollection("p", "a", "l", "b", "c", "d", "e", "f");
+            var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
+            var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
+            var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
+            var paths = new PathCollection(directories, sourcePaths, targetPaths);
             var model = new ScriptCreationStateModel(project, configuration, previousVersion, true, HandlerFunc)
             {
                 Paths = paths

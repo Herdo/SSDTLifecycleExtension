@@ -3,7 +3,6 @@
     using System;
     using System.IO;
     using System.Linq;
-    using System.Runtime.CompilerServices;
     using System.Threading.Tasks;
     using System.Xml;
     using System.Xml.Linq;
@@ -85,30 +84,39 @@
             var previousVersionString = previousVersion == null ? null : _versionService.FormatVersion(previousVersion, configuration);
             var newVersionString = createLatest ? latestKeyword : _versionService.FormatVersion(project.ProjectProperties.DacVersion, configuration);
 
-            // DACPAC paths
-            var profilePath = DeterminePublishProfilePath(configuration, projectDirectory);
+            // Directories
             var artifactsPath = Path.Combine(projectDirectory, configuration.ArtifactsPath);
+            DirectoryPaths directories;
+            {
+                var latestDirectory = Path.Combine(artifactsPath, latestKeyword);
+                var newVersionDirectory = Path.Combine(artifactsPath, newVersionString);
+                directories = new DirectoryPaths(projectDirectory,
+                                                 latestDirectory,
+                                                 newVersionDirectory);
+            }
+
+            // Source paths
+            var newVersionPath = Path.Combine(directories.NewArtifactsDirectory, $"{project.ProjectProperties.SqlTargetName}.dacpac");
+            var profilePath = DeterminePublishProfilePath(configuration, projectDirectory);
             var previousVersionDirectory = previousVersion == null ? null : Path.Combine(artifactsPath, previousVersionString);
             var previousVersionPath = previousVersion == null ? null : Path.Combine(previousVersionDirectory, $"{project.ProjectProperties.SqlTargetName}.dacpac");
-            var latestDirectory = Path.Combine(artifactsPath, latestKeyword);
-            var newVersionDirectory = Path.Combine(artifactsPath, newVersionString);
-            var newVersionPath = Path.Combine(newVersionDirectory, $"{project.ProjectProperties.SqlTargetName}.dacpac");
+            var sources = new DeploySourcePaths(newVersionPath,
+                                                profilePath,
+                                                previousVersionPath);
+
+            // Target paths
             var deployScriptPath = previousVersion == null
                                        ? null
-                                       : Path.Combine(newVersionDirectory, $"{project.ProjectProperties.SqlTargetName}_{previousVersionString}_{newVersionString}.sql");
+                                       : Path.Combine(directories.NewArtifactsDirectory, $"{project.ProjectProperties.SqlTargetName}_{previousVersionString}_{newVersionString}.sql");
             var deployReportPath = previousVersion != null // Can only create report when comparing against a previous version
                                    && configuration.CreateDocumentationWithScriptCreation
-                                       ? Path.Combine(newVersionDirectory, $"{project.ProjectProperties.SqlTargetName}_{previousVersionString}_{newVersionString}.xml")
+                                       ? Path.Combine(directories.NewArtifactsDirectory, $"{project.ProjectProperties.SqlTargetName}_{previousVersionString}_{newVersionString}.xml")
                                        : null;
+            var targets = new DeployTargetPaths(deployScriptPath, deployReportPath);
 
-            return new PathCollection(projectDirectory,
-                                      profilePath,
-                                      latestDirectory,
-                                      newVersionDirectory,
-                                      newVersionPath,
-                                      previousVersionPath,
-                                      deployScriptPath,
-                                      deployReportPath);
+            return new PathCollection(directories,
+                                      sources,
+                                      targets);
         }
 
         private string DeterminePublishProfilePath(ConfigurationModel configuration,

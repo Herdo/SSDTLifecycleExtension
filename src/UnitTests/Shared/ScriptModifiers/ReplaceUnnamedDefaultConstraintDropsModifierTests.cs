@@ -237,13 +237,13 @@ GO";
             // Arrange
             var daMock = new Mock<IDacAccess>();
             var loggerMock = new Mock<ILogger>();
-            daMock.Setup(m => m.GetDefaultConstraintsAsync("old"))
+            daMock.Setup(m => m.GetDefaultConstraintsAsync("previousDacpacPath"))
                   .ReturnsAsync(() => (new DefaultConstraint[0], new []
                                           {
                                               "oldError1",
                                               "oldError2"
                                           }));
-            daMock.Setup(m => m.GetDefaultConstraintsAsync("new"))
+            daMock.Setup(m => m.GetDefaultConstraintsAsync("newDacpacPath"))
                   .ReturnsAsync(() => (new DefaultConstraint[0], new[]
                                           {
                                               "newError1",
@@ -263,7 +263,10 @@ GO";
                 BuildBeforeScriptCreation = true,
                 TrackDacpacVersion = false
             };
-            var paths = new PathCollection("p", "a", "l", "b", "new", "old", "e", "f");
+            var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
+            var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
+            var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
+            var paths = new PathCollection(directories, sourcePaths, targetPaths);
             IScriptModifier modifier = new ReplaceUnnamedDefaultConstraintDropsModifier(daMock.Object, loggerMock.Object);
             var model = new ScriptModificationModel(MultipleDropDefaultConstraintStatements, project, config, paths, new Version(1, 0, 0), false);
 
@@ -286,13 +289,13 @@ GO";
             // Arrange
             var daMock = new Mock<IDacAccess>();
             var loggerMock = new Mock<ILogger>();
-            daMock.Setup(m => m.GetDefaultConstraintsAsync("old"))
+            daMock.Setup(m => m.GetDefaultConstraintsAsync("previousDacpacPath"))
                   .ReturnsAsync(() => (new[]
                                           {
                                               new DefaultConstraint("dbo", "Author", "LastName", null),
                                               new DefaultConstraint("dbo", "Book", "RegisteredDate", "DF_RegisteredDate_Today")
                                           }, null));
-            daMock.Setup(m => m.GetDefaultConstraintsAsync("new"))
+            daMock.Setup(m => m.GetDefaultConstraintsAsync("newDacpacPath"))
                   .ReturnsAsync(() => (new DefaultConstraint[0], null));
             var project = new SqlProject("a", "b", "c");
             var config = new ConfigurationModel
@@ -308,7 +311,10 @@ GO";
                 BuildBeforeScriptCreation = true,
                 TrackDacpacVersion = false
             };
-            var paths = new PathCollection("p", "a", "l", "b", "new", "old", "e", "f");
+            var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
+            var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
+            var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
+            var paths = new PathCollection(directories, sourcePaths, targetPaths);
             IScriptModifier modifier = new ReplaceUnnamedDefaultConstraintDropsModifier(daMock.Object, loggerMock.Object);
             var model = new ScriptModificationModel(MultipleDropDefaultConstraintStatements, project, config, paths, new Version(1, 0, 0), false);
 
@@ -329,14 +335,14 @@ GO";
             var expectedOutput = string.Format(MultipleDropDefaultConstraintStatementsReplacedPartiallyWithPlaceholder, schemaName);
             var daMock = new Mock<IDacAccess>();
             var loggerMock = new Mock<ILogger>();
-            daMock.Setup(m => m.GetDefaultConstraintsAsync("old"))
+            daMock.Setup(m => m.GetDefaultConstraintsAsync("previousDacpacPath"))
                   .ReturnsAsync(() => (new[]
                                           {
                                               new DefaultConstraint("dbo", "Author", "LastName", null),
                                               new DefaultConstraint("dbo", "Book", "Title", null),
                                               new DefaultConstraint("dbo", "Book", "RegisteredDate", "DF_RegisteredDate_Today")
                                           }, null));
-            daMock.Setup(m => m.GetDefaultConstraintsAsync("new"))
+            daMock.Setup(m => m.GetDefaultConstraintsAsync("newDacpacPath"))
                   .ReturnsAsync(() => (new DefaultConstraint[0], null));
             var project = new SqlProject("a", "b", "c");
             var config = new ConfigurationModel
@@ -352,7 +358,10 @@ GO";
                 BuildBeforeScriptCreation = true,
                 TrackDacpacVersion = false
             };
-            var paths = new PathCollection("p", "a", "l", "b", "new", "old", "e", "f");
+            var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
+            var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
+            var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
+            var paths = new PathCollection(directories, sourcePaths, targetPaths);
             IScriptModifier modifier = new ReplaceUnnamedDefaultConstraintDropsModifier(daMock.Object, loggerMock.Object);
             var model = new ScriptModificationModel(input, project, config, paths, new Version(1, 0, 0), false);
 
@@ -370,14 +379,14 @@ GO";
             // Arrange
             var daMock = new Mock<IDacAccess>();
             var loggerMock = new Mock<ILogger>();
-            daMock.Setup(m => m.GetDefaultConstraintsAsync("old"))
+            daMock.Setup(m => m.GetDefaultConstraintsAsync("previousDacpacPath"))
                   .ReturnsAsync(() => (new[]
                                           {
                                               new DefaultConstraint("dbo", "Author", "LastName", null),
                                               new DefaultConstraint("dbo", "Book", "Title", null),
                                               new DefaultConstraint("dbo", "Book", "RegisteredDate", "DF_RegisteredDate_Today")
                                           }, null));
-            daMock.Setup(m => m.GetDefaultConstraintsAsync("new"))
+            daMock.Setup(m => m.GetDefaultConstraintsAsync("newDacpacPath"))
                   .ReturnsAsync(() => (new DefaultConstraint[0], null));
             var project = new SqlProject("a", "b", "c");
             var config = new ConfigurationModel
@@ -393,7 +402,10 @@ GO";
                 BuildBeforeScriptCreation = true,
                 TrackDacpacVersion = false
             };
-            var paths = new PathCollection("p", "a", "l", "b", "new", "old", "e", "f");
+            var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
+            var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
+            var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
+            var paths = new PathCollection(directories, sourcePaths, targetPaths);
             IScriptModifier modifier = new ReplaceUnnamedDefaultConstraintDropsModifier(daMock.Object, loggerMock.Object);
             var model = new ScriptModificationModel(MultipleDropDefaultConstraintStatements, project, config, paths, new Version(1, 0, 0), false);
 
