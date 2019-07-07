@@ -41,14 +41,14 @@
             var deletedFiles = _fileSystemAccess.TryToCleanDirectory(paths.ProjectDirectory, "*.refactorlog");
             if (deletedFiles.Length == 0)
             {
-                await _logger.LogAsync("No files were deleted.");
+                await _logger.LogAsync("  => No files were deleted.");
             }
             else
             {
                 foreach (var deletedFile in deletedFiles)
                 {
                     _visualStudioAccess.RemoveItemFromProjectRoot(project, deletedFile);
-                    await _logger.LogAsync($"Deleted file {deletedFile} ...");
+                    await _logger.LogAsync($"  => Deleted file {deletedFile} ...");
                 }
             }
 
