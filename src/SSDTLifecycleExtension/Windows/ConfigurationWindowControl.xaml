@@ -458,6 +458,21 @@
                                       Grid.Column="1"
                                       Style="{StaticResource ConfigurationCheckBoxStyle}"
                                       IsChecked="{Binding Model.DeleteRefactorlogAfterVersionedScriptGeneration, Mode=TwoWay}"/>
+
+                            <!-- Delete latest after versioned script generation -->
+                            <TextBlock Grid.Row="1"
+                                       Grid.Column="0"
+                                       Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
+                                <Run Text="Delete 'latest' files after versioned script"
+                                     FontWeight="Bold"/>
+                                <LineBreak/>
+                                <Run Text="generation"
+                                     FontWeight="Bold"/>
+                            </TextBlock>
+                            <CheckBox Grid.Row="1"
+                                      Grid.Column="1"
+                                      Style="{StaticResource ConfigurationCheckBoxStyle}"
+                                      IsChecked="{Binding Model.DeleteLatestAfterVersionedScriptGeneration, Mode=TwoWay}"/>
                         </Grid>
                     </GroupBox>
                 </StackPanel>

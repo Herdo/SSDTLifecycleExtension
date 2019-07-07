@@ -24,8 +24,15 @@
         }
 
         private async Task CleanArtifactsDirectoryInternal(IStateModel stateModel,
+                                                           ConfigurationModel configuration,
                                                            PathCollection paths)
         {
+            if (!configuration.DeleteLatestAfterVersionedScriptGeneration)
+            {
+                stateModel.CurrentState = StateModelState.DeletedLatestArtifacts;
+                return;
+            }
+
             await _logger.LogAsync("Cleaning latest artifacts directory ...");
             // Even if this operation fails, there's no reason to make the whole process fail.
             // Therefore this will not set the stateModel.Result property.
@@ -40,7 +47,9 @@
             if (stateModel == null)
                 throw new ArgumentNullException(nameof(stateModel));
 
-            return CleanArtifactsDirectoryInternal(stateModel, stateModel.Paths);
+            return CleanArtifactsDirectoryInternal(stateModel,
+                                                   stateModel.Configuration,
+                                                   stateModel.Paths);
         }
     }
 }
