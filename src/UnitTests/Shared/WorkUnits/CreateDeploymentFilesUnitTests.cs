@@ -72,7 +72,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             // Arrange
             var daMock = new Mock<IDacAccess>();
             daMock.Setup(m => m.CreateDeployFilesAsync("previousDacpacPath", "newDacpacPath", "publishProfilePath", true, true))
-                  .ReturnsAsync((null, null, new[] {"error1", "error2"}));
+                  .ReturnsAsync((null, null, null, null, new[] {"error1", "error2"}));
             var fsaMock = new Mock<IFileSystemAccess>();
             var loggerMock = new Mock<ILogger>();
             IWorkUnit<ScriptCreationStateModel> unit = new CreateDeploymentFilesUnit(daMock.Object, fsaMock.Object, loggerMock.Object);
@@ -108,9 +108,9 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             // Arrange
             var daMock = new Mock<IDacAccess>();
             daMock.Setup(m => m.CreateDeployFilesAsync("previousDacpacPath", "newDacpacPath", "publishProfilePath", true, true))
-                  .ReturnsAsync(("script", "report", null));
+                  .ReturnsAsync(("pre script post", "report", "pre ", " post", null));
             var fsaMock = new Mock<IFileSystemAccess>();
-            fsaMock.Setup(m => m.WriteFileAsync("deployScriptPath", "script"))
+            fsaMock.Setup(m => m.WriteFileAsync("deployScriptPath", "pre script post"))
                    .ThrowsAsync(new Exception("test exception"));
             var loggerMock = new Mock<ILogger>();
             IWorkUnit<ScriptCreationStateModel> unit = new CreateDeploymentFilesUnit(daMock.Object, fsaMock.Object, loggerMock.Object);
@@ -145,7 +145,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             // Arrange
             var daMock = new Mock<IDacAccess>();
             daMock.Setup(m => m.CreateDeployFilesAsync("previousDacpacPath", "newDacpacPath", "publishProfilePath", true, true))
-                  .ReturnsAsync(("script", "report", null));
+                  .ReturnsAsync(("pre script post", "report", "pre ", " post", null));
             var fsaMock = new Mock<IFileSystemAccess>();
             fsaMock.Setup(m => m.WriteFileAsync("deployReportPath", "report"))
                    .ThrowsAsync(new Exception("test exception"));
@@ -177,12 +177,88 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
         }
 
         [Test]
-        public async Task Work_ScriptCreationStateModel_CreateOnlyScript_Async()
+        public async Task Work_ScriptCreationStateModel_ScriptDoesNotContainPreDeploymentScript_Async()
+        {
+            // Arrange
+            var daMock = new Mock<IDacAccess>();
+            daMock.Setup(m => m.CreateDeployFilesAsync("previousDacpacPath", "newDacpacPath", "publishProfilePath", true, true))
+                  .ReturnsAsync(("script post", "report", "pre ", " post", null));
+            var fsaMock = new Mock<IFileSystemAccess>();
+            fsaMock.Setup(m => m.WriteFileAsync("deployReportPath", "report"))
+                   .ThrowsAsync(new Exception("test exception"));
+            var loggerMock = new Mock<ILogger>();
+            IWorkUnit<ScriptCreationStateModel> unit = new CreateDeploymentFilesUnit(daMock.Object, fsaMock.Object, loggerMock.Object);
+            var project = new SqlProject("a", "b", "c");
+            var configuration = ConfigurationModel.GetDefault();
+            configuration.CreateDocumentationWithScriptCreation = true;
+            var previousVersion = new Version(1, 0);
+            Task HandlerFunc(bool b) => Task.CompletedTask;
+            var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
+            var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
+            var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
+            var paths = new PathCollection(directories, sourcePaths, targetPaths);
+            var model = new ScriptCreationStateModel(project, configuration, previousVersion, false, HandlerFunc)
+            {
+                Paths = paths
+            };
+
+            // Act
+            await unit.Work(model, CancellationToken.None);
+
+            // Assert
+            Assert.AreEqual(StateModelState.TriedToCreateDeploymentFiles, model.CurrentState);
+            Assert.IsFalse(model.Result);
+            loggerMock.Verify(m => m.LogAsync("ERROR: Failed to create complete script. Generated script is missing the pre-deployment script."), Times.Once);
+            fsaMock.Verify(m => m.WriteFileAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+        }
+
+        [Test]
+        public async Task Work_ScriptCreationStateModel_ScriptDoesNotContainPostDeploymentScript_Async()
+        {
+            // Arrange
+            var daMock = new Mock<IDacAccess>();
+            daMock.Setup(m => m.CreateDeployFilesAsync("previousDacpacPath", "newDacpacPath", "publishProfilePath", true, true))
+                  .ReturnsAsync(("pre script", "report", "pre ", " post", null));
+            var fsaMock = new Mock<IFileSystemAccess>();
+            fsaMock.Setup(m => m.WriteFileAsync("deployReportPath", "report"))
+                   .ThrowsAsync(new Exception("test exception"));
+            var loggerMock = new Mock<ILogger>();
+            IWorkUnit<ScriptCreationStateModel> unit = new CreateDeploymentFilesUnit(daMock.Object, fsaMock.Object, loggerMock.Object);
+            var project = new SqlProject("a", "b", "c");
+            var configuration = ConfigurationModel.GetDefault();
+            configuration.CreateDocumentationWithScriptCreation = true;
+            var previousVersion = new Version(1, 0);
+            Task HandlerFunc(bool b) => Task.CompletedTask;
+            var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
+            var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
+            var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
+            var paths = new PathCollection(directories, sourcePaths, targetPaths);
+            var model = new ScriptCreationStateModel(project, configuration, previousVersion, false, HandlerFunc)
+            {
+                Paths = paths
+            };
+
+            // Act
+            await unit.Work(model, CancellationToken.None);
+
+            // Assert
+            Assert.AreEqual(StateModelState.TriedToCreateDeploymentFiles, model.CurrentState);
+            Assert.IsFalse(model.Result);
+            loggerMock.Verify(m => m.LogAsync("ERROR: Failed to create complete script. Generated script is missing the post-deployment script."), Times.Once);
+            fsaMock.Verify(m => m.WriteFileAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+        }
+
+        [Test]
+        [TestCase(true, true)]
+        [TestCase(true, false)]
+        [TestCase(false, true)]
+        [TestCase(false, false)]
+        public async Task Work_ScriptCreationStateModel_CreateOnlyScript_Async(bool includePreDeployment, bool includePostDeployment)
         {
             // Arrange
             var daMock = new Mock<IDacAccess>();
             daMock.Setup(m => m.CreateDeployFilesAsync("previousDacpacPath", "newDacpacPath", "publishProfilePath", true, false))
-                  .ReturnsAsync(("script", null, null));
+                  .ReturnsAsync(((includePreDeployment ? "pre " : "") + "script" + (includePostDeployment ? " post" : ""), null, includePreDeployment ? "pre " : null, includePostDeployment ? " post" : null, null));
             var fsaMock = new Mock<IFileSystemAccess>();
             var loggerMock = new Mock<ILogger>();
             IWorkUnit<ScriptCreationStateModel> unit = new CreateDeploymentFilesUnit(daMock.Object, fsaMock.Object, loggerMock.Object);
@@ -207,16 +283,20 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             Assert.AreEqual(StateModelState.TriedToCreateDeploymentFiles, model.CurrentState);
             Assert.IsNull(model.Result);
             fsaMock.Verify(m => m.WriteFileAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
-            fsaMock.Verify(m => m.WriteFileAsync("deployScriptPath", "script"), Times.Once);
+            fsaMock.Verify(m => m.WriteFileAsync("deployScriptPath", (includePreDeployment ? "pre " : "") + "script" + (includePostDeployment ? " post" : "")), Times.Once);
         }
 
         [Test]
-        public async Task Work_ScriptCreationStateModel_CreateScriptAndReport_Async()
+        [TestCase(true, true)]
+        [TestCase(true, false)]
+        [TestCase(false, true)]
+        [TestCase(false, false)]
+        public async Task Work_ScriptCreationStateModel_CreateScriptAndReport_Async(bool includePreDeployment, bool includePostDeployment)
         {
             // Arrange
             var daMock = new Mock<IDacAccess>();
             daMock.Setup(m => m.CreateDeployFilesAsync("previousDacpacPath", "newDacpacPath", "publishProfilePath", true, true))
-                  .ReturnsAsync(("script", "report", null));
+                  .ReturnsAsync(((includePreDeployment ? "pre " : "") + "script" + (includePostDeployment ? " post" : ""), "report", includePreDeployment ? "pre " : null, includePostDeployment ? " post" : null, null));
             var fsaMock = new Mock<IFileSystemAccess>();
             var loggerMock = new Mock<ILogger>();
             IWorkUnit<ScriptCreationStateModel> unit = new CreateDeploymentFilesUnit(daMock.Object, fsaMock.Object, loggerMock.Object);
@@ -241,7 +321,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             Assert.AreEqual(StateModelState.TriedToCreateDeploymentFiles, model.CurrentState);
             Assert.IsNull(model.Result);
             fsaMock.Verify(m => m.WriteFileAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Exactly(2));
-            fsaMock.Verify(m => m.WriteFileAsync("deployScriptPath", "script"), Times.Once);
+            fsaMock.Verify(m => m.WriteFileAsync("deployScriptPath", (includePreDeployment ? "pre " : "") + "script" + (includePostDeployment ? " post" : "")), Times.Once);
             fsaMock.Verify(m => m.WriteFileAsync("deployReportPath", "report"), Times.Once);
         }
     }

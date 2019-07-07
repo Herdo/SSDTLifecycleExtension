@@ -129,7 +129,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
             IDacAccess da = new DacAccess(xfsMock, fsaMock.Object);
 
             // Act
-            var (deployScriptContent, deployReportContent, errors) = await da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, true, true);
+            var (deployScriptContent, deployReportContent, _, _, errors) = await da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, true, true);
 
             // Assert
             Assert.IsNull(deployScriptContent);
@@ -172,7 +172,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
             IDacAccess da = new DacAccess(xfsMock, fsaMock.Object);
 
             // Act
-            var (deployScriptContent, deployReportContent, errors) = await da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, true, true);
+            var (deployScriptContent, deployReportContent, _, _, errors) = await da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, true, true);
 
             // Assert
             Assert.IsNull(deployScriptContent);
@@ -220,7 +220,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
             IDacAccess da = new DacAccess(xfsMock, fsaMock.Object);
 
             // Act
-            var (deployScriptContent, deployReportContent, errors) = await da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, true, true);
+            var (deployScriptContent, deployReportContent, _, _, errors) = await da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, true, true);
 
             // Assert
             Assert.IsNull(deployScriptContent);
@@ -275,7 +275,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
             IDacAccess da = new DacAccess(xfsMock, fsaMock.Object);
 
             // Act
-            var (deployScriptContent, deployReportContent, errors) = await da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, true, true);
+            var (deployScriptContent, deployReportContent, _, _, errors) = await da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, true, true);
 
             // Assert
             Assert.IsNull(deployScriptContent);
@@ -320,7 +320,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
             IDacAccess da = new DacAccess(xfsMock.Object, fsaMock.Object);
 
             // Act
-            var (deployScriptContent, deployReportContent, errors) = await da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, true, true);
+            var (deployScriptContent, deployReportContent, _, _, errors) = await da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, true, true);
 
             // Assert
             Assert.IsNotNull(deployScriptContent);

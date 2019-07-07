@@ -59,14 +59,28 @@
         private async Task<(bool Success, string DeployScriptContent, string DeployReportContent)> CreateDeployContent(PathCollection paths,
                                                                                                                        bool createDocumentation)
         {
-            var (deployScriptContent, deployReportContent, errors) = await _dacAccess.CreateDeployFilesAsync(paths.DeploySources.PreviousDacpacPath,
-                                                                                                             paths.DeploySources.NewDacpacPath,
-                                                                                                             paths.DeploySources.PublishProfilePath,
-                                                                                                             true,
-                                                                                                             createDocumentation);
+            var (deployScriptContent, deployReportContent, preDeploymentScript, postDeploymentScript, errors) = await _dacAccess.CreateDeployFilesAsync(paths.DeploySources.PreviousDacpacPath,
+                                                                                                                                                        paths.DeploySources.NewDacpacPath,
+                                                                                                                                                        paths.DeploySources.PublishProfilePath,
+                                                                                                                                                        true,
+                                                                                                                                                        createDocumentation);
 
             if (errors == null)
+            {
+                if (!string.IsNullOrEmpty(preDeploymentScript) && !deployScriptContent.Contains(preDeploymentScript))
+                {
+                    await _logger.LogAsync("ERROR: Failed to create complete script. Generated script is missing the pre-deployment script.");
+                    return (false, null, null);
+                }
+
+                if (!string.IsNullOrEmpty(postDeploymentScript) && !deployScriptContent.Contains(postDeploymentScript))
+                {
+                    await _logger.LogAsync("ERROR: Failed to create complete script. Generated script is missing the post-deployment script.");
+                    return (false, null, null);
+                }
+
                 return (true, deployScriptContent, deployReportContent);
+            }
 
             await _logger.LogAsync("ERROR: Failed to create script:");
             foreach (var s in errors)
