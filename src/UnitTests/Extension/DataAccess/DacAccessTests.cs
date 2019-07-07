@@ -344,6 +344,72 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
         }
 
         [Test]
+        public async Task CreateDeployFilesAsync_CorrectCreation_WithPreAndPostDeploymentScripts_Async()
+        {
+            // Arrange
+            var previousVersionDacpacPath = "path1";
+            var newVersionDacpacPath = "path2";
+            var publishProfilePath = "path3";
+            var xfsMock = new Mock<IXmlFormatService>();
+            xfsMock.Setup(m => m.FormatDeployReport(It.IsNotNull<string>())).Returns((string s) => s);
+
+            var fsaMock = new Mock<IFileSystemAccess>();
+            fsaMock.Setup(m => m.ReadFromStream(previousVersionDacpacPath, It.IsNotNull<Func<Stream, DacPackage>>()))
+                   .Returns((string path,
+                             Func<Stream, DacPackage> consumer) =>
+                   {
+                       var stream = GetEmbeddedResourceStream("TestDatabase_Empty.dacpac");
+                       return new SecureStreamResult<DacPackage>(stream, consumer(stream), null);
+                   });
+            fsaMock.Setup(m => m.ReadFromStream(newVersionDacpacPath, It.IsNotNull<Func<Stream, DacPackage>>()))
+                   .Returns((string path,
+                             Func<Stream, DacPackage> consumer) =>
+                   {
+                       var stream = GetEmbeddedResourceStream("TestDatabase_WithPreAndPostDeployment.dacpac");
+                       return new SecureStreamResult<DacPackage>(stream, consumer(stream), null);
+                   });
+            fsaMock.Setup(m => m.ReadFromStream(publishProfilePath, It.IsNotNull<Func<Stream, DacDeployOptions>>()))
+                   .Returns((string path,
+                             Func<Stream, DacDeployOptions> consumer) =>
+                   {
+                       var stream = GetEmbeddedResourceStream("TestDatabase.publish.xml");
+                       return new SecureStreamResult<DacDeployOptions>(stream, consumer(stream), null);
+                   });
+            IDacAccess da = new DacAccess(xfsMock.Object, fsaMock.Object);
+
+            // Act
+            var (deployScriptContent, deployReportContent, preDeploymentScript, postDeploymentScript, errors) = await da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, true, true);
+
+            // Assert
+            Assert.IsNotNull(deployScriptContent);
+            Assert.IsNotNull(deployReportContent);
+            Assert.AreEqual("-- Pre-deployment script content goes here\r\nGO\r\n", preDeploymentScript);
+            Assert.AreEqual("-- Post-deployment script content goes here\r\nGO\r\n", postDeploymentScript);
+            Assert.IsNull(errors);
+            xfsMock.Verify(m => m.FormatDeployReport(It.IsNotNull<string>()), Times.Once);
+            // Verify script
+            var productionIndex = deployScriptContent.IndexOf("PRODUCTION", StringComparison.InvariantCulture);
+            Assert.IsTrue(productionIndex > 0);
+            var onErrorIndex = deployScriptContent.IndexOf(":on error exit", StringComparison.InvariantCulture);
+            Assert.IsTrue(onErrorIndex > productionIndex);
+            var changeDatabaseIndex = deployScriptContent.IndexOf("USE [$(DatabaseName)]", StringComparison.InvariantCulture);
+            Assert.IsTrue(changeDatabaseIndex > onErrorIndex);
+            var preDeploymentIndex = deployScriptContent.IndexOf(preDeploymentScript, StringComparison.InvariantCulture);
+            Assert.IsTrue(preDeploymentIndex > changeDatabaseIndex);
+            var createAuthorPrintIndex = deployScriptContent.IndexOf("[dbo].[Author]...';", StringComparison.InvariantCulture);
+            Assert.IsTrue(createAuthorPrintIndex > preDeploymentIndex);
+            var createAuthorTableIndex = deployScriptContent.IndexOf("CREATE TABLE [dbo].[Author]", StringComparison.InvariantCulture);
+            Assert.IsTrue(createAuthorTableIndex > createAuthorPrintIndex);
+            var postDeploymentIndex = deployScriptContent.IndexOf(postDeploymentScript, StringComparison.InvariantCulture);
+            Assert.IsTrue(postDeploymentIndex > createAuthorTableIndex);
+            // Verify report
+            Assert.AreEqual(@"<?xml version=""1.0"" encoding=""utf-8""?><DeploymentReport xmlns=""http://schemas.microsoft.com/sqlserver/dac/DeployReport/2012/02""><Alerts />" +
+                            @"<Operations><Operation Name=""Create""><Item Value=""[dbo].[Author]"" Type=""SqlTable"" /><Item Value=""[dbo].[DF_Birthday_Today]"" Type=""SqlDefaultConstraint"" /></Operation>" +
+                            @"</Operations></DeploymentReport>",
+                            deployReportContent);
+        }
+
+        [Test]
         public void GetDefaultConstraintsAsync_ArgumentNullException_DacpacPath()
         {
             // Arrange
