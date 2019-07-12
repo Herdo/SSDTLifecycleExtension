@@ -8,6 +8,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
     using Moq;
     using SSDTLifecycleExtension.Shared.Contracts;
     using SSDTLifecycleExtension.Shared.Contracts.DataAccess;
+    using SSDTLifecycleExtension.Shared.Contracts.Enums;
     using SSDTLifecycleExtension.Shared.Contracts.Services;
     using SSDTLifecycleExtension.Shared.Models;
     using SSDTLifecycleExtension.ViewModels;
@@ -154,6 +155,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             Assert.IsNotNull(vm.BrowsePublishProfileCommand);
             Assert.IsNotNull(vm.ResetConfigurationToDefaultCommand);
             Assert.IsNotNull(vm.SaveConfigurationCommand);
+            Assert.IsNotNull(vm.OpenDocumentationCommand);
         }
 
         [Test]
@@ -818,6 +820,82 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             // Assert
             csMock.Verify(m => m.SaveConfigurationAsync(project, It.IsNotNull<ConfigurationModel>()), Times.Once());
             loggerMock.Verify(m => m.LogAsync(It.IsNotNull<string>()), Times.Once);
+        }
+
+        [Test]
+        public void OpenDocumentation_CanExecute_Always()
+        {
+            // Arrange
+            var project = new SqlProject("", "", "");
+            var csMock = Mock.Of<IConfigurationService>();
+            var fsaMock = Mock.Of<IFileSystemAccess>();
+            var ssMock = Mock.Of<IScaffoldingService>();
+            var scsMock = Mock.Of<IScriptCreationService>();
+            var loggerMock = Mock.Of<ILogger>();
+            var vm = new ConfigurationViewModel(project,
+                                                csMock,
+                                                fsaMock,
+                                                ssMock,
+                                                scsMock,
+                                                loggerMock);
+
+            // Act
+            var canExecute = vm.OpenDocumentationCommand.CanExecute(null);
+
+            // Assert
+            Assert.IsTrue(canExecute);
+        }
+
+        [Test]
+        [TestCase(1)]
+        [TestCase(null)]
+        [TestCase(5.0)]
+        [TestCase(StateModelState.Undefined)]
+        public void OpenDocumentation_Execute_NoStringAnchor(object anchor)
+        {
+            // Arrange
+            var project = new SqlProject("", "", "");
+            var csMock = Mock.Of<IConfigurationService>();
+            var fsaMock = new Mock<IFileSystemAccess>();
+            var ssMock = Mock.Of<IScaffoldingService>();
+            var scsMock = Mock.Of<IScriptCreationService>();
+            var loggerMock = Mock.Of<ILogger>();
+            var vm = new ConfigurationViewModel(project,
+                                                csMock,
+                                                fsaMock.Object,
+                                                ssMock,
+                                                scsMock,
+                                                loggerMock);
+
+            // Act
+            vm.OpenDocumentationCommand.Execute(anchor);
+
+            // Assert
+            fsaMock.Verify(m => m.OpenUrl(It.IsAny<string>()), Times.Never);
+        }
+
+        [Test]
+        public void OpenDocumentation_Execute_StringAnchor()
+        {
+            // Arrange
+            var project = new SqlProject("", "", "");
+            var csMock = Mock.Of<IConfigurationService>();
+            var fsaMock = new Mock<IFileSystemAccess>();
+            var ssMock = Mock.Of<IScaffoldingService>();
+            var scsMock = Mock.Of<IScriptCreationService>();
+            var loggerMock = Mock.Of<ILogger>();
+            var vm = new ConfigurationViewModel(project,
+                                                csMock,
+                                                fsaMock.Object,
+                                                ssMock,
+                                                scsMock,
+                                                loggerMock);
+
+            // Act
+            vm.OpenDocumentationCommand.Execute("test-help");
+
+            // Assert
+            fsaMock.Verify(m => m.OpenUrl("https://github.com/Herdo/SSDTLifecycleExtension/wiki/Configuration#test-help"), Times.Once);
         }
     }
 }

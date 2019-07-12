@@ -59,5 +59,7 @@
 
         string[] GetFilesIn([NotNull] string directory,
                             [NotNull] string filter);
+
+        void OpenUrl(string url);
     }
 }

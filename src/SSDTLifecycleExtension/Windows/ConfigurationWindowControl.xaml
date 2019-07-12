@@ -5,6 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:vsshell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0"
              xmlns:viewModels="clr-namespace:SSDTLifecycleExtension.ViewModels"
+             xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
+             xmlns:catalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"
              Background="{DynamicResource {x:Static vsshell:VsBrushes.ToolWindowBackgroundKey}}"
              Foreground="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey}}"
              mc:Ignorable="d"
@@ -61,9 +63,17 @@
             <Setter Property="Width" Value="250"/>
             <Setter Property="Margin" Value="5, 5, 10, 15"/>
         </Style>
+        <Style TargetType="Run" x:Key="HeaderRunStyle">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="BaselineAlignment" Value="Top"/>
+        </Style>
         <Style TargetType="Run" x:Key="HighlightRunStyle">
             <Setter Property="FontStyle" Value="Italic"/>
             <Setter Property="Foreground" Value="Navy"/>
+        </Style>
+        <Style TargetType="imaging:CrispImage" x:Key="HelpCrispImageStyle">
+            <Setter Property="Height" Value="16"/>
+            <Setter Property="Width" Value="16"/>
         </Style>
 
         <!-- CheckBox Styles -->
@@ -226,6 +236,18 @@
             <Setter Property="Margin" Value="5"/>
             <Setter Property="Padding" Value="10, 5"/>
         </Style>
+        <Style TargetType="Button" x:Key="HelpButtonStyle">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="ContentTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <imaging:CrispImage Style="{StaticResource HelpCrispImageStyle}"
+                                            Moniker="{x:Static catalog:KnownMonikers.StatusHelp}"/>
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </UserControl.Resources>
 
     <Grid>
@@ -265,7 +287,10 @@
                                        Grid.Column="0"
                                        Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
                                 <Run Text="Artifacts path"
-                                     FontWeight="Bold"/>
+                                     Style="{StaticResource HeaderRunStyle}"/>
+                                <Button Style="{StaticResource HelpButtonStyle}"
+                                        Command="{Binding OpenDocumentationCommand}"
+                                        CommandParameter="artifacts-path"/>
                                 <LineBreak/>
                                 <Run Text="The path where the artifacts (DACPACs,"
                                      FontStyle="Italic"/>
@@ -287,7 +312,10 @@
                                        Grid.Column="0"
                                        Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
                                 <Run Text="Publish profile path"
-                                     FontWeight="Bold"/>
+                                     Style="{StaticResource HeaderRunStyle}"/>
+                                <Button Style="{StaticResource HelpButtonStyle}"
+                                        Command="{Binding OpenDocumentationCommand}"
+                                        CommandParameter="publish-profile-path"/>
                                 <LineBreak/>
                                 <Run Text="The path to the publish profile"
                                      FontStyle="Italic"/>
@@ -347,7 +375,10 @@
                                        Grid.Column="0"
                                        Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
                                 <Run Text="Build before script creation"
-                                     FontWeight="Bold"/>
+                                     Style="{StaticResource HeaderRunStyle}"/>
+                                <Button Style="{StaticResource HelpButtonStyle}"
+                                        Command="{Binding OpenDocumentationCommand}"
+                                        CommandParameter="build-before-script-creation"/>
                             </TextBlock>
                             <CheckBox Grid.Row="0"
                                       Grid.Column="1"
@@ -359,7 +390,10 @@
                                        Grid.Column="0"
                                        Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
                                 <Run Text="Create documentation"
-                                     FontWeight="Bold"/>
+                                     Style="{StaticResource HeaderRunStyle}"/>
+                                <Button Style="{StaticResource HelpButtonStyle}"
+                                        Command="{Binding OpenDocumentationCommand}"
+                                        CommandParameter="create-documentation"/>
                             </TextBlock>
                             <CheckBox Grid.Row="1"
                                       Grid.Column="1"
@@ -371,10 +405,13 @@
                                        Grid.Column="0"
                                        Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
                                 <Run Text="Comment out unnamed default constraint"
-                                     FontWeight="Bold"/>
+                                     Style="{StaticResource HeaderRunStyle}"/>
                                 <LineBreak/>
                                 <Run Text="drops"
-                                     FontWeight="Bold"/>
+                                     Style="{StaticResource HeaderRunStyle}"/>
+                                <Button Style="{StaticResource HelpButtonStyle}"
+                                        Command="{Binding OpenDocumentationCommand}"
+                                        CommandParameter="comment-out-unnamed-default-constraint-drops"/>
                             </TextBlock>
                             <CheckBox Grid.Row="2"
                                       Grid.Column="1"
@@ -385,8 +422,14 @@
                             <TextBlock Grid.Row="3"
                                        Grid.Column="0"
                                        Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
-                                <Run Text="Replace unnamed default constraint drops"
-                                     FontWeight="Bold"/>
+                                <Run Text="Replace unnamed default constraint"
+                                     Style="{StaticResource HeaderRunStyle}"/>
+                                <LineBreak/>
+                                <Run Text="drops"
+                                     Style="{StaticResource HeaderRunStyle}"/>
+                                <Button Style="{StaticResource HelpButtonStyle}"
+                                        Command="{Binding OpenDocumentationCommand}"
+                                        CommandParameter="replace-unnamed-default-constraint-drops"/>
                                 <LineBreak/>
                                 <Run Text="Replaces unnamed default constraint drops"
                                      FontStyle="Italic"/>
@@ -410,7 +453,10 @@
                                        Grid.Column="0"
                                        Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
                                 <Run Text="Remove SQLCMD statements"
-                                     FontWeight="Bold"/>
+                                     Style="{StaticResource HeaderRunStyle}"/>
+                                <Button Style="{StaticResource HelpButtonStyle}"
+                                        Command="{Binding OpenDocumentationCommand}"
+                                        CommandParameter="remove-sqlcmd-statements"/>
                                 <LineBreak/>
                                 <Run Text="Removes all SQLCMD related statements"
                                      FontStyle="Italic"/>
@@ -449,10 +495,13 @@
                                        Grid.Column="0"
                                        Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
                                 <Run Text="Delete refactorlog after versioned script"
-                                     FontWeight="Bold"/>
+                                     Style="{StaticResource HeaderRunStyle}"/>
                                 <LineBreak/>
                                 <Run Text="generation"
-                                     FontWeight="Bold"/>
+                                     Style="{StaticResource HeaderRunStyle}"/>
+                                <Button Style="{StaticResource HelpButtonStyle}"
+                                        Command="{Binding OpenDocumentationCommand}"
+                                        CommandParameter="delete-refactorlog-after-versioned-script-generation"/>
                             </TextBlock>
                             <CheckBox Grid.Row="0"
                                       Grid.Column="1"
@@ -464,10 +513,13 @@
                                        Grid.Column="0"
                                        Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
                                 <Run Text="Delete 'latest' files after versioned script"
-                                     FontWeight="Bold"/>
+                                     Style="{StaticResource HeaderRunStyle}"/>
                                 <LineBreak/>
                                 <Run Text="generation"
-                                     FontWeight="Bold"/>
+                                     Style="{StaticResource HeaderRunStyle}"/>
+                                <Button Style="{StaticResource HelpButtonStyle}"
+                                        Command="{Binding OpenDocumentationCommand}"
+                                        CommandParameter="delete-latest-files-after-versioned-script"/>
                             </TextBlock>
                             <CheckBox Grid.Row="1"
                                       Grid.Column="1"
@@ -495,7 +547,10 @@
                                        Grid.Column="0"
                                        Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
                                 <Run Text="Version pattern"
-                                     FontWeight="Bold"/>
+                                     Style="{StaticResource HeaderRunStyle}"/>
+                                <Button Style="{StaticResource HelpButtonStyle}"
+                                        Command="{Binding OpenDocumentationCommand}"
+                                        CommandParameter="version-pattern"/>
                                 <LineBreak/>
                                 <Run Text="The version pattern used during"
                                      FontStyle="Italic"/>
@@ -529,7 +584,10 @@
                                        Grid.Column="0"
                                        Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
                                 <Run Text="Track DACPAC version"
-                                     FontWeight="Bold"/>
+                                     Style="{StaticResource HeaderRunStyle}"/>
+                                <Button Style="{StaticResource HelpButtonStyle}"
+                                        Command="{Binding OpenDocumentationCommand}"
+                                        CommandParameter="track-dacpac-version"/>
                                 <LineBreak/>
                                 <Run Text="Tracks the version of this DACPAC in a"
                                      FontStyle="Italic"/>
@@ -572,7 +630,10 @@
                                        Grid.Column="0"
                                        Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
                                 <Run Text="Custom header"
-                                     FontWeight="Bold"/>
+                                     Style="{StaticResource HeaderRunStyle}"/>
+                                <Button Style="{StaticResource HelpButtonStyle}"
+                                        Command="{Binding OpenDocumentationCommand}"
+                                        CommandParameter="custom-header"/>
                                 <LineBreak/>
                                 <Run Text="The custom header will be placed above"
                                      FontStyle="Italic"/>
@@ -604,7 +665,10 @@
                                        Grid.Column="0"
                                        Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
                                 <Run Text="Custom footer"
-                                     FontWeight="Bold"/>
+                                     Style="{StaticResource HeaderRunStyle}"/>
+                                <Button Style="{StaticResource HelpButtonStyle}"
+                                        Command="{Binding OpenDocumentationCommand}"
+                                        CommandParameter="custom-footer"/>
                                 <LineBreak/>
                                 <Run Text="The custom footer will be placed beneath"
                                      FontStyle="Italic"/>

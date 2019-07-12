@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Linq;
@@ -243,6 +244,14 @@
             return Directory.Exists(directory)
                        ? Directory.GetFiles(directory, filter, SearchOption.TopDirectoryOnly)
                        : new string[0];
+        }
+
+        void IFileSystemAccess.OpenUrl(string url)
+        {
+            var uri = new Uri(url);
+            if (uri.Scheme != "http" && uri.Scheme != "https")
+                return;
+            Process.Start(url);
         }
     }
 }

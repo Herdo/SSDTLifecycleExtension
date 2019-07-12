@@ -64,6 +64,7 @@
         public ICommand BrowsePublishProfileCommand { get; }
         public ICommand ResetConfigurationToDefaultCommand { get; }
         public IAsyncCommand SaveConfigurationCommand { get; }
+        public ICommand OpenDocumentationCommand { get; }
 
         public ConfigurationViewModel([NotNull] SqlProject project,
                                       [NotNull] IConfigurationService configurationService,
@@ -84,6 +85,7 @@
             BrowsePublishProfileCommand = new DelegateCommand(BrowsePublishProfile_Executed, BrowsePublishProfile_CanExecute);
             ResetConfigurationToDefaultCommand = new DelegateCommand(ResetConfigurationToDefault_Executed);
             SaveConfigurationCommand = new AsyncCommand(SaveConfiguration_ExecutedAsync, SaveConfiguration_CanExecute, this);
+            OpenDocumentationCommand = new DelegateCommand(OpenDocumentation_Executed);
         }
 
         private bool BrowsePublishProfile_CanExecute() => Model != null;
@@ -121,6 +123,15 @@
             await _configurationService.SaveConfigurationAsync(_project, copy);
             _lastSavedModel = copy;
             CheckIfModelIsDirty();
+        }
+
+        private void OpenDocumentation_Executed(object param)
+        {
+            const string baseUrl = "https://github.com/Herdo/SSDTLifecycleExtension/wiki/Configuration#";
+
+            if (!(param is string anchor))
+                return;
+            _fileSystemAccess.OpenUrl(baseUrl + anchor);
         }
 
         private void CheckIfModelIsDirty()
