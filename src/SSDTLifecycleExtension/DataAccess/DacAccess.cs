@@ -26,18 +26,14 @@
             _fileSystemAccess = fileSystemAccess ?? throw new ArgumentNullException(nameof(fileSystemAccess));
         }
 
-        private async Task<(string DeployScriptContent,
-            string DeployReportContent,
-            string PreDepoymentScript,
-            string PostDeploymentScript,
-            string[] Errors)> CreateDeployFilesInternalAsync(string previousVersionDacpacPath,
-                                                             string newVersionDacpacPath,
-                                                             string publishProfilePath,
-                                                             bool createDeployScript,
-                                                             bool createDeployReport)
+        private async Task<CreateDeployFilesResult> CreateDeployFilesInternalAsync(string previousVersionDacpacPath,
+                                                                                   string newVersionDacpacPath,
+                                                                                   string publishProfilePath,
+                                                                                   bool createDeployScript,
+                                                                                   bool createDeployReport)
         {
-            var (publishResult, preDeploymentScript, postDeploymentScript, errors) =
-                await Task.Run<(PublishResult Result, string PreDeploymentScript, string PostDeploymentScript, string[] Errors)>(() =>
+            return
+                await Task.Run(() =>
                 {
                     PublishResult result;
                     string preDeploymentScriptContent;
@@ -66,7 +62,7 @@
                                         || previousDacpac.Result == null
                                         || newDacpac.Result == null
                                         || deployOptions.Result == null)
-                                        return (null, null, null, fileOpenErrors.ToArray());
+                                        return new CreateDeployFilesResult(fileOpenErrors.ToArray());
 
                                     // Read pre-deployment and post-deployment from new DACPAC.
                                     preDeploymentScriptContent = TryToReadDeploymentScriptContent(newDacpac.Result.PreDeploymentScript);
@@ -87,7 +83,7 @@
                     }
                     catch (DacServicesException e)
                     {
-                        return (null, null, null, new[] {e.GetBaseException().Message});
+                        return new CreateDeployFilesResult(new[] {e.GetBaseException().Message});
                     }
                     finally
                     {
@@ -96,10 +92,8 @@
                         deployOptions?.Dispose();
                     }
 
-                    return (result, preDeploymentScriptContent, postDeploymentScriptContent, null);
+                    return new CreateDeployFilesResult(result?.DatabaseScript, _xmlFormatService.FormatDeployReport(result?.DeploymentReport), preDeploymentScriptContent, postDeploymentScriptContent);
                 });
-
-            return (publishResult?.DatabaseScript, _xmlFormatService.FormatDeployReport(publishResult?.DeploymentReport), preDeploymentScript, postDeploymentScript, errors);
         }
 
         private static string TryToReadDeploymentScriptContent(Stream stream)
@@ -170,15 +164,11 @@
             return result.ToArray();
         }
 
-        Task<(string DeployScriptContent,
-            string DeployReportContent,
-            string PreDeploymentScript,
-            string PostDeploymentScript,
-            string[] Errors)> IDacAccess.CreateDeployFilesAsync(string previousVersionDacpacPath,
-                                                                string newVersionDacpacPath,
-                                                                string publishProfilePath,
-                                                                bool createDeployScript,
-                                                                bool createDeployReport)
+        Task<CreateDeployFilesResult> IDacAccess.CreateDeployFilesAsync(string previousVersionDacpacPath,
+                                                                        string newVersionDacpacPath,
+                                                                        string publishProfilePath,
+                                                                        bool createDeployScript,
+                                                                        bool createDeployReport)
         {
             if (previousVersionDacpacPath == null)
                 throw new ArgumentNullException(nameof(previousVersionDacpacPath));

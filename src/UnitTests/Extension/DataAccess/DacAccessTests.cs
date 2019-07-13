@@ -129,16 +129,16 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
             IDacAccess da = new DacAccess(xfsMock, fsaMock.Object);
 
             // Act
-            var (deployScriptContent, deployReportContent, _, _, errors) = await da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, true, true);
+            var result = await da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, true, true);
 
             // Assert
-            Assert.IsNull(deployScriptContent);
-            Assert.IsNull(deployReportContent);
-            Assert.IsNotNull(errors);
-            Assert.AreEqual(3, errors.Length);
-            Assert.AreEqual("Error reading previous DACPAC: Test exception1", errors[0]);
-            Assert.AreEqual("Error reading new DACPAC: Test exception2", errors[1]);
-            Assert.AreEqual("Error reading publish profile: Test exception3", errors[2]);
+            Assert.IsNull(result.DeployScriptContent);
+            Assert.IsNull(result.DeployReportContent);
+            Assert.IsNotNull(result.Errors);
+            Assert.AreEqual(3, result.Errors.Length);
+            Assert.AreEqual("Error reading previous DACPAC: Test exception1", result.Errors[0]);
+            Assert.AreEqual("Error reading new DACPAC: Test exception2", result.Errors[1]);
+            Assert.AreEqual("Error reading publish profile: Test exception3", result.Errors[2]);
         }
 
         [Test]
@@ -172,14 +172,14 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
             IDacAccess da = new DacAccess(xfsMock, fsaMock.Object);
 
             // Act
-            var (deployScriptContent, deployReportContent, _, _, errors) = await da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, true, true);
+            var result = await da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, true, true);
 
             // Assert
-            Assert.IsNull(deployScriptContent);
-            Assert.IsNull(deployReportContent);
-            Assert.IsNotNull(errors);
-            Assert.AreEqual(1, errors.Length);
-            Assert.IsNotEmpty(errors[0]);
+            Assert.IsNull(result.DeployScriptContent);
+            Assert.IsNull(result.DeployReportContent);
+            Assert.IsNotNull(result.Errors);
+            Assert.AreEqual(1, result.Errors.Length);
+            Assert.IsNotEmpty(result.Errors[0]);
         }
 
         [Test]
@@ -220,14 +220,14 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
             IDacAccess da = new DacAccess(xfsMock, fsaMock.Object);
 
             // Act
-            var (deployScriptContent, deployReportContent, _, _, errors) = await da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, true, true);
+            var result = await da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, true, true);
 
             // Assert
-            Assert.IsNull(deployScriptContent);
-            Assert.IsNull(deployReportContent);
-            Assert.IsNotNull(errors);
-            Assert.AreEqual(1, errors.Length);
-            Assert.IsNotEmpty(errors[0]);
+            Assert.IsNull(result.DeployScriptContent);
+            Assert.IsNull(result.DeployReportContent);
+            Assert.IsNotNull(result.Errors);
+            Assert.AreEqual(1, result.Errors.Length);
+            Assert.IsNotEmpty(result.Errors[0]);
         }
 
         [Test]
@@ -275,14 +275,14 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
             IDacAccess da = new DacAccess(xfsMock, fsaMock.Object);
 
             // Act
-            var (deployScriptContent, deployReportContent, _, _, errors) = await da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, true, true);
+            var result = await da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, true, true);
 
             // Assert
-            Assert.IsNull(deployScriptContent);
-            Assert.IsNull(deployReportContent);
-            Assert.IsNotNull(errors);
-            Assert.AreEqual(1, errors.Length);
-            Assert.IsNotEmpty(errors[0]);
+            Assert.IsNull(result.DeployScriptContent);
+            Assert.IsNull(result.DeployReportContent);
+            Assert.IsNotNull(result.Errors);
+            Assert.AreEqual(1, result.Errors.Length);
+            Assert.IsNotEmpty(result.Errors[0]);
         }
 
         [Test]
@@ -320,27 +320,27 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
             IDacAccess da = new DacAccess(xfsMock.Object, fsaMock.Object);
 
             // Act
-            var (deployScriptContent, deployReportContent, _, _, errors) = await da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, true, true);
+            var result = await da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, true, true);
 
             // Assert
-            Assert.IsNotNull(deployScriptContent);
-            Assert.IsNotNull(deployReportContent);
-            Assert.IsNull(errors);
+            Assert.IsNotNull(result.DeployScriptContent);
+            Assert.IsNotNull(result.DeployReportContent);
+            Assert.IsNull(result.Errors);
             xfsMock.Verify(m => m.FormatDeployReport(It.IsNotNull<string>()), Times.Once);
             // Verify script
-            var productionIndex = deployScriptContent.IndexOf("PRODUCTION", StringComparison.InvariantCulture);
+            var productionIndex = result.DeployScriptContent.IndexOf("PRODUCTION", StringComparison.InvariantCulture);
             Assert.IsTrue(productionIndex > 0);
-            var onErrorIndex = deployScriptContent.IndexOf(":on error exit", StringComparison.InvariantCulture);
+            var onErrorIndex = result.DeployScriptContent.IndexOf(":on error exit", StringComparison.InvariantCulture);
             Assert.IsTrue(onErrorIndex > productionIndex);
-            var changeDatabaseIndex = deployScriptContent.IndexOf("USE [$(DatabaseName)]", StringComparison.InvariantCulture);
+            var changeDatabaseIndex = result.DeployScriptContent.IndexOf("USE [$(DatabaseName)]", StringComparison.InvariantCulture);
             Assert.IsTrue(changeDatabaseIndex > onErrorIndex);
-            var createAuthorPrintIndex = deployScriptContent.IndexOf("[dbo].[Author]...';", StringComparison.InvariantCulture);
+            var createAuthorPrintIndex = result.DeployScriptContent.IndexOf("[dbo].[Author]...';", StringComparison.InvariantCulture);
             Assert.IsTrue(createAuthorPrintIndex > changeDatabaseIndex);
-            var createAuthorTableIndex = deployScriptContent.IndexOf("CREATE TABLE [dbo].[Author]", StringComparison.InvariantCulture);
+            var createAuthorTableIndex = result.DeployScriptContent.IndexOf("CREATE TABLE [dbo].[Author]", StringComparison.InvariantCulture);
             Assert.IsTrue(createAuthorTableIndex > createAuthorPrintIndex);
             // Verify report
             Assert.AreEqual(@"<?xml version=""1.0"" encoding=""utf-8""?><DeploymentReport xmlns=""http://schemas.microsoft.com/sqlserver/dac/DeployReport/2012/02""><Alerts /><Operations><Operation Name=""Create""><Item Value=""[dbo].[Author]"" Type=""SqlTable"" /></Operation></Operations></DeploymentReport>",
-                            deployReportContent);
+                            result.DeployReportContent);
         }
 
         [Test]
@@ -378,35 +378,35 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
             IDacAccess da = new DacAccess(xfsMock.Object, fsaMock.Object);
 
             // Act
-            var (deployScriptContent, deployReportContent, preDeploymentScript, postDeploymentScript, errors) = await da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, true, true);
+            var result = await da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, true, true);
 
             // Assert
-            Assert.IsNotNull(deployScriptContent);
-            Assert.IsNotNull(deployReportContent);
-            Assert.AreEqual("-- Pre-deployment script content goes here\r\nGO\r\n", preDeploymentScript);
-            Assert.AreEqual("-- Post-deployment script content goes here\r\nGO\r\n", postDeploymentScript);
-            Assert.IsNull(errors);
+            Assert.IsNotNull(result.DeployScriptContent);
+            Assert.IsNotNull(result.DeployReportContent);
+            Assert.AreEqual("-- Pre-deployment script content goes here\r\nGO\r\n", result.PreDeploymentScript);
+            Assert.AreEqual("-- Post-deployment script content goes here\r\nGO\r\n", result.PostDeploymentScript);
+            Assert.IsNull(result.Errors);
             xfsMock.Verify(m => m.FormatDeployReport(It.IsNotNull<string>()), Times.Once);
             // Verify script
-            var productionIndex = deployScriptContent.IndexOf("PRODUCTION", StringComparison.InvariantCulture);
+            var productionIndex = result.DeployScriptContent.IndexOf("PRODUCTION", StringComparison.InvariantCulture);
             Assert.IsTrue(productionIndex > 0);
-            var onErrorIndex = deployScriptContent.IndexOf(":on error exit", StringComparison.InvariantCulture);
+            var onErrorIndex = result.DeployScriptContent.IndexOf(":on error exit", StringComparison.InvariantCulture);
             Assert.IsTrue(onErrorIndex > productionIndex);
-            var changeDatabaseIndex = deployScriptContent.IndexOf("USE [$(DatabaseName)]", StringComparison.InvariantCulture);
+            var changeDatabaseIndex = result.DeployScriptContent.IndexOf("USE [$(DatabaseName)]", StringComparison.InvariantCulture);
             Assert.IsTrue(changeDatabaseIndex > onErrorIndex);
-            var preDeploymentIndex = deployScriptContent.IndexOf(preDeploymentScript, StringComparison.InvariantCulture);
+            var preDeploymentIndex = result.DeployScriptContent.IndexOf(result.PreDeploymentScript, StringComparison.InvariantCulture);
             Assert.IsTrue(preDeploymentIndex > changeDatabaseIndex);
-            var createAuthorPrintIndex = deployScriptContent.IndexOf("[dbo].[Author]...';", StringComparison.InvariantCulture);
+            var createAuthorPrintIndex = result.DeployScriptContent.IndexOf("[dbo].[Author]...';", StringComparison.InvariantCulture);
             Assert.IsTrue(createAuthorPrintIndex > preDeploymentIndex);
-            var createAuthorTableIndex = deployScriptContent.IndexOf("CREATE TABLE [dbo].[Author]", StringComparison.InvariantCulture);
+            var createAuthorTableIndex = result.DeployScriptContent.IndexOf("CREATE TABLE [dbo].[Author]", StringComparison.InvariantCulture);
             Assert.IsTrue(createAuthorTableIndex > createAuthorPrintIndex);
-            var postDeploymentIndex = deployScriptContent.IndexOf(postDeploymentScript, StringComparison.InvariantCulture);
+            var postDeploymentIndex = result.DeployScriptContent.IndexOf(result.PostDeploymentScript, StringComparison.InvariantCulture);
             Assert.IsTrue(postDeploymentIndex > createAuthorTableIndex);
             // Verify report
             Assert.AreEqual(@"<?xml version=""1.0"" encoding=""utf-8""?><DeploymentReport xmlns=""http://schemas.microsoft.com/sqlserver/dac/DeployReport/2012/02""><Alerts />" +
                             @"<Operations><Operation Name=""Create""><Item Value=""[dbo].[Author]"" Type=""SqlTable"" /><Item Value=""[dbo].[DF_Birthday_Today]"" Type=""SqlDefaultConstraint"" /></Operation>" +
                             @"</Operations></DeploymentReport>",
-                            deployReportContent);
+                            result.DeployReportContent);
         }
 
         [Test]
