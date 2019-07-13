@@ -131,6 +131,43 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
         }
 
         [Test]
+        public async Task GetConfigurationOrDefaultAsync_ConfigurationFound_PopulateMissingMemberFromDefaultInstance_Async()
+        {
+            // Arrange
+            var fsaMock = new Mock<IFileSystemAccess>();
+            fsaMock.Setup(m => m.ReadFileAsync("C:\\Temp\\Test\\Properties\\ssdtlifecycle.json"))
+                   .ReturnsAsync(() =>
+                                     "{  \"ArtifactsPath\": \"__Deployment\",  " +
+                                     "\"BuildBeforeScriptCreation\": false,  \"CreateDocumentationWithScriptCreation\": true,  " +
+                                     "\"CommentOutUnnamedDefaultConstraintDrops\": true, \"RemoveSqlCmdStatements\": true, " +
+                                     "\"ReplaceUnnamedDefaultConstraintDrops\": true,  " +
+                                     "\"TrackDacpacVersion\": true,  \"CustomHeader\": \"header\",  \"CustomFooter\": \"footer\"}");
+            var vsaMock = Mock.Of<IVisualStudioAccess>();
+            IConfigurationService service = new ConfigurationService(fsaMock.Object, vsaMock);
+            var project = new SqlProject("", "C:\\Temp\\Test\\Test.sqlproj", "");
+            var defaultConfiguration = ConfigurationModel.GetDefault();
+
+            // Act
+            var configuration = await service.GetConfigurationOrDefaultAsync(project);
+
+            // Assert
+            Assert.IsNotNull(configuration);
+            Assert.IsFalse(defaultConfiguration.Equals(configuration));
+            Assert.AreEqual("__Deployment", configuration.ArtifactsPath);
+            Assert.AreEqual(defaultConfiguration.PublishProfilePath, configuration.PublishProfilePath);
+            Assert.IsFalse(configuration.BuildBeforeScriptCreation);
+            Assert.IsTrue(configuration.CreateDocumentationWithScriptCreation);
+            Assert.IsTrue(configuration.CommentOutUnnamedDefaultConstraintDrops);   // This must be true to cause an validation error for the last assert.
+            Assert.IsTrue(configuration.ReplaceUnnamedDefaultConstraintDrops);      // This must be true to cause an validation error for the last assert.
+            Assert.AreEqual(defaultConfiguration.VersionPattern, configuration.VersionPattern);
+            Assert.IsTrue(configuration.TrackDacpacVersion);
+            Assert.AreEqual("header", configuration.CustomHeader);
+            Assert.AreEqual("footer", configuration.CustomFooter);
+            Assert.IsTrue(configuration.RemoveSqlCmdStatements);
+            Assert.IsTrue(configuration.HasErrors); // This will check if ValidateAll is called correctly.
+        }
+
+        [Test]
         public void SaveConfigurationAsync_ArgumentNullException_Project()
         {
             // Arrange

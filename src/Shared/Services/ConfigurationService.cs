@@ -2,6 +2,7 @@
 {
     using System;
     using System.IO;
+    using System.Reflection;
     using System.Threading.Tasks;
     using Contracts;
     using Contracts.DataAccess;
@@ -10,10 +11,11 @@
     using JetBrains.Annotations;
     using Models;
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Serialization;
     using Task = System.Threading.Tasks.Task;
 
     [UsedImplicitly]
-    public class ConfigurationService : IConfigurationService
+    public class ConfigurationService : DefaultContractResolver, IConfigurationService
     {
         private readonly IFileSystemAccess _fileSystemAccess;
         private readonly IVisualStudioAccess _visualStudioAccess;
@@ -35,9 +37,18 @@
         {
             var sourcePath = GetConfigurationPath(project);
             var serialized = await _fileSystemAccess.ReadFileAsync(sourcePath);
-            var deserialized = serialized == null
-                                   ? ConfigurationModel.GetDefault()
-                                   : JsonConvert.DeserializeObject<ConfigurationModel>(serialized);
+            if (serialized == null)
+            {
+                var defaultInstance = ConfigurationModel.GetDefault();
+                defaultInstance.ValidateAll();
+                return defaultInstance;
+            }
+
+            var settings = new JsonSerializerSettings
+            {
+                ContractResolver = this
+            };
+            var deserialized = JsonConvert.DeserializeObject<ConfigurationModel>(serialized, settings);
             deserialized.ValidateAll();
             return deserialized;
         }
@@ -56,6 +67,20 @@
 
             // Add configuration to the project, if it hasn't been added before.
             _visualStudioAccess.AddItemToProjectProperties(project, targetPath);
+        }
+
+        protected override JsonProperty CreateProperty(MemberInfo member,
+                                                       MemberSerialization memberSerialization)
+        {
+            var defaultInstance = ConfigurationModel.GetDefault();
+            var property = base.CreateProperty(member, memberSerialization);
+            var defaultValue = typeof(ConfigurationModel).GetProperty(member.Name)?.GetValue(defaultInstance);
+            if (defaultValue != null)
+            {
+                property.DefaultValueHandling = DefaultValueHandling.Populate;
+                property.DefaultValue = defaultValue;
+            }
+            return property;
         }
 
         public event EventHandler<ProjectConfigurationChangedEventArgs> ConfigurationChanged;
