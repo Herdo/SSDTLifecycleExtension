@@ -7,6 +7,7 @@
     using JetBrains.Annotations;
     using Microsoft.VisualStudio.PlatformUI;
     using MVVM;
+    using Properties;
     using Shared.Contracts;
     using Shared.Contracts.DataAccess;
     using Shared.Contracts.Services;
@@ -127,11 +128,9 @@
 
         private void OpenDocumentation_Executed(object param)
         {
-            const string baseUrl = "https://github.com/Herdo/SSDTLifecycleExtension/wiki/Configuration#";
-
             if (!(param is string anchor))
                 return;
-            _fileSystemAccess.OpenUrl(baseUrl + anchor);
+            _fileSystemAccess.OpenUrl(Settings.Default.DocumentationBaseUrl + anchor);
         }
 
         private void CheckIfModelIsDirty()
