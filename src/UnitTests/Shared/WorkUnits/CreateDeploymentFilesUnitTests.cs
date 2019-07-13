@@ -71,7 +71,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
         {
             // Arrange
             var daMock = new Mock<IDacAccess>();
-            daMock.Setup(m => m.CreateDeployFilesAsync("previousDacpacPath", "newDacpacPath", "publishProfilePath", true, true))
+            daMock.Setup(m => m.CreateDeployFilesAsync("previousDacpacPath", "newDacpacPath", "publishProfilePath", true, true, It.IsNotNull<Func<PublishProfile, Task<bool>>>()))
                   .ReturnsAsync(new CreateDeployFilesResult(new[] {"error1", "error2"}));
             var fsaMock = new Mock<IFileSystemAccess>();
             var loggerMock = new Mock<ILogger>();
@@ -107,7 +107,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
         {
             // Arrange
             var daMock = new Mock<IDacAccess>();
-            daMock.Setup(m => m.CreateDeployFilesAsync("previousDacpacPath", "newDacpacPath", "publishProfilePath", true, true))
+            daMock.Setup(m => m.CreateDeployFilesAsync("previousDacpacPath", "newDacpacPath", "publishProfilePath", true, true, It.IsNotNull<Func<PublishProfile, Task<bool>>>()))
                   .ReturnsAsync(new CreateDeployFilesResult("pre script post", "report", "pre ", " post"));
             var fsaMock = new Mock<IFileSystemAccess>();
             fsaMock.Setup(m => m.WriteFileAsync("deployScriptPath", "pre script post"))
@@ -144,7 +144,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
         {
             // Arrange
             var daMock = new Mock<IDacAccess>();
-            daMock.Setup(m => m.CreateDeployFilesAsync("previousDacpacPath", "newDacpacPath", "publishProfilePath", true, true))
+            daMock.Setup(m => m.CreateDeployFilesAsync("previousDacpacPath", "newDacpacPath", "publishProfilePath", true, true, It.IsNotNull<Func<PublishProfile, Task<bool>>>()))
                   .ReturnsAsync(new CreateDeployFilesResult("pre script post", "report", "pre ", " post"));
             var fsaMock = new Mock<IFileSystemAccess>();
             fsaMock.Setup(m => m.WriteFileAsync("deployReportPath", "report"))
@@ -181,7 +181,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
         {
             // Arrange
             var daMock = new Mock<IDacAccess>();
-            daMock.Setup(m => m.CreateDeployFilesAsync("previousDacpacPath", "newDacpacPath", "publishProfilePath", true, true))
+            daMock.Setup(m => m.CreateDeployFilesAsync("previousDacpacPath", "newDacpacPath", "publishProfilePath", true, true, It.IsNotNull<Func<PublishProfile, Task<bool>>>()))
                   .ReturnsAsync(new CreateDeployFilesResult("script post", "report", "pre ", " post"));
             var fsaMock = new Mock<IFileSystemAccess>();
             fsaMock.Setup(m => m.WriteFileAsync("deployReportPath", "report"))
@@ -217,7 +217,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
         {
             // Arrange
             var daMock = new Mock<IDacAccess>();
-            daMock.Setup(m => m.CreateDeployFilesAsync("previousDacpacPath", "newDacpacPath", "publishProfilePath", true, true))
+            daMock.Setup(m => m.CreateDeployFilesAsync("previousDacpacPath", "newDacpacPath", "publishProfilePath", true, true, It.IsNotNull<Func<PublishProfile, Task<bool>>>()))
                   .ReturnsAsync(new CreateDeployFilesResult("pre script", "report", "pre ", " post"));
             var fsaMock = new Mock<IFileSystemAccess>();
             fsaMock.Setup(m => m.WriteFileAsync("deployReportPath", "report"))
@@ -257,7 +257,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
         {
             // Arrange
             var daMock = new Mock<IDacAccess>();
-            daMock.Setup(m => m.CreateDeployFilesAsync("previousDacpacPath", "newDacpacPath", "publishProfilePath", true, false))
+            daMock.Setup(m => m.CreateDeployFilesAsync("previousDacpacPath", "newDacpacPath", "publishProfilePath", true, false, It.IsNotNull<Func<PublishProfile, Task<bool>>>()))
                   .ReturnsAsync(new CreateDeployFilesResult((includePreDeployment ? "pre " : "") + "script" + (includePostDeployment ? " post" : ""),
                                                             null,
                                                             includePreDeployment ? "pre " : null,
@@ -298,7 +298,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
         {
             // Arrange
             var daMock = new Mock<IDacAccess>();
-            daMock.Setup(m => m.CreateDeployFilesAsync("previousDacpacPath", "newDacpacPath", "publishProfilePath", true, true))
+            daMock.Setup(m => m.CreateDeployFilesAsync("previousDacpacPath", "newDacpacPath", "publishProfilePath", true, true, It.IsNotNull<Func<PublishProfile, Task<bool>>>()))
                   .ReturnsAsync(new CreateDeployFilesResult((includePreDeployment ? "pre " : "") + "script" + (includePostDeployment ? " post" : ""),
                                                             "report",
                                                             includePreDeployment ? "pre " : null,

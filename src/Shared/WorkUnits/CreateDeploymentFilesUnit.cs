@@ -28,9 +28,10 @@
 
         private async Task CreateDeploymentFilesInternal(IStateModel stateModel,
                                                          PathCollection paths,
+                                                         ConfigurationModel configuration,
                                                          bool createDocumentationWithScriptCreation)
         {
-            var success = await CreateAndPersistDeployFiles(paths, createDocumentationWithScriptCreation);
+            var success = await CreateAndPersistDeployFiles(paths, configuration, createDocumentationWithScriptCreation);
             if (!success)
             {
                 await _logger.LogAsync("ERROR: Script creation aborted.");
@@ -41,10 +42,11 @@
         }
 
         private async Task<bool> CreateAndPersistDeployFiles(PathCollection paths,
+                                                             ConfigurationModel configuration,
                                                              bool createDocumentation)
         {
             await _logger.LogAsync("Creating diff files ...");
-            var result = await CreateDeployContent(paths, createDocumentation);
+            var result = await CreateDeployContent(paths, configuration, createDocumentation);
             if (!result.Success)
                 return false;
 
@@ -57,13 +59,15 @@
         }
 
         private async Task<(bool Success, string DeployScriptContent, string DeployReportContent)> CreateDeployContent(PathCollection paths,
+                                                                                                                       ConfigurationModel configuration,
                                                                                                                        bool createDocumentation)
         {
             var result = await _dacAccess.CreateDeployFilesAsync(paths.DeploySources.PreviousDacpacPath,
                                                                  paths.DeploySources.NewDacpacPath,
                                                                  paths.DeploySources.PublishProfilePath,
                                                                  true,
-                                                                 createDocumentation);
+                                                                 createDocumentation,
+                                                                 profile => ValidatePublishProfileAgainstConfiguration(profile, configuration));
 
             if (result.Errors == null)
             {
@@ -87,6 +91,39 @@
                 await _logger.LogAsync(s);
 
             return (false, null, null);
+        }
+
+        private async Task<bool> ValidatePublishProfileAgainstConfiguration(PublishProfile publishProfile,
+                                                                            ConfigurationModel configuration)
+        {
+            if (!configuration.RemoveSqlCmdStatements)
+                return true;
+
+            if (publishProfile.CreateNewDatabase)
+            {
+                await _logger.LogAsync($"{nameof(PublishProfile.CreateNewDatabase)} cannot bet set to true, when {nameof(ConfigurationModel.RemoveSqlCmdStatements)} is also true.");
+                return false;
+            }
+
+            if (publishProfile.BackupDatabaseBeforeChanges)
+            {
+                await _logger.LogAsync($"{nameof(PublishProfile.BackupDatabaseBeforeChanges)} cannot bet set to true, when {nameof(ConfigurationModel.RemoveSqlCmdStatements)} is also true.");
+                return false;
+            }
+
+            if (publishProfile.ScriptDatabaseOptions)
+            {
+                await _logger.LogAsync($"{nameof(PublishProfile.ScriptDatabaseOptions)} cannot bet set to true, when {nameof(ConfigurationModel.RemoveSqlCmdStatements)} is also true.");
+                return false;
+            }
+
+            if (publishProfile.ScriptDeployStateChecks)
+            {
+                await _logger.LogAsync($"{nameof(PublishProfile.ScriptDeployStateChecks)} cannot bet set to true, when {nameof(ConfigurationModel.RemoveSqlCmdStatements)} is also true.");
+                return false;
+            }
+
+            return true;
         }
 
         private async Task<bool> PersistDeployScript(string deployScriptPath,
@@ -127,7 +164,10 @@
             if (stateModel == null)
                 throw new ArgumentNullException(nameof(stateModel));
 
-            return CreateDeploymentFilesInternal(stateModel, stateModel.Paths, stateModel.Configuration.CreateDocumentationWithScriptCreation);
+            return CreateDeploymentFilesInternal(stateModel,
+                                                 stateModel.Paths,
+                                                 stateModel.Configuration,
+                                                 stateModel.Configuration.CreateDocumentationWithScriptCreation);
         }
     }
 }

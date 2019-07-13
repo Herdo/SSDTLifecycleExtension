@@ -1,5 +1,6 @@
 ﻿namespace SSDTLifecycleExtension.Shared.Contracts.DataAccess
 {
+    using System;
     using System.Threading.Tasks;
     using JetBrains.Annotations;
 
@@ -9,7 +10,8 @@
                                                              [NotNull] string newVersionDacpacPath,
                                                              [NotNull] string publishProfilePath,
                                                              bool createDeployScript,
-                                                             bool createDeployReport);
+                                                             bool createDeployReport,
+                                                             [NotNull] Func<PublishProfile, Task<bool>> validatePublishProfile);
 
         Task<(DefaultConstraint[] DefaultConstraints, string[] Errors)> GetDefaultConstraintsAsync([NotNull] string dacpacPath);
     }
