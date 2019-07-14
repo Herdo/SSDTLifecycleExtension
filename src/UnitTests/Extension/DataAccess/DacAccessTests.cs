@@ -58,7 +58,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
 
             // Act & Assert
             // ReSharper disable AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => da.CreateDeployFilesAsync(null, null, null, false, false, null));
+            Assert.Throws<ArgumentNullException>(() => da.CreateDeployFilesAsync(null, null, null, false, false));
             // ReSharper restore AssignNullToNotNullAttribute
         }
 
@@ -73,7 +73,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
 
             // Act & Assert
             // ReSharper disable AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => da.CreateDeployFilesAsync(previousVersionDacpacPath, null, null, false, false, null));
+            Assert.Throws<ArgumentNullException>(() => da.CreateDeployFilesAsync(previousVersionDacpacPath, null, null, false, false));
             // ReSharper restore AssignNullToNotNullAttribute
         }
 
@@ -89,24 +89,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
 
             // Act & Assert
             // ReSharper disable AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, null, false, false, null));
-            // ReSharper restore AssignNullToNotNullAttribute
-        }
-
-        [Test]
-        public void CreateDeployFilesAsync_ArgumentNullException_ValidatePublishProfile()
-        {
-            // Arrange
-            var xfsMock = Mock.Of<IXmlFormatService>();
-            var fsaMock = Mock.Of<IFileSystemAccess>();
-            IDacAccess da = new DacAccess(xfsMock, fsaMock);
-            var previousVersionDacpacPath = "path1";
-            var newVersionDacpacPath = "path2";
-            var publishProfilePath = "path3";
-
-            // Act & Assert
-            // ReSharper disable AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, false, false, null));
+            Assert.Throws<ArgumentNullException>(() => da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, null, false, false));
             // ReSharper restore AssignNullToNotNullAttribute
         }
 
@@ -122,7 +105,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
             var publishProfilePath = "path3";
 
             // Act & Assert
-            Assert.Throws<InvalidOperationException>(() => da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, false, false, profile => Task.FromResult(true)));
+            Assert.Throws<InvalidOperationException>(() => da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, false, false));
         }
 
         [Test]
@@ -146,7 +129,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
             IDacAccess da = new DacAccess(xfsMock, fsaMock.Object);
 
             // Act
-            var result = await da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, true, true, profile => Task.FromResult(true));
+            var result = await da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, true, true);
 
             // Assert
             Assert.IsNull(result.DeployScriptContent);
@@ -189,7 +172,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
             IDacAccess da = new DacAccess(xfsMock, fsaMock.Object);
 
             // Act
-            var result = await da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, true, true, profile => Task.FromResult(true));
+            var result = await da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, true, true);
 
             // Assert
             Assert.IsNull(result.DeployScriptContent);
@@ -237,7 +220,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
             IDacAccess da = new DacAccess(xfsMock, fsaMock.Object);
 
             // Act
-            var result = await da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, true, true, profile => Task.FromResult(true));
+            var result = await da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, true, true);
 
             // Assert
             Assert.IsNull(result.DeployScriptContent);
@@ -292,7 +275,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
             IDacAccess da = new DacAccess(xfsMock, fsaMock.Object);
 
             // Act
-            var result = await da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, true, true, profile => Task.FromResult(true));
+            var result = await da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, true, true);
 
             // Assert
             Assert.IsNull(result.DeployScriptContent);
@@ -337,7 +320,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
             IDacAccess da = new DacAccess(xfsMock.Object, fsaMock.Object);
 
             // Act
-            var result = await da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, true, true, profile => Task.FromResult(true));
+            var result = await da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, true, true);
 
             // Assert
             Assert.IsNotNull(result.DeployScriptContent);
@@ -395,7 +378,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
             IDacAccess da = new DacAccess(xfsMock.Object, fsaMock.Object);
 
             // Act
-            var result = await da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, true, true, profile => Task.FromResult(true));
+            var result = await da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, true, true);
 
             // Assert
             Assert.IsNotNull(result.DeployScriptContent);

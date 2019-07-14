@@ -30,13 +30,13 @@
                                                                                    string newVersionDacpacPath,
                                                                                    string publishProfilePath,
                                                                                    bool createDeployScript,
-                                                                                   bool createDeployReport,
-                                                                                   Func<PublishProfile, Task<bool>> validatePublishProfile)
+                                                                                   bool createDeployReport)
         {
             return
-                await Task.Run(async () =>
+                await Task.Run(() =>
                 {
                     PublishResult result;
+                    PublishProfile publishProfile;
                     string preDeploymentScriptContent;
                     string postDeploymentScriptContent;
                     SecureStreamResult<DacPackage> previousDacpac = null;
@@ -56,10 +56,8 @@
                                     if (deployInputErrors != null)
                                         return deployInputErrors;
 
-                                    // Validate configuration
-                                    var publishProfileErrors = await ValidatePublishProfileAsync(validatePublishProfile, deployOptions.Result);
-                                    if (publishProfileErrors != null)
-                                        return publishProfileErrors;
+                                    // Convert publish profile
+                                    publishProfile =  ConvertPublishProfile(deployOptions.Result);
 
                                     // Read pre-deployment and post-deployment from new DACPAC.
                                     preDeploymentScriptContent = TryToReadDeploymentScriptContent(newDacpac.Result.PreDeploymentScript);
@@ -89,7 +87,11 @@
                         deployOptions?.Dispose();
                     }
 
-                    return new CreateDeployFilesResult(result?.DatabaseScript, _xmlFormatService.FormatDeployReport(result?.DeploymentReport), preDeploymentScriptContent, postDeploymentScriptContent);
+                    return new CreateDeployFilesResult(result?.DatabaseScript,
+                                                       _xmlFormatService.FormatDeployReport(result?.DeploymentReport),
+                                                       preDeploymentScriptContent,
+                                                       postDeploymentScriptContent,
+                                                       publishProfile);
                 });
         }
 
@@ -112,20 +114,15 @@
             return null;
         }
 
-        private static async Task<CreateDeployFilesResult> ValidatePublishProfileAsync(Func<PublishProfile, Task<bool>> validatePublishProfile,
-                                                                                       DacDeployOptions deployOptions)
+        private static PublishProfile ConvertPublishProfile(DacDeployOptions deployOptions)
         {
-            var profile = new PublishProfile
+            return new PublishProfile
             {
                 CreateNewDatabase = deployOptions.CreateNewDatabase,
                 BackupDatabaseBeforeChanges = deployOptions.BackupDatabaseBeforeChanges,
                 ScriptDatabaseOptions = deployOptions.ScriptDatabaseOptions,
                 ScriptDeployStateChecks = deployOptions.ScriptDeployStateChecks
             };
-            var isValid = await validatePublishProfile(profile);
-            return isValid
-                       ? null
-                       : new CreateDeployFilesResult(new[] {"The combination of the current configuration and the chosen publish profile is not valid."});
         }
 
         private static string TryToReadDeploymentScriptContent(Stream stream)
@@ -200,8 +197,7 @@
                                                                         string newVersionDacpacPath,
                                                                         string publishProfilePath,
                                                                         bool createDeployScript,
-                                                                        bool createDeployReport,
-                                                                        Func<PublishProfile, Task<bool>> validatePublishProfile)
+                                                                        bool createDeployReport)
         {
             if (previousVersionDacpacPath == null)
                 throw new ArgumentNullException(nameof(previousVersionDacpacPath));
@@ -209,12 +205,10 @@
                 throw new ArgumentNullException(nameof(newVersionDacpacPath));
             if (publishProfilePath == null)
                 throw new ArgumentNullException(nameof(publishProfilePath));
-            if (validatePublishProfile == null)
-                throw new ArgumentNullException(nameof(validatePublishProfile));
             if (!createDeployScript && !createDeployReport)
                 throw new InvalidOperationException($"Either {nameof(createDeployScript)} or {nameof(createDeployReport)} must be true.");
 
-            return CreateDeployFilesInternalAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, createDeployScript, createDeployReport, validatePublishProfile);
+            return CreateDeployFilesInternalAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, createDeployScript, createDeployReport);
         }
 
         Task<(DefaultConstraint[] DefaultConstraints, string[] Errors)> IDacAccess.GetDefaultConstraintsAsync(string dacpacPath)

@@ -71,7 +71,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
         {
             // Arrange
             var daMock = new Mock<IDacAccess>();
-            daMock.Setup(m => m.CreateDeployFilesAsync("previousDacpacPath", "newDacpacPath", "publishProfilePath", true, true, It.IsNotNull<Func<PublishProfile, Task<bool>>>()))
+            daMock.Setup(m => m.CreateDeployFilesAsync("previousDacpacPath", "newDacpacPath", "publishProfilePath", true, true))
                   .ReturnsAsync(new CreateDeployFilesResult(new[] {"error1", "error2"}));
             var fsaMock = new Mock<IFileSystemAccess>();
             var loggerMock = new Mock<ILogger>();
@@ -107,8 +107,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
         {
             // Arrange
             var daMock = new Mock<IDacAccess>();
-            daMock.Setup(m => m.CreateDeployFilesAsync("previousDacpacPath", "newDacpacPath", "publishProfilePath", true, true, It.IsNotNull<Func<PublishProfile, Task<bool>>>()))
-                  .ReturnsAsync(new CreateDeployFilesResult("pre script post", "report", "pre ", " post"));
+            daMock.Setup(m => m.CreateDeployFilesAsync("previousDacpacPath", "newDacpacPath", "publishProfilePath", true, true))
+                  .ReturnsAsync(new CreateDeployFilesResult("pre script post", "report", "pre ", " post", new PublishProfile()));
             var fsaMock = new Mock<IFileSystemAccess>();
             fsaMock.Setup(m => m.WriteFileAsync("deployScriptPath", "pre script post"))
                    .ThrowsAsync(new Exception("test exception"));
@@ -144,8 +144,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
         {
             // Arrange
             var daMock = new Mock<IDacAccess>();
-            daMock.Setup(m => m.CreateDeployFilesAsync("previousDacpacPath", "newDacpacPath", "publishProfilePath", true, true, It.IsNotNull<Func<PublishProfile, Task<bool>>>()))
-                  .ReturnsAsync(new CreateDeployFilesResult("pre script post", "report", "pre ", " post"));
+            daMock.Setup(m => m.CreateDeployFilesAsync("previousDacpacPath", "newDacpacPath", "publishProfilePath", true, true))
+                  .ReturnsAsync(new CreateDeployFilesResult("pre script post", "report", "pre ", " post", new PublishProfile()));
             var fsaMock = new Mock<IFileSystemAccess>();
             fsaMock.Setup(m => m.WriteFileAsync("deployReportPath", "report"))
                    .ThrowsAsync(new Exception("test exception"));
@@ -181,8 +181,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
         {
             // Arrange
             var daMock = new Mock<IDacAccess>();
-            daMock.Setup(m => m.CreateDeployFilesAsync("previousDacpacPath", "newDacpacPath", "publishProfilePath", true, true, It.IsNotNull<Func<PublishProfile, Task<bool>>>()))
-                  .ReturnsAsync(new CreateDeployFilesResult("script post", "report", "pre ", " post"));
+            daMock.Setup(m => m.CreateDeployFilesAsync("previousDacpacPath", "newDacpacPath", "publishProfilePath", true, true))
+                  .ReturnsAsync(new CreateDeployFilesResult("script post", "report", "pre ", " post", new PublishProfile()));
             var fsaMock = new Mock<IFileSystemAccess>();
             fsaMock.Setup(m => m.WriteFileAsync("deployReportPath", "report"))
                    .ThrowsAsync(new Exception("test exception"));
@@ -217,8 +217,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
         {
             // Arrange
             var daMock = new Mock<IDacAccess>();
-            daMock.Setup(m => m.CreateDeployFilesAsync("previousDacpacPath", "newDacpacPath", "publishProfilePath", true, true, It.IsNotNull<Func<PublishProfile, Task<bool>>>()))
-                  .ReturnsAsync(new CreateDeployFilesResult("pre script", "report", "pre ", " post"));
+            daMock.Setup(m => m.CreateDeployFilesAsync("previousDacpacPath", "newDacpacPath", "publishProfilePath", true, true))
+                  .ReturnsAsync(new CreateDeployFilesResult("pre script", "report", "pre ", " post", new PublishProfile()));
             var fsaMock = new Mock<IFileSystemAccess>();
             fsaMock.Setup(m => m.WriteFileAsync("deployReportPath", "report"))
                    .ThrowsAsync(new Exception("test exception"));
@@ -257,11 +257,12 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
         {
             // Arrange
             var daMock = new Mock<IDacAccess>();
-            daMock.Setup(m => m.CreateDeployFilesAsync("previousDacpacPath", "newDacpacPath", "publishProfilePath", true, false, It.IsNotNull<Func<PublishProfile, Task<bool>>>()))
+            daMock.Setup(m => m.CreateDeployFilesAsync("previousDacpacPath", "newDacpacPath", "publishProfilePath", true, false))
                   .ReturnsAsync(new CreateDeployFilesResult((includePreDeployment ? "pre " : "") + "script" + (includePostDeployment ? " post" : ""),
                                                             null,
                                                             includePreDeployment ? "pre " : null,
-                                                            includePostDeployment ? " post" : null));
+                                                            includePostDeployment ? " post" : null,
+                                                            new PublishProfile()));
             var fsaMock = new Mock<IFileSystemAccess>();
             var loggerMock = new Mock<ILogger>();
             IWorkUnit<ScriptCreationStateModel> unit = new CreateDeploymentFilesUnit(daMock.Object, fsaMock.Object, loggerMock.Object);
@@ -298,11 +299,12 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
         {
             // Arrange
             var daMock = new Mock<IDacAccess>();
-            daMock.Setup(m => m.CreateDeployFilesAsync("previousDacpacPath", "newDacpacPath", "publishProfilePath", true, true, It.IsNotNull<Func<PublishProfile, Task<bool>>>()))
+            daMock.Setup(m => m.CreateDeployFilesAsync("previousDacpacPath", "newDacpacPath", "publishProfilePath", true, true))
                   .ReturnsAsync(new CreateDeployFilesResult((includePreDeployment ? "pre " : "") + "script" + (includePostDeployment ? " post" : ""),
                                                             "report",
                                                             includePreDeployment ? "pre " : null,
-                                                            includePostDeployment ? " post" : null));
+                                                            includePostDeployment ? " post" : null,
+                                                            new PublishProfile()));
             var fsaMock = new Mock<IFileSystemAccess>();
             var loggerMock = new Mock<ILogger>();
             IWorkUnit<ScriptCreationStateModel> unit = new CreateDeploymentFilesUnit(daMock.Object, fsaMock.Object, loggerMock.Object);
@@ -329,6 +331,108 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             fsaMock.Verify(m => m.WriteFileAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Exactly(2));
             fsaMock.Verify(m => m.WriteFileAsync("deployScriptPath", (includePreDeployment ? "pre " : "") + "script" + (includePostDeployment ? " post" : "")), Times.Once);
             fsaMock.Verify(m => m.WriteFileAsync("deployReportPath", "report"), Times.Once);
+        }
+
+        [Test]
+        [TestCase(false, false, false, false, false, null)]
+        [TestCase(false, false, false, false, true, null)]
+        [TestCase(false, false, false, true, false, null)]
+        [TestCase(false, false, false, true, true, null)]
+        [TestCase(false, false, true, false, false, null)]
+        [TestCase(false, false, true, false, true, null)]
+        [TestCase(false, false, true, true, false, null)]
+        [TestCase(false, false, true, true, true, null)]
+        [TestCase(false, true, false, false, false, null)]
+        [TestCase(false, true, false, false, true, null)]
+        [TestCase(false, true, false, true, false, null)]
+        [TestCase(false, true, false, true, true, null)]
+        [TestCase(false, true, true, false, false, null)]
+        [TestCase(false, true, true, false, true, null)]
+        [TestCase(false, true, true, true, false, null)]
+        [TestCase(false, true, true, true, true, null)]
+        [TestCase(true, false, false, false, false, null)]
+        [TestCase(true, false, false, false, true, false)]
+        [TestCase(true, false, false, true, false, false)]
+        [TestCase(true, false, false, true, true, false)]
+        [TestCase(true, false, true, false, false, false)]
+        [TestCase(true, false, true, false, true, false)]
+        [TestCase(true, false, true, true, false, false)]
+        [TestCase(true, false, true, true, true, false)]
+        [TestCase(true, true, false, false, false, false)]
+        [TestCase(true, true, false, false, true, false)]
+        [TestCase(true, true, false, true, false, false)]
+        [TestCase(true, true, false, true, true, false)]
+        [TestCase(true, true, true, false, false, false)]
+        [TestCase(true, true, true, false, true, false)]
+        [TestCase(true, true, true, true, false, false)]
+        [TestCase(true, true, true, true, true, false)]
+        public async Task Work_ScriptCreationStateModel_PublishProfileValidation_Async(bool removeSqlCmdStatements,
+                                                                                       bool createNewDatabase,
+                                                                                       bool backupDatabaseBeforeChanges,
+                                                                                       bool scriptDatabaseOptions,
+                                                                                       bool scriptDeployStateChecks,
+                                                                                       bool? expectedResult)
+        {
+            // Arrange
+            var daMock = new Mock<IDacAccess>();
+            daMock.Setup(m => m.CreateDeployFilesAsync("previousDacpacPath", "newDacpacPath", "publishProfilePath", true, true))
+                  .ReturnsAsync(new CreateDeployFilesResult("pre script post", "report", "pre ", " post", new PublishProfile
+                   {
+                      CreateNewDatabase = createNewDatabase,
+                      BackupDatabaseBeforeChanges = backupDatabaseBeforeChanges,
+                      ScriptDatabaseOptions = scriptDatabaseOptions,
+                      ScriptDeployStateChecks = scriptDeployStateChecks
+                   }));
+            var fsaMock = new Mock<IFileSystemAccess>();
+            var loggerMock = new Mock<ILogger>();
+            IWorkUnit<ScriptCreationStateModel> unit = new CreateDeploymentFilesUnit(daMock.Object, fsaMock.Object, loggerMock.Object);
+            var project = new SqlProject("a", "b", "c");
+            var configuration = ConfigurationModel.GetDefault();
+            configuration.CreateDocumentationWithScriptCreation = true;
+            configuration.RemoveSqlCmdStatements = removeSqlCmdStatements;
+            var previousVersion = new Version(1, 0);
+            Task HandlerFunc(bool b) => Task.CompletedTask;
+            var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
+            var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
+            var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
+            var paths = new PathCollection(directories, sourcePaths, targetPaths);
+            var model = new ScriptCreationStateModel(project, configuration, previousVersion, false, HandlerFunc)
+            {
+                Paths = paths
+            };
+
+            // Act
+            await unit.Work(model, CancellationToken.None);
+
+            // Assert
+            Assert.AreEqual(StateModelState.TriedToCreateDeploymentFiles, model.CurrentState);
+            Assert.AreEqual(expectedResult, model.Result);
+            if (removeSqlCmdStatements && createNewDatabase)
+            {
+                loggerMock.Verify(m => m.LogAsync($"ERROR: {nameof(PublishProfile.CreateNewDatabase)} cannot bet set to true, when {nameof(ConfigurationModel.RemoveSqlCmdStatements)} is also true."), Times.Once);
+            }
+            if (removeSqlCmdStatements && backupDatabaseBeforeChanges)
+            {
+                loggerMock.Verify(m => m.LogAsync($"ERROR: {nameof(PublishProfile.BackupDatabaseBeforeChanges)} cannot bet set to true, when {nameof(ConfigurationModel.RemoveSqlCmdStatements)} is also true."), Times.Once);
+            }
+            if (removeSqlCmdStatements && scriptDatabaseOptions)
+            {
+                loggerMock.Verify(m => m.LogAsync($"ERROR: {nameof(PublishProfile.ScriptDatabaseOptions)} cannot bet set to true, when {nameof(ConfigurationModel.RemoveSqlCmdStatements)} is also true."), Times.Once);
+            }
+            if (removeSqlCmdStatements && scriptDeployStateChecks)
+            {
+                loggerMock.Verify(m => m.LogAsync($"ERROR: {nameof(PublishProfile.ScriptDeployStateChecks)} cannot bet set to true, when {nameof(ConfigurationModel.RemoveSqlCmdStatements)} is also true."), Times.Once);
+            }
+
+            if (expectedResult == null)
+            {
+                fsaMock.Verify(m => m.WriteFileAsync("deployScriptPath", "pre script post"), Times.Once);
+                fsaMock.Verify(m => m.WriteFileAsync("deployReportPath", "report"), Times.Once);
+            }
+            else
+            {
+                fsaMock.Verify(m => m.WriteFileAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+            }
         }
     }
 }

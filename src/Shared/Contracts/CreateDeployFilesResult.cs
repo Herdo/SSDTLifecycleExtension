@@ -13,17 +13,21 @@
 
         public string PostDeploymentScript { get; }
 
+        public PublishProfile UsedPublishProfile { get; }
+
         public string[] Errors { get; }
 
         public CreateDeployFilesResult([CanBeNull] string deployScriptContent,
                                        [CanBeNull] string deployReportContent,
                                        [CanBeNull] string preDeploymentScript,
-                                       [CanBeNull] string postDeploymentScript)
+                                       [CanBeNull] string postDeploymentScript,
+                                       [CanBeNull] PublishProfile usedPublishProfile)
         {
             DeployScriptContent = deployScriptContent;
             DeployReportContent = deployReportContent;
             PreDeploymentScript = preDeploymentScript;
             PostDeploymentScript = postDeploymentScript;
+            UsedPublishProfile = usedPublishProfile;
         }
 
         public CreateDeployFilesResult([NotNull] string[] errors)

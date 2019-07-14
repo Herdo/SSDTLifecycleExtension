@@ -66,8 +66,7 @@
                                                                  paths.DeploySources.NewDacpacPath,
                                                                  paths.DeploySources.PublishProfilePath,
                                                                  true,
-                                                                 createDocumentation,
-                                                                 profile => ValidatePublishProfileAgainstConfiguration(profile, configuration));
+                                                                 createDocumentation);
 
             if (result.Errors == null)
             {
@@ -83,7 +82,10 @@
                     return (false, null, null);
                 }
 
-                return (true, result.DeployScriptContent, result.DeployReportContent);
+                var valid = await ValidatePublishProfileAgainstConfiguration(result.UsedPublishProfile, configuration);
+                return valid
+                           ? (true, result.DeployScriptContent, result.DeployReportContent)
+                           : (false, null, null);
             }
 
             await _logger.LogAsync("ERROR: Failed to create script:");
@@ -99,31 +101,32 @@
             if (!configuration.RemoveSqlCmdStatements)
                 return true;
 
+            var valid = true;
             if (publishProfile.CreateNewDatabase)
             {
-                await _logger.LogAsync($"{nameof(PublishProfile.CreateNewDatabase)} cannot bet set to true, when {nameof(ConfigurationModel.RemoveSqlCmdStatements)} is also true.");
-                return false;
+                await _logger.LogAsync($"ERROR: {nameof(PublishProfile.CreateNewDatabase)} cannot bet set to true, when {nameof(ConfigurationModel.RemoveSqlCmdStatements)} is also true.");
+                valid = false;
             }
 
             if (publishProfile.BackupDatabaseBeforeChanges)
             {
-                await _logger.LogAsync($"{nameof(PublishProfile.BackupDatabaseBeforeChanges)} cannot bet set to true, when {nameof(ConfigurationModel.RemoveSqlCmdStatements)} is also true.");
-                return false;
+                await _logger.LogAsync($"ERROR: {nameof(PublishProfile.BackupDatabaseBeforeChanges)} cannot bet set to true, when {nameof(ConfigurationModel.RemoveSqlCmdStatements)} is also true.");
+                valid = false;
             }
 
             if (publishProfile.ScriptDatabaseOptions)
             {
-                await _logger.LogAsync($"{nameof(PublishProfile.ScriptDatabaseOptions)} cannot bet set to true, when {nameof(ConfigurationModel.RemoveSqlCmdStatements)} is also true.");
-                return false;
+                await _logger.LogAsync($"ERROR: {nameof(PublishProfile.ScriptDatabaseOptions)} cannot bet set to true, when {nameof(ConfigurationModel.RemoveSqlCmdStatements)} is also true.");
+                valid = false;
             }
 
             if (publishProfile.ScriptDeployStateChecks)
             {
-                await _logger.LogAsync($"{nameof(PublishProfile.ScriptDeployStateChecks)} cannot bet set to true, when {nameof(ConfigurationModel.RemoveSqlCmdStatements)} is also true.");
-                return false;
+                await _logger.LogAsync($"ERROR: {nameof(PublishProfile.ScriptDeployStateChecks)} cannot bet set to true, when {nameof(ConfigurationModel.RemoveSqlCmdStatements)} is also true.");
+                valid = false;
             }
 
-            return true;
+            return valid;
         }
 
         private async Task<bool> PersistDeployScript(string deployScriptPath,

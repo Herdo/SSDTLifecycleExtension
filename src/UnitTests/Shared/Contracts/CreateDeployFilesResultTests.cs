@@ -31,6 +31,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Contracts
             Assert.IsNull(result.DeployReportContent);
             Assert.IsNull(result.PreDeploymentScript);
             Assert.IsNull(result.PostDeploymentScript);
+            Assert.IsNull(result.UsedPublishProfile);
             Assert.AreSame(errors, result.Errors);
         }
 
@@ -42,15 +43,17 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Contracts
             const string report = "report";
             const string pre = "pre";
             const string post = "post";
+            var publishProfile = new PublishProfile();
 
             // Act
-            var result = new CreateDeployFilesResult(script, report, pre, post);
+            var result = new CreateDeployFilesResult(script, report, pre, post, publishProfile);
 
             // Assert
             Assert.AreEqual(script, result.DeployScriptContent);
             Assert.AreEqual(report, result.DeployReportContent);
             Assert.AreEqual(pre, result.PreDeploymentScript);
             Assert.AreEqual(post, result.PostDeploymentScript);
+            Assert.AreSame(publishProfile, result.UsedPublishProfile);
             Assert.IsNull(result.Errors);
         }
     }
