@@ -43,7 +43,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
 
             // Act & Assert
             // ReSharper disable once AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => service.GetConfigurationOrDefaultAsync(null));
+            Assert.Throws<ArgumentNullException>(() => service.GetConfigurationOrDefaultAsync(null as SqlProject));
         }
 
         [Test]

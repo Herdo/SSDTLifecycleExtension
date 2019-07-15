@@ -1,4 +1,4 @@
-namespace SSDTLifecycleExtension.ViewModels
+﻿namespace SSDTLifecycleExtension.ViewModels
 {
     using System;
     using System.ComponentModel;
@@ -67,6 +67,7 @@ namespace SSDTLifecycleExtension.ViewModels
         public ICommand ResetConfigurationToDefaultCommand { get; }
         public IAsyncCommand SaveConfigurationCommand { get; }
         public ICommand OpenDocumentationCommand { get; }
+        public IAsyncCommand ImportConfigurationCommand { get; }
 
         public ConfigurationViewModel([NotNull] SqlProject project,
                                       [NotNull] IConfigurationService configurationService,
@@ -88,6 +89,7 @@ namespace SSDTLifecycleExtension.ViewModels
             ResetConfigurationToDefaultCommand = new DelegateCommand(ResetConfigurationToDefault_Executed);
             SaveConfigurationCommand = new AsyncCommand(SaveConfiguration_ExecutedAsync, SaveConfiguration_CanExecute, this);
             OpenDocumentationCommand = new DelegateCommand(OpenDocumentation_Executed);
+            ImportConfigurationCommand = new AsyncCommand(ImportConfiguration_ExecutedAsync, ImportConfiguration_CanExecute, this);
         }
 
         private bool BrowsePublishProfile_CanExecute() => Model != null;
@@ -134,6 +136,21 @@ namespace SSDTLifecycleExtension.ViewModels
             _fileSystemAccess.OpenUrl(Settings.Default.DocumentationBaseUrl + anchor);
         }
 
+        private bool ImportConfiguration_CanExecute()
+        {
+            return !_scaffoldingService.IsScaffolding
+                   && !_scriptCreationService.IsCreating;
+        }
+
+        private async Task ImportConfiguration_ExecutedAsync()
+        {
+            var browsedPath = _fileSystemAccess.BrowseForFile(".json", "JSON (*.json)|*.json");
+            if (browsedPath == null)
+                return;
+
+            Model = await _configurationService.GetConfigurationOrDefaultAsync(browsedPath);
+        }
+
         private void CheckIfModelIsDirty()
         {
             if (Model == null)
@@ -162,11 +179,13 @@ namespace SSDTLifecycleExtension.ViewModels
         private void ScaffoldingService_IsScaffoldingChanged(object sender, EventArgs e)
         {
             SaveConfigurationCommand.RaiseCanExecuteChanged();
+            ImportConfigurationCommand.RaiseCanExecuteChanged();
         }
 
         private void ScriptCreationService_IsCreatingChanged(object sender, EventArgs e)
         {
             SaveConfigurationCommand.RaiseCanExecuteChanged();
+            ImportConfigurationCommand.RaiseCanExecuteChanged();
         }
 
         private void Model_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -183,7 +202,7 @@ namespace SSDTLifecycleExtension.ViewModels
         {
             try
             {
-                await _logger.LogAsync($"Error during execution of {nameof(SaveConfigurationCommand)}: {exception}").ConfigureAwait(false);
+                await _logger.LogAsync($"Error during execution of {command.GetType().Name}: {exception}").ConfigureAwait(false);
             }
             catch
             {

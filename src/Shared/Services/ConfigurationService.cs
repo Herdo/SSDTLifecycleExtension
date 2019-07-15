@@ -33,9 +33,10 @@
             return Path.Combine(directory ?? throw new InvalidOperationException("Cannot find configuration file. Directory is <null>."), "Properties", "ssdtlifecycle.json");
         }
 
-        private async Task<ConfigurationModel> GetConfigurationOrDefaultInternalAsync(SqlProject project)
+        private async Task<ConfigurationModel> GetConfigurationOrDefaultInternalAsync(SqlProject project,
+                                                                                      string path)
         {
-            var sourcePath = GetConfigurationPath(project);
+            var sourcePath = path ?? GetConfigurationPath(project);
             var serialized = await _fileSystemAccess.ReadFileAsync(sourcePath);
             if (serialized == null)
             {
@@ -90,7 +91,15 @@
             if (project == null)
                 throw new ArgumentNullException(nameof(project));
 
-            return GetConfigurationOrDefaultInternalAsync(project);
+            return GetConfigurationOrDefaultInternalAsync(project, null);
+        }
+
+        Task<ConfigurationModel> IConfigurationService.GetConfigurationOrDefaultAsync(string path)
+        {
+            if (path == null)
+                throw new ArgumentNullException(nameof(path));
+
+            return GetConfigurationOrDefaultInternalAsync(null, path);
         }
 
         Task IConfigurationService.SaveConfigurationAsync(SqlProject project,
