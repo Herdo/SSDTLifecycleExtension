@@ -1,4 +1,4 @@
-﻿namespace SSDTLifecycleExtension.ViewModels
+namespace SSDTLifecycleExtension.ViewModels
 {
     using System;
     using System.ComponentModel;
@@ -51,13 +51,14 @@
             }
         }
 
-        private bool IsModelDirty
+        public bool IsModelDirty
         {
             get => _isModelDirty;
-            set
+            private set
             {
                 if (value == _isModelDirty) return;
                 _isModelDirty = value;
+                OnPropertyChanged();
                 SaveConfigurationCommand.RaiseCanExecuteChanged();
             }
         }
