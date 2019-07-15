@@ -396,16 +396,19 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
                                                 ssMock,
                                                 scsMock,
                                                 loggerMock);
-            object invokedSender = null;
-            string invokedProperty = null;
+
+            var changedSenders = new List<object>();
+            var changedProperties = new List<string>();
             var errorChangedSenderList = new List<object>();
             var errorChangedPropertyList = new List<string>();
             ConfigurationModel propertyChangedModel = null;
             vm.PropertyChanged += (sender,
                                    args) =>
             {
-                invokedSender = sender;
-                invokedProperty = args?.PropertyName;
+                if (sender != null)
+                    changedSenders.Add(sender);
+                if (args?.PropertyName != null)
+                    changedProperties.Add(args.PropertyName);
                 if (vm.Model == null)
                     return;
 
@@ -424,8 +427,12 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             vm.ResetConfigurationToDefaultCommand.Execute(null);
 
             // Assert
-            Assert.AreSame(vm, invokedSender);
-            Assert.AreEqual(nameof(ConfigurationViewModel.Model), invokedProperty);
+            Assert.AreEqual(2, changedSenders.Count);
+            Assert.AreSame(vm, changedSenders[0]);
+            Assert.AreSame(vm, changedSenders[1]);
+            Assert.AreEqual(2, changedProperties.Count);
+            Assert.AreEqual(nameof(ConfigurationViewModel.Model), changedProperties[0]);
+            Assert.AreEqual(nameof(ConfigurationViewModel.IsModelDirty), changedProperties[1]);
             Assert.AreSame(vm.Model, propertyChangedModel);
             Assert.AreEqual(defaultModel, vm.Model);
             Assert.IsTrue(errorChangedSenderList.Count > 0);
@@ -896,6 +903,384 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
 
             // Assert
             fsaMock.Verify(m => m.OpenUrl("https://github.com/Herdo/SSDTLifecycleExtension/wiki/Configuration#test-help"), Times.Once);
+        }
+
+        [Test]
+        public void ImportConfiguration_CanExecute_NotWhenScaffoldingIsInProgress()
+        {
+            // Arrange
+            var model = new ConfigurationModel
+            {
+                ArtifactsPath = "foobar",
+                ReplaceUnnamedDefaultConstraintDrops = true,
+                CommentOutUnnamedDefaultConstraintDrops = false,
+                PublishProfilePath = "Test.publish.xml",
+                VersionPattern = "1.2.3.4",
+                CreateDocumentationWithScriptCreation = true,
+                CustomHeader = "awesome header",
+                CustomFooter = "lame footer",
+                BuildBeforeScriptCreation = true,
+                TrackDacpacVersion = false
+            };
+            var project = new SqlProject("", "", "");
+            var csMock = Mock.Of<IConfigurationService>();
+            var fsaMock = Mock.Of<IFileSystemAccess>();
+            var ssMock = new Mock<IScaffoldingService>();
+            ssMock.SetupGet(m => m.IsScaffolding).Returns(true);
+            var scsMock = Mock.Of<IScriptCreationService>();
+            var loggerMock = Mock.Of<ILogger>();
+            var vm = new ConfigurationViewModel(project,
+                                                csMock,
+                                                fsaMock,
+                                                ssMock.Object,
+                                                scsMock,
+                                                loggerMock)
+            {
+                Model = model
+            };
+
+            // Act
+            var canExecute = vm.ImportConfigurationCommand.CanExecute();
+
+            // Assert
+            Assert.IsFalse(canExecute);
+        }
+
+        [Test]
+        public void ImportConfiguration_CanExecute_YesAfterScaffoldingCompleted()
+        {
+            // Arrange
+            var model = new ConfigurationModel
+            {
+                ArtifactsPath = "foobar",
+                ReplaceUnnamedDefaultConstraintDrops = true,
+                CommentOutUnnamedDefaultConstraintDrops = false,
+                PublishProfilePath = "Test.publish.xml",
+                VersionPattern = "1.2.3.4",
+                CreateDocumentationWithScriptCreation = true,
+                CustomHeader = "awesome header",
+                CustomFooter = "lame footer",
+                BuildBeforeScriptCreation = true,
+                TrackDacpacVersion = false
+            };
+            var project = new SqlProject("", "", "");
+            var csMock = Mock.Of<IConfigurationService>();
+            var fsaMock = Mock.Of<IFileSystemAccess>();
+            var ssMock = new Mock<IScaffoldingService>();
+            ssMock.SetupGet(m => m.IsScaffolding).Returns(true);
+            var scsMock = Mock.Of<IScriptCreationService>();
+            var loggerMock = Mock.Of<ILogger>();
+            var vm = new ConfigurationViewModel(project,
+                                                csMock,
+                                                fsaMock,
+                                                ssMock.Object,
+                                                scsMock,
+                                                loggerMock)
+            {
+                Model = model
+            };
+
+            // Act
+            var canExecuteDuringScaffolding = vm.ImportConfigurationCommand.CanExecute();
+            ssMock.SetupGet(m => m.IsScaffolding).Returns(false);
+            ssMock.Raise(service => service.IsScaffoldingChanged += null, EventArgs.Empty);
+            var canExecuteAfterScaffolding = vm.ImportConfigurationCommand.CanExecute();
+
+            // Assert
+            Assert.IsFalse(canExecuteDuringScaffolding);
+            Assert.IsTrue(canExecuteAfterScaffolding);
+        }
+
+        [Test]
+        public void ImportConfiguration_CanExecute_NotWhenScriptCreationIsInProgress()
+        {
+            // Arrange
+            var model = new ConfigurationModel
+            {
+                ArtifactsPath = "foobar",
+                ReplaceUnnamedDefaultConstraintDrops = true,
+                CommentOutUnnamedDefaultConstraintDrops = false,
+                PublishProfilePath = "Test.publish.xml",
+                VersionPattern = "1.2.3.4",
+                CreateDocumentationWithScriptCreation = true,
+                CustomHeader = "awesome header",
+                CustomFooter = "lame footer",
+                BuildBeforeScriptCreation = true,
+                TrackDacpacVersion = false
+            };
+            var project = new SqlProject("", "", "");
+            var csMock = Mock.Of<IConfigurationService>();
+            var fsaMock = Mock.Of<IFileSystemAccess>();
+            var ssMock = Mock.Of<IScaffoldingService>();
+            var scsMock = new Mock<IScriptCreationService>();
+            scsMock.SetupGet(m => m.IsCreating).Returns(true);
+            var loggerMock = Mock.Of<ILogger>();
+            var vm = new ConfigurationViewModel(project,
+                                                csMock,
+                                                fsaMock,
+                                                ssMock,
+                                                scsMock.Object,
+                                                loggerMock)
+            {
+                Model = model
+            };
+
+            // Act
+            var canExecute = vm.ImportConfigurationCommand.CanExecute();
+
+            // Assert
+            Assert.IsFalse(canExecute);
+        }
+
+        [Test]
+        public void ImportConfiguration_CanExecute_YesAfterScriptCreationCompleted()
+        {
+            // Arrange
+            var model = new ConfigurationModel
+            {
+                ArtifactsPath = "foobar",
+                ReplaceUnnamedDefaultConstraintDrops = true,
+                CommentOutUnnamedDefaultConstraintDrops = false,
+                PublishProfilePath = "Test.publish.xml",
+                VersionPattern = "1.2.3.4",
+                CreateDocumentationWithScriptCreation = true,
+                CustomHeader = "awesome header",
+                CustomFooter = "lame footer",
+                BuildBeforeScriptCreation = true,
+                TrackDacpacVersion = false
+            };
+            var project = new SqlProject("", "", "");
+            var csMock = Mock.Of<IConfigurationService>();
+            var fsaMock = Mock.Of<IFileSystemAccess>();
+            var ssMock = Mock.Of<IScaffoldingService>();
+            var scsMock = new Mock<IScriptCreationService>();
+            scsMock.SetupGet(m => m.IsCreating).Returns(true);
+            var loggerMock = Mock.Of<ILogger>();
+            var vm = new ConfigurationViewModel(project,
+                                                csMock,
+                                                fsaMock,
+                                                ssMock,
+                                                scsMock.Object,
+                                                loggerMock)
+            {
+                Model = model
+            };
+
+            // Act
+            var canExecuteDuringScriptCreation = vm.ImportConfigurationCommand.CanExecute();
+            scsMock.SetupGet(m => m.IsCreating).Returns(false);
+            scsMock.Raise(service => service.IsCreatingChanged += null, EventArgs.Empty);
+            var canExecuteAfterScriptCreation = vm.ImportConfigurationCommand.CanExecute();
+
+            // Assert
+            Assert.IsFalse(canExecuteDuringScriptCreation);
+            Assert.IsTrue(canExecuteAfterScriptCreation);
+        }
+
+        [Test]
+        public async Task ImportConfiguration_Execute_Async()
+        {
+            // Arrange
+            const string testPath = "foobar";
+            var oldModel = new ConfigurationModel();
+            var newModel = new ConfigurationModel
+            {
+                ArtifactsPath = "foobar",
+                ReplaceUnnamedDefaultConstraintDrops = true,
+                CommentOutUnnamedDefaultConstraintDrops = false,
+                PublishProfilePath = "Test.publish.xml",
+                VersionPattern = "1.2.3.4",
+                CreateDocumentationWithScriptCreation = true,
+                CustomHeader = "awesome header",
+                CustomFooter = "lame footer",
+                BuildBeforeScriptCreation = true,
+                TrackDacpacVersion = false
+            };
+            var project = new SqlProject("", "", "");
+            var csMock = new Mock<IConfigurationService>();
+            csMock.Setup(m => m.GetConfigurationOrDefaultAsync(testPath))
+                  .ReturnsAsync(newModel);
+            var fsaMock = new Mock<IFileSystemAccess>();
+            fsaMock.Setup(m => m.BrowseForFile(".json", "JSON (*.json)|*.json"))
+                   .Returns(testPath);
+            var ssMock = Mock.Of<IScaffoldingService>();
+            var scsMock = Mock.Of<IScriptCreationService>();
+            var loggerMock = Mock.Of<ILogger>();
+            var vm = new ConfigurationViewModel(project,
+                                                csMock.Object,
+                                                fsaMock.Object,
+                                                ssMock,
+                                                scsMock,
+                                                loggerMock)
+            {
+                Model = oldModel
+            };
+
+            // Act
+            var canImportBeforeSaving = vm.ImportConfigurationCommand.CanExecute();
+            await vm.ImportConfigurationCommand.ExecuteAsync();
+            var canImportAfterSaving = vm.ImportConfigurationCommand.CanExecute();
+
+            // Assert
+            Assert.IsTrue(canImportBeforeSaving);
+            Assert.IsTrue(canImportAfterSaving);
+            csMock.Verify(m => m.GetConfigurationOrDefaultAsync(testPath), Times.Once);
+            Assert.AreSame(newModel, vm.Model);
+        }
+
+        [Test]
+        public async Task ImportConfiguration_Execute_NoFileSelected_Async()
+        {
+            // Arrange
+            var oldModel = new ConfigurationModel();
+            var newModel = new ConfigurationModel
+            {
+                ArtifactsPath = "foobar",
+                ReplaceUnnamedDefaultConstraintDrops = true,
+                CommentOutUnnamedDefaultConstraintDrops = false,
+                PublishProfilePath = "Test.publish.xml",
+                VersionPattern = "1.2.3.4",
+                CreateDocumentationWithScriptCreation = true,
+                CustomHeader = "awesome header",
+                CustomFooter = "lame footer",
+                BuildBeforeScriptCreation = true,
+                TrackDacpacVersion = false
+            };
+            var project = new SqlProject("", "", "");
+            var csMock = new Mock<IConfigurationService>();
+            var fsaMock = new Mock<IFileSystemAccess>();
+            fsaMock.Setup(m => m.BrowseForFile(".json", "JSON (*.json)|*.json"))
+                   .Returns(null as string);
+            var ssMock = Mock.Of<IScaffoldingService>();
+            var scsMock = Mock.Of<IScriptCreationService>();
+            var loggerMock = Mock.Of<ILogger>();
+            var vm = new ConfigurationViewModel(project,
+                                                csMock.Object,
+                                                fsaMock.Object,
+                                                ssMock,
+                                                scsMock,
+                                                loggerMock)
+            {
+                Model = oldModel
+            };
+
+            // Act
+            var canImportBeforeSaving = vm.ImportConfigurationCommand.CanExecute();
+            await vm.ImportConfigurationCommand.ExecuteAsync();
+            var canImportAfterSaving = vm.ImportConfigurationCommand.CanExecute();
+
+            // Assert
+            Assert.IsTrue(canImportBeforeSaving);
+            Assert.IsTrue(canImportAfterSaving);
+            csMock.Verify(m => m.GetConfigurationOrDefaultAsync(It.IsAny<string>()), Times.Never);
+            Assert.AreSame(oldModel, vm.Model);
+        }
+
+        [Test]
+        public void ImportConfiguration_Execute_CallLoggerOnError()
+        {
+            // Arrange
+            const string testPath = "foobar";
+            var oldModel = new ConfigurationModel
+            {
+                ArtifactsPath = "foobar",
+                ReplaceUnnamedDefaultConstraintDrops = true,
+                CommentOutUnnamedDefaultConstraintDrops = false,
+                PublishProfilePath = "Test.publish.xml",
+                VersionPattern = "1.2.3.4",
+                CreateDocumentationWithScriptCreation = true,
+                CustomHeader = "awesome header",
+                CustomFooter = "lame footer",
+                BuildBeforeScriptCreation = true,
+                TrackDacpacVersion = false
+            };
+            var project = new SqlProject("", "", "");
+            var csMock = new Mock<IConfigurationService>();
+            csMock.Setup(m => m.GetConfigurationOrDefaultAsync(testPath))
+                  .ThrowsAsync(new InvalidOperationException("test exception"));
+            var fsaMock = new Mock<IFileSystemAccess>();
+            fsaMock.Setup(m => m.BrowseForFile(".json", "JSON (*.json)|*.json"))
+                   .Returns(testPath);
+            var ssMock = Mock.Of<IScaffoldingService>();
+            var scsMock = Mock.Of<IScriptCreationService>();
+            string loggedMessage = null;
+            var loggerMock = new Mock<ILogger>();
+            loggerMock.Setup(m => m.LogAsync(It.IsNotNull<string>()))
+                      .Callback((string message) => loggedMessage = message)
+                      .Returns(Task.CompletedTask);
+            var vm = new ConfigurationViewModel(project,
+                                                csMock.Object,
+                                                fsaMock.Object,
+                                                ssMock,
+                                                scsMock,
+                                                loggerMock.Object)
+            {
+                Model = oldModel
+            };
+
+            // Act
+            var canImportBeforeSaving = vm.ImportConfigurationCommand.CanExecute();
+            vm.ImportConfigurationCommand.Execute(null);
+            var canImportAfterSaving = vm.ImportConfigurationCommand.CanExecute();
+
+            // Assert
+            Assert.IsTrue(canImportBeforeSaving);
+            Assert.IsTrue(canImportAfterSaving);
+            csMock.Verify(m => m.GetConfigurationOrDefaultAsync(testPath), Times.Once);
+            Assert.AreSame(oldModel, vm.Model);
+            loggerMock.Verify(m => m.LogAsync(It.IsNotNull<string>()), Times.Once);
+            Assert.IsNotNull(loggedMessage);
+            Assert.IsTrue(loggedMessage.Contains(nameof(InvalidOperationException)));
+            Assert.IsTrue(loggedMessage.Contains(nameof(ConfigurationViewModel.ImportConfigurationCommand)));
+            Assert.IsTrue(loggedMessage.Contains("test exception"));
+        }
+
+        [Test]
+        public void ImportConfiguration_Execute_CallLoggerOnError_DoNotThrowExceptionFromLogger()
+        {
+            // Arrange
+            const string testPath = "foobar";
+            var oldModel = new ConfigurationModel
+            {
+                ArtifactsPath = "foobar",
+                ReplaceUnnamedDefaultConstraintDrops = true,
+                CommentOutUnnamedDefaultConstraintDrops = false,
+                PublishProfilePath = "Test.publish.xml",
+                VersionPattern = "1.2.3.4",
+                CreateDocumentationWithScriptCreation = true,
+                CustomHeader = "awesome header",
+                CustomFooter = "lame footer",
+                BuildBeforeScriptCreation = true,
+                TrackDacpacVersion = false
+            };
+            var project = new SqlProject("", "", "");
+            var csMock = new Mock<IConfigurationService>();
+            csMock.Setup(m => m.GetConfigurationOrDefaultAsync(testPath))
+                  .ThrowsAsync(new InvalidOperationException("test exception"));
+            var fsaMock = new Mock<IFileSystemAccess>();
+            fsaMock.Setup(m => m.BrowseForFile(".json", "JSON (*.json)|*.json"))
+                   .Returns(testPath);
+            var ssMock = Mock.Of<IScaffoldingService>();
+            var scsMock = Mock.Of<IScriptCreationService>();
+            var loggerMock = new Mock<ILogger>();
+            loggerMock.Setup(m => m.LogAsync(It.IsNotNull<string>()))
+                      .ThrowsAsync(new Exception("logger failed"));
+            var vm = new ConfigurationViewModel(project,
+                                                csMock.Object,
+                                                fsaMock.Object,
+                                                ssMock,
+                                                scsMock,
+                                                loggerMock.Object)
+            {
+                Model = oldModel
+            };
+
+            // Act
+            Assert.DoesNotThrow(() => vm.ImportConfigurationCommand.Execute(null));
+
+            // Assert
+            csMock.Verify(m => m.GetConfigurationOrDefaultAsync(testPath), Times.Once);
+            loggerMock.Verify(m => m.LogAsync(It.IsNotNull<string>()), Times.Once);
         }
     }
 }

@@ -169,6 +169,12 @@
             IsModelDirty = !Model.Equals(_lastSavedModel);
         }
 
+        private void UpdateAsyncCommandsCanExecuteState()
+        {
+            SaveConfigurationCommand.RaiseCanExecuteChanged();
+            ImportConfigurationCommand.RaiseCanExecuteChanged();
+        }
+
         public override async Task<bool> InitializeAsync()
         {
             _lastSavedModel = await _configurationService.GetConfigurationOrDefaultAsync(_project);
@@ -176,17 +182,9 @@
             return true;
         }
 
-        private void ScaffoldingService_IsScaffoldingChanged(object sender, EventArgs e)
-        {
-            SaveConfigurationCommand.RaiseCanExecuteChanged();
-            ImportConfigurationCommand.RaiseCanExecuteChanged();
-        }
+        private void ScaffoldingService_IsScaffoldingChanged(object sender, EventArgs e) => UpdateAsyncCommandsCanExecuteState();
 
-        private void ScriptCreationService_IsCreatingChanged(object sender, EventArgs e)
-        {
-            SaveConfigurationCommand.RaiseCanExecuteChanged();
-            ImportConfigurationCommand.RaiseCanExecuteChanged();
-        }
+        private void ScriptCreationService_IsCreatingChanged(object sender, EventArgs e) => UpdateAsyncCommandsCanExecuteState();
 
         private void Model_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -200,9 +198,19 @@
 
         async Task IErrorHandler.HandleErrorAsync(IAsyncCommand command, Exception exception)
         {
+            var commandName = string.Empty;
+            if (ReferenceEquals(SaveConfigurationCommand, command))
+            {
+                commandName = nameof(SaveConfigurationCommand);
+            }
+            else if (ReferenceEquals(ImportConfigurationCommand, command))
+            {
+                commandName = nameof(ImportConfigurationCommand);
+            }
+
             try
             {
-                await _logger.LogAsync($"Error during execution of {command.GetType().Name}: {exception}").ConfigureAwait(false);
+                await _logger.LogAsync($"Error during execution of {commandName}: {exception}").ConfigureAwait(false);
             }
             catch
             {

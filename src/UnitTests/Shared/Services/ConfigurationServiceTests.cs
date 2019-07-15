@@ -34,7 +34,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
         }
 
         [Test]
-        public void GetConfigurationOrDefaultAsync_ArgumentNullException_Project()
+        public void GetConfigurationOrDefaultAsync_SqlProject_ArgumentNullException_Project()
         {
             // Arrange
             var fsaMock = Mock.Of<IFileSystemAccess>();
@@ -47,7 +47,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
         }
 
         [Test]
-        public void GetConfigurationOrDefaultAsync_ArgumentExceptionException_InvalidPathFormat()
+        public void GetConfigurationOrDefaultAsync_SqlProject_ArgumentExceptionException_InvalidPathFormat()
         {
             // Arrange
             var fsaMock = Mock.Of<IFileSystemAccess>();
@@ -61,7 +61,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
         }
 
         [Test]
-        public void GetConfigurationOrDefaultAsync_InvalidOperationException_InvalidDirectoryPathOfProject()
+        public void GetConfigurationOrDefaultAsync_SqlProject_InvalidOperationException_InvalidDirectoryPathOfProject()
         {
             // Arrange
             var fsaMock = Mock.Of<IFileSystemAccess>();
@@ -75,7 +75,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
         }
 
         [Test]
-        public async Task GetConfigurationOrDefaultAsync_NoConfigurationFound_UseDefault_Async()
+        public async Task GetConfigurationOrDefaultAsync_SqlProject_NoConfigurationFound_UseDefault_Async()
         {
             // Arrange
             var fsaMock = new Mock<IFileSystemAccess>();
@@ -94,7 +94,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
         }
 
         [Test]
-        public async Task GetConfigurationOrDefaultAsync_ConfigurationFound_Async()
+        public async Task GetConfigurationOrDefaultAsync_SqlProject_ConfigurationFound_Async()
         {
             // Arrange
             var fsaMock = new Mock<IFileSystemAccess>();
@@ -131,7 +131,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
         }
 
         [Test]
-        public async Task GetConfigurationOrDefaultAsync_ConfigurationFound_PopulateMissingMemberFromDefaultInstance_Async()
+        public async Task GetConfigurationOrDefaultAsync_SqlProject_ConfigurationFound_PopulateMissingMemberFromDefaultInstance_Async()
         {
             // Arrange
             var fsaMock = new Mock<IFileSystemAccess>();
@@ -149,6 +149,110 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
 
             // Act
             var configuration = await service.GetConfigurationOrDefaultAsync(project);
+
+            // Assert
+            Assert.IsNotNull(configuration);
+            Assert.IsFalse(defaultConfiguration.Equals(configuration));
+            Assert.AreEqual("__Deployment", configuration.ArtifactsPath);
+            Assert.AreEqual(defaultConfiguration.PublishProfilePath, configuration.PublishProfilePath);
+            Assert.IsFalse(configuration.BuildBeforeScriptCreation);
+            Assert.IsTrue(configuration.CreateDocumentationWithScriptCreation);
+            Assert.IsTrue(configuration.CommentOutUnnamedDefaultConstraintDrops);   // This must be true to cause an validation error for the last assert.
+            Assert.IsTrue(configuration.ReplaceUnnamedDefaultConstraintDrops);      // This must be true to cause an validation error for the last assert.
+            Assert.AreEqual(defaultConfiguration.VersionPattern, configuration.VersionPattern);
+            Assert.IsTrue(configuration.TrackDacpacVersion);
+            Assert.AreEqual("header", configuration.CustomHeader);
+            Assert.AreEqual("footer", configuration.CustomFooter);
+            Assert.IsTrue(configuration.RemoveSqlCmdStatements);
+            Assert.IsTrue(configuration.HasErrors); // This will check if ValidateAll is called correctly.
+        }
+
+        [Test]
+        public void GetConfigurationOrDefaultAsync_Path_ArgumentNullException_Project()
+        {
+            // Arrange
+            var fsaMock = Mock.Of<IFileSystemAccess>();
+            var vsaMock = Mock.Of<IVisualStudioAccess>();
+            IConfigurationService service = new ConfigurationService(fsaMock, vsaMock);
+
+            // Act & Assert
+            // ReSharper disable once AssignNullToNotNullAttribute
+            Assert.Throws<ArgumentNullException>(() => service.GetConfigurationOrDefaultAsync(null as string));
+        }
+
+        [Test]
+        public async Task GetConfigurationOrDefaultAsync_Path_NoConfigurationFound_UseDefault_Async()
+        {
+            // Arrange
+            var fsaMock = new Mock<IFileSystemAccess>();
+            fsaMock.Setup(m => m.ReadFileAsync("C:\\Temp\\Test\\Properties\\ssdtlifecycle.json"))
+                   .ReturnsAsync(() => null as string);
+            var vsaMock = Mock.Of<IVisualStudioAccess>();
+            IConfigurationService service = new ConfigurationService(fsaMock.Object, vsaMock);
+            var defaultConfiguration = ConfigurationModel.GetDefault();
+
+            // Act
+            var configuration = await service.GetConfigurationOrDefaultAsync("C:\\Temp\\Test\\Properties\\ssdtlifecycle.json");
+
+            // Assert
+            Assert.IsNotNull(configuration);
+            Assert.IsTrue(defaultConfiguration.Equals(configuration));
+        }
+
+        [Test]
+        public async Task GetConfigurationOrDefaultAsync_Path_ConfigurationFound_Async()
+        {
+            // Arrange
+            var fsaMock = new Mock<IFileSystemAccess>();
+            fsaMock.Setup(m => m.ReadFileAsync("C:\\Temp\\Test\\Properties\\ssdtlifecycle.json"))
+                   .ReturnsAsync(() =>
+                                     "{  \"ArtifactsPath\": \"__Deployment\",  \"PublishProfilePath\": \"Test.publish.xml\",  " +
+                                     "\"BuildBeforeScriptCreation\": false,  \"CreateDocumentationWithScriptCreation\": true,  " +
+                                     "\"CommentOutUnnamedDefaultConstraintDrops\": true, \"RemoveSqlCmdStatements\": true, " +
+                                     "\"ReplaceUnnamedDefaultConstraintDrops\": true,  \"VersionPattern\": \"{MAJOR}.0.{BUILD}\",  " +
+                                     "\"TrackDacpacVersion\": true,  \"CustomHeader\": \"header\",  \"CustomFooter\": \"footer\"}");
+            var vsaMock = Mock.Of<IVisualStudioAccess>();
+            IConfigurationService service = new ConfigurationService(fsaMock.Object, vsaMock);
+            var defaultConfiguration = ConfigurationModel.GetDefault();
+
+            // Act
+            var configuration = await service.GetConfigurationOrDefaultAsync("C:\\Temp\\Test\\Properties\\ssdtlifecycle.json");
+
+            // Assert
+            Assert.IsNotNull(configuration);
+            Assert.IsFalse(defaultConfiguration.Equals(configuration));
+            Assert.AreEqual("__Deployment", configuration.ArtifactsPath);
+            Assert.AreEqual("Test.publish.xml", configuration.PublishProfilePath);
+            Assert.IsFalse(configuration.BuildBeforeScriptCreation);
+            Assert.IsTrue(configuration.CreateDocumentationWithScriptCreation);
+            Assert.IsTrue(configuration.CommentOutUnnamedDefaultConstraintDrops);   // This must be true to cause an validation error for the last assert.
+            Assert.IsTrue(configuration.ReplaceUnnamedDefaultConstraintDrops);      // This must be true to cause an validation error for the last assert.
+            Assert.AreEqual("{MAJOR}.0.{BUILD}", configuration.VersionPattern);
+            Assert.IsTrue(configuration.TrackDacpacVersion);
+            Assert.AreEqual("header", configuration.CustomHeader);
+            Assert.AreEqual("footer", configuration.CustomFooter);
+            Assert.IsTrue(configuration.RemoveSqlCmdStatements);
+            Assert.IsTrue(configuration.HasErrors); // This will check if ValidateAll is called correctly.
+        }
+
+        [Test]
+        public async Task GetConfigurationOrDefaultAsync_Path_ConfigurationFound_PopulateMissingMemberFromDefaultInstance_Async()
+        {
+            // Arrange
+            var fsaMock = new Mock<IFileSystemAccess>();
+            fsaMock.Setup(m => m.ReadFileAsync("C:\\Temp\\Test\\Properties\\ssdtlifecycle.json"))
+                   .ReturnsAsync(() =>
+                                     "{  \"ArtifactsPath\": \"__Deployment\",  " +
+                                     "\"BuildBeforeScriptCreation\": false,  \"CreateDocumentationWithScriptCreation\": true,  " +
+                                     "\"CommentOutUnnamedDefaultConstraintDrops\": true, \"RemoveSqlCmdStatements\": true, " +
+                                     "\"ReplaceUnnamedDefaultConstraintDrops\": true,  " +
+                                     "\"TrackDacpacVersion\": true,  \"CustomHeader\": \"header\",  \"CustomFooter\": \"footer\"}");
+            var vsaMock = Mock.Of<IVisualStudioAccess>();
+            IConfigurationService service = new ConfigurationService(fsaMock.Object, vsaMock);
+            var defaultConfiguration = ConfigurationModel.GetDefault();
+
+            // Act
+            var configuration = await service.GetConfigurationOrDefaultAsync("C:\\Temp\\Test\\Properties\\ssdtlifecycle.json");
 
             // Assert
             Assert.IsNotNull(configuration);
