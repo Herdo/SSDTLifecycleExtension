@@ -91,6 +91,42 @@
         }
 
         /// <summary>
+        /// Validates the <paramref name="model"/>.<see cref="ConfigurationModel.SharedDacpacRepositoryPath"/> and returns all found errors.
+        /// </summary>
+        /// <param name="model">The <see cref="ConfigurationModel"/> instance to validate.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="model"/> is <b>null</b>.</exception>
+        /// <returns>A list of all found errors. Empty list if no errors were found.</returns>
+        [NotNull]
+        public static List<string> ValidateSharedDacpacRepositoryPath(ConfigurationModel model)
+        {
+            if (model == null)
+                throw new ArgumentNullException(nameof(model));
+
+            var errors = new List<string>();
+
+            if (string.IsNullOrWhiteSpace(model.SharedDacpacRepositoryPath))
+                return errors;
+
+            try
+            {
+                if (!Path.IsPathRooted(model.SharedDacpacRepositoryPath))
+                {
+                    errors.Add("Path must be an absolute path.");
+                }
+                else if (Path.GetDirectoryName(model.SharedDacpacRepositoryPath) != model.SharedDacpacRepositoryPath.Substring(0, model.SharedDacpacRepositoryPath.Length - 1))
+                {
+                    errors.Add("Path must be a directory.");
+                }
+            }
+            catch
+            {
+                errors.Add("Path contains invalid characters.");
+            }
+
+            return errors;
+        }
+
+        /// <summary>
         /// Validates the <paramref name="model"/>.<see cref="ConfigurationModel.CommentOutUnnamedDefaultConstraintDrops"/> against the
         /// <paramref name="model"/>.<see cref="ConfigurationModel.ReplaceUnnamedDefaultConstraintDrops"/> and returns all found errors.
         /// </summary>

@@ -102,6 +102,41 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Models
         }
 
         [Test]
+        public void SharedDacpacRepositoryPath_Get_Set_PropertyChanged_ErrorsChanged()
+        {
+            // Arrange
+            const string testValue = "C:\\Test\\Repository\\";
+            var model = new ConfigurationModel();
+            object invokedPropertyChangedSender = null;
+            string invokedPropertyChangedProperty = null;
+            model.PropertyChanged += (sender,
+                                      args) =>
+            {
+                invokedPropertyChangedSender = sender;
+                invokedPropertyChangedProperty = args?.PropertyName;
+            };
+            object invokedErrorsChangedSender = null;
+            string invokedErrorsChangedProperty = null;
+            model.ErrorsChanged += (sender,
+                                    args) =>
+            {
+                invokedErrorsChangedSender = sender;
+                invokedErrorsChangedProperty = args?.PropertyName;
+            };
+
+            // Act
+            model.SharedDacpacRepositoryPath = testValue;
+            var returnedValue = model.SharedDacpacRepositoryPath;
+
+            // Assert
+            Assert.AreEqual(testValue, returnedValue);
+            Assert.AreSame(model, invokedPropertyChangedSender);
+            Assert.AreEqual(nameof(ConfigurationModel.SharedDacpacRepositoryPath), invokedPropertyChangedProperty);
+            Assert.AreSame(model, invokedErrorsChangedSender);
+            Assert.AreEqual(nameof(ConfigurationModel.SharedDacpacRepositoryPath), invokedErrorsChangedProperty);
+        }
+
+        [Test]
         public void BuildBeforeScriptCreation_Get_Set_PropertyChanged()
         {
             // Arrange
@@ -506,6 +541,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Models
             {
                 ArtifactsPath = "TestPath1",
                 PublishProfilePath = "TestPath2",
+                SharedDacpacRepositoryPath = "C:\\Temp\\Repository\\",
                 ReplaceUnnamedDefaultConstraintDrops = true,
                 VersionPattern = "TestPattern",
                 CommentOutUnnamedDefaultConstraintDrops = true,
@@ -527,6 +563,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Models
             Assert.AreNotSame(model, copy);
             Assert.AreEqual(model.ArtifactsPath, copy.ArtifactsPath);
             Assert.AreEqual(model.PublishProfilePath, copy.PublishProfilePath);
+            Assert.AreEqual(model.SharedDacpacRepositoryPath, copy.SharedDacpacRepositoryPath);
             Assert.AreEqual(model.ReplaceUnnamedDefaultConstraintDrops, copy.ReplaceUnnamedDefaultConstraintDrops);
             Assert.AreEqual(model.VersionPattern, copy.VersionPattern);
             Assert.AreEqual(model.CommentOutUnnamedDefaultConstraintDrops, copy.CommentOutUnnamedDefaultConstraintDrops);
@@ -546,6 +583,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Models
             {
                 ArtifactsPath = "TestPath1",
                 PublishProfilePath = "TestPath2",
+                SharedDacpacRepositoryPath = "C:\\Temp\\Repository\\",
                 ReplaceUnnamedDefaultConstraintDrops = true,
                 VersionPattern = "TestPattern",
                 CommentOutUnnamedDefaultConstraintDrops = true,
@@ -574,6 +612,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Models
             {
                 ArtifactsPath = "TestPath1",
                 PublishProfilePath = "TestPath2",
+                SharedDacpacRepositoryPath = "C:\\Temp\\Repository\\",
                 ReplaceUnnamedDefaultConstraintDrops = true,
                 VersionPattern = "TestPattern",
                 CommentOutUnnamedDefaultConstraintDrops = true,
@@ -602,6 +641,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Models
             {
                 ArtifactsPath = "TestPath1",
                 PublishProfilePath = "TestPath2",
+                SharedDacpacRepositoryPath = "C:\\Temp\\Repository\\",
                 ReplaceUnnamedDefaultConstraintDrops = true,
                 VersionPattern = "TestPattern",
                 CommentOutUnnamedDefaultConstraintDrops = true,
@@ -618,6 +658,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Models
             {
                 ArtifactsPath = "TestPath1",
                 PublishProfilePath = "TestPath2",
+                SharedDacpacRepositoryPath = "C:\\Temp\\Repository\\",
                 ReplaceUnnamedDefaultConstraintDrops = true,
                 VersionPattern = "TestPattern",
                 CommentOutUnnamedDefaultConstraintDrops = true,
@@ -646,6 +687,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Models
             {
                 ArtifactsPath = "TestPath1",
                 PublishProfilePath = "TestPath2",
+                SharedDacpacRepositoryPath = "C:\\Temp\\Repository\\",
                 ReplaceUnnamedDefaultConstraintDrops = true,
                 VersionPattern = "TestPattern",
                 CommentOutUnnamedDefaultConstraintDrops = true,
@@ -662,6 +704,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Models
             {
                 ArtifactsPath = "TestPath1",
                 PublishProfilePath = "TestPath2",
+                SharedDacpacRepositoryPath = "C:\\Temp\\Repository\\",
                 ReplaceUnnamedDefaultConstraintDrops = true,
                 VersionPattern = "TestPattern",
                 CommentOutUnnamedDefaultConstraintDrops = true,

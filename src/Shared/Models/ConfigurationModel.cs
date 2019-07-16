@@ -14,6 +14,7 @@
 
         private string _artifactsPath;
         private string _publishProfilePath;
+        private string _sharedDacpacRepositoryPath;
         private bool _buildBeforeScriptCreation;
         private bool _createDocumentationWithScriptCreation;
         private bool _commentOutUnnamedDefaultConstraintDrops;
@@ -55,6 +56,22 @@
                 _publishProfilePath = value;
                 OnPropertyChanged();
                 SetValidationErrors(ConfigurationModelValidations.ValidatePublishProfilePath(this));
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the absolute path for the shared DACPAC repository.
+        /// </summary>
+        public string SharedDacpacRepositoryPath
+        {
+            get => _sharedDacpacRepositoryPath;
+            set
+            {
+                if (value == _sharedDacpacRepositoryPath)
+                    return;
+                _sharedDacpacRepositoryPath = value;
+                OnPropertyChanged();
+                SetValidationErrors(ConfigurationModelValidations.ValidateSharedDacpacRepositoryPath(this));
             }
         }
 
@@ -229,6 +246,7 @@
             {
                 ArtifactsPath = "_Deployment",
                 PublishProfilePath = UseSinglePublishProfileSpecialKeyword,
+                SharedDacpacRepositoryPath = null,
                 BuildBeforeScriptCreation = true,
                 CreateDocumentationWithScriptCreation = true,
                 CommentOutUnnamedDefaultConstraintDrops = false,
@@ -246,6 +264,7 @@
         {
             SetValidationErrors(ConfigurationModelValidations.ValidateArtifactsPath(this), nameof(ArtifactsPath));
             SetValidationErrors(ConfigurationModelValidations.ValidatePublishProfilePath(this), nameof(PublishProfilePath));
+            SetValidationErrors(ConfigurationModelValidations.ValidateSharedDacpacRepositoryPath(this), nameof(SharedDacpacRepositoryPath));
 
             var unnamedDefaultConstraintDropsErrors = ConfigurationModelValidations.ValidateUnnamedDefaultConstraintDropsBehavior(this);
             SetValidationErrors(unnamedDefaultConstraintDropsErrors, nameof(CommentOutUnnamedDefaultConstraintDrops));
@@ -260,6 +279,7 @@
             {
                 ArtifactsPath = ArtifactsPath,
                 PublishProfilePath = PublishProfilePath,
+                SharedDacpacRepositoryPath = SharedDacpacRepositoryPath,
                 BuildBeforeScriptCreation = BuildBeforeScriptCreation,
                 CreateDocumentationWithScriptCreation = CreateDocumentationWithScriptCreation,
                 CommentOutUnnamedDefaultConstraintDrops = CommentOutUnnamedDefaultConstraintDrops,
@@ -284,6 +304,7 @@
                 return true;
             return string.Equals(_artifactsPath, other._artifactsPath)
                    && string.Equals(_publishProfilePath, other._publishProfilePath)
+                   && string.Equals(_sharedDacpacRepositoryPath, other._sharedDacpacRepositoryPath)
                    && _buildBeforeScriptCreation == other._buildBeforeScriptCreation
                    && _createDocumentationWithScriptCreation == other._createDocumentationWithScriptCreation
                    && _commentOutUnnamedDefaultConstraintDrops == other._commentOutUnnamedDefaultConstraintDrops

@@ -101,6 +101,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             fsaMock.Setup(m => m.ReadFileAsync("C:\\Temp\\Test\\Properties\\ssdtlifecycle.json"))
                    .ReturnsAsync(() =>
                                      "{  \"ArtifactsPath\": \"__Deployment\",  \"PublishProfilePath\": \"Test.publish.xml\",  " +
+                                     "\"SharedDacpacRepositoryPath\": \"C:\\\\Temp\\\\Repository\\\\\", " +
                                      "\"BuildBeforeScriptCreation\": false,  \"CreateDocumentationWithScriptCreation\": true,  " +
                                      "\"CommentOutUnnamedDefaultConstraintDrops\": true, \"RemoveSqlCmdStatements\": true, " +
                                      "\"ReplaceUnnamedDefaultConstraintDrops\": true,  \"VersionPattern\": \"{MAJOR}.0.{BUILD}\",  " +
@@ -118,6 +119,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             Assert.IsFalse(defaultConfiguration.Equals(configuration));
             Assert.AreEqual("__Deployment", configuration.ArtifactsPath);
             Assert.AreEqual("Test.publish.xml", configuration.PublishProfilePath);
+            Assert.AreEqual("C:\\Temp\\Repository\\", configuration.SharedDacpacRepositoryPath);
             Assert.IsFalse(configuration.BuildBeforeScriptCreation);
             Assert.IsTrue(configuration.CreateDocumentationWithScriptCreation);
             Assert.IsTrue(configuration.CommentOutUnnamedDefaultConstraintDrops);   // This must be true to cause an validation error for the last assert.
@@ -155,6 +157,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             Assert.IsFalse(defaultConfiguration.Equals(configuration));
             Assert.AreEqual("__Deployment", configuration.ArtifactsPath);
             Assert.AreEqual(defaultConfiguration.PublishProfilePath, configuration.PublishProfilePath);
+            Assert.AreEqual(defaultConfiguration.SharedDacpacRepositoryPath, configuration.SharedDacpacRepositoryPath);
             Assert.IsFalse(configuration.BuildBeforeScriptCreation);
             Assert.IsTrue(configuration.CreateDocumentationWithScriptCreation);
             Assert.IsTrue(configuration.CommentOutUnnamedDefaultConstraintDrops);   // This must be true to cause an validation error for the last assert.
@@ -207,6 +210,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             fsaMock.Setup(m => m.ReadFileAsync("C:\\Temp\\Test\\Properties\\ssdtlifecycle.json"))
                    .ReturnsAsync(() =>
                                      "{  \"ArtifactsPath\": \"__Deployment\",  \"PublishProfilePath\": \"Test.publish.xml\",  " +
+                                     "\"SharedDacpacRepositoryPath\": \"C:\\\\Temp\\\\Repository\\\\\", " +
                                      "\"BuildBeforeScriptCreation\": false,  \"CreateDocumentationWithScriptCreation\": true,  " +
                                      "\"CommentOutUnnamedDefaultConstraintDrops\": true, \"RemoveSqlCmdStatements\": true, " +
                                      "\"ReplaceUnnamedDefaultConstraintDrops\": true,  \"VersionPattern\": \"{MAJOR}.0.{BUILD}\",  " +
@@ -223,6 +227,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             Assert.IsFalse(defaultConfiguration.Equals(configuration));
             Assert.AreEqual("__Deployment", configuration.ArtifactsPath);
             Assert.AreEqual("Test.publish.xml", configuration.PublishProfilePath);
+            Assert.AreEqual("C:\\Temp\\Repository\\", configuration.SharedDacpacRepositoryPath);
             Assert.IsFalse(configuration.BuildBeforeScriptCreation);
             Assert.IsTrue(configuration.CreateDocumentationWithScriptCreation);
             Assert.IsTrue(configuration.CommentOutUnnamedDefaultConstraintDrops);   // This must be true to cause an validation error for the last assert.
@@ -259,6 +264,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             Assert.IsFalse(defaultConfiguration.Equals(configuration));
             Assert.AreEqual("__Deployment", configuration.ArtifactsPath);
             Assert.AreEqual(defaultConfiguration.PublishProfilePath, configuration.PublishProfilePath);
+            Assert.AreEqual(defaultConfiguration.SharedDacpacRepositoryPath, configuration.SharedDacpacRepositoryPath);
             Assert.IsFalse(configuration.BuildBeforeScriptCreation);
             Assert.IsTrue(configuration.CreateDocumentationWithScriptCreation);
             Assert.IsTrue(configuration.CommentOutUnnamedDefaultConstraintDrops);   // This must be true to cause an validation error for the last assert.

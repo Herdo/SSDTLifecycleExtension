@@ -197,6 +197,108 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.ModelValidations
         }
 
         [Test]
+        public void ValidateSharedDacpacRepositoryPath_ArgumentNullException_Model()
+        {
+            // Act & Assert
+            // ReSharper disable once AssignNullToNotNullAttribute
+            Assert.Throws<ArgumentNullException>(() => ConfigurationModelValidations.ValidateSharedDacpacRepositoryPath(null));
+        }
+
+        [Test]
+        public void ValidateSharedDacpacRepositoryPath_Errors_InvalidCharacters()
+        {
+            // Arrange
+            var model = new ConfigurationModel
+            {
+                SharedDacpacRepositoryPath = "C:\\" + new string(Path.GetInvalidPathChars()) + "\\Test\\"
+            };
+
+            // Act
+            var errors = ConfigurationModelValidations.ValidateSharedDacpacRepositoryPath(model);
+
+            // Assert
+            Assert.IsNotNull(errors);
+            Assert.AreEqual(1, errors.Count);
+            Assert.AreEqual("Path contains invalid characters.", errors[0]);
+        }
+
+        [Test]
+        [TestCase(@"C:\Temp\.")]
+        [TestCase(@"C:\Temp\test.foo")]
+        [TestCase(@"C:\Temp\.foo")]
+        public void ValidateSharedDacpacRepositoryPath_Errors_MustBeDirectory(string path)
+        {
+            // Arrange
+            var model = new ConfigurationModel
+            {
+                SharedDacpacRepositoryPath = path
+            };
+
+            // Act
+            var errors = ConfigurationModelValidations.ValidateSharedDacpacRepositoryPath(model);
+
+            // Assert
+            Assert.IsNotNull(errors);
+            Assert.AreEqual(1, errors.Count);
+            Assert.AreEqual("Path must be a directory.", errors[0]);
+        }
+
+        [Test]
+        public void ValidateSharedDacpacRepositoryPath_Errors_NoAbsolutePath()
+        {
+            // Arrange
+            var model = new ConfigurationModel
+            {
+                SharedDacpacRepositoryPath = @"..\Repository"
+            };
+
+            // Act
+            var errors = ConfigurationModelValidations.ValidateSharedDacpacRepositoryPath(model);
+
+            // Assert
+            Assert.IsNotNull(errors);
+            Assert.AreEqual(1, errors.Count);
+            Assert.AreEqual("Path must be an absolute path.", errors[0]);
+        }
+
+        [Test]
+        [TestCase(null)]
+        [TestCase("")]
+        [TestCase("    ")]
+        public void ValidateSharedDacpacRepositoryPath_NoErrors_EmptyPath(string path)
+        {
+            // Arrange
+            var model = new ConfigurationModel
+            {
+                SharedDacpacRepositoryPath = path
+            };
+
+            // Act
+            var errors = ConfigurationModelValidations.ValidateSharedDacpacRepositoryPath(model);
+
+            // Assert
+            Assert.IsNotNull(errors);
+            Assert.AreEqual(0, errors.Count);
+        }
+
+        [Test]
+        public void ValidateSharedDacpacRepositoryPath_NoErrors()
+        {
+            // Arrange
+            var model = new ConfigurationModel
+            {
+                SharedDacpacRepositoryPath = @"C:\Test\Repository\"
+            };
+
+            // Act
+            var errors = ConfigurationModelValidations.ValidateSharedDacpacRepositoryPath(model);
+
+            // Assert
+            Assert.IsNotNull(errors);
+            Assert.AreEqual(0, errors.Count);
+        }
+
+        [Test]
         public void ValidateUnnamedDefaultConstraintDropsBehavior_ArgumentNullException_Model()
         {
             // Act & Assert
