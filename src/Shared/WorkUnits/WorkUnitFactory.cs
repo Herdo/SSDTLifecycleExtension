@@ -40,6 +40,8 @@
                 case StateModelState.TriedToCleanArtifactsDirectory:
                     return _dependencyResolver.Get<CopyBuildResultUnit>();
                 case StateModelState.TriedToCopyBuildResult:
+                    return _dependencyResolver.Get<CopyDacpacToSharedDacpacRepositoryUnit>();
+                case StateModelState.TriedToCopyDacpacToSharedDacpacRepository:
                     return null;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(stateModel) + '.' + nameof(IStateModel.CurrentState));
@@ -70,6 +72,8 @@
                 case StateModelState.TriedToCleanArtifactsDirectory:
                     return _dependencyResolver.Get<CopyBuildResultUnit>();
                 case StateModelState.TriedToCopyBuildResult:
+                    return _dependencyResolver.Get<CopyDacpacToSharedDacpacRepositoryUnit>();
+                case StateModelState.TriedToCopyDacpacToSharedDacpacRepository:
                     return _dependencyResolver.Get<CreateDeploymentFilesUnit>();
                 case StateModelState.TriedToCreateDeploymentFiles:
                     return _dependencyResolver.Get<ModifyDeploymentScriptUnit>();

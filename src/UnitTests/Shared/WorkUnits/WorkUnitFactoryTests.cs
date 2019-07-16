@@ -251,7 +251,11 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
         public void GetNextWorkUnit_ScaffoldingStateModel_CorrectWorkUnitForTriedToCopyBuildResult()
         {
             // Arrange
+            var fsaMock = Mock.Of<IFileSystemAccess>();
+            var loggerMock = Mock.Of<ILogger>();
+            var expectedWorkUnit = new CopyDacpacToSharedDacpacRepositoryUnit(fsaMock, loggerMock);
             var drMock = new Mock<IDependencyResolver>();
+            drMock.Setup(m => m.Get<CopyDacpacToSharedDacpacRepositoryUnit>()).Returns(expectedWorkUnit);
             IWorkUnitFactory wuf = new WorkUnitFactory(drMock.Object);
             var project = new SqlProject("a", "b", "c");
             var configuration = ConfigurationModel.GetDefault();
@@ -260,6 +264,29 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             var model = new ScaffoldingStateModel(project, configuration, targetVersion, HandlerFunc)
             {
                 CurrentState = StateModelState.TriedToCopyBuildResult
+            };
+
+            // Act
+            var workUnit = wuf.GetNextWorkUnit(model);
+
+            // Assert
+            Assert.AreSame(expectedWorkUnit, workUnit);
+            drMock.Verify(m => m.Get<CopyDacpacToSharedDacpacRepositoryUnit>(), Times.Once);
+        }
+
+        [Test]
+        public void GetNextWorkUnit_ScaffoldingStateModel_CorrectWorkUnitForTriedToCopyDacpacToSharedDacpacRepository()
+        {
+            // Arrange
+            var drMock = new Mock<IDependencyResolver>();
+            IWorkUnitFactory wuf = new WorkUnitFactory(drMock.Object);
+            var project = new SqlProject("a", "b", "c");
+            var configuration = ConfigurationModel.GetDefault();
+            var targetVersion = new Version(1, 0);
+            Task HandlerFunc(bool b) => Task.CompletedTask;
+            var model = new ScaffoldingStateModel(project, configuration, targetVersion, HandlerFunc)
+            {
+                CurrentState = StateModelState.TriedToCopyDacpacToSharedDacpacRepository
             };
 
             // Act
@@ -517,6 +544,33 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
         public void GetNextWorkUnit_ScriptCreationStateModel_CorrectWorkUnitForTriedToCopyBuildResult()
         {
             // Arrange
+            var fsaMock = Mock.Of<IFileSystemAccess>();
+            var loggerMock = Mock.Of<ILogger>();
+            var expectedWorkUnit = new CopyDacpacToSharedDacpacRepositoryUnit(fsaMock, loggerMock);
+            var drMock = new Mock<IDependencyResolver>();
+            drMock.Setup(m => m.Get<CopyDacpacToSharedDacpacRepositoryUnit>()).Returns(expectedWorkUnit);
+            IWorkUnitFactory wuf = new WorkUnitFactory(drMock.Object);
+            var project = new SqlProject("a", "b", "c");
+            var configuration = ConfigurationModel.GetDefault();
+            var previousVersion = new Version(1, 0);
+            Task HandlerFunc(bool b) => Task.CompletedTask;
+            var model = new ScriptCreationStateModel(project, configuration, previousVersion, false, HandlerFunc)
+            {
+                CurrentState = StateModelState.TriedToCopyBuildResult
+            };
+
+            // Act
+            var workUnit = wuf.GetNextWorkUnit(model);
+
+            // Assert
+            Assert.AreSame(expectedWorkUnit, workUnit);
+            drMock.Verify(m => m.Get<CopyDacpacToSharedDacpacRepositoryUnit>(), Times.Once);
+        }
+
+        [Test]
+        public void GetNextWorkUnit_ScriptCreationStateModel_CorrectWorkUnitForTriedToCopyDacpacToSharedDacpacRepository()
+        {
+            // Arrange
             var daMock = Mock.Of<IDacAccess>();
             var fsaMock = Mock.Of<IFileSystemAccess>();
             var loggerMock = Mock.Of<ILogger>();
@@ -530,7 +584,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             Task HandlerFunc(bool b) => Task.CompletedTask;
             var model = new ScriptCreationStateModel(project, configuration, previousVersion, false, HandlerFunc)
             {
-                CurrentState = StateModelState.TriedToCopyBuildResult
+                CurrentState = StateModelState.TriedToCopyDacpacToSharedDacpacRepository
             };
 
             // Act

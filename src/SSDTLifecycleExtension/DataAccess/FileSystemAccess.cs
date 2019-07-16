@@ -223,6 +223,25 @@
             }
         }
 
+        string IFileSystemAccess.CopyFile(string source,
+                                          string target)
+        {
+            if (string.IsNullOrWhiteSpace(source))
+                throw new ArgumentException("Value cannot be null or white space.", nameof(source));
+            if (string.IsNullOrWhiteSpace(target))
+                throw new ArgumentException("Value cannot be null or white space.", nameof(target));
+
+            try
+            {
+                File.Copy(source, target, true);
+                return null;
+            }
+            catch (Exception e)
+            {
+                return e.Message;
+            }
+        }
+
         string[] IFileSystemAccess.GetDirectoriesIn(string directory)
         {
             if (directory == null)

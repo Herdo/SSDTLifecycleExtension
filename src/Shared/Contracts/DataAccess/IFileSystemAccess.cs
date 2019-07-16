@@ -55,6 +55,9 @@
                          [NotNull] string targetDirectory,
                          [NotNull] string searchPattern);
 
+        string CopyFile([NotNull] string source,
+                        [NotNull] string target);
+
         string[] GetDirectoriesIn([NotNull] string directory);
 
         string[] GetFilesIn([NotNull] string directory,

@@ -12,6 +12,7 @@
         TriedToBuildProject = 50,
         TriedToCleanArtifactsDirectory = 55,
         TriedToCopyBuildResult = 60,
+        TriedToCopyDacpacToSharedDacpacRepository = 65,
         TriedToCreateDeploymentFiles = 70,
         ModifiedDeploymentScript = 80,
         DeletedRefactorLog = 90,
