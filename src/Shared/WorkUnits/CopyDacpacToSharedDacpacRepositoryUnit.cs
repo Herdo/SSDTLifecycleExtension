@@ -25,9 +25,9 @@
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        private async Task TryCopyInternal(IStateModel stateModel,
-                                           string newDacpacPath,
-                                           string sharedDacpacRepositoryPath)
+        private async Task TryCopyInternal([NotNull] IStateModel stateModel,
+                                           [NotNull] string newDacpacPath,
+                                           [NotNull] string sharedDacpacRepositoryPath)
         {
             if (string.IsNullOrWhiteSpace(sharedDacpacRepositoryPath))
             {
@@ -39,20 +39,14 @@
             try
             {
                 var fileName = Path.GetFileName(newDacpacPath);
-                if (fileName == null)
-                {
-                    await _logger.LogAsync($"ERROR: Cannot get file name from path '{newDacpacPath}'.");
-                    stateModel.CurrentState = StateModelState.TriedToCopyDacpacToSharedDacpacRepository;
-                    stateModel.Result = false;
-                    return;
-                }
                 var targetFile = Path.Combine(sharedDacpacRepositoryPath, fileName);
                 var directoryError = _fileSystemAccess.EnsureDirectoryExists(sharedDacpacRepositoryPath);
                 if (directoryError != null)
                 {
-                    await _logger.LogAsync($"ERROR: Failed to ensure that the directory '{sharedDacpacRepositoryPath}' exists.");
+                    await _logger.LogAsync($"ERROR: Failed to ensure that the directory '{sharedDacpacRepositoryPath}' exists: {directoryError}");
                     stateModel.CurrentState = StateModelState.TriedToCopyDacpacToSharedDacpacRepository;
                     stateModel.Result = false;
+                    return;
                 }
 
                 var copyError = _fileSystemAccess.CopyFile(newDacpacPath, targetFile);

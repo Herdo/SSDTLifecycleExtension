@@ -98,6 +98,7 @@
     <Compile Include="Shared\WorkUnits\CleanLatestArtifactsDirectoryUnitTests.cs" />
     <Compile Include="Shared\WorkUnits\CleanNewArtifactsDirectoryUnitTests.cs" />
     <Compile Include="Shared\WorkUnits\CopyBuildResultUnitTests.cs" />
+    <Compile Include="Shared\WorkUnits\CopyDacpacToSharedDacpacRepositoryUnitTests.cs" />
     <Compile Include="Shared\WorkUnits\CreateDeploymentFilesUnitTests.cs" />
     <Compile Include="Shared\WorkUnits\DeleteRefactorLogUnitTests.cs" />
     <Compile Include="Shared\WorkUnits\FormatTargetVersionUnitTests.cs" />
