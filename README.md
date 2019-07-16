@@ -20,7 +20,7 @@ If you want to add a versioned deployment process to this method of working with
 # How do you use this extension?
 Primarily, the extension adds a new context menu entry to SQL database projects:
 <a href="https://raw.githubusercontent.com/Herdo/SSDTLifecycleExtension/master/images/context-menu.png">![](https://raw.githubusercontent.com/Herdo/SSDTLifecycleExtension/master/images/context-menu.png)</a>  
-From this menu you can start the scaffolding, script creation and configuration, of how the extension will work for your project. For more details, please have a look at the documentation:
+From this menu you can start the script creation process, as well as open the configuration that defines how the extension will work for your project. For more details, please have a look at the documentation:
 - [Getting started](https://github.com/Herdo/SSDTLifecycleExtension/wiki/Getting-started)
 - [Featrues](https://github.com/Herdo/SSDTLifecycleExtension/wiki/Features)
 - [Configuration](https://github.com/Herdo/SSDTLifecycleExtension/wiki/Configuration)
