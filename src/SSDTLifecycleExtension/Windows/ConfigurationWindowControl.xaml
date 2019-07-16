@@ -292,6 +292,7 @@
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
@@ -368,6 +369,37 @@
                                         Content="..."
                                         ToolTip="Browse..."/>
                             </Grid>
+
+                            <!-- Shared DACPAC repository path -->
+                            <TextBlock Grid.Row="2"
+                                       Grid.Column="0"
+                                       Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
+                                    <Run Text="Shared DACPAC repository path"
+                                         Style="{StaticResource HeaderRunStyle}"/>
+                                    <Button Style="{StaticResource HelpButtonStyle}"
+                                            Command="{Binding OpenDocumentationCommand}"
+                                            CommandParameter="shared-dacpac-repository-path"/>
+                                    <LineBreak/>
+                                    <Run Text="The path of the shared DACPAC"
+                                         FontStyle="Italic"/>
+                                    <LineBreak/>
+                                    <Run Text="repository where the DACPAC will"
+                                         FontStyle="Italic"/>
+                                    <LineBreak/>
+                                    <Run Text="be copied to, if set."
+                                         FontStyle="Italic"/>
+                                    <LineBreak/>
+                                    <LineBreak/>
+                                    <Run Text="Must be an absolute path and"
+                                         FontStyle="Italic"/>
+                                    <LineBreak/>
+                                    <Run Text="end with a backslash."
+                                         FontStyle="Italic"/>
+                            </TextBlock>
+                            <TextBox Grid.Row="2"
+                                     Grid.Column="1"
+                                     Style="{StaticResource DefaultTextTextBoxStyle}"
+                                     Text="{Binding Model.SharedDacpacRepositoryPath, Mode=TwoWay}"/>
                         </Grid>
                     </GroupBox>
                     <!-- Script creation options -->
@@ -491,56 +523,6 @@
                                       Grid.Column="1"
                                       Style="{StaticResource ConfigurationCheckBoxStyle}"
                                       IsChecked="{Binding Model.RemoveSqlCmdStatements, Mode=TwoWay}"/>
-                        </Grid>
-                    </GroupBox>
-                    <!-- Cleanup -->
-                    <GroupBox Style="{StaticResource SettingsGroupStyle}"
-                              Header="Cleanup">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-
-                            <!-- Delete refactorlog after versioned script generation -->
-                            <TextBlock Grid.Row="0"
-                                       Grid.Column="0"
-                                       Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
-                                <Run Text="Delete refactorlog after versioned script"
-                                     Style="{StaticResource HeaderRunStyle}"/>
-                                <LineBreak/>
-                                <Run Text="generation"
-                                     Style="{StaticResource HeaderRunStyle}"/>
-                                <Button Style="{StaticResource HelpButtonStyle}"
-                                        Command="{Binding OpenDocumentationCommand}"
-                                        CommandParameter="delete-refactorlog-after-versioned-script-generation"/>
-                            </TextBlock>
-                            <CheckBox Grid.Row="0"
-                                      Grid.Column="1"
-                                      Style="{StaticResource ConfigurationCheckBoxStyle}"
-                                      IsChecked="{Binding Model.DeleteRefactorlogAfterVersionedScriptGeneration, Mode=TwoWay}"/>
-
-                            <!-- Delete latest after versioned script generation -->
-                            <TextBlock Grid.Row="1"
-                                       Grid.Column="0"
-                                       Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
-                                <Run Text="Delete 'latest' files after versioned script"
-                                     Style="{StaticResource HeaderRunStyle}"/>
-                                <LineBreak/>
-                                <Run Text="generation"
-                                     Style="{StaticResource HeaderRunStyle}"/>
-                                <Button Style="{StaticResource HelpButtonStyle}"
-                                        Command="{Binding OpenDocumentationCommand}"
-                                        CommandParameter="delete-latest-files-after-versioned-script"/>
-                            </TextBlock>
-                            <CheckBox Grid.Row="1"
-                                      Grid.Column="1"
-                                      Style="{StaticResource ConfigurationCheckBoxStyle}"
-                                      IsChecked="{Binding Model.DeleteLatestAfterVersionedScriptGeneration, Mode=TwoWay}"/>
                         </Grid>
                     </GroupBox>
                 </StackPanel>
@@ -710,6 +692,56 @@
                                      Grid.Column="1"
                                      Style="{StaticResource MultiLineTextTextBoxStyle}"
                                      Text="{Binding Model.CustomFooter, Mode=TwoWay}"/>
+                        </Grid>
+                    </GroupBox>
+                    <!-- Cleanup -->
+                    <GroupBox Style="{StaticResource SettingsGroupStyle}"
+                              Header="Cleanup">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Delete refactorlog after versioned script generation -->
+                            <TextBlock Grid.Row="0"
+                                       Grid.Column="0"
+                                       Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
+                                <Run Text="Delete refactorlog after versioned script"
+                                     Style="{StaticResource HeaderRunStyle}"/>
+                                <LineBreak/>
+                                <Run Text="generation"
+                                     Style="{StaticResource HeaderRunStyle}"/>
+                                <Button Style="{StaticResource HelpButtonStyle}"
+                                        Command="{Binding OpenDocumentationCommand}"
+                                        CommandParameter="delete-refactorlog-after-versioned-script-generation"/>
+                            </TextBlock>
+                            <CheckBox Grid.Row="0"
+                                      Grid.Column="1"
+                                      Style="{StaticResource ConfigurationCheckBoxStyle}"
+                                      IsChecked="{Binding Model.DeleteRefactorlogAfterVersionedScriptGeneration, Mode=TwoWay}"/>
+
+                            <!-- Delete latest after versioned script generation -->
+                            <TextBlock Grid.Row="1"
+                                       Grid.Column="0"
+                                       Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
+                                <Run Text="Delete 'latest' files after versioned script"
+                                     Style="{StaticResource HeaderRunStyle}"/>
+                                <LineBreak/>
+                                <Run Text="generation"
+                                     Style="{StaticResource HeaderRunStyle}"/>
+                                <Button Style="{StaticResource HelpButtonStyle}"
+                                        Command="{Binding OpenDocumentationCommand}"
+                                        CommandParameter="delete-latest-files-after-versioned-script"/>
+                            </TextBlock>
+                            <CheckBox Grid.Row="1"
+                                      Grid.Column="1"
+                                      Style="{StaticResource ConfigurationCheckBoxStyle}"
+                                      IsChecked="{Binding Model.DeleteLatestAfterVersionedScriptGeneration, Mode=TwoWay}"/>
                         </Grid>
                     </GroupBox>
                 </StackPanel>
