@@ -78,7 +78,7 @@
                     }
                     catch (DacServicesException e)
                     {
-                        return new CreateDeployFilesResult(new[] {e.GetBaseException().Message});
+                        return new CreateDeployFilesResult(GetErrorList(e));
                     }
                     finally
                     {
@@ -191,6 +191,16 @@
             }
 
             return result.ToArray();
+        }
+
+        private static string[] GetErrorList(DacServicesException e)
+        {
+            var errorList = new List<string>
+            {
+                e.GetBaseException().Message
+            };
+            errorList.AddRange(e.Messages.Select(dacMessage => dacMessage.ToString()));
+            return errorList.ToArray();
         }
 
         Task<CreateDeployFilesResult> IDacAccess.CreateDeployFilesAsync(string previousVersionDacpacPath,
