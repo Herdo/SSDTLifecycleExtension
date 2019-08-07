@@ -179,6 +179,14 @@
                 return false;
             }
 
+            // Verify XML 'Name' property
+            if (name != project.Name)
+            {
+                await _logger.LogWarningAsync("XML node 'Name' doesn't match the actual project name. This could cause an unexpected behavior.");
+                await _logger.LogDebugAsync($"Value of 'Name' node: {name}");
+                await _logger.LogDebugAsync($"Actual project name: {project.Name}");
+            }
+
             // Set properties on the project object
             project.ProjectProperties.SqlTargetName = string.IsNullOrWhiteSpace(sqlTargetName) ? name : sqlTargetName;
             project.ProjectProperties.BinaryDirectory = Path.Combine(projectDirectory, outputPath);

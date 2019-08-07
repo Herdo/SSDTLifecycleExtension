@@ -309,6 +309,42 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
         }
 
         [Test]
+        public async Task TryLoadSqlProjectPropertiesAsync_IssueWarningIfNameNodeIsDifferentFromProjectName_Async()
+        {
+            // Arrange
+            const string xml =
+                @"<?xml version=""1.0"" encoding=""utf-8""?>
+<Project>
+  <PropertyGroup>
+    <Name>TestProject</Name>
+    <OutputPath>bin\Output</OutputPath>
+    <DacVersion>2.2.3</DacVersion>
+  </PropertyGroup>
+</Project>";
+            var project = new SqlProject("awesomeproject", @"C:\TestProject\TestProject.sqlproj", "c");
+            var vsMock = Mock.Of<IVersionService>();
+            var fsaMock = new Mock<IFileSystemAccess>();
+            fsaMock.Setup(m => m.ReadFileAsync(project.FullName))
+                   .ReturnsAsync(xml);
+            var loggerMock = new Mock<ILogger>();
+            ISqlProjectService service = new SqlProjectService(vsMock, fsaMock.Object, loggerMock.Object);
+
+            // Act
+            var loadedSuccessfully = await service.TryLoadSqlProjectPropertiesAsync(project);
+
+            // Assert
+            Assert.IsTrue(loadedSuccessfully);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<Exception>(), It.IsAny<string>()), Times.Never);
+            Assert.AreEqual("TestProject", project.ProjectProperties.SqlTargetName);
+            Assert.AreEqual(@"C:\TestProject\bin\Output", project.ProjectProperties.BinaryDirectory);
+            Assert.AreEqual(new Version(2, 2, 3), project.ProjectProperties.DacVersion);
+            loggerMock.Verify(m => m.LogWarningAsync("XML node 'Name' doesn't match the actual project name. This could cause an unexpected behavior."), Times.Once);
+            loggerMock.Verify(m => m.LogDebugAsync("Value of 'Name' node: TestProject"), Times.Once);
+            loggerMock.Verify(m => m.LogDebugAsync("Actual project name: awesomeproject"), Times.Once);
+        }
+
+        [Test]
         public void TryLoadPathsForScaffoldingAsync_ArgumentNullException_Project()
         {
             // Arrange
