@@ -47,7 +47,7 @@
 
             var createPaneResult = outputWindow.CreatePane(ref _paneGuid, "SSDT Lifecycle", 1, 1);
             if (createPaneResult != Microsoft.VisualStudio.VSConstants.S_OK)
-                throw new InvalidOperationException($"Failed to get or create SSDT Lifecycle output pane.");
+                throw new InvalidOperationException("Failed to get or create SSDT Lifecycle output pane.");
             getPaneResult = outputWindow.GetPane(ref _paneGuid, out outputPane);
             if (getPaneResult == Microsoft.VisualStudio.VSConstants.S_OK)
             {
@@ -55,7 +55,7 @@
                 return outputPane;
             }
 
-            throw new InvalidOperationException($"Failed to get or create SSDT Lifecycle output pane.");
+            throw new InvalidOperationException("Failed to get or create SSDT Lifecycle output pane.");
         }
 
         private async Task LogToOutputPanelInternalAsync(string message)
