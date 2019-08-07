@@ -77,7 +77,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             Assert.AreEqual(StateModelState.FormattedTargetVersionValidated, model.CurrentState);
             Assert.IsNull(model.Result);
             vsaMock.Verify(m => m.ShowModalError(It.IsAny<string>()), Times.Never);
-            loggerMock.Verify(m => m.LogAsync(It.Is<string>(str => str.StartsWith("ERROR"))), Times.Never);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);
         }
 
         [Test]
@@ -108,7 +108,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             Assert.AreEqual(StateModelState.FormattedTargetVersionValidated, model.CurrentState);
             Assert.IsFalse(model.Result);
             vsaMock.Verify(m => m.ShowModalError("Please change the DAC version in the SQL project settings (see output window)."), Times.Once);
-            loggerMock.Verify(m => m.LogAsync(It.Is<string>(str => str.StartsWith("ERROR"))), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Once);
         }
 
         [Test]
@@ -148,7 +148,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             Assert.AreEqual(StateModelState.FormattedTargetVersionValidated, model.CurrentState);
             Assert.IsNull(model.Result);
             vsaMock.Verify(m => m.ShowModalError(It.IsAny<string>()), Times.Never);
-            loggerMock.Verify(m => m.LogAsync(It.Is<string>(str => str.StartsWith("ERROR"))), Times.Never);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);
         }
 
         [Test]
@@ -174,7 +174,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             Assert.AreEqual(StateModelState.FormattedTargetVersionValidated, model.CurrentState);
             Assert.IsNull(model.Result);
             vsaMock.Verify(m => m.ShowModalError(It.IsAny<string>()), Times.Never);
-            loggerMock.Verify(m => m.LogAsync(It.Is<string>(str => str.StartsWith("ERROR"))), Times.Never);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);
         }
 
         [Test]
@@ -203,7 +203,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             Assert.AreEqual(StateModelState.FormattedTargetVersionValidated, model.CurrentState);
             Assert.IsFalse(model.Result);
             vsaMock.Verify(m => m.ShowModalError("Please change the DAC version in the SQL project settings (see output window)."), Times.Once);
-            loggerMock.Verify(m => m.LogAsync(It.Is<string>(str => str.StartsWith("ERROR"))), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Once);
         }
     }
 }

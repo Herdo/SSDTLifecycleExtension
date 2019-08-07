@@ -56,9 +56,9 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             Assert.AreEqual(2, stateList.Count);
             Assert.IsTrue(stateList[0]);
             Assert.IsFalse(stateList[1]);
-            loggerMock.Verify(m => m.LogAsync("started"), Times.Once);
-            loggerMock.Verify(m => m.LogAsync("Creation was canceled by the user."), Times.Once);
-            loggerMock.Verify(m => m.LogAsync(It.Is<string>(s => s.StartsWith("completed stateModel in"))), Times.Once);
+            loggerMock.Verify(m => m.LogInfoAsync("started"), Times.Once);
+            loggerMock.Verify(m => m.LogInfoAsync("Creation was canceled by the user."), Times.Once);
+            loggerMock.Verify(m => m.LogInfoAsync(It.Is<string>(s => s.StartsWith("completed stateModel in"))), Times.Once);
         }
 
         [Test]
@@ -93,9 +93,9 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             Assert.AreEqual(2, stateList.Count);
             Assert.IsTrue(stateList[0]);
             Assert.IsFalse(stateList[1]);
-            loggerMock.Verify(m => m.LogAsync("started"), Times.Once);
-            loggerMock.Verify(m => m.LogAsync("Creation was canceled by the user."), Times.Never);
-            loggerMock.Verify(m => m.LogAsync(It.Is<string>(s => s.StartsWith("completed stateModel in"))), Times.Once);
+            loggerMock.Verify(m => m.LogInfoAsync("started"), Times.Once);
+            loggerMock.Verify(m => m.LogInfoAsync("Creation was canceled by the user."), Times.Never);
+            loggerMock.Verify(m => m.LogInfoAsync(It.Is<string>(s => s.StartsWith("completed stateModel in"))), Times.Once);
         }
 
         [Test]
@@ -134,15 +134,16 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             Assert.IsTrue(stateList[0]);
             Assert.IsFalse(stateList[1]);
             wuMock.Verify(m => m.Work(model, cts.Token), Times.Once);
-            loggerMock.Verify(m => m.LogAsync("started"), Times.Once);
-            loggerMock.Verify(m => m.LogAsync("Creation was canceled by the user."), Times.Never);
-            loggerMock.Verify(m => m.LogAsync(It.Is<string>(s => s.StartsWith("completed stateModel in"))), Times.Once);
+            loggerMock.Verify(m => m.LogInfoAsync("started"), Times.Once);
+            loggerMock.Verify(m => m.LogInfoAsync("Creation was canceled by the user."), Times.Never);
+            loggerMock.Verify(m => m.LogInfoAsync(It.Is<string>(s => s.StartsWith("completed stateModel in"))), Times.Once);
         }
 
         [Test]
         public async Task DoWorkAsync_ExceptionInWorkUnit_Async()
         {
             // Arrange
+            var testException = new Exception("test exception");
             var loggerMock = new Mock<ILogger>();
             var wuMock = new Mock<IWorkUnit<ScaffoldingStateModel>>();
             var instance = new AsyncExecutorBaseTestImplementation(loggerMock.Object, () => wuMock.Object);
@@ -159,7 +160,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             var model = new ScaffoldingStateModel(project, configuration, targetVersion, HandlerFunc);
             var cts = new CancellationTokenSource();
             wuMock.Setup(m => m.Work(model, cts.Token))
-                  .ThrowsAsync(new Exception("test exception"));
+                  .ThrowsAsync(testException);
 
             // Act
             await instance.CallDoWorkAsync(model, cts.Token);
@@ -170,18 +171,19 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             Assert.IsTrue(stateList[0]);
             Assert.IsFalse(stateList[1]);
             wuMock.Verify(m => m.Work(model, cts.Token), Times.Once);
-            loggerMock.Verify(m => m.LogAsync("started"), Times.Once);
-            loggerMock.Verify(m => m.LogAsync("Creation was canceled by the user."), Times.Never);
-            loggerMock.Verify(m => m.LogAsync(It.Is<string>(s => s.StartsWith("completed stateModel in"))), Times.Never);
-            loggerMock.Verify(m => m.LogAsync("Failed: test exception"), Times.Once);
+            loggerMock.Verify(m => m.LogInfoAsync("started"), Times.Once);
+            loggerMock.Verify(m => m.LogInfoAsync("Creation was canceled by the user."), Times.Never);
+            loggerMock.Verify(m => m.LogInfoAsync(It.Is<string>(s => s.StartsWith("completed stateModel in"))), Times.Never);
+            loggerMock.Verify(m => m.LogErrorAsync(testException, "operation failed."), Times.Once);
         }
 
         [Test]
         public async Task DoWorkAsync_ExceptionInWorkUnitWithExceptionInCatch_Async()
         {
             // Arrange
+            var testException = new Exception("test exception");
             var loggerMock = new Mock<ILogger>();
-            loggerMock.Setup(m => m.LogAsync("Failed: test exception"))
+            loggerMock.Setup(m => m.LogErrorAsync(testException, "operation failed."))
                       .ThrowsAsync(new Exception("catch exception"));
             var wuMock = new Mock<IWorkUnit<ScaffoldingStateModel>>();
             var instance = new AsyncExecutorBaseTestImplementation(loggerMock.Object, () => wuMock.Object);
@@ -198,7 +200,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             var model = new ScaffoldingStateModel(project, configuration, targetVersion, HandlerFunc);
             var cts = new CancellationTokenSource();
             wuMock.Setup(m => m.Work(model, cts.Token))
-                  .ThrowsAsync(new Exception("test exception"));
+                  .ThrowsAsync(testException);
 
             // Act
             await instance.CallDoWorkAsync(model, cts.Token);
@@ -209,10 +211,10 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             Assert.IsTrue(stateList[0]);
             Assert.IsFalse(stateList[1]);
             wuMock.Verify(m => m.Work(model, cts.Token), Times.Once);
-            loggerMock.Verify(m => m.LogAsync("started"), Times.Once);
-            loggerMock.Verify(m => m.LogAsync("Creation was canceled by the user."), Times.Never);
-            loggerMock.Verify(m => m.LogAsync(It.Is<string>(s => s.StartsWith("completed stateModel in"))), Times.Never);
-            loggerMock.Verify(m => m.LogAsync("Failed: test exception"), Times.Once);
+            loggerMock.Verify(m => m.LogInfoAsync("started"), Times.Once);
+            loggerMock.Verify(m => m.LogInfoAsync("Creation was canceled by the user."), Times.Never);
+            loggerMock.Verify(m => m.LogInfoAsync(It.Is<string>(s => s.StartsWith("completed stateModel in"))), Times.Never);
+            loggerMock.Verify(m => m.LogErrorAsync(testException, "operation failed."), Times.Once);
         }
 
         [Test]
@@ -253,9 +255,9 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             Assert.IsTrue(stateList[0]);
             Assert.IsFalse(stateList[1]);
             wuMock.Verify(m => m.Work(model, cts.Token), Times.Once);
-            loggerMock.Verify(m => m.LogAsync("started"), Times.Once);
-            loggerMock.Verify(m => m.LogAsync("Creation was canceled by the user."), Times.Never);
-            loggerMock.Verify(m => m.LogAsync(It.Is<string>(s => s.StartsWith("completed stateModel in"))), Times.Once);
+            loggerMock.Verify(m => m.LogInfoAsync("started"), Times.Once);
+            loggerMock.Verify(m => m.LogInfoAsync("Creation was canceled by the user."), Times.Never);
+            loggerMock.Verify(m => m.LogInfoAsync(It.Is<string>(s => s.StartsWith("completed stateModel in"))), Times.Once);
         }
 
         private class AsyncExecutorBaseTestImplementation : AsyncExecutorBase<ScaffoldingStateModel>
@@ -275,7 +277,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
                                                                    long elapsedMilliseconds) =>
                 $"completed {nameof(stateModel)} in {elapsedMilliseconds}";
 
-            protected override string GetOperationFailedMessage(Exception exception) => $"Failed: {exception.Message}";
+            protected override string GetOperationFailedMessage() => "operation failed.";
 
             protected override IWorkUnit<ScaffoldingStateModel> GetNextWorkUnitForStateModel(ScaffoldingStateModel stateModel) => _workUnitGetter();
 

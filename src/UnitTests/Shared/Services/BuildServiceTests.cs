@@ -62,10 +62,11 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
         public async Task BuildProjectAsync_LogException_Async()
         {
             // Arrange
+            var testException = new InvalidOperationException("test exception");
             var project = new SqlProject("a", @"C:\TestProject\TestProject.sqlproj", "c");
             var vsaMock = new Mock<IVisualStudioAccess>();
             vsaMock.Setup(m => m.BuildProject(project))
-                   .Throws(new InvalidOperationException("test exception"));
+                   .Throws(testException);
             var fsaMock = Mock.Of<IFileSystemAccess>();
             var loggerMock = new Mock<ILogger>();
             IBuildService service = new BuildService(vsaMock.Object, fsaMock, loggerMock.Object);
@@ -76,7 +77,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             // Assert
             Assert.IsFalse(result);
             vsaMock.Verify(m => m.BuildProject(project), Times.Once);
-            loggerMock.Verify(m => m.LogAsync(@"ERROR: Failed to build C:\TestProject\TestProject.sqlproj - test exception"), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync(testException, @"Failed to build C:\TestProject\TestProject.sqlproj"), Times.Once);
         }
 
         [Test]
@@ -162,7 +163,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
 
             // Assert
             Assert.IsFalse(result);
-            loggerMock.Verify(m => m.LogAsync("ERROR: Failed to ensure the target directory exists: failed to access parent directory"), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync("Failed to ensure the target directory exists: failed to access parent directory"), Times.Once);
         }
 
         [Test]
@@ -186,7 +187,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
 
             // Assert
             Assert.IsFalse(result);
-            loggerMock.Verify(m => m.LogAsync("ERROR: Failed to copy files to the target directory: failed to find files to copy"), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync("Failed to copy files to the target directory: failed to find files to copy"), Times.Once);
         }
 
         [Test]

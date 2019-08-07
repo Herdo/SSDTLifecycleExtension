@@ -78,7 +78,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             Assert.AreEqual(StateModelState.TriedToCleanArtifactsDirectory, model.CurrentState);
             Assert.IsNull(model.Result);
             fsaMock.Verify(m => m.TryToCleanDirectory("newArtifactsDirectory"), Times.Once);
-            loggerMock.Verify(m => m.LogAsync(It.IsNotNull<string>()), Times.Once);
+            loggerMock.Verify(m => m.LogInfoAsync(It.IsNotNull<string>()), Times.Once);
         }
 
         [Test]
@@ -121,7 +121,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             Assert.AreEqual(StateModelState.TriedToCleanArtifactsDirectory, model.CurrentState);
             Assert.IsNull(model.Result);
             fsaMock.Verify(m => m.TryToCleanDirectory("newArtifactsDirectory"), Times.Once);
-            loggerMock.Verify(m => m.LogAsync(It.IsNotNull<string>()), Times.Once);
+            loggerMock.Verify(m => m.LogInfoAsync(It.IsNotNull<string>()), Times.Once);
         }
     }
 }

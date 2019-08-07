@@ -69,7 +69,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             var fsaMock = Mock.Of<IFileSystemAccess>();
             var loggedMessages = new List<string>();
             var loggerMock = new Mock<ILogger>();
-            loggerMock.Setup(m => m.LogAsync(It.IsAny<string>()))
+            loggerMock.Setup(m => m.LogErrorAsync(It.IsAny<string>()))
                       .Callback((string message) => loggedMessages.Add(message))
                       .Returns(Task.CompletedTask);
             ISqlProjectService service = new SqlProjectService(vsMock, fsaMock, loggerMock.Object);
@@ -80,7 +80,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             // Assert
             Assert.IsFalse(loadedSuccessfully);
             Assert.AreEqual(1, loggedMessages.Count);
-            Assert.AreEqual(@"ERROR: Cannot get project directory for C:\", loggedMessages[0]);
+            Assert.AreEqual(@"Cannot get project directory for C:\", loggedMessages[0]);
         }
 
         [Test]
@@ -93,10 +93,10 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             var fsaMock = new Mock<IFileSystemAccess>();
             fsaMock.Setup(m => m.ReadFileAsync(project.FullName))
                    .ReturnsAsync(xml);
-            var loggedMessages = new List<string>();
+            var loggedErrorMessages = new List<(Exception Exception, string Message)>();
             var loggerMock = new Mock<ILogger>();
-            loggerMock.Setup(m => m.LogAsync(It.IsAny<string>()))
-                      .Callback((string message) => loggedMessages.Add(message))
+            loggerMock.Setup(m => m.LogErrorAsync(It.IsAny<Exception>(), It.IsAny<string>()))
+                      .Callback((Exception e, string message) => loggedErrorMessages.Add((e, message)))
                       .Returns(Task.CompletedTask);
             ISqlProjectService service = new SqlProjectService(vsMock, fsaMock.Object, loggerMock.Object);
 
@@ -105,9 +105,10 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
 
             // Assert
             Assert.IsFalse(loadedSuccessfully);
-            Assert.AreEqual(1, loggedMessages.Count);
-            Assert.IsNotNull(loggedMessages[0]);
-            Assert.IsTrue(loggedMessages[0].StartsWith(@"ERROR: Cannot read contents of C:\TestProject.sqlproj - "));
+            Assert.AreEqual(1, loggedErrorMessages.Count);
+            Assert.IsNotNull(loggedErrorMessages[0]);
+            Assert.IsNotNull(loggedErrorMessages[0].Exception);
+            Assert.IsTrue(loggedErrorMessages[0].Message.StartsWith(@"Cannot read contents of C:\TestProject.sqlproj"));
         }
 
         [Test]
@@ -125,10 +126,10 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             var fsaMock = new Mock<IFileSystemAccess>();
             fsaMock.Setup(m => m.ReadFileAsync(project.FullName))
                    .ReturnsAsync(xml);
-            var loggedMessages = new List<string>();
+            var loggedErrorMessages = new List<string>();
             var loggerMock = new Mock<ILogger>();
-            loggerMock.Setup(m => m.LogAsync(It.IsAny<string>()))
-                      .Callback((string message) => loggedMessages.Add(message))
+            loggerMock.Setup(m => m.LogErrorAsync(It.IsAny<string>()))
+                      .Callback((string message) => loggedErrorMessages.Add(message))
                       .Returns(Task.CompletedTask);
             ISqlProjectService service = new SqlProjectService(vsMock, fsaMock.Object, loggerMock.Object);
 
@@ -137,8 +138,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
 
             // Assert
             Assert.IsFalse(loadedSuccessfully);
-            Assert.AreEqual(1, loggedMessages.Count);
-            Assert.AreEqual(@"ERROR: Cannot read name of C:\TestProject.sqlproj", loggedMessages[0]);
+            Assert.AreEqual(1, loggedErrorMessages.Count);
+            Assert.AreEqual(@"Cannot read name of C:\TestProject.sqlproj", loggedErrorMessages[0]);
         }
 
         [Test]
@@ -157,10 +158,10 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             var fsaMock = new Mock<IFileSystemAccess>();
             fsaMock.Setup(m => m.ReadFileAsync(project.FullName))
                    .ReturnsAsync(xml);
-            var loggedMessages = new List<string>();
+            var loggedErrorMessages = new List<string>();
             var loggerMock = new Mock<ILogger>();
-            loggerMock.Setup(m => m.LogAsync(It.IsAny<string>()))
-                      .Callback((string message) => loggedMessages.Add(message))
+            loggerMock.Setup(m => m.LogErrorAsync(It.IsAny<string>()))
+                      .Callback((string message) => loggedErrorMessages.Add(message))
                       .Returns(Task.CompletedTask);
             ISqlProjectService service = new SqlProjectService(vsMock, fsaMock.Object, loggerMock.Object);
 
@@ -169,8 +170,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
 
             // Assert
             Assert.IsFalse(loadedSuccessfully);
-            Assert.AreEqual(1, loggedMessages.Count);
-            Assert.AreEqual(@"ERROR: Cannot read output path of C:\TestProject.sqlproj", loggedMessages[0]);
+            Assert.AreEqual(1, loggedErrorMessages.Count);
+            Assert.AreEqual(@"Cannot read output path of C:\TestProject.sqlproj", loggedErrorMessages[0]);
         }
 
         [Test]
@@ -190,10 +191,10 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             var fsaMock = new Mock<IFileSystemAccess>();
             fsaMock.Setup(m => m.ReadFileAsync(project.FullName))
                    .ReturnsAsync(xml);
-            var loggedMessages = new List<string>();
+            var loggedErrorMessages = new List<string>();
             var loggerMock = new Mock<ILogger>();
-            loggerMock.Setup(m => m.LogAsync(It.IsAny<string>()))
-                      .Callback((string message) => loggedMessages.Add(message))
+            loggerMock.Setup(m => m.LogErrorAsync(It.IsAny<string>()))
+                      .Callback((string message) => loggedErrorMessages.Add(message))
                       .Returns(Task.CompletedTask);
             ISqlProjectService service = new SqlProjectService(vsMock, fsaMock.Object, loggerMock.Object);
 
@@ -202,8 +203,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
 
             // Assert
             Assert.IsFalse(loadedSuccessfully);
-            Assert.AreEqual(1, loggedMessages.Count);
-            Assert.AreEqual(@"ERROR: Cannot read DacVersion of C:\TestProject.sqlproj", loggedMessages[0]);
+            Assert.AreEqual(1, loggedErrorMessages.Count);
+            Assert.AreEqual(@"Cannot read DacVersion of C:\TestProject.sqlproj", loggedErrorMessages[0]);
         }
 
         [Test]
@@ -232,7 +233,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
 
             // Assert
             Assert.IsTrue(loadedSuccessfully);
-            loggerMock.Verify(m => m.LogAsync(It.IsAny<string>()), Times.Never);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<Exception>(), It.IsAny<string>()), Times.Never);
             Assert.AreEqual("TestProject", project.ProjectProperties.SqlTargetName);
             Assert.AreEqual(@"C:\TestProject\bin\Output", project.ProjectProperties.BinaryDirectory);
             Assert.AreEqual(new Version(2, 2, 3), project.ProjectProperties.DacVersion);
@@ -265,7 +267,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
 
             // Assert
             Assert.IsTrue(loadedSuccessfully);
-            loggerMock.Verify(m => m.LogAsync(It.IsAny<string>()), Times.Never);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<Exception>(), It.IsAny<string>()), Times.Never);
             Assert.AreEqual("TestProjectName", project.ProjectProperties.SqlTargetName);
             Assert.AreEqual(@"C:\TestProject\bin\Output", project.ProjectProperties.BinaryDirectory);
             Assert.AreEqual(new Version(2, 2, 3), project.ProjectProperties.DacVersion);
@@ -298,7 +301,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
 
             // Assert
             Assert.IsTrue(loadedSuccessfully);
-            loggerMock.Verify(m => m.LogAsync(It.IsAny<string>()), Times.Never);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<Exception>(), It.IsAny<string>()), Times.Never);
             Assert.AreEqual("TestProject", project.ProjectProperties.SqlTargetName);
             Assert.AreEqual(@"C:\TestProject\bin\Output", project.ProjectProperties.BinaryDirectory);
             Assert.AreEqual(new Version(2, 2, 3), project.ProjectProperties.DacVersion);
@@ -343,10 +347,10 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             var configuration = new ConfigurationModel();
             var vsMock = Mock.Of<IVersionService>();
             var fsaMock = Mock.Of<IFileSystemAccess>();
-            var loggedMessages = new List<string>();
+            var loggedErrorMessages = new List<string>();
             var loggerMock = new Mock<ILogger>();
-            loggerMock.Setup(m => m.LogAsync(It.IsAny<string>()))
-                      .Callback((string message) => loggedMessages.Add(message))
+            loggerMock.Setup(m => m.LogErrorAsync(It.IsAny<string>()))
+                      .Callback((string message) => loggedErrorMessages.Add(message))
                       .Returns(Task.CompletedTask);
             ISqlProjectService service = new SqlProjectService(vsMock, fsaMock, loggerMock.Object);
 
@@ -355,8 +359,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
 
             // Assert
             Assert.IsNull(paths);
-            Assert.AreEqual(1, loggedMessages.Count);
-            Assert.AreEqual(@"ERROR: Cannot get project directory for C:\", loggedMessages[0]);
+            Assert.AreEqual(1, loggedErrorMessages.Count);
+            Assert.AreEqual(@"Cannot get project directory for C:\", loggedErrorMessages[0]);
         }
 
         [Test]
@@ -388,7 +392,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
 
             // Assert
             Assert.IsNotNull(paths);
-            loggerMock.Verify(m => m.LogAsync(It.IsAny<string>()), Times.Never);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<Exception>(), It.IsAny<string>()), Times.Never);
             Assert.AreEqual(@"C:\TestProject", paths.Directories.ProjectDirectory);
             Assert.AreEqual(@"C:\TestProject\TestProfile.publish.xml", paths.DeploySources.PublishProfilePath);
             Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest", paths.Directories.LatestArtifactsDirectory);
@@ -426,7 +431,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
 
             // Assert
             Assert.IsNotNull(paths);
-            loggerMock.Verify(m => m.LogAsync(It.IsAny<string>()), Times.Never);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<Exception>(), It.IsAny<string>()), Times.Never);
             Assert.AreEqual(@"C:\TestProject", paths.Directories.ProjectDirectory);
             Assert.AreEqual(string.Empty, paths.DeploySources.PublishProfilePath);
             Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest", paths.Directories.LatestArtifactsDirectory);
@@ -493,10 +499,10 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             var configuration = new ConfigurationModel();
             var vsMock = Mock.Of<IVersionService>();
             var fsaMock = Mock.Of<IFileSystemAccess>();
-            var loggedMessages = new List<string>();
+            var loggedErrorMessages = new List<string>();
             var loggerMock = new Mock<ILogger>();
-            loggerMock.Setup(m => m.LogAsync(It.IsAny<string>()))
-                      .Callback((string message) => loggedMessages.Add(message))
+            loggerMock.Setup(m => m.LogErrorAsync(It.IsAny<string>()))
+                      .Callback((string message) => loggedErrorMessages.Add(message))
                       .Returns(Task.CompletedTask);
             ISqlProjectService service = new SqlProjectService(vsMock, fsaMock, loggerMock.Object);
 
@@ -505,8 +511,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
 
             // Assert
             Assert.IsNull(paths);
-            Assert.AreEqual(1, loggedMessages.Count);
-            Assert.AreEqual(@"ERROR: Cannot get project directory for C:\", loggedMessages[0]);
+            Assert.AreEqual(1, loggedErrorMessages.Count);
+            Assert.AreEqual(@"Cannot get project directory for C:\", loggedErrorMessages[0]);
         }
 
         [Test]
@@ -539,7 +545,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
 
             // Assert
             Assert.IsNotNull(paths);
-            loggerMock.Verify(m => m.LogAsync(It.IsAny<string>()), Times.Never);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<Exception>(), It.IsAny<string>()), Times.Never);
             Assert.AreEqual(@"C:\TestProject", paths.Directories.ProjectDirectory);
             Assert.AreEqual(@"C:\TestProject\TestProfile.publish.xml", paths.DeploySources.PublishProfilePath);
             Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest", paths.Directories.LatestArtifactsDirectory);
@@ -578,7 +585,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
 
             // Assert
             Assert.IsNotNull(paths);
-            loggerMock.Verify(m => m.LogAsync(It.IsAny<string>()), Times.Never);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<Exception>(), It.IsAny<string>()), Times.Never);
             Assert.AreEqual(@"C:\TestProject", paths.Directories.ProjectDirectory);
             Assert.AreEqual(string.Empty, paths.DeploySources.PublishProfilePath);
             Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest", paths.Directories.LatestArtifactsDirectory);
@@ -619,7 +627,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
 
             // Assert
             Assert.IsNotNull(paths);
-            loggerMock.Verify(m => m.LogAsync(It.IsAny<string>()), Times.Never);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<Exception>(), It.IsAny<string>()), Times.Never);
             Assert.AreEqual(@"C:\TestProject", paths.Directories.ProjectDirectory);
             Assert.AreEqual(@"C:\TestProject\TestProfile.publish.xml", paths.DeploySources.PublishProfilePath);
             Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest", paths.Directories.LatestArtifactsDirectory);
@@ -658,7 +667,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
 
             // Assert
             Assert.IsNotNull(paths);
-            loggerMock.Verify(m => m.LogAsync(It.IsAny<string>()), Times.Never);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<Exception>(), It.IsAny<string>()), Times.Never);
             Assert.AreEqual(@"C:\TestProject", paths.Directories.ProjectDirectory);
             Assert.AreEqual(string.Empty, paths.DeploySources.PublishProfilePath);
             Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest", paths.Directories.LatestArtifactsDirectory);

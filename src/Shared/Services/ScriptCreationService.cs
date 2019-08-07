@@ -47,7 +47,7 @@ namespace SSDTLifecycleExtension.Shared.Services
             return $"========== Script creation finished after {elapsedMilliseconds} milliseconds. ==========";
         }
 
-        protected override string GetOperationFailedMessage(Exception exception) => $"ERROR: Script creation failed: {exception.Message}";
+        protected override string GetOperationFailedMessage() => "Script creation failed.";
 
         protected override IWorkUnit<ScriptCreationStateModel> GetNextWorkUnitForStateModel(ScriptCreationStateModel stateModel)
         {

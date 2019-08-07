@@ -93,6 +93,7 @@
     <Compile Include="Shared\Services\ScriptModifierProviderServiceTests.cs" />
     <Compile Include="Shared\Services\SqlProjectServiceTests.cs" />
     <Compile Include="Shared\Services\VersionServiceTests.cs" />
+    <Compile Include="Shared\Services\VisualStudioLoggerTests.cs" />
     <Compile Include="Shared\Services\XmlFormatServiceTests.cs" />
     <Compile Include="Shared\WorkUnits\BuildProjectUnitTests.cs" />
     <Compile Include="Shared\WorkUnits\CleanLatestArtifactsDirectoryUnitTests.cs" />

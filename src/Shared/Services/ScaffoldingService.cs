@@ -44,7 +44,7 @@
             return $"========== Scaffolding version {stateModel.FormattedTargetVersion} finished after {elapsedMilliseconds} milliseconds. ==========";
         }
 
-        protected override string GetOperationFailedMessage(Exception exception) => $"ERROR: DACPAC scaffolding failed: {exception.Message}";
+        protected override string GetOperationFailedMessage() => "DACPAC scaffolding failed.";
 
         protected override IWorkUnit<ScaffoldingStateModel> GetNextWorkUnitForStateModel(ScaffoldingStateModel stateModel)
         {

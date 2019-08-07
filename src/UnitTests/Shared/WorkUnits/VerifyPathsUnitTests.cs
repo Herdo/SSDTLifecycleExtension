@@ -78,7 +78,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             // Assert
             Assert.AreEqual(StateModelState.PathsVerified, model.CurrentState);
             Assert.IsNull(model.Result);
-            loggerMock.Verify(m => m.LogAsync(It.Is<string>(str => str.StartsWith("ERROR"))), Times.Never);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);
         }
 
         [Test]
@@ -107,7 +107,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             // Assert
             Assert.AreEqual(StateModelState.PathsVerified, model.CurrentState);
             Assert.IsFalse(model.Result);
-            loggerMock.Verify(m => m.LogAsync(It.Is<string>(str => str.StartsWith("ERROR"))), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsNotNull<string>()), Times.Once);
             fsaMock.Verify(m => m.CheckIfFileExists(It.IsAny<string>()), Times.Never);
         }
 
@@ -138,7 +138,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             // Assert
             Assert.AreEqual(StateModelState.PathsVerified, model.CurrentState);
             Assert.IsFalse(model.Result);
-            loggerMock.Verify(m => m.LogAsync(It.Is<string>(str => str.StartsWith("ERROR"))), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsNotNull<string>()), Times.Once);
         }
     }
 }

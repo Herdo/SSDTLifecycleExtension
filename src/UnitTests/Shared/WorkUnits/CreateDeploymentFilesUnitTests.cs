@@ -97,21 +97,23 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             Assert.AreEqual(StateModelState.TriedToCreateDeploymentFiles, model.CurrentState);
             Assert.IsFalse(model.Result);
             fsaMock.Verify(m => m.WriteFileAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
-            loggerMock.Verify(m => m.LogAsync(It.Is<string>(s => s.StartsWith("ERROR"))), Times.Exactly(2));
-            loggerMock.Verify(m => m.LogAsync("error1"), Times.Once);
-            loggerMock.Verify(m => m.LogAsync("error2"), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync("Script creation aborted."), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync("Failed to create script."), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync("error1"), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync("error2"), Times.Once);
         }
 
         [Test]
         public async Task Work_ScriptCreationStateModel_PersistScriptError_Async()
         {
             // Arrange
+            var testException = new Exception("test exception");
             var daMock = new Mock<IDacAccess>();
             daMock.Setup(m => m.CreateDeployFilesAsync("previousDacpacPath", "newDacpacPath", "publishProfilePath", true, true))
                   .ReturnsAsync(new CreateDeployFilesResult("pre script post", "report", "pre ", " post", new PublishProfile()));
             var fsaMock = new Mock<IFileSystemAccess>();
             fsaMock.Setup(m => m.WriteFileAsync("deployScriptPath", "pre script post"))
-                   .ThrowsAsync(new Exception("test exception"));
+                   .ThrowsAsync(testException);
             var loggerMock = new Mock<ILogger>();
             IWorkUnit<ScriptCreationStateModel> unit = new CreateDeploymentFilesUnit(daMock.Object, fsaMock.Object, loggerMock.Object);
             var project = new SqlProject("a", "b", "c");
@@ -135,20 +137,21 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             Assert.AreEqual(StateModelState.TriedToCreateDeploymentFiles, model.CurrentState);
             Assert.IsFalse(model.Result);
             fsaMock.Verify(m => m.WriteFileAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
-            loggerMock.Verify(m => m.LogAsync(It.Is<string>(s => s.StartsWith("ERROR"))), Times.Exactly(2));
-            loggerMock.Verify(m => m.LogAsync("ERROR: Failed to write deploy script: test exception"), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync("Script creation aborted."), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync(testException, "Failed to write deploy script"), Times.Once);
         }
 
         [Test]
         public async Task Work_ScriptCreationStateModel_PersistReportError_Async()
         {
             // Arrange
+            var testException = new Exception("test exception");
             var daMock = new Mock<IDacAccess>();
             daMock.Setup(m => m.CreateDeployFilesAsync("previousDacpacPath", "newDacpacPath", "publishProfilePath", true, true))
                   .ReturnsAsync(new CreateDeployFilesResult("pre script post", "report", "pre ", " post", new PublishProfile()));
             var fsaMock = new Mock<IFileSystemAccess>();
             fsaMock.Setup(m => m.WriteFileAsync("deployReportPath", "report"))
-                   .ThrowsAsync(new Exception("test exception"));
+                   .ThrowsAsync(testException);
             var loggerMock = new Mock<ILogger>();
             IWorkUnit<ScriptCreationStateModel> unit = new CreateDeploymentFilesUnit(daMock.Object, fsaMock.Object, loggerMock.Object);
             var project = new SqlProject("a", "b", "c");
@@ -172,8 +175,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             Assert.AreEqual(StateModelState.TriedToCreateDeploymentFiles, model.CurrentState);
             Assert.IsFalse(model.Result);
             fsaMock.Verify(m => m.WriteFileAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Exactly(2));
-            loggerMock.Verify(m => m.LogAsync(It.Is<string>(s => s.StartsWith("ERROR"))), Times.Exactly(2));
-            loggerMock.Verify(m => m.LogAsync("ERROR: Failed to write deploy report: test exception"), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync("Script creation aborted."), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync(testException, "Failed to write deploy report"), Times.Once);
         }
 
         [Test]
@@ -208,7 +211,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             // Assert
             Assert.AreEqual(StateModelState.TriedToCreateDeploymentFiles, model.CurrentState);
             Assert.IsFalse(model.Result);
-            loggerMock.Verify(m => m.LogAsync("ERROR: Failed to create complete script. Generated script is missing the pre-deployment script."), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync("Failed to create complete script. Generated script is missing the pre-deployment script."), Times.Once);
             fsaMock.Verify(m => m.WriteFileAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
         }
 
@@ -244,7 +247,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             // Assert
             Assert.AreEqual(StateModelState.TriedToCreateDeploymentFiles, model.CurrentState);
             Assert.IsFalse(model.Result);
-            loggerMock.Verify(m => m.LogAsync("ERROR: Failed to create complete script. Generated script is missing the post-deployment script."), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync("Failed to create complete script. Generated script is missing the post-deployment script."), Times.Once);
             fsaMock.Verify(m => m.WriteFileAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
         }
 
@@ -288,6 +291,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             Assert.IsNull(model.Result);
             fsaMock.Verify(m => m.WriteFileAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
             fsaMock.Verify(m => m.WriteFileAsync("deployScriptPath", (includePreDeployment ? "pre " : "") + "script" + (includePostDeployment ? " post" : "")), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<Exception>(), It.IsAny<string>()), Times.Never);
         }
 
         [Test]
@@ -331,6 +336,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             fsaMock.Verify(m => m.WriteFileAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Exactly(2));
             fsaMock.Verify(m => m.WriteFileAsync("deployScriptPath", (includePreDeployment ? "pre " : "") + "script" + (includePostDeployment ? " post" : "")), Times.Once);
             fsaMock.Verify(m => m.WriteFileAsync("deployReportPath", "report"), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<Exception>(), It.IsAny<string>()), Times.Never);
         }
 
         [Test]
@@ -409,19 +416,19 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             Assert.AreEqual(expectedResult, model.Result);
             if (removeSqlCmdStatements && createNewDatabase)
             {
-                loggerMock.Verify(m => m.LogAsync($"ERROR: {nameof(PublishProfile.CreateNewDatabase)} cannot bet set to true, when {nameof(ConfigurationModel.RemoveSqlCmdStatements)} is also true."), Times.Once);
+                loggerMock.Verify(m => m.LogErrorAsync($"{nameof(PublishProfile.CreateNewDatabase)} cannot bet set to true, when {nameof(ConfigurationModel.RemoveSqlCmdStatements)} is also true."), Times.Once);
             }
             if (removeSqlCmdStatements && backupDatabaseBeforeChanges)
             {
-                loggerMock.Verify(m => m.LogAsync($"ERROR: {nameof(PublishProfile.BackupDatabaseBeforeChanges)} cannot bet set to true, when {nameof(ConfigurationModel.RemoveSqlCmdStatements)} is also true."), Times.Once);
+                loggerMock.Verify(m => m.LogErrorAsync($"{nameof(PublishProfile.BackupDatabaseBeforeChanges)} cannot bet set to true, when {nameof(ConfigurationModel.RemoveSqlCmdStatements)} is also true."), Times.Once);
             }
             if (removeSqlCmdStatements && scriptDatabaseOptions)
             {
-                loggerMock.Verify(m => m.LogAsync($"ERROR: {nameof(PublishProfile.ScriptDatabaseOptions)} cannot bet set to true, when {nameof(ConfigurationModel.RemoveSqlCmdStatements)} is also true."), Times.Once);
+                loggerMock.Verify(m => m.LogErrorAsync($"{nameof(PublishProfile.ScriptDatabaseOptions)} cannot bet set to true, when {nameof(ConfigurationModel.RemoveSqlCmdStatements)} is also true."), Times.Once);
             }
             if (removeSqlCmdStatements && scriptDeployStateChecks)
             {
-                loggerMock.Verify(m => m.LogAsync($"ERROR: {nameof(PublishProfile.ScriptDeployStateChecks)} cannot bet set to true, when {nameof(ConfigurationModel.RemoveSqlCmdStatements)} is also true."), Times.Once);
+                loggerMock.Verify(m => m.LogErrorAsync($"{nameof(PublishProfile.ScriptDeployStateChecks)} cannot bet set to true, when {nameof(ConfigurationModel.RemoveSqlCmdStatements)} is also true."), Times.Once);
             }
 
             if (expectedResult == null)

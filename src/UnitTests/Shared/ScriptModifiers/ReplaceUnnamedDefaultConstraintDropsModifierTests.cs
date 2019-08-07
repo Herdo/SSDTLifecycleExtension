@@ -275,12 +275,12 @@ GO";
 
             // Assert
             Assert.AreEqual(MultipleDropDefaultConstraintStatements, model.CurrentScript);
-            loggerMock.Verify(m => m.LogAsync("ERROR: Failed to load the default constraints of the previous DACPAC:"), Times.Once);
-            loggerMock.Verify(m => m.LogAsync("oldError1"), Times.Once);
-            loggerMock.Verify(m => m.LogAsync("oldError2"), Times.Once);
-            loggerMock.Verify(m => m.LogAsync("ERROR: Failed to load the default constraints of the current DACPAC:"), Times.Once);
-            loggerMock.Verify(m => m.LogAsync("newError1"), Times.Once);
-            loggerMock.Verify(m => m.LogAsync("newError2"), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync("Failed to load the default constraints of the previous DACPAC:"), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync("oldError1"), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync("oldError2"), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync("Failed to load the default constraints of the current DACPAC:"), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync("newError1"), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync("newError2"), Times.Once);
         }
 
         [Test]
@@ -323,7 +323,7 @@ GO";
 
             // Assert
             Assert.AreEqual(MultipleDropDefaultConstraintStatementsReplacedPartially, model.CurrentScript);
-            loggerMock.Verify(m => m.LogAsync($"WARNING - {nameof(ReplaceUnnamedDefaultConstraintDropsModifier)}: Script defines 1 unnamed default constraint(s) more to drop than the DACPAC models provide."), Times.Once);
+            loggerMock.Verify(m => m.LogWarningAsync($"{nameof(ReplaceUnnamedDefaultConstraintDropsModifier)}: Script defines 1 unnamed default constraint(s) more to drop than the DACPAC models provide."), Times.Once);
         }
 
         [Test]
@@ -370,7 +370,7 @@ GO";
 
             // Assert
             Assert.AreEqual(expectedOutput, model.CurrentScript);
-            loggerMock.Verify(m => m.LogAsync($"WARNING - {nameof(ReplaceUnnamedDefaultConstraintDropsModifier)}: Regular expression matching timed out 1 time(s)."), Times.Once);
+            loggerMock.Verify(m => m.LogWarningAsync($"{nameof(ReplaceUnnamedDefaultConstraintDropsModifier)}: Regular expression matching timed out 1 time(s)."), Times.Once);
         }
 
         [Test]

@@ -23,7 +23,7 @@
 
         private async Task<bool> BuildProjectInternalAsync(SqlProject project)
         {
-            await _logger.LogAsync("Building project ...");
+            await _logger.LogInfoAsync("Building project ...");
             try
             {
                 _visualStudioAccess.BuildProject(project);
@@ -31,7 +31,7 @@
             }
             catch (Exception e)
             {
-                await _logger.LogAsync($"ERROR: Failed to build {project.FullName} - {e.Message}");
+                await _logger.LogErrorAsync(e, $"Failed to build {project.FullName}");
                 return false;
             }
         }
@@ -39,11 +39,11 @@
         private async Task<bool> CopyBuildResultInternalAsync(SqlProject project,
                                                               string targetDirectory)
         {
-            await _logger.LogAsync("Copying files to target directory ...");
+            await _logger.LogInfoAsync("Copying files to target directory ...");
             var directoryCreationError = _fileSystemAccess.EnsureDirectoryExists(targetDirectory);
             if (directoryCreationError != null)
             {
-                await _logger.LogAsync($"ERROR: Failed to ensure the target directory exists: {directoryCreationError}");
+                await _logger.LogErrorAsync($"Failed to ensure the target directory exists: {directoryCreationError}");
                 return false;
             }
 
@@ -51,7 +51,7 @@
             if (copyFilesError == null)
                 return true;
 
-            await _logger.LogAsync($"ERROR: Failed to copy files to the target directory: {copyFilesError}");
+            await _logger.LogErrorAsync($"Failed to copy files to the target directory: {copyFilesError}");
             return false;
         }
 

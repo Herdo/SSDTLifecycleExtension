@@ -35,7 +35,7 @@
                 return;
             }
 
-            await _logger.LogAsync("Copying DACPAC to shared DACPAC repository ...");
+            await _logger.LogInfoAsync("Copying DACPAC to shared DACPAC repository ...");
             try
             {
                 var fileName = Path.GetFileName(newDacpacPath);
@@ -43,7 +43,7 @@
                 var directoryError = _fileSystemAccess.EnsureDirectoryExists(sharedDacpacRepositoryPath);
                 if (directoryError != null)
                 {
-                    await _logger.LogAsync($"ERROR: Failed to ensure that the directory '{sharedDacpacRepositoryPath}' exists: {directoryError}");
+                    await _logger.LogErrorAsync($"Failed to ensure that the directory '{sharedDacpacRepositoryPath}' exists: {directoryError}");
                     stateModel.CurrentState = StateModelState.TriedToCopyDacpacToSharedDacpacRepository;
                     stateModel.Result = false;
                     return;
@@ -54,12 +54,12 @@
                 if (copyError == null)
                     return;
 
-                await _logger.LogAsync($"ERROR: Failed to copy DACPAC to shared DACPAC repository: {copyError}");
+                await _logger.LogErrorAsync($"Failed to copy DACPAC to shared DACPAC repository: {copyError}");
                 stateModel.Result = false;
             }
             catch (Exception e)
             {
-                await _logger.LogAsync($"ERROR: Failed to copy DACPAC to shared DACPAC repository: {e.Message}");
+                await _logger.LogErrorAsync($"Failed to copy DACPAC to shared DACPAC repository: {e.Message}");
                 stateModel.CurrentState = StateModelState.TriedToCopyDacpacToSharedDacpacRepository;
                 stateModel.Result = false;
             }

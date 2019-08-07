@@ -75,7 +75,7 @@
             var projectDirectory = Path.GetDirectoryName(projectPath);
             if (projectDirectory == null)
             {
-                await _logger.LogAsync($"ERROR: Cannot get project directory for {project.FullName}");
+                await _logger.LogErrorAsync($"Cannot get project directory for {project.FullName}");
                 return null;
             }
 
@@ -136,7 +136,7 @@
             var projectDirectory = Path.GetDirectoryName(project.FullName);
             if (projectDirectory == null)
             {
-                await _logger.LogAsync($"ERROR: Cannot get project directory for {project.FullName}");
+                await _logger.LogErrorAsync($"Cannot get project directory for {project.FullName}");
                 return false;
             }
 
@@ -151,7 +151,7 @@
             }
             catch (XmlException e)
             {
-                await _logger.LogAsync($"ERROR: Cannot read contents of {project.FullName} - {e.Message}");
+                await _logger.LogErrorAsync(e, $"Cannot read contents of {project.FullName}");
                 return false;
             }
 
@@ -163,19 +163,19 @@
 
             if (name == null)
             {
-                await _logger.LogAsync($"ERROR: Cannot read name of {project.FullName}");
+                await _logger.LogErrorAsync($"Cannot read name of {project.FullName}");
                 return false;
             }
 
             if (outputPath == null)
             {
-                await _logger.LogAsync($"ERROR: Cannot read output path of {project.FullName}");
+                await _logger.LogErrorAsync($"Cannot read output path of {project.FullName}");
                 return false;
             }
 
             if (dacVersion == null)
             {
-                await _logger.LogAsync($"ERROR: Cannot read DacVersion of {project.FullName}");
+                await _logger.LogErrorAsync($"Cannot read DacVersion of {project.FullName}");
                 return false;
             }
 

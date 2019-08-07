@@ -981,6 +981,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
         [TestCase(false)]
         public void ScaffoldDevelopmentVersionCommand_Executed_CallLoggerOnError(bool loggerThrowsException)
         {
+            var testException = new InvalidOperationException("test exception");
             var config = new ConfigurationModel
             {
                 ArtifactsPath = "_Deployment",
@@ -1000,7 +1001,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
                   .ReturnsAsync(config);
             var ssMock = new Mock<IScaffoldingService>();
             ssMock.Setup(m => m.ScaffoldAsync(project, config, new Version(0, 0, 0, 0), CancellationToken.None))
-                  .ThrowsAsync(new InvalidOperationException("test exception"));
+                  .ThrowsAsync(testException);
             var scsMock = new Mock<IScriptCreationService>();
             var asMock = new Mock<IArtifactsService>();
             asMock.Setup(m => m.GetExistingArtifactVersions(project, config))
@@ -1015,7 +1016,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             var loggerMock = new Mock<ILogger>();
             if (loggerThrowsException)
             {
-                loggerMock.Setup(m => m.LogAsync(It.IsAny<string>()))
+                loggerMock.Setup(m => m.LogErrorAsync(It.IsAny<Exception>(), It.IsAny<string>()))
                           .ThrowsAsync(new InvalidOperationException("logger exception"));
             }
             var vm = new ScriptCreationViewModel(project, csMock.Object, ssMock.Object, scsMock.Object, asMock.Object, loggerMock.Object);
@@ -1040,7 +1041,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             // Assert
             csMock.Verify(m => m.GetConfigurationOrDefaultAsync(project), Times.Once);
             ssMock.Verify(m => m.ScaffoldAsync(project, config, new Version(0, 0, 0, 0), CancellationToken.None), Times.Once);
-            loggerMock.Verify(m => m.LogAsync(It.Is<string>(message => message.Contains(nameof(ScriptCreationViewModel.ScaffoldDevelopmentVersionCommand)) && message.Contains("test exception"))),
+            loggerMock.Verify(m => m.LogErrorAsync(testException, It.Is<string>(message => message.Contains(nameof(ScriptCreationViewModel.ScaffoldDevelopmentVersionCommand)))),
                               Times.Once);
             Assert.AreEqual(1, scaffoldDevelopmentVersionCommandCanExecuteChangedCount);
             Assert.AreEqual(0, scaffoldCurrentProductionVersionCommandCanExecuteChangedCount);
@@ -1053,6 +1054,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
         [TestCase(false)]
         public void ScaffoldCurrentProductionVersionCommand_Executed_CallLoggerOnError(bool loggerThrowsException)
         {
+            var testException = new InvalidOperationException("test exception");
             var config = new ConfigurationModel
             {
                 ArtifactsPath = "_Deployment",
@@ -1072,7 +1074,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
                   .ReturnsAsync(config);
             var ssMock = new Mock<IScaffoldingService>();
             ssMock.Setup(m => m.ScaffoldAsync(project, config, new Version(1, 0, 0, 0), CancellationToken.None))
-                  .ThrowsAsync(new InvalidOperationException("test exception"));
+                  .ThrowsAsync(testException);
             var scsMock = new Mock<IScriptCreationService>();
             var asMock = new Mock<IArtifactsService>();
             asMock.Setup(m => m.GetExistingArtifactVersions(project, config))
@@ -1087,7 +1089,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             var loggerMock = new Mock<ILogger>();
             if (loggerThrowsException)
             {
-                loggerMock.Setup(m => m.LogAsync(It.IsAny<string>()))
+                loggerMock.Setup(m => m.LogErrorAsync(It.IsAny<Exception>(), It.IsAny<string>()))
                           .ThrowsAsync(new InvalidOperationException("logger exception"));
             }
             var vm = new ScriptCreationViewModel(project, csMock.Object, ssMock.Object, scsMock.Object, asMock.Object, loggerMock.Object);
@@ -1112,7 +1114,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             // Assert
             csMock.Verify(m => m.GetConfigurationOrDefaultAsync(project), Times.Once);
             ssMock.Verify(m => m.ScaffoldAsync(project, config, new Version(1, 0, 0, 0), CancellationToken.None), Times.Once);
-            loggerMock.Verify(m => m.LogAsync(It.Is<string>(message => message.Contains(nameof(ScriptCreationViewModel.ScaffoldCurrentProductionVersionCommand)) && message.Contains("test exception"))),
+            loggerMock.Verify(m => m.LogErrorAsync(testException, It.Is<string>(message => message.Contains(nameof(ScriptCreationViewModel.ScaffoldCurrentProductionVersionCommand)))),
                               Times.Once);
             Assert.AreEqual(0, scaffoldDevelopmentVersionCommandCanExecuteChangedCount);
             Assert.AreEqual(1, scaffoldCurrentProductionVersionCommandCanExecuteChangedCount);
@@ -1125,6 +1127,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
         [TestCase(false)]
         public void StartLatestCreationCommand_Executed_CallLoggerOnError(bool loggerThrowsException)
         {
+            var testException = new InvalidOperationException("test exception");
             var config = new ConfigurationModel
             {
                 ArtifactsPath = "_Deployment",
@@ -1157,14 +1160,14 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             var loggerMock = new Mock<ILogger>();
             if (loggerThrowsException)
             {
-                loggerMock.Setup(m => m.LogAsync(It.IsAny<string>()))
+                loggerMock.Setup(m => m.LogErrorAsync(It.IsAny<Exception>(), It.IsAny<string>()))
                           .ThrowsAsync(new InvalidOperationException("logger exception"));
             }
             var vm = new ScriptCreationViewModel(project, csMock.Object, ssMock.Object, scsMock.Object, asMock.Object, loggerMock.Object);
             bool? isCreatingScriptDuringCall = null;
             scsMock.Setup(m => m.CreateAsync(project, config, new Version(4, 0), true, CancellationToken.None))
                    .Callback(() => isCreatingScriptDuringCall = true)
-                   .ThrowsAsync(new InvalidOperationException("test exception"));
+                   .ThrowsAsync(testException);
             var invokedIsCreatingScriptCount = 0;
             vm.PropertyChanged += (sender,
                                    args) =>
@@ -1194,7 +1197,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             // Assert
             csMock.Verify(m => m.GetConfigurationOrDefaultAsync(project), Times.Once);
             scsMock.Verify(m => m.CreateAsync(project, config, new Version(4, 0), true, CancellationToken.None), Times.Once);
-            loggerMock.Verify(m => m.LogAsync(It.Is<string>(message => message.Contains(nameof(ScriptCreationViewModel.StartLatestCreationCommand)) && message.Contains("test exception"))),
+            loggerMock.Verify(m => m.LogErrorAsync(testException, It.Is<string>(message => message.Contains(nameof(ScriptCreationViewModel.StartLatestCreationCommand)))),
                               Times.Once);
             Assert.AreEqual(0, scaffoldDevelopmentVersionCommandCanExecuteChangedCount);
             Assert.AreEqual(0, scaffoldCurrentProductionVersionCommandCanExecuteChangedCount);
@@ -1210,6 +1213,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
         [TestCase(false)]
         public void StartVersionedCreationCommand_Executed_CallLoggerOnError(bool loggerThrowsException)
         {
+            var testException = new InvalidOperationException("test exception");
             var config = new ConfigurationModel
             {
                 ArtifactsPath = "_Deployment",
@@ -1242,14 +1246,14 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             var loggerMock = new Mock<ILogger>();
             if (loggerThrowsException)
             {
-                loggerMock.Setup(m => m.LogAsync(It.IsAny<string>()))
+                loggerMock.Setup(m => m.LogErrorAsync(It.IsAny<Exception>(), It.IsAny<string>()))
                           .ThrowsAsync(new InvalidOperationException("logger exception"));
             }
             var vm = new ScriptCreationViewModel(project, csMock.Object, ssMock.Object, scsMock.Object, asMock.Object, loggerMock.Object);
             bool? isCreatingScriptDuringCall = null;
             scsMock.Setup(m => m.CreateAsync(project, config, new Version(4, 0), false, CancellationToken.None))
                    .Callback(() => isCreatingScriptDuringCall = true)
-                   .ThrowsAsync(new InvalidOperationException("test exception"));
+                   .ThrowsAsync(testException);
             var invokedIsCreatingScriptCount = 0;
             vm.PropertyChanged += (sender,
                                    args) =>
@@ -1279,7 +1283,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             // Assert
             csMock.Verify(m => m.GetConfigurationOrDefaultAsync(project), Times.Once);
             scsMock.Verify(m => m.CreateAsync(project, config, new Version(4, 0), false, CancellationToken.None), Times.Once);
-            loggerMock.Verify(m => m.LogAsync(It.Is<string>(message => message.Contains(nameof(ScriptCreationViewModel.StartVersionedCreationCommand)) && message.Contains("test exception"))),
+            loggerMock.Verify(m => m.LogErrorAsync(testException, It.Is<string>(message => message.Contains(nameof(ScriptCreationViewModel.StartVersionedCreationCommand)))),
                               Times.Once);
             Assert.AreEqual(0, scaffoldDevelopmentVersionCommandCanExecuteChangedCount);
             Assert.AreEqual(0, scaffoldCurrentProductionVersionCommandCanExecuteChangedCount);

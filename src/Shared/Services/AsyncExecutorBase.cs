@@ -24,7 +24,7 @@
             if (!cancellationToken.IsCancellationRequested)
                 return false;
 
-            await _logger.LogAsync("Creation was canceled by the user.");
+            await _logger.LogInfoAsync("Creation was canceled by the user.");
             return true;
         }
 
@@ -50,7 +50,7 @@
             try
             {
                 await stateModel.HandleWorkInProgressChanged.Invoke(true);
-                await _logger.LogAsync(GetOperationStartedMessage());
+                await _logger.LogInfoAsync(GetOperationStartedMessage());
 
                 IWorkUnit<TStateModel> workUnit;
                 do
@@ -65,14 +65,14 @@
                 } while (workUnit != null);
 
                 sw.Stop();
-                await _logger.LogAsync(GetOperationCompletedMessage(stateModel, sw.ElapsedMilliseconds));
+                await _logger.LogInfoAsync(GetOperationCompletedMessage(stateModel, sw.ElapsedMilliseconds));
             }
             catch (Exception e)
             {
                 sw.Stop();
                 try
                 {
-                    await _logger.LogAsync(GetOperationFailedMessage(e));
+                    await _logger.LogErrorAsync(e, GetOperationFailedMessage());
                 }
                 catch
                 {
@@ -96,7 +96,7 @@
 
         protected abstract string GetOperationCompletedMessage(TStateModel stateModel, long elapsedMilliseconds);
 
-        protected abstract string GetOperationFailedMessage(Exception exception);
+        protected abstract string GetOperationFailedMessage();
 
         protected abstract IWorkUnit<TStateModel> GetNextWorkUnitForStateModel(TStateModel stateModel);
     }

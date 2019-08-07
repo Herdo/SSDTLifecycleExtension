@@ -80,7 +80,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             Assert.IsNull(model.Result);
             fsaMock.Verify(m => m.EnsureDirectoryExists(It.IsAny<string>()), Times.Never);
             fsaMock.Verify(m => m.CopyFile(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
-            loggerMock.Verify(m => m.LogAsync(It.IsAny<string>()), Times.Never);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<Exception>(), It.IsAny<string>()), Times.Never);
         }
 
         [Test]
@@ -112,9 +113,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             Assert.IsFalse(model.Result);
             fsaMock.Verify(m => m.EnsureDirectoryExists(It.IsAny<string>()), Times.Never);
             fsaMock.Verify(m => m.CopyFile(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
-            loggerMock.Verify(m => m.LogAsync(It.IsAny<string>()), Times.Exactly(2));
-            loggerMock.Verify(m => m.LogAsync("Copying DACPAC to shared DACPAC repository ..."), Times.Once);
-            loggerMock.Verify(m => m.LogAsync(It.Is<string>(s => s.StartsWith("ERROR: Failed to copy DACPAC to shared DACPAC repository: "))), Times.Once);
+            loggerMock.Verify(m => m.LogInfoAsync("Copying DACPAC to shared DACPAC repository ..."), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync(It.Is<string>(s => s.StartsWith("Failed to copy DACPAC to shared DACPAC repository: "))), Times.Once);
         }
 
         [Test]
@@ -148,9 +148,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             Assert.IsFalse(model.Result);
             fsaMock.Verify(m => m.EnsureDirectoryExists("C:\\Temp\\Test\\"), Times.Once);
             fsaMock.Verify(m => m.CopyFile(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
-            loggerMock.Verify(m => m.LogAsync(It.IsAny<string>()), Times.Exactly(2));
-            loggerMock.Verify(m => m.LogAsync("Copying DACPAC to shared DACPAC repository ..."), Times.Once);
-            loggerMock.Verify(m => m.LogAsync("ERROR: Failed to ensure that the directory 'C:\\Temp\\Test\\' exists: test directory error"), Times.Once);
+            loggerMock.Verify(m => m.LogInfoAsync("Copying DACPAC to shared DACPAC repository ..."), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync("Failed to ensure that the directory 'C:\\Temp\\Test\\' exists: test directory error"), Times.Once);
         }
 
         [Test]
@@ -186,9 +185,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             Assert.IsFalse(model.Result);
             fsaMock.Verify(m => m.EnsureDirectoryExists("C:\\Temp\\Test\\"), Times.Once);
             fsaMock.Verify(m => m.CopyFile("newDacpacPath", "C:\\Temp\\Test\\newDacpacPath"), Times.Once);
-            loggerMock.Verify(m => m.LogAsync(It.IsAny<string>()), Times.Exactly(2));
-            loggerMock.Verify(m => m.LogAsync("Copying DACPAC to shared DACPAC repository ..."), Times.Once);
-            loggerMock.Verify(m => m.LogAsync("ERROR: Failed to copy DACPAC to shared DACPAC repository: test copy error"), Times.Once);
+            loggerMock.Verify(m => m.LogInfoAsync("Copying DACPAC to shared DACPAC repository ..."), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync("Failed to copy DACPAC to shared DACPAC repository: test copy error"), Times.Once);
         }
 
         [Test]
@@ -224,8 +222,9 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             Assert.IsNull(model.Result);
             fsaMock.Verify(m => m.EnsureDirectoryExists("C:\\Temp\\Test\\"), Times.Once);
             fsaMock.Verify(m => m.CopyFile("newDacpacPath", "C:\\Temp\\Test\\newDacpacPath"), Times.Once);
-            loggerMock.Verify(m => m.LogAsync(It.IsAny<string>()), Times.Once);
-            loggerMock.Verify(m => m.LogAsync("Copying DACPAC to shared DACPAC repository ..."), Times.Once);
+            loggerMock.Verify(m => m.LogInfoAsync("Copying DACPAC to shared DACPAC repository ..."), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<Exception>(), It.IsAny<string>()), Times.Never);
         }
 
         [Test]
@@ -269,7 +268,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             Assert.IsNull(model.Result);
             fsaMock.Verify(m => m.EnsureDirectoryExists(It.IsAny<string>()), Times.Never);
             fsaMock.Verify(m => m.CopyFile(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
-            loggerMock.Verify(m => m.LogAsync(It.IsAny<string>()), Times.Never);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<Exception>(), It.IsAny<string>()), Times.Never);
         }
 
         [Test]
@@ -301,9 +301,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             Assert.IsFalse(model.Result);
             fsaMock.Verify(m => m.EnsureDirectoryExists(It.IsAny<string>()), Times.Never);
             fsaMock.Verify(m => m.CopyFile(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
-            loggerMock.Verify(m => m.LogAsync(It.IsAny<string>()), Times.Exactly(2));
-            loggerMock.Verify(m => m.LogAsync("Copying DACPAC to shared DACPAC repository ..."), Times.Once);
-            loggerMock.Verify(m => m.LogAsync(It.Is<string>(s => s.StartsWith("ERROR: Failed to copy DACPAC to shared DACPAC repository: "))), Times.Once);
+            loggerMock.Verify(m => m.LogInfoAsync("Copying DACPAC to shared DACPAC repository ..."), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync(It.Is<string>(s => s.StartsWith("Failed to copy DACPAC to shared DACPAC repository: "))), Times.Once);
         }
 
         [Test]
@@ -337,9 +336,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             Assert.IsFalse(model.Result);
             fsaMock.Verify(m => m.EnsureDirectoryExists("C:\\Temp\\Test\\"), Times.Once);
             fsaMock.Verify(m => m.CopyFile(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
-            loggerMock.Verify(m => m.LogAsync(It.IsAny<string>()), Times.Exactly(2));
-            loggerMock.Verify(m => m.LogAsync("Copying DACPAC to shared DACPAC repository ..."), Times.Once);
-            loggerMock.Verify(m => m.LogAsync("ERROR: Failed to ensure that the directory 'C:\\Temp\\Test\\' exists: test directory error"), Times.Once);
+            loggerMock.Verify(m => m.LogInfoAsync("Copying DACPAC to shared DACPAC repository ..."), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync("Failed to ensure that the directory 'C:\\Temp\\Test\\' exists: test directory error"), Times.Once);
         }
 
         [Test]
@@ -375,9 +373,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             Assert.IsFalse(model.Result);
             fsaMock.Verify(m => m.EnsureDirectoryExists("C:\\Temp\\Test\\"), Times.Once);
             fsaMock.Verify(m => m.CopyFile("newDacpacPath", "C:\\Temp\\Test\\newDacpacPath"), Times.Once);
-            loggerMock.Verify(m => m.LogAsync(It.IsAny<string>()), Times.Exactly(2));
-            loggerMock.Verify(m => m.LogAsync("Copying DACPAC to shared DACPAC repository ..."), Times.Once);
-            loggerMock.Verify(m => m.LogAsync("ERROR: Failed to copy DACPAC to shared DACPAC repository: test copy error"), Times.Once);
+            loggerMock.Verify(m => m.LogInfoAsync("Copying DACPAC to shared DACPAC repository ..."), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync("Failed to copy DACPAC to shared DACPAC repository: test copy error"), Times.Once);
         }
 
         [Test]
@@ -413,8 +410,9 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             Assert.IsNull(model.Result);
             fsaMock.Verify(m => m.EnsureDirectoryExists("C:\\Temp\\Test\\"), Times.Once);
             fsaMock.Verify(m => m.CopyFile("newDacpacPath", "C:\\Temp\\Test\\newDacpacPath"), Times.Once);
-            loggerMock.Verify(m => m.LogAsync(It.IsAny<string>()), Times.Once);
-            loggerMock.Verify(m => m.LogAsync("Copying DACPAC to shared DACPAC repository ..."), Times.Once);
+            loggerMock.Verify(m => m.LogInfoAsync("Copying DACPAC to shared DACPAC repository ..."), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<Exception>(), It.IsAny<string>()), Times.Never);
         }
     }
 }

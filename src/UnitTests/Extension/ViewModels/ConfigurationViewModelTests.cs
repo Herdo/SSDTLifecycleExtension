@@ -726,6 +726,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
         public void SaveConfiguration_Execute_CallLoggerOnError()
         {
             // Arrange
+            var testException = new InvalidOperationException("test exception");
             var model = new ConfigurationModel
             {
                 ArtifactsPath = "foobar",
@@ -745,14 +746,19 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             csMock.Setup(m => m.SaveConfigurationAsync(project, It.IsNotNull<ConfigurationModel>()))
                   .Callback((SqlProject p,
                              ConfigurationModel m) => savedModel = m)
-                  .ThrowsAsync(new InvalidOperationException("test exception"));
+                  .ThrowsAsync(testException);
             var fsaMock = Mock.Of<IFileSystemAccess>();
             var ssMock = Mock.Of<IScaffoldingService>();
             var scsMock = Mock.Of<IScriptCreationService>();
+            Exception loggedException = null;
             string loggedMessage = null;
             var loggerMock = new Mock<ILogger>();
-            loggerMock.Setup(m => m.LogAsync(It.IsNotNull<string>()))
-                      .Callback((string message) => loggedMessage = message)
+            loggerMock.Setup(m => m.LogErrorAsync(It.IsAny<Exception>(), It.IsNotNull<string>()))
+                      .Callback((Exception exception, string message) =>
+                       {
+                           loggedException = exception;
+                           loggedMessage = message;
+                       })
                       .Returns(Task.CompletedTask);
             var vm = new ConfigurationViewModel(project,
                                                 csMock.Object,
@@ -777,11 +783,10 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             Assert.AreNotSame(model, savedModel);
             Assert.AreEqual(model, savedModel);
             Assert.AreSame(model, vm.Model);
-            loggerMock.Verify(m => m.LogAsync(It.IsNotNull<string>()), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsNotNull<Exception>(), It.IsNotNull<string>()), Times.Once);
+            Assert.AreSame(testException, loggedException);
             Assert.IsNotNull(loggedMessage);
-            Assert.IsTrue(loggedMessage.Contains(nameof(InvalidOperationException)));
             Assert.IsTrue(loggedMessage.Contains(nameof(ConfigurationViewModel.SaveConfigurationCommand)));
-            Assert.IsTrue(loggedMessage.Contains("test exception"));
         }
 
         [Test]
@@ -809,7 +814,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             var ssMock = Mock.Of<IScaffoldingService>();
             var scsMock = Mock.Of<IScriptCreationService>();
             var loggerMock = new Mock<ILogger>();
-            loggerMock.Setup(m => m.LogAsync(It.IsNotNull<string>()))
+            loggerMock.Setup(m => m.LogErrorAsync(It.IsNotNull<Exception>(), It.IsNotNull<string>()))
                       .ThrowsAsync(new Exception("logger failed"));
             var vm = new ConfigurationViewModel(project,
                                                 csMock.Object,
@@ -826,7 +831,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
 
             // Assert
             csMock.Verify(m => m.SaveConfigurationAsync(project, It.IsNotNull<ConfigurationModel>()), Times.Once());
-            loggerMock.Verify(m => m.LogAsync(It.IsNotNull<string>()), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsNotNull<Exception>(), It.IsNotNull<string>()), Times.Once);
         }
 
         [Test]
@@ -1133,19 +1138,6 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
         {
             // Arrange
             var oldModel = new ConfigurationModel();
-            var newModel = new ConfigurationModel
-            {
-                ArtifactsPath = "foobar",
-                ReplaceUnnamedDefaultConstraintDrops = true,
-                CommentOutUnnamedDefaultConstraintDrops = false,
-                PublishProfilePath = "Test.publish.xml",
-                VersionPattern = "1.2.3.4",
-                CreateDocumentationWithScriptCreation = true,
-                CustomHeader = "awesome header",
-                CustomFooter = "lame footer",
-                BuildBeforeScriptCreation = true,
-                TrackDacpacVersion = false
-            };
             var project = new SqlProject("", "", "");
             var csMock = new Mock<IConfigurationService>();
             var fsaMock = new Mock<IFileSystemAccess>();
@@ -1181,6 +1173,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
         {
             // Arrange
             const string testPath = "foobar";
+            var testException = new InvalidOperationException("test exception");
             var oldModel = new ConfigurationModel
             {
                 ArtifactsPath = "foobar",
@@ -1197,16 +1190,21 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             var project = new SqlProject("", "", "");
             var csMock = new Mock<IConfigurationService>();
             csMock.Setup(m => m.GetConfigurationOrDefaultAsync(testPath))
-                  .ThrowsAsync(new InvalidOperationException("test exception"));
+                  .ThrowsAsync(testException);
             var fsaMock = new Mock<IFileSystemAccess>();
             fsaMock.Setup(m => m.BrowseForFile(".json", "JSON (*.json)|*.json"))
                    .Returns(testPath);
             var ssMock = Mock.Of<IScaffoldingService>();
             var scsMock = Mock.Of<IScriptCreationService>();
+            Exception loggedException = null;
             string loggedMessage = null;
             var loggerMock = new Mock<ILogger>();
-            loggerMock.Setup(m => m.LogAsync(It.IsNotNull<string>()))
-                      .Callback((string message) => loggedMessage = message)
+            loggerMock.Setup(m => m.LogErrorAsync(It.IsNotNull<Exception>(), It.IsNotNull<string>()))
+                      .Callback((Exception exception, string message) =>
+                       {
+                           loggedException = exception;
+                           loggedMessage = message;
+                       })
                       .Returns(Task.CompletedTask);
             var vm = new ConfigurationViewModel(project,
                                                 csMock.Object,
@@ -1228,11 +1226,10 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             Assert.IsTrue(canImportAfterSaving);
             csMock.Verify(m => m.GetConfigurationOrDefaultAsync(testPath), Times.Once);
             Assert.AreSame(oldModel, vm.Model);
-            loggerMock.Verify(m => m.LogAsync(It.IsNotNull<string>()), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsNotNull<Exception>(), It.IsNotNull<string>()), Times.Once);
+            Assert.AreSame(testException, loggedException);
             Assert.IsNotNull(loggedMessage);
-            Assert.IsTrue(loggedMessage.Contains(nameof(InvalidOperationException)));
             Assert.IsTrue(loggedMessage.Contains(nameof(ConfigurationViewModel.ImportConfigurationCommand)));
-            Assert.IsTrue(loggedMessage.Contains("test exception"));
         }
 
         [Test]
@@ -1263,7 +1260,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             var ssMock = Mock.Of<IScaffoldingService>();
             var scsMock = Mock.Of<IScriptCreationService>();
             var loggerMock = new Mock<ILogger>();
-            loggerMock.Setup(m => m.LogAsync(It.IsNotNull<string>()))
+            loggerMock.Setup(m => m.LogErrorAsync(It.IsNotNull<Exception>(), It.IsNotNull<string>()))
                       .ThrowsAsync(new Exception("logger failed"));
             var vm = new ConfigurationViewModel(project,
                                                 csMock.Object,
@@ -1280,7 +1277,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
 
             // Assert
             csMock.Verify(m => m.GetConfigurationOrDefaultAsync(testPath), Times.Once);
-            loggerMock.Verify(m => m.LogAsync(It.IsNotNull<string>()), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsNotNull<Exception>(), It.IsNotNull<string>()), Times.Once);
         }
     }
 }

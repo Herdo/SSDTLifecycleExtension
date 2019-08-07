@@ -34,7 +34,7 @@
             var success = await CreateAndPersistDeployFiles(paths, configuration, createDocumentationWithScriptCreation);
             if (!success)
             {
-                await _logger.LogAsync("ERROR: Script creation aborted.");
+                await _logger.LogErrorAsync("Script creation aborted.");
                 stateModel.Result = false;
             }
 
@@ -45,7 +45,7 @@
                                                              ConfigurationModel configuration,
                                                              bool createDocumentation)
         {
-            await _logger.LogAsync("Creating diff files ...");
+            await _logger.LogInfoAsync("Creating diff files ...");
             var result = await CreateDeployContent(paths, configuration, createDocumentation);
             if (!result.Success)
                 return false;
@@ -72,13 +72,13 @@
             {
                 if (!string.IsNullOrEmpty(result.PreDeploymentScript) && !result.DeployScriptContent.Contains(result.PreDeploymentScript))
                 {
-                    await _logger.LogAsync("ERROR: Failed to create complete script. Generated script is missing the pre-deployment script.");
+                    await _logger.LogErrorAsync("Failed to create complete script. Generated script is missing the pre-deployment script.");
                     return (false, null, null);
                 }
 
                 if (!string.IsNullOrEmpty(result.PostDeploymentScript) && !result.DeployScriptContent.Contains(result.PostDeploymentScript))
                 {
-                    await _logger.LogAsync("ERROR: Failed to create complete script. Generated script is missing the post-deployment script.");
+                    await _logger.LogErrorAsync("Failed to create complete script. Generated script is missing the post-deployment script.");
                     return (false, null, null);
                 }
 
@@ -88,9 +88,9 @@
                            : (false, null, null);
             }
 
-            await _logger.LogAsync("ERROR: Failed to create script:");
+            await _logger.LogErrorAsync("Failed to create script.");
             foreach (var s in result.Errors)
-                await _logger.LogAsync(s);
+                await _logger.LogErrorAsync(s);
 
             return (false, null, null);
         }
@@ -104,25 +104,25 @@
             var valid = true;
             if (publishProfile.CreateNewDatabase)
             {
-                await _logger.LogAsync($"ERROR: {nameof(PublishProfile.CreateNewDatabase)} cannot bet set to true, when {nameof(ConfigurationModel.RemoveSqlCmdStatements)} is also true.");
+                await _logger.LogErrorAsync($"{nameof(PublishProfile.CreateNewDatabase)} cannot bet set to true, when {nameof(ConfigurationModel.RemoveSqlCmdStatements)} is also true.");
                 valid = false;
             }
 
             if (publishProfile.BackupDatabaseBeforeChanges)
             {
-                await _logger.LogAsync($"ERROR: {nameof(PublishProfile.BackupDatabaseBeforeChanges)} cannot bet set to true, when {nameof(ConfigurationModel.RemoveSqlCmdStatements)} is also true.");
+                await _logger.LogErrorAsync($"{nameof(PublishProfile.BackupDatabaseBeforeChanges)} cannot bet set to true, when {nameof(ConfigurationModel.RemoveSqlCmdStatements)} is also true.");
                 valid = false;
             }
 
             if (publishProfile.ScriptDatabaseOptions)
             {
-                await _logger.LogAsync($"ERROR: {nameof(PublishProfile.ScriptDatabaseOptions)} cannot bet set to true, when {nameof(ConfigurationModel.RemoveSqlCmdStatements)} is also true.");
+                await _logger.LogErrorAsync($"{nameof(PublishProfile.ScriptDatabaseOptions)} cannot bet set to true, when {nameof(ConfigurationModel.RemoveSqlCmdStatements)} is also true.");
                 valid = false;
             }
 
             if (publishProfile.ScriptDeployStateChecks)
             {
-                await _logger.LogAsync($"ERROR: {nameof(PublishProfile.ScriptDeployStateChecks)} cannot bet set to true, when {nameof(ConfigurationModel.RemoveSqlCmdStatements)} is also true.");
+                await _logger.LogErrorAsync($"{nameof(PublishProfile.ScriptDeployStateChecks)} cannot bet set to true, when {nameof(ConfigurationModel.RemoveSqlCmdStatements)} is also true.");
                 valid = false;
             }
 
@@ -134,13 +134,13 @@
         {
             try
             {
-                await _logger.LogAsync($"Writing deploy script to {deployScriptPath} ...");
+                await _logger.LogInfoAsync($"Writing deploy script to {deployScriptPath} ...");
                 await _fileSystemAccess.WriteFileAsync(deployScriptPath, deployScriptContent);
                 return true;
             }
             catch (Exception e)
             {
-                await _logger.LogAsync($"ERROR: Failed to write deploy script: {e.Message}");
+                await _logger.LogErrorAsync(e, "Failed to write deploy script");
                 return false;
             }
         }
@@ -150,13 +150,13 @@
         {
             try
             {
-                await _logger.LogAsync($"Writing deploy report to {deployReportPath} ...");
+                await _logger.LogInfoAsync($"Writing deploy report to {deployReportPath} ...");
                 await _fileSystemAccess.WriteFileAsync(deployReportPath, deployReportContent);
                 return true;
             }
             catch (Exception e)
             {
-                await _logger.LogAsync($"ERROR: Failed to write deploy report: {e.Message}");
+                await _logger.LogErrorAsync(e, "Failed to write deploy report");
                 return false;
             }
         }

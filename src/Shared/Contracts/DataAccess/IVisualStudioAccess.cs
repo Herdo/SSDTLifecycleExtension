@@ -44,5 +44,7 @@
         /// <exception cref="ArgumentNullException"><paramref name="project"/> or <paramref name="item"/> are <b>null</b>.</exception>
         void RemoveItemFromProjectRoot([NotNull] SqlProject project,
                                        [NotNull] string item);
+
+        Task LogToOutputPanelAsync([NotNull] string message);
     }
 }

@@ -38,7 +38,7 @@
 
             stateModel.Result = false;
             stateModel.CurrentState = StateModelState.FormattedTargetVersionValidated;
-            await _logger.LogAsync(getLogMessage(stateModel));
+            await _logger.LogErrorAsync(getLogMessage(stateModel));
             _visualStudioAccess.ShowModalError("Please change the DAC version in the SQL project settings (see output window).");
         }
 
@@ -50,7 +50,7 @@
 
             return ValidateTargetVersionInternal(stateModel,
                                                  sm => sm.Project.ProjectProperties.DacVersion == sm.FormattedTargetVersion,
-                                                 sm => $"ERROR: DacVersion of SQL project ({sm.Project.ProjectProperties.DacVersion}) doesn't match target version ({sm.FormattedTargetVersion}).");
+                                                 sm => $"DacVersion of SQL project ({sm.Project.ProjectProperties.DacVersion}) doesn't match target version ({sm.FormattedTargetVersion}).");
         }
 
         Task IWorkUnit<ScriptCreationStateModel>.Work(ScriptCreationStateModel stateModel,
@@ -61,7 +61,7 @@
 
             return ValidateTargetVersionInternal(stateModel,
                                                  sm => sm.CreateLatest || sm.FormattedTargetVersion > sm.PreviousVersion,
-                                                 sm => $"ERROR: DacVersion of SQL project ({sm.FormattedTargetVersion}) is equal to or smaller than the previous version ({sm.PreviousVersion}).");
+                                                 sm => $"DacVersion of SQL project ({sm.FormattedTargetVersion}) is equal to or smaller than the previous version ({sm.PreviousVersion}).");
         }
     }
 }

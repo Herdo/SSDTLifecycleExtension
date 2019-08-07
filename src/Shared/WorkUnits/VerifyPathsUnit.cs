@@ -26,7 +26,7 @@
         private async Task VerifyPathsInternal(IStateModel stateModel,
                                                PathCollection paths)
         {
-            await _logger.LogAsync("Verifying paths ...");
+            await _logger.LogInfoAsync("Verifying paths ...");
             if (!string.IsNullOrWhiteSpace(paths.DeploySources.PublishProfilePath) && _fileSystemAccess.CheckIfFileExists(paths.DeploySources.PublishProfilePath))
             {
                 stateModel.CurrentState = StateModelState.PathsVerified;
@@ -35,7 +35,7 @@
 
             stateModel.Result = false;
             stateModel.CurrentState = StateModelState.PathsVerified;
-            await _logger.LogAsync("ERROR: Failed to find publish profile.");
+            await _logger.LogErrorAsync("Failed to find publish profile.");
         }
 
         Task IWorkUnit<ScriptCreationStateModel>.Work(ScriptCreationStateModel stateModel,

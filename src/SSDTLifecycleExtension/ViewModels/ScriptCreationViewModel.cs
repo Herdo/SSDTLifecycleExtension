@@ -242,7 +242,7 @@
 
             try
             {
-                await _logger.LogAsync($"Error during execution of {commandName}: {exception}").ConfigureAwait(false);
+                await _logger.LogErrorAsync(exception, $"Error during execution of {commandName}").ConfigureAwait(false);
             }
             catch
             {

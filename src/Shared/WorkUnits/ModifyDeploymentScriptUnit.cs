@@ -8,7 +8,6 @@
     using Contracts;
     using Contracts.DataAccess;
     using Contracts.Enums;
-    using Contracts.Factories;
     using Contracts.Models;
     using Contracts.Services;
     using JetBrains.Annotations;
@@ -60,7 +59,7 @@
 
             foreach (var m in modifiers.OrderBy(m => m.Key))
             {
-                await _logger.LogAsync($"Modifying script: {m.Key}");
+                await _logger.LogInfoAsync($"Modifying script: {m.Key}");
                 await m.Value.ModifyAsync(model);
             }
 

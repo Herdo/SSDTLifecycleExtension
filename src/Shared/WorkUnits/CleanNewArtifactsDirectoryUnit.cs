@@ -27,7 +27,7 @@
         private async Task CleanArtifactsDirectoryInternal(IStateModel stateModel,
                                                            PathCollection paths)
         {
-            await _logger.LogAsync("Cleaning artifacts directory ...");
+            await _logger.LogInfoAsync("Cleaning artifacts directory ...");
             // Even if this operation fails, there's no reason to make the whole process fail.
             // Therefore this will not set the stateModel.Result property.
             _fileSystemAccess.TryToCleanDirectory(paths.Directories.NewArtifactsDirectory);

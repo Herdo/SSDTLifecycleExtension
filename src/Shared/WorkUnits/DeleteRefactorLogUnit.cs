@@ -37,18 +37,18 @@
                 return;
             }
 
-            await _logger.LogAsync("Deleting refactorlog files ...");
+            await _logger.LogInfoAsync("Deleting refactorlog files ...");
             var deletedFiles = _fileSystemAccess.TryToCleanDirectory(paths.Directories.ProjectDirectory, "*.refactorlog");
             if (deletedFiles.Length == 0)
             {
-                await _logger.LogAsync("  => No files were deleted.");
+                await _logger.LogTraceAsync("No files were deleted.");
             }
             else
             {
                 foreach (var deletedFile in deletedFiles)
                 {
                     _visualStudioAccess.RemoveItemFromProjectRoot(project, deletedFile);
-                    await _logger.LogAsync($"  => Deleted file {deletedFile} ...");
+                    await _logger.LogTraceAsync($"Deleted file {deletedFile} ...");
                 }
             }
 

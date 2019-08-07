@@ -14,6 +14,7 @@
     using Microsoft.VisualStudio;
     using Microsoft.VisualStudio.Shell;
     using Microsoft.VisualStudio.Shell.Interop;
+    using Shared.Services;
     using Task = System.Threading.Tasks.Task;
 
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
@@ -58,7 +59,8 @@
                 throw new InvalidOperationException($"Cannot initialize {nameof(SSDTLifecycleExtensionPackage)} without the {nameof(OleMenuCommandService)}.");
 
             var visualStudioAccess = new VisualStudioAccess(_dte2, this);
-            return new DependencyResolver(visualStudioAccess, visualStudioAccess, commandService);
+            var visualStudioLogger = new VisualStudioLogger(visualStudioAccess);
+            return new DependencyResolver(visualStudioAccess, visualStudioLogger, commandService);
         }
 
         #region Base Overrides

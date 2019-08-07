@@ -98,9 +98,9 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             Assert.IsNull(model.Result);
             fsaMock.Verify(m => m.TryToCleanDirectory("projectDirectory", "*.refactorlog"), Times.Once);
             vsaMock.Verify(m => m.RemoveItemFromProjectRoot(project, It.IsAny<string>()), Times.Never);
-            loggerMock.Verify(m => m.LogAsync("Deleting refactorlog files ..."), Times.Once);
-            loggerMock.Verify(m => m.LogAsync("  => No files were deleted."), Times.Once);
-            loggerMock.Verify(m => m.LogAsync(It.Is<string>(s => s.StartsWith("Deleted file"))), Times.Never);
+            loggerMock.Verify(m => m.LogInfoAsync("Deleting refactorlog files ..."), Times.Once);
+            loggerMock.Verify(m => m.LogTraceAsync("No files were deleted."), Times.Once);
+            loggerMock.Verify(m => m.LogTraceAsync(It.Is<string>(s => s.StartsWith("Deleted file"))), Times.Never);
         }
 
         [Test]
@@ -140,10 +140,10 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             fsaMock.Verify(m => m.TryToCleanDirectory("projectDirectory", "*.refactorlog"), Times.Once);
             vsaMock.Verify(m => m.RemoveItemFromProjectRoot(project, "file1.refactorlog"), Times.Once);
             vsaMock.Verify(m => m.RemoveItemFromProjectRoot(project, "file2.refactorlog"), Times.Once);
-            loggerMock.Verify(m => m.LogAsync("Deleting refactorlog files ..."), Times.Once);
-            loggerMock.Verify(m => m.LogAsync("  => No files were deleted."), Times.Never);
-            loggerMock.Verify(m => m.LogAsync("  => Deleted file file1.refactorlog ..."), Times.Once);
-            loggerMock.Verify(m => m.LogAsync("  => Deleted file file2.refactorlog ..."), Times.Once);
+            loggerMock.Verify(m => m.LogInfoAsync("Deleting refactorlog files ..."), Times.Once);
+            loggerMock.Verify(m => m.LogTraceAsync("No files were deleted."), Times.Never);
+            loggerMock.Verify(m => m.LogTraceAsync("Deleted file file1.refactorlog ..."), Times.Once);
+            loggerMock.Verify(m => m.LogTraceAsync("Deleted file file2.refactorlog ..."), Times.Once);
         }
 
         [Test]
@@ -176,7 +176,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             Assert.IsNull(model.Result);
             fsaMock.Verify(m => m.TryToCleanDirectory(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
             vsaMock.Verify(m => m.RemoveItemFromProjectRoot(project, It.IsAny<string>()), Times.Never);
-            loggerMock.Verify(m => m.LogAsync(It.IsAny<string>()), Times.Never);
+            loggerMock.Verify(m => m.LogInfoAsync(It.IsAny<string>()), Times.Never);
+            loggerMock.Verify(m => m.LogTraceAsync(It.IsAny<string>()), Times.Never);
         }
     }
 }

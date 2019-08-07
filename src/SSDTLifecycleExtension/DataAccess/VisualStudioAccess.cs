@@ -17,8 +17,7 @@
 
     [UsedImplicitly]
     [ExcludeFromCodeCoverage] // Test would require a Visual Studio shell.
-    public class VisualStudioAccess : IVisualStudioAccess,
-                                      ILogger
+    public class VisualStudioAccess : IVisualStudioAccess
     {
         private readonly DTE2 _dte2;
         private readonly AsyncPackage _package;
@@ -57,6 +56,16 @@
             }
 
             throw new InvalidOperationException($"Failed to get or create SSDT Lifecycle output pane.");
+        }
+
+        private async Task LogToOutputPanelInternalAsync(string message)
+        {
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+            var outputPane = await GetOrCreateSSDTOutputPaneAsync();
+            outputPane.Activate();
+            outputPane.OutputString(message);
+            outputPane.OutputString(Environment.NewLine);
         }
 
         Guid IVisualStudioAccess.GetSelectedProjectKind()
@@ -197,16 +206,12 @@
             matchingItem?.Remove();
         }
 
-        async Task ILogger.LogAsync(string message)
+        Task IVisualStudioAccess.LogToOutputPanelAsync(string message)
         {
-            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-
             if (message == null)
                 throw new ArgumentNullException(nameof(message));
 
-            var outputPane = await GetOrCreateSSDTOutputPaneAsync();
-            outputPane.OutputString(message);
-            outputPane.OutputString(Environment.NewLine);
+            return LogToOutputPanelInternalAsync(message);
         }
     }
 }

@@ -33,7 +33,7 @@
                 return;
             }
 
-            await _logger.LogAsync("Cleaning latest artifacts directory ...");
+            await _logger.LogInfoAsync("Cleaning latest artifacts directory ...");
             // Even if this operation fails, there's no reason to make the whole process fail.
             // Therefore this will not set the stateModel.Result property.
             _fileSystemAccess.TryToCleanDirectory(paths.Directories.LatestArtifactsDirectory);

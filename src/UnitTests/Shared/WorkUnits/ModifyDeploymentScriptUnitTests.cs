@@ -92,7 +92,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             mpsMock.Verify(m => m.GetScriptModifiers(It.IsAny<ConfigurationModel>()), Times.Once);
             fsaMock.Verify(m => m.ReadFileAsync(It.IsAny<string>()), Times.Never);
             fsaMock.Verify(m => m.WriteFileAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
-            loggerMock.Verify(m => m.LogAsync(It.IsAny<string>()), Times.Never);
+            loggerMock.Verify(m => m.LogInfoAsync(It.IsAny<string>()), Times.Never);
         }
 
         [Test]
@@ -143,7 +143,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             mpsMock.Verify(m => m.GetScriptModifiers(It.IsAny<ConfigurationModel>()), Times.Once);
             fsaMock.Verify(m => m.ReadFileAsync(paths.DeployTargets.DeployScriptPath), Times.Once);
             fsaMock.Verify(m => m.WriteFileAsync(paths.DeployTargets.DeployScriptPath, expectedResultScript), Times.Once);
-            loggerMock.Verify(m => m.LogAsync(It.IsAny<string>()), Times.Exactly(2));
+            loggerMock.Verify(m => m.LogInfoAsync(It.IsAny<string>()), Times.Exactly(2));
             smHeaderMock.Verify(m => m.ModifyAsync(It.IsNotNull<ScriptModificationModel>()), Times.Once);
             smFooterMock.Verify(m => m.ModifyAsync(It.IsNotNull<ScriptModificationModel>()), Times.Once);
         }
