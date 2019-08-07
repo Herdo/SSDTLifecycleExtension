@@ -195,9 +195,9 @@
             return TryToCleanDirectoryInternal(directoryPath, filter);
         }
 
-        string IFileSystemAccess.CopyFiles(string sourceDirectory,
-                                           string targetDirectory,
-                                           string searchPattern)
+        (string[] CopiedFiles, (string File, Exception Exception)[] Errors) IFileSystemAccess.CopyFiles(string sourceDirectory,
+                                                                                                        string targetDirectory,
+                                                                                                        string searchPattern)
         {
             if (string.IsNullOrWhiteSpace(sourceDirectory))
                 throw new ArgumentException("Value cannot be null or white space.", nameof(sourceDirectory));
@@ -206,21 +206,34 @@
             if (string.IsNullOrWhiteSpace(searchPattern))
                 throw new ArgumentException("Value cannot be null or white space.", nameof(searchPattern));
 
+            var copiedFiles = new List<string>();
+            var errors = new List<(string File, Exception Exception)>();
+            string[] sourceFiles;
             try
             {
-                var sourceFiles = Directory.GetFiles(sourceDirectory, searchPattern, SearchOption.TopDirectoryOnly);
-                foreach (var sourceFile in sourceFiles)
-                {
-                    var fi = new FileInfo(sourceFile);
-                    fi.CopyTo(Path.Combine(targetDirectory, fi.Name), true);
-                }
-
-                return null;
+                sourceFiles = Directory.GetFiles(sourceDirectory, searchPattern, SearchOption.TopDirectoryOnly);
             }
             catch (Exception e)
             {
-                return e.Message;
+                errors.Add((null, e));
+                return (copiedFiles.ToArray(), errors.ToArray());
             }
+
+            foreach (var sourceFile in sourceFiles)
+            {
+                try
+                {
+                    var fi = new FileInfo(sourceFile);
+                    fi.CopyTo(Path.Combine(targetDirectory, fi.Name), true);
+                    copiedFiles.Add(fi.FullName);
+                }
+                catch (Exception e)
+                {
+                    errors.Add((sourceFile, e));
+                }
+            }
+
+            return (copiedFiles.ToArray(), errors.ToArray());
         }
 
         string IFileSystemAccess.CopyFile(string source,

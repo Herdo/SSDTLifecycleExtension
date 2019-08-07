@@ -63,7 +63,6 @@
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
             var outputPane = await GetOrCreateSSDTOutputPaneAsync();
-            outputPane.Activate();
             outputPane.OutputString(message);
             outputPane.OutputString(Environment.NewLine);
         }

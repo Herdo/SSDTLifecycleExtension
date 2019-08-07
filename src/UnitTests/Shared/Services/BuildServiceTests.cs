@@ -170,6 +170,8 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
         public async Task CopyBuildResultAsync_LogError_FailedToCopyFiles_Async()
         {
             // Arrange
+            var directoryException = new Exception("failed to find files to copy");
+            var fileException = new Exception("failed to copy file");
             var project = new SqlProject("a", @"C:\TestProject\TestProject.sqlproj", "c");
             project.ProjectProperties.BinaryDirectory = @"C:\TestProject\bin\Output";
             const string targetDirectory = @"C:\TestProject\_Deployment\1.0.0";
@@ -178,7 +180,15 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             fsaMock.Setup(m => m.EnsureDirectoryExists(targetDirectory))
                    .Returns(null as string);
             fsaMock.Setup(m => m.CopyFiles(project.ProjectProperties.BinaryDirectory, targetDirectory, "*.dacpac"))
-                   .Returns("failed to find files to copy");
+                   .Returns((new[]
+                             {
+                                 @"C:\Target\test.dacpac"
+                             },
+                             new (string File, Exception Exception)[]
+                             {
+                                 (null, directoryException),
+                                 ("test123.dacpac", fileException)
+                             }));
             var loggerMock = new Mock<ILogger>();
             IBuildService service = new BuildService(vsaMock, fsaMock.Object, loggerMock.Object);
 
@@ -187,7 +197,10 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
 
             // Assert
             Assert.IsFalse(result);
-            loggerMock.Verify(m => m.LogErrorAsync("Failed to copy files to the target directory: failed to find files to copy"), Times.Once);
+            loggerMock.Verify(m => m.LogTraceAsync(@"Copied file to C:\Target\test.dacpac ..."), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync("Failed to copy files to the target directory."), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync(directoryException, "Failed to access the directory"), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync(fileException, "Failed to copy file test123.dacpac"), Times.Once);
         }
 
         [Test]
@@ -202,7 +215,11 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             fsaMock.Setup(m => m.EnsureDirectoryExists(targetDirectory))
                    .Returns(null as string);
             fsaMock.Setup(m => m.CopyFiles(project.ProjectProperties.BinaryDirectory, targetDirectory, "*.dacpac"))
-                   .Returns(null as string);
+                   .Returns((new[]
+                             {
+                                 @"C:\Target\test.dacpac"
+                             },
+                             new (string File, Exception Exception)[0]));
             var loggerMock = new Mock<ILogger>();
             IBuildService service = new BuildService(vsaMock, fsaMock.Object, loggerMock.Object);
 
@@ -211,6 +228,9 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
 
             // Assert
             Assert.IsTrue(result);
+            loggerMock.Verify(m => m.LogTraceAsync(@"Copied file to C:\Target\test.dacpac ..."), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<Exception>(), It.IsAny<string>()), Times.Never);
+            loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);
         }
     }
 }

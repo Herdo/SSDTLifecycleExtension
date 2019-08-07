@@ -47,12 +47,29 @@
                 return false;
             }
 
-            var copyFilesError = _fileSystemAccess.CopyFiles(project.ProjectProperties.BinaryDirectory, targetDirectory, "*.dacpac");
-            if (copyFilesError == null)
+            var copyFilesResult = _fileSystemAccess.CopyFiles(project.ProjectProperties.BinaryDirectory, targetDirectory, "*.dacpac");
+            foreach (var copiedFile in copyFilesResult.CopiedFiles)
+            {
+                await _logger.LogTraceAsync($"Copied file to {copiedFile} ...");
+            }
+
+            if (copyFilesResult.Errors.Length == 0)
                 return true;
 
-            await _logger.LogErrorAsync($"Failed to copy files to the target directory: {copyFilesError}");
+            await _logger.LogErrorAsync("Failed to copy files to the target directory.");
+            foreach (var (file, exception) in copyFilesResult.Errors)
+            {
+                if (file == null)
+                {
+                    await _logger.LogErrorAsync(exception, "Failed to access the directory");
+                }
+                else
+                {
+                    await _logger.LogErrorAsync(exception, $"Failed to copy file {file}");
+                }
+            }
             return false;
+
         }
 
         Task<bool> IBuildService.BuildProjectAsync(SqlProject project)
