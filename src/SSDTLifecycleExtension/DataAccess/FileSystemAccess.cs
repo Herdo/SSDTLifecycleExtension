@@ -195,9 +195,9 @@
             return TryToCleanDirectoryInternal(directoryPath, filter);
         }
 
-        (string[] CopiedFiles, (string File, Exception Exception)[] Errors) IFileSystemAccess.CopyFiles(string sourceDirectory,
-                                                                                                        string targetDirectory,
-                                                                                                        string searchPattern)
+        ((string Source, string Target)[] CopiedFiles, (string File, Exception Exception)[] Errors) IFileSystemAccess.CopyFiles(string sourceDirectory,
+                                                                                                                                string targetDirectory,
+                                                                                                                                string searchPattern)
         {
             if (string.IsNullOrWhiteSpace(sourceDirectory))
                 throw new ArgumentException("Value cannot be null or white space.", nameof(sourceDirectory));
@@ -206,7 +206,7 @@
             if (string.IsNullOrWhiteSpace(searchPattern))
                 throw new ArgumentException("Value cannot be null or white space.", nameof(searchPattern));
 
-            var copiedFiles = new List<string>();
+            var copiedFiles = new List<(string Source, string Target)>();
             var errors = new List<(string File, Exception Exception)>();
             string[] sourceFiles;
             try
@@ -224,8 +224,9 @@
                 try
                 {
                     var fi = new FileInfo(sourceFile);
-                    fi.CopyTo(Path.Combine(targetDirectory, fi.Name), true);
-                    copiedFiles.Add(fi.FullName);
+                    var targetFilePath = Path.Combine(targetDirectory, fi.Name);
+                    fi.CopyTo(targetFilePath, true);
+                    copiedFiles.Add((sourceFile, targetFilePath));
                 }
                 catch (Exception e)
                 {

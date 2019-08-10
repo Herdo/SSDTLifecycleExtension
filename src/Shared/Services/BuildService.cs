@@ -48,9 +48,9 @@
             }
 
             var copyFilesResult = _fileSystemAccess.CopyFiles(project.ProjectProperties.BinaryDirectory, targetDirectory, "*.dacpac");
-            foreach (var copiedFile in copyFilesResult.CopiedFiles)
+            foreach (var (source, target) in copyFilesResult.CopiedFiles)
             {
-                await _logger.LogTraceAsync($"Copied file to {copiedFile} ...");
+                await _logger.LogTraceAsync($"Copied file \"{source}\" to \"{target}\" ...");
             }
 
             if (copyFilesResult.Errors.Length == 0)

@@ -182,7 +182,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             fsaMock.Setup(m => m.CopyFiles(project.ProjectProperties.BinaryDirectory, targetDirectory, "*.dacpac"))
                    .Returns((new[]
                              {
-                                 @"C:\Target\test.dacpac"
+                                 (@"C:\Source\test.dacpac", @"C:\Target\test.dacpac")
                              },
                              new (string File, Exception Exception)[]
                              {
@@ -197,7 +197,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
 
             // Assert
             Assert.IsFalse(result);
-            loggerMock.Verify(m => m.LogTraceAsync(@"Copied file to C:\Target\test.dacpac ..."), Times.Once);
+            loggerMock.Verify(m => m.LogTraceAsync(@"Copied file ""C:\Source\test.dacpac"" to ""C:\Target\test.dacpac"" ..."), Times.Once);
             loggerMock.Verify(m => m.LogErrorAsync("Failed to copy files to the target directory."), Times.Once);
             loggerMock.Verify(m => m.LogErrorAsync(directoryException, "Failed to access the directory"), Times.Once);
             loggerMock.Verify(m => m.LogErrorAsync(fileException, "Failed to copy file test123.dacpac"), Times.Once);
@@ -217,7 +217,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             fsaMock.Setup(m => m.CopyFiles(project.ProjectProperties.BinaryDirectory, targetDirectory, "*.dacpac"))
                    .Returns((new[]
                              {
-                                 @"C:\Target\test.dacpac"
+                                 (@"C:\Source\test.dacpac", @"C:\Target\test.dacpac")
                              },
                              new (string File, Exception Exception)[0]));
             var loggerMock = new Mock<ILogger>();
@@ -228,7 +228,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
 
             // Assert
             Assert.IsTrue(result);
-            loggerMock.Verify(m => m.LogTraceAsync(@"Copied file to C:\Target\test.dacpac ..."), Times.Once);
+            loggerMock.Verify(m => m.LogTraceAsync(@"Copied file ""C:\Source\test.dacpac"" to ""C:\Target\test.dacpac"" ..."), Times.Once);
             loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<Exception>(), It.IsAny<string>()), Times.Never);
             loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);
         }

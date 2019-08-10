@@ -51,9 +51,9 @@
         string[] TryToCleanDirectory([NotNull] string directoryPath,
                                      [NotNull] string filter);
 
-        (string[] CopiedFiles, (string File, Exception Exception)[] Errors) CopyFiles([NotNull] string sourceDirectory,
-                                                                                      [NotNull] string targetDirectory,
-                                                                                      [NotNull] string searchPattern);
+        ((string Source, string Target)[] CopiedFiles, (string File, Exception Exception)[] Errors) CopyFiles([NotNull] string sourceDirectory,
+                                                                                                              [NotNull] string targetDirectory,
+                                                                                                              [NotNull] string searchPattern);
 
         string CopyFile([NotNull] string source,
                         [NotNull] string target);
