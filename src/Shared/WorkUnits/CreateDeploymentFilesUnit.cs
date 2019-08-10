@@ -62,6 +62,10 @@
                                                                                                                        ConfigurationModel configuration,
                                                                                                                        bool createDocumentation)
         {
+            await _logger.LogDebugAsync($"Previous DACPAC path: \"{paths.DeploySources.PreviousDacpacPath}\"");
+            await _logger.LogDebugAsync($"New DACPAC path: \"{paths.DeploySources.NewDacpacPath}\"");
+            await _logger.LogDebugAsync($"Publish profile path: \"{paths.DeploySources.PublishProfilePath}\"");
+            await _logger.LogDebugAsync($"Current working directory: \"{Environment.CurrentDirectory}\"");
             var result = await _dacAccess.CreateDeployFilesAsync(paths.DeploySources.PreviousDacpacPath,
                                                                  paths.DeploySources.NewDacpacPath,
                                                                  paths.DeploySources.PublishProfilePath,

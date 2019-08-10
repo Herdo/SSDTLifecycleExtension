@@ -291,6 +291,10 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             Assert.IsNull(model.Result);
             fsaMock.Verify(m => m.WriteFileAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
             fsaMock.Verify(m => m.WriteFileAsync("deployScriptPath", (includePreDeployment ? "pre " : "") + "script" + (includePostDeployment ? " post" : "")), Times.Once);
+            loggerMock.Verify(m => m.LogDebugAsync("Previous DACPAC path: \"previousDacpacPath\""), Times.Once);
+            loggerMock.Verify(m => m.LogDebugAsync("New DACPAC path: \"newDacpacPath\""), Times.Once);
+            loggerMock.Verify(m => m.LogDebugAsync("Publish profile path: \"publishProfilePath\""), Times.Once);
+            loggerMock.Verify(m => m.LogDebugAsync(It.Is<string>(s => s.StartsWith("Current working directory: \"") && s.EndsWith("\""))), Times.Once);
             loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);
             loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<Exception>(), It.IsAny<string>()), Times.Never);
         }
@@ -336,6 +340,10 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             fsaMock.Verify(m => m.WriteFileAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Exactly(2));
             fsaMock.Verify(m => m.WriteFileAsync("deployScriptPath", (includePreDeployment ? "pre " : "") + "script" + (includePostDeployment ? " post" : "")), Times.Once);
             fsaMock.Verify(m => m.WriteFileAsync("deployReportPath", "report"), Times.Once);
+            loggerMock.Verify(m => m.LogDebugAsync("Previous DACPAC path: \"previousDacpacPath\""), Times.Once);
+            loggerMock.Verify(m => m.LogDebugAsync("New DACPAC path: \"newDacpacPath\""), Times.Once);
+            loggerMock.Verify(m => m.LogDebugAsync("Publish profile path: \"publishProfilePath\""), Times.Once);
+            loggerMock.Verify(m => m.LogDebugAsync(It.Is<string>(s => s.StartsWith("Current working directory: \"") && s.EndsWith("\""))), Times.Once);
             loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);
             loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<Exception>(), It.IsAny<string>()), Times.Never);
         }
