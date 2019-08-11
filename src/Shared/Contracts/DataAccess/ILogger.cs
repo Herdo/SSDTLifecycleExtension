@@ -6,6 +6,8 @@
 
     public interface ILogger
     {
+        string DocumentationBaseUrl { get; }
+
         Task LogCriticalAsync([NotNull] Exception exception,
                               [NotNull] string message);
 

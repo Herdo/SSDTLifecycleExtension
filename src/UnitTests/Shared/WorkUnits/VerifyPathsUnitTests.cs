@@ -99,6 +99,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             };
             var fsaMock = new Mock<IFileSystemAccess>();
             var loggerMock = new Mock<ILogger>();
+            loggerMock.SetupGet(m => m.DocumentationBaseUrl).Returns("foobasebar");
             IWorkUnit<ScriptCreationStateModel> unit = new VerifyPathsUnit(fsaMock.Object, loggerMock.Object);
 
             // Act
@@ -107,7 +108,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             // Assert
             Assert.AreEqual(StateModelState.PathsVerified, model.CurrentState);
             Assert.IsFalse(model.Result);
-            loggerMock.Verify(m => m.LogErrorAsync(It.IsNotNull<string>()), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync(It.Is<string>(s => s.Contains(ConfigurationModel.UseSinglePublishProfileSpecialKeyword) && s.Contains("foobasebarpublish-profile-path"))), Times.Once);
             fsaMock.Verify(m => m.CheckIfFileExists(It.IsAny<string>()), Times.Never);
         }
 
@@ -130,6 +131,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             var fsaMock = new Mock<IFileSystemAccess>();
             fsaMock.Setup(m => m.CheckIfFileExists(paths.DeploySources.PublishProfilePath)).Returns(false);
             var loggerMock = new Mock<ILogger>();
+            loggerMock.SetupGet(m => m.DocumentationBaseUrl).Returns("foobasebar");
             IWorkUnit<ScriptCreationStateModel> unit = new VerifyPathsUnit(fsaMock.Object, loggerMock.Object);
 
             // Act
@@ -138,7 +140,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.WorkUnits
             // Assert
             Assert.AreEqual(StateModelState.PathsVerified, model.CurrentState);
             Assert.IsFalse(model.Result);
-            loggerMock.Verify(m => m.LogErrorAsync(It.IsNotNull<string>()), Times.Once);
+            loggerMock.Verify(m => m.LogErrorAsync(It.Is<string>(s => s.Contains("publishProfilePath") && s.Contains("foobasebarpublish-profile-path"))), Times.Once);
         }
     }
 }

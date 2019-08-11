@@ -120,7 +120,7 @@
         }
 
         private string DeterminePublishProfilePath(ConfigurationModel configuration,
-                                                          string projectDirectory)
+                                                   string projectDirectory)
         {
             if (configuration.PublishProfilePath != ConfigurationModel.UseSinglePublishProfileSpecialKeyword)
                 return Path.Combine(projectDirectory, configuration.PublishProfilePath);

@@ -16,8 +16,36 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
         {
             // Act & Assert
             // ReSharper disable once ObjectCreationAsStatement
-            // ReSharper disable once AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => new VisualStudioLogger(null));
+            // ReSharper disable AssignNullToNotNullAttribute
+            Assert.Throws<ArgumentNullException>(() => new VisualStudioLogger(null, null));
+            // ReSharper restore AssignNullToNotNullAttribute
+        }
+
+        [Test]
+        public void Constructor_ArgumentNullException_DocumentationBaseUrl()
+        {
+            // Arrange
+            var vsaMock = new Mock<IVisualStudioAccess>();
+
+            // Act & Assert
+            // ReSharper disable once ObjectCreationAsStatement
+            // ReSharper disable AssignNullToNotNullAttribute
+            Assert.Throws<ArgumentNullException>(() => new VisualStudioLogger(vsaMock.Object, null));
+            // ReSharper restore AssignNullToNotNullAttribute
+        }
+
+        [Test]
+        public void DocumentationBaseUrl_GetCorrectValue()
+        {
+            // Arrange
+            var vsaMock = new Mock<IVisualStudioAccess>();
+            const string documentationBaseUrl = "foobar";
+
+            // Act
+            ILogger logger = new VisualStudioLogger(vsaMock.Object, documentationBaseUrl);
+
+            // Assert
+            Assert.AreEqual(documentationBaseUrl, logger.DocumentationBaseUrl);
         }
 
         [Test]
@@ -25,7 +53,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
         {
             // Arrange
             var vsaMock = new Mock<IVisualStudioAccess>();
-            ILogger logger = new VisualStudioLogger(vsaMock.Object);
+            ILogger logger = new VisualStudioLogger(vsaMock.Object, "foo");
 
             // Act & Assert
             // ReSharper disable once AssignNullToNotNullAttribute
@@ -37,7 +65,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
         {
             // Arrange
             var vsaMock = new Mock<IVisualStudioAccess>();
-            ILogger logger = new VisualStudioLogger(vsaMock.Object);
+            ILogger logger = new VisualStudioLogger(vsaMock.Object, "foo");
 
             // Act
             await logger.LogTraceAsync("test message");
@@ -51,7 +79,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
         {
             // Arrange
             var vsaMock = new Mock<IVisualStudioAccess>();
-            ILogger logger = new VisualStudioLogger(vsaMock.Object);
+            ILogger logger = new VisualStudioLogger(vsaMock.Object, "foo");
 
             // Act & Assert
             // ReSharper disable once AssignNullToNotNullAttribute
@@ -63,7 +91,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
         {
             // Arrange
             var vsaMock = new Mock<IVisualStudioAccess>();
-            ILogger logger = new VisualStudioLogger(vsaMock.Object);
+            ILogger logger = new VisualStudioLogger(vsaMock.Object, "foo");
 
             // Act
             await logger.LogDebugAsync("test message");
@@ -77,7 +105,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
         {
             // Arrange
             var vsaMock = new Mock<IVisualStudioAccess>();
-            ILogger logger = new VisualStudioLogger(vsaMock.Object);
+            ILogger logger = new VisualStudioLogger(vsaMock.Object, "foo");
 
             // Act & Assert
             // ReSharper disable once AssignNullToNotNullAttribute
@@ -89,7 +117,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
         {
             // Arrange
             var vsaMock = new Mock<IVisualStudioAccess>();
-            ILogger logger = new VisualStudioLogger(vsaMock.Object);
+            ILogger logger = new VisualStudioLogger(vsaMock.Object, "foo");
 
             // Act
             await logger.LogInfoAsync("test message");
@@ -103,7 +131,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
         {
             // Arrange
             var vsaMock = new Mock<IVisualStudioAccess>();
-            ILogger logger = new VisualStudioLogger(vsaMock.Object);
+            ILogger logger = new VisualStudioLogger(vsaMock.Object, "foo");
 
             // Act & Assert
             // ReSharper disable once AssignNullToNotNullAttribute
@@ -115,7 +143,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
         {
             // Arrange
             var vsaMock = new Mock<IVisualStudioAccess>();
-            ILogger logger = new VisualStudioLogger(vsaMock.Object);
+            ILogger logger = new VisualStudioLogger(vsaMock.Object, "foo");
 
             // Act
             await logger.LogWarningAsync("test message");
@@ -129,7 +157,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
         {
             // Arrange
             var vsaMock = new Mock<IVisualStudioAccess>();
-            ILogger logger = new VisualStudioLogger(vsaMock.Object);
+            ILogger logger = new VisualStudioLogger(vsaMock.Object, "foo");
 
             // Act & Assert
             // ReSharper disable AssignNullToNotNullAttribute
@@ -142,7 +170,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
         {
             // Arrange
             var vsaMock = new Mock<IVisualStudioAccess>();
-            ILogger logger = new VisualStudioLogger(vsaMock.Object);
+            ILogger logger = new VisualStudioLogger(vsaMock.Object, "foo");
             var exception = new Exception("test");
 
             // Act & Assert
@@ -156,7 +184,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
         {
             // Arrange
             var vsaMock = new Mock<IVisualStudioAccess>();
-            ILogger logger = new VisualStudioLogger(vsaMock.Object);
+            ILogger logger = new VisualStudioLogger(vsaMock.Object, "foo");
             var exception = new Exception("test exception");
 
             // Act
@@ -174,7 +202,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
         {
             // Arrange
             var vsaMock = new Mock<IVisualStudioAccess>();
-            ILogger logger = new VisualStudioLogger(vsaMock.Object);
+            ILogger logger = new VisualStudioLogger(vsaMock.Object, "foo");
 
             // Act & Assert
             // ReSharper disable once AssignNullToNotNullAttribute
@@ -186,7 +214,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
         {
             // Arrange
             var vsaMock = new Mock<IVisualStudioAccess>();
-            ILogger logger = new VisualStudioLogger(vsaMock.Object);
+            ILogger logger = new VisualStudioLogger(vsaMock.Object, "foo");
 
             // Act
             await logger.LogErrorAsync("test message");
@@ -200,7 +228,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
         {
             // Arrange
             var vsaMock = new Mock<IVisualStudioAccess>();
-            ILogger logger = new VisualStudioLogger(vsaMock.Object);
+            ILogger logger = new VisualStudioLogger(vsaMock.Object, "foo");
 
             // Act & Assert
             // ReSharper disable AssignNullToNotNullAttribute
@@ -213,7 +241,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
         {
             // Arrange
             var vsaMock = new Mock<IVisualStudioAccess>();
-            ILogger logger = new VisualStudioLogger(vsaMock.Object);
+            ILogger logger = new VisualStudioLogger(vsaMock.Object, "foo");
             var exception = new Exception("test");
 
             // Act & Assert
@@ -227,7 +255,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
         {
             // Arrange
             var vsaMock = new Mock<IVisualStudioAccess>();
-            ILogger logger = new VisualStudioLogger(vsaMock.Object);
+            ILogger logger = new VisualStudioLogger(vsaMock.Object, "foo");
             var exception = new Exception("test exception");
 
             // Act
@@ -245,7 +273,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
         {
             // Arrange
             var vsaMock = new Mock<IVisualStudioAccess>();
-            ILogger logger = new VisualStudioLogger(vsaMock.Object);
+            ILogger logger = new VisualStudioLogger(vsaMock.Object, "foo");
 
             // Act & Assert
             // ReSharper disable once AssignNullToNotNullAttribute
@@ -257,7 +285,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
         {
             // Arrange
             var vsaMock = new Mock<IVisualStudioAccess>();
-            ILogger logger = new VisualStudioLogger(vsaMock.Object);
+            ILogger logger = new VisualStudioLogger(vsaMock.Object, "foo");
 
             // Act
             await logger.LogCriticalAsync("test message");

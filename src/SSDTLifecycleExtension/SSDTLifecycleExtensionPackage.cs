@@ -14,6 +14,7 @@
     using Microsoft.VisualStudio;
     using Microsoft.VisualStudio.Shell;
     using Microsoft.VisualStudio.Shell.Interop;
+    using Properties;
     using Shared.Services;
     using Task = System.Threading.Tasks.Task;
 
@@ -59,7 +60,7 @@
                 throw new InvalidOperationException($"Cannot initialize {nameof(SSDTLifecycleExtensionPackage)} without the {nameof(OleMenuCommandService)}.");
 
             var visualStudioAccess = new VisualStudioAccess(_dte2, this);
-            var visualStudioLogger = new VisualStudioLogger(visualStudioAccess);
+            var visualStudioLogger = new VisualStudioLogger(visualStudioAccess, Settings.Default.DocumentationBaseUrl);
             return new DependencyResolver(visualStudioAccess, visualStudioLogger, commandService);
         }
 
