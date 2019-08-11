@@ -108,7 +108,7 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             Assert.AreEqual(1, loggedErrorMessages.Count);
             Assert.IsNotNull(loggedErrorMessages[0]);
             Assert.IsNotNull(loggedErrorMessages[0].Exception);
-            Assert.IsTrue(loggedErrorMessages[0].Message.StartsWith(@"Cannot read contents of C:\TestProject.sqlproj"));
+            Assert.IsTrue(loggedErrorMessages[0].Message.StartsWith(@"Cannot read contents of ""C:\TestProject.sqlproj"""));
         }
 
         [Test]
@@ -139,7 +139,10 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             // Assert
             Assert.IsFalse(loadedSuccessfully);
             Assert.AreEqual(1, loggedErrorMessages.Count);
-            Assert.AreEqual(@"Cannot read name of C:\TestProject.sqlproj", loggedErrorMessages[0]);
+            Assert.AreEqual(@"Cannot read name of ""C:\TestProject.sqlproj"". " +
+                            "Please make sure that the \"Name\" is set correctly, e.g. \"MyDatabaseProject\". " +
+                            "This value has to be set manually in XML.",
+                            loggedErrorMessages[0]);
         }
 
         [Test]
@@ -171,7 +174,10 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             // Assert
             Assert.IsFalse(loadedSuccessfully);
             Assert.AreEqual(1, loggedErrorMessages.Count);
-            Assert.AreEqual(@"Cannot read output path of C:\TestProject.sqlproj", loggedErrorMessages[0]);
+            Assert.AreEqual(@"Cannot read output path of ""C:\TestProject.sqlproj"". " +
+                            "Please make sure that the \"OutputPath\" for the current configuration is set correctly, e.g. \"bin\\Output\\\". " +
+                            "This value can be set from your database project => \"Properties\" => \"Build\" => \"Output path\".",
+                            loggedErrorMessages[0]);
         }
 
         [Test]
@@ -204,7 +210,10 @@ namespace SSDTLifecycleExtension.UnitTests.Shared.Services
             // Assert
             Assert.IsFalse(loadedSuccessfully);
             Assert.AreEqual(1, loggedErrorMessages.Count);
-            Assert.AreEqual(@"Cannot read DacVersion of C:\TestProject.sqlproj", loggedErrorMessages[0]);
+            Assert.AreEqual(@"Cannot read DacVersion of ""C:\TestProject.sqlproj"". " +
+                            "Please make sure that the \"DacVersion\" is set correctly, e.g. \"1.0.0\". " +
+                            "This value can bet set from your database project => \"Properties\" => \"Project Settings\" => \"Output types\" => \"Data-tier Application\" => \"Properties...\" => \"Version\".",
+                            loggedErrorMessages[0]);
         }
 
         [Test]

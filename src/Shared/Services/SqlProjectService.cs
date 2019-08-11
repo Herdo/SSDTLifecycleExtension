@@ -151,7 +151,7 @@
             }
             catch (XmlException e)
             {
-                await _logger.LogErrorAsync(e, $"Cannot read contents of {project.FullName}");
+                await _logger.LogErrorAsync(e, $"Cannot read contents of \"{project.FullName}\"");
                 return false;
             }
 
@@ -163,19 +163,25 @@
 
             if (name == null)
             {
-                await _logger.LogErrorAsync($"Cannot read name of {project.FullName}");
+                await _logger.LogErrorAsync($"Cannot read name of \"{project.FullName}\". " +
+                                            "Please make sure that the \"Name\" is set correctly, e.g. \"MyDatabaseProject\". " +
+                                            "This value has to be set manually in XML.");
                 return false;
             }
 
             if (outputPath == null)
             {
-                await _logger.LogErrorAsync($"Cannot read output path of {project.FullName}");
+                await _logger.LogErrorAsync($"Cannot read output path of \"{project.FullName}\". " +
+                                            "Please make sure that the \"OutputPath\" for the current configuration is set correctly, e.g. \"bin\\Output\\\". " +
+                                            "This value can be set from your database project => \"Properties\" => \"Build\" => \"Output path\".");
                 return false;
             }
 
             if (dacVersion == null)
             {
-                await _logger.LogErrorAsync($"Cannot read DacVersion of {project.FullName}");
+                await _logger.LogErrorAsync($"Cannot read DacVersion of \"{project.FullName}\". " +
+                                            "Please make sure that the \"DacVersion\" is set correctly, e.g. \"1.0.0\". " +
+                                            "This value can bet set from your database project => \"Properties\" => \"Project Settings\" => \"Output types\" => \"Data-tier Application\" => \"Properties...\" => \"Version\".");
                 return false;
             }
 
