@@ -69,10 +69,11 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.Windows
             var windowMock = Mock.Of<IVisualStudioToolWindow>();
 
             // Act
-            var success = await twi.TryInitializeToolWindowAsync<ViewModelBaseTestImplementationWithSuccessfulInitialization>(windowMock);
+            var (success, fullProjectPath) = await twi.TryInitializeToolWindowAsync<ViewModelBaseTestImplementationWithSuccessfulInitialization>(windowMock);
 
             // Assert
             Assert.IsFalse(success);
+            Assert.IsNull(fullProjectPath);
         }
 
         [Test]
@@ -91,10 +92,11 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.Windows
             windowMock.SetupGet(m => m.Content).Returns(null as object);
 
             // Act
-            var success = await twi.TryInitializeToolWindowAsync<ViewModelBaseTestImplementationWithExceptionInitialization>(windowMock.Object);
+            var (success, fullProjectPath) = await twi.TryInitializeToolWindowAsync<ViewModelBaseTestImplementationWithExceptionInitialization>(windowMock.Object);
 
             // Assert
             Assert.IsTrue(success);
+            Assert.AreEqual("b", fullProjectPath);
         }
 
         [Test]
@@ -114,10 +116,11 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.Windows
             windowMock.SetupGet(m => m.Content).Returns(viewMock);
 
             // Act
-            var success = await twi.TryInitializeToolWindowAsync<ViewModelBaseTestImplementationWithFailingInitialization>(windowMock.Object);
+            var (success, fullProjectPath) = await twi.TryInitializeToolWindowAsync<ViewModelBaseTestImplementationWithFailingInitialization>(windowMock.Object);
 
             // Assert
             Assert.IsFalse(success);
+            Assert.AreEqual("b", fullProjectPath);
         }
 
         [Test]
@@ -137,10 +140,11 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.Windows
             windowMock.SetupGet(m => m.Content).Returns(viewMock.Object);
 
             // Act
-            var success = await twi.TryInitializeToolWindowAsync<ViewModelBaseTestImplementationWithSuccessfulInitialization>(windowMock.Object);
+            var (success, fullProjectPath) = await twi.TryInitializeToolWindowAsync<ViewModelBaseTestImplementationWithSuccessfulInitialization>(windowMock.Object);
 
             // Assert
             Assert.IsTrue(success);
+            Assert.AreEqual("b", fullProjectPath);
             viewMock.Verify(m => m.SetDataContext(It.Is<IViewModel>(model => model != null && model.GetType() == typeof(ViewModelBaseTestImplementationWithSuccessfulInitialization))));
         }
 

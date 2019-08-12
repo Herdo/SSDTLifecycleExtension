@@ -1,8 +1,10 @@
 ﻿namespace SSDTLifecycleExtension
 {
     using System;
+    using System.Collections.Generic;
     using System.ComponentModel.Design;
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using System.Runtime.InteropServices;
     using System.Threading;
     using System.Threading.Tasks;
@@ -11,6 +13,7 @@
     using DataAccess;
     using EnvDTE;
     using EnvDTE80;
+    using JetBrains.Annotations;
     using Microsoft.VisualStudio;
     using Microsoft.VisualStudio.Shell;
     using Microsoft.VisualStudio.Shell.Interop;
@@ -51,8 +54,15 @@
         // ReSharper disable once MemberCanBePrivate.Global
         public const string PackageGuidString = "757ac7eb-a0da-4387-9fa2-675e78561cde";
 
+        private readonly Dictionary<string, List<IVsWindowFrame>> _openedWindowFrames;
+
         private DependencyResolver _dependencyResolver;
         private DTE2 _dte2;
+
+        public SSDTLifecycleExtensionPackage()
+        {
+            _openedWindowFrames = new Dictionary<string, List<IVsWindowFrame>>();
+        }
 
         private async Task<DependencyResolver> GetDependencyResolverAsync()
         {
@@ -62,6 +72,56 @@
             var visualStudioAccess = new VisualStudioAccess(_dte2, this);
             var visualStudioLogger = new VisualStudioLogger(visualStudioAccess, Settings.Default.DocumentationBaseUrl);
             return new DependencyResolver(visualStudioAccess, visualStudioLogger, commandService);
+        }
+
+        private void AttachToDteEvents()
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+            _dte2.Events.SolutionEvents.AfterClosing += SolutionEvents_AfterClosing;
+            _dte2.Events.SolutionEvents.ProjectRemoved += SolutionEvents_ProjectRemoved;
+            _dte2.Events.SolutionEvents.ProjectRenamed += SolutionEvents_ProjectRenamed;
+        }
+
+        private void SolutionEvents_AfterClosing()
+        {
+            CloseOpenFrames(null);
+        }
+
+        private void SolutionEvents_ProjectRemoved(Project project)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+            CloseOpenFrames(project.FullName);
+        }
+
+        private void SolutionEvents_ProjectRenamed(Project project, string oldName)
+        {
+            CloseOpenFrames(oldName);
+        }
+
+        private void CloseOpenFrames(string filter)
+        {
+            var keyToRemove = new List<string>();
+            foreach (var windowFrames in _openedWindowFrames.Where(m => filter == null || m.Key == filter))
+            {
+                keyToRemove.Add(windowFrames.Key);
+                foreach (var windowFrame in windowFrames.Value)
+                {
+                    try
+                    {
+                        ThreadHelper.ThrowIfNotOnUIThread();
+                        windowFrame.CloseFrame((uint)__FRAMECLOSE.FRAMECLOSE_NoSave);
+                    }
+                    catch
+                    {
+                        // Even when closing a window fails, we try to close the other windows as well.
+                        // When closing fails after the solution is closed, there's no reason to notify the user.
+                        // In that case, we're just leaving behind an unclean UI state.
+                    }
+                }
+            }
+
+            foreach (var key in keyToRemove)
+                _openedWindowFrames.Remove(key);
         }
 
         #region Base Overrides
@@ -79,6 +139,9 @@
             // Initialize DependencyResolver
             _dependencyResolver = await GetDependencyResolverAsync();
             _dependencyResolver.RegisterPackage(this);
+
+            // Initialize DTE event handlers
+            AttachToDteEvents();
 
             // Initialize commands
             ScriptCreationWindowCommand.Initialize(_dependencyResolver.Get<ScriptCreationWindowCommand>());
@@ -130,5 +193,28 @@
         }
 
         #endregion
+
+        /// <summary>
+        /// Adds the <paramref name="windowFrame"/> to an internal list. When the solution is closed, all registered window frames will be closed.
+        /// </summary>
+        /// <param name="fullProjectPath">The full path of the project the <paramref name="windowFrame"/> was opened for.</param>
+        /// <param name="windowFrame">The opened <see cref="IVsWindowFrame"/>.</param>
+        internal void RegisterWindowFrame([NotNull] string fullProjectPath,
+                                          [NotNull] IVsWindowFrame windowFrame)
+        {
+            if (fullProjectPath == null)
+                throw new ArgumentNullException(nameof(fullProjectPath));
+            if (windowFrame == null)
+                throw new ArgumentNullException(nameof(windowFrame));
+
+            if (!_openedWindowFrames.TryGetValue(fullProjectPath, out var windowFrames))
+            {
+                windowFrames = new List<IVsWindowFrame>();
+                _openedWindowFrames[fullProjectPath] = windowFrames;
+            }
+
+            if (!windowFrames.Contains(windowFrame))
+                windowFrames.Add(windowFrame);
+        }
     }
 }

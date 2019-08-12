@@ -18,28 +18,28 @@
             _dependencyResolver = dependencyResolver ?? throw new ArgumentNullException(nameof(dependencyResolver));
         }
 
-        private async Task<bool> TryInitializeToolWindowInternalAsync<TViewModel>(IVisualStudioToolWindow window) where TViewModel : IViewModel
+        private async Task<(bool Success, string FullProjectPath)> TryInitializeToolWindowInternalAsync<TViewModel>(IVisualStudioToolWindow window) where TViewModel : IViewModel
         {
             // Set caption
             var project = _visualStudioAccess.GetSelectedSqlProject();
             if (project == null)
-                return false;
+                return (false, null);
             window.SetCaption(project.Name);
 
             // Set data context
             if (!(window.Content is IView windowContent))
-                return true;
+                return (true, project.FullName);
 
             var viewModel = _dependencyResolver.GetViewModel<TViewModel>(project);
             var initializedSuccessfully = await viewModel.InitializeAsync();
             if (!initializedSuccessfully)
-                return false;
+                return (false, project.FullName);
             windowContent.SetDataContext(viewModel);
 
-            return true;
+            return (true, project.FullName);
         }
 
-        internal Task<bool> TryInitializeToolWindowAsync<TViewModel>([NotNull] IVisualStudioToolWindow window)
+        internal Task<(bool Success, string FullProjectPath)> TryInitializeToolWindowAsync<TViewModel>([NotNull] IVisualStudioToolWindow window)
             where TViewModel : IViewModel
         {
             if (window == null)

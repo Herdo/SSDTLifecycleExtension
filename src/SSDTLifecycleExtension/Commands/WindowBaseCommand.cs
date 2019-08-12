@@ -44,11 +44,13 @@
 
                 await _package.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-                if (!await _toolWindowInitializer.TryInitializeToolWindowAsync<TViewModel>(window))
+                var (success, fullProjectPath) = await _toolWindowInitializer.TryInitializeToolWindowAsync<TViewModel>(window);
+                if (!success)
                     return;
 
                 // Show the frame
                 var windowFrame = (IVsWindowFrame) window.Frame;
+                _package.RegisterWindowFrame(fullProjectPath, windowFrame);
                 Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
             });
         }
