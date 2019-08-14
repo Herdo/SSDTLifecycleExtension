@@ -66,6 +66,9 @@
     <Compile Include="MVVM\IAsyncCommand.cs" />
     <Compile Include="MVVM\IErrorHandler.cs" />
     <Compile Include="MVVM\TaskUtilities.cs" />
+    <Compile Include="OutputClassification\ClassificationTypes.cs" />
+    <Compile Include="OutputClassification\OutputClassifier.cs" />
+    <Compile Include="OutputClassification\OutputClassifierProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -111,6 +114,7 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Design" />
     <Reference Include="System.Xaml" />
     <Reference Include="WindowsBase" />
