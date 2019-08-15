@@ -84,6 +84,7 @@
 
         private void SolutionEvents_AfterClosing()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             CloseOpenFrames(null);
         }
 
@@ -95,6 +96,7 @@
 
         private void SolutionEvents_ProjectRenamed(Project project, string oldName)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             CloseOpenFrames(oldName);
         }
 

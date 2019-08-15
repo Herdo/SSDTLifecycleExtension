@@ -11,9 +11,9 @@
     {
         [Import] internal IClassificationTypeRegistryService ClassificationTypeRegistryService;
 
-        private static OutputClassifier _outputClassifier;
+        private OutputClassifier _outputClassifier;
 
-        public IClassifier GetClassifier(ITextBuffer textBuffer)
+        IClassifier IClassifierProvider.GetClassifier(ITextBuffer textBuffer)
         {
             return _outputClassifier ?? (_outputClassifier = new OutputClassifier(ClassificationTypeRegistryService));
         }

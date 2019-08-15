@@ -3,14 +3,15 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using JetBrains.Annotations;
     using Microsoft.VisualStudio.Text;
     using Microsoft.VisualStudio.Text.Classification;
 
-    public class OutputClassifier : IClassifier
+    internal sealed class OutputClassifier : IClassifier
     {
         private readonly IClassificationTypeRegistryService _classificationTypeRegistryService;
 
-        public OutputClassifier(IClassificationTypeRegistryService classificationTypeRegistryService)
+        internal OutputClassifier([NotNull] IClassificationTypeRegistryService classificationTypeRegistryService)
         {
             _classificationTypeRegistryService = classificationTypeRegistryService ?? throw new ArgumentNullException(nameof(classificationTypeRegistryService));
         }
@@ -19,7 +20,7 @@
         {
             var snapshot = span.Snapshot;
             var spans = new List<ClassificationSpan>();
-            if (snapshot.Length == 0)
+            if (snapshot == null || snapshot.Length == 0)
                 return spans;
 
             var text = span.GetText();
@@ -62,6 +63,10 @@
             return spans;
         }
 
-        public event EventHandler<ClassificationChangedEventArgs> ClassificationChanged;
+        event EventHandler<ClassificationChangedEventArgs> IClassifier.ClassificationChanged
+        {
+            add => throw new NotSupportedException();
+            remove => throw new NotSupportedException();
+        }
     }
 }

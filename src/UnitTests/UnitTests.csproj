@@ -51,6 +51,9 @@
     <Compile Include="Extension\Converters\BoolInvertConverterTests.cs" />
     <Compile Include="Extension\Converters\BoolToVisibilityConverterTests.cs" />
     <Compile Include="Extension\MVVM\TaskUtilitiesTests.cs" />
+    <Compile Include="Extension\OutputClassification\ClassificationTypesTests.cs" />
+    <Compile Include="Extension\OutputClassification\OutputClassifierProviderTests.cs" />
+    <Compile Include="Extension\OutputClassification\OutputClassifierTests.cs" />
     <Compile Include="Extension\ViewModels\ConfigurationViewModelTests.cs" />
     <Compile Include="Extension\ViewModels\ScriptCreationViewModelTests.cs" />
     <Compile Include="Extension\ViewModels\ViewModelBaseTests.cs" />

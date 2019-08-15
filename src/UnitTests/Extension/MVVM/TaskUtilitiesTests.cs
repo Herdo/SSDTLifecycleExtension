@@ -4,6 +4,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.MVVM
 {
     using System;
     using System.IO;
+    using System.Threading;
     using System.Threading.Tasks;
     using Moq;
     using SSDTLifecycleExtension.MVVM;
@@ -73,6 +74,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.MVVM
             task.FireAndForget(commandMock, errorHandlerMock.Object);
 
             // Assert
+            Thread.Sleep(500); // Build-server delay
             errorHandlerMock.Verify(m => m.HandleErrorAsync(commandMock, It.IsNotNull<InvalidOperationException>()), Times.Once);
         }
 
@@ -90,6 +92,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.MVVM
             Assert.DoesNotThrow(() => task.FireAndForget(commandMock, errorHandlerMock.Object));
 
             // Assert
+            Thread.Sleep(500); // Build-server delay
             errorHandlerMock.Verify(m => m.HandleErrorAsync(commandMock, It.IsNotNull<InvalidOperationException>()), Times.Once);
         }
     }
