@@ -21,27 +21,14 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.OutputClassification
         }
 
         [Test]
-        public void ClassificationChanged_NotSupportedException()
-        {
-            // Arrange
-            var classificationTypeRegistryServiceMock = new Mock<IClassificationTypeRegistryService>();
-            IClassifier classifier = new OutputClassifier(classificationTypeRegistryServiceMock.Object);
-            void ClassifierClassificationChanged(object sender, ClassificationChangedEventArgs e)
-            {
-                Assert.Fail("This shouldn't be called.");
-            }
-
-            // Act & Assert
-            Assert.Throws<NotSupportedException>(() => classifier.ClassificationChanged += ClassifierClassificationChanged);
-            Assert.Throws<NotSupportedException>(() => classifier.ClassificationChanged += ClassifierClassificationChanged);
-        }
-
-        [Test]
         public void GetClassificationSpans_EmptyWhenNoSnapshot()
         {
             // Arrange
             var classificationTypeRegistryServiceMock = new Mock<IClassificationTypeRegistryService>();
             IClassifier classifier = new OutputClassifier(classificationTypeRegistryServiceMock.Object);
+            void ClassifierClassificationChanged(object sender, ClassificationChangedEventArgs args) => Assert.Fail("This shouldn't be invoked.");
+            classifier.ClassificationChanged -= ClassifierClassificationChanged;
+            classifier.ClassificationChanged += ClassifierClassificationChanged;
             var span = new SnapshotSpan();
 
             // Act
@@ -58,6 +45,9 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.OutputClassification
             // Arrange
             var classificationTypeRegistryServiceMock = new Mock<IClassificationTypeRegistryService>();
             IClassifier classifier = new OutputClassifier(classificationTypeRegistryServiceMock.Object);
+            void ClassifierClassificationChanged(object sender, ClassificationChangedEventArgs args) => Assert.Fail("This shouldn't be invoked.");
+            classifier.ClassificationChanged -= ClassifierClassificationChanged;
+            classifier.ClassificationChanged += ClassifierClassificationChanged;
             var snapshotMock = new Mock<ITextSnapshot>();
             snapshotMock.SetupGet(m => m.Length).Returns(0);
             var snapshotSpan = new SnapshotSpan(snapshotMock.Object, new Span());
@@ -76,6 +66,9 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.OutputClassification
             // Arrange
             var classificationTypeRegistryServiceMock = new Mock<IClassificationTypeRegistryService>();
             IClassifier classifier = new OutputClassifier(classificationTypeRegistryServiceMock.Object);
+            void ClassifierClassificationChanged(object sender, ClassificationChangedEventArgs args) => Assert.Fail("This shouldn't be invoked.");
+            classifier.ClassificationChanged -= ClassifierClassificationChanged;
+            classifier.ClassificationChanged += ClassifierClassificationChanged;
             const string text = "foobar";
             var span = new Span(0, text.Length);
             var snapshotMock = new Mock<ITextSnapshot>();
@@ -109,6 +102,9 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.OutputClassification
             classificationTypeRegistryServiceMock.Setup(m => m.GetClassificationType(ClassificationTypes.Trace)).Returns(traceClassificationType);
             classificationTypeRegistryServiceMock.Setup(m => m.GetClassificationType(ClassificationTypes.Done)).Returns(doneClassificationType);
             IClassifier classifier = new OutputClassifier(classificationTypeRegistryServiceMock.Object);
+            void ClassifierClassificationChanged(object sender, ClassificationChangedEventArgs args) => Assert.Fail("This shouldn't be invoked.");
+            classifier.ClassificationChanged -= ClassifierClassificationChanged;
+            classifier.ClassificationChanged += ClassifierClassificationChanged;
             const string text = "CRITICAL: foobar";
             var span = new Span(0, text.Length);
             var snapshotMock = new Mock<ITextSnapshot>();
@@ -145,6 +141,9 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.OutputClassification
             classificationTypeRegistryServiceMock.Setup(m => m.GetClassificationType(ClassificationTypes.Trace)).Returns(traceClassificationType);
             classificationTypeRegistryServiceMock.Setup(m => m.GetClassificationType(ClassificationTypes.Done)).Returns(doneClassificationType);
             IClassifier classifier = new OutputClassifier(classificationTypeRegistryServiceMock.Object);
+            void ClassifierClassificationChanged(object sender, ClassificationChangedEventArgs args) => Assert.Fail("This shouldn't be invoked.");
+            classifier.ClassificationChanged -= ClassifierClassificationChanged;
+            classifier.ClassificationChanged += ClassifierClassificationChanged;
             const string text = "ERROR: foobar";
             var span = new Span(0, text.Length);
             var snapshotMock = new Mock<ITextSnapshot>();
@@ -181,6 +180,9 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.OutputClassification
             classificationTypeRegistryServiceMock.Setup(m => m.GetClassificationType(ClassificationTypes.Trace)).Returns(traceClassificationType);
             classificationTypeRegistryServiceMock.Setup(m => m.GetClassificationType(ClassificationTypes.Done)).Returns(doneClassificationType);
             IClassifier classifier = new OutputClassifier(classificationTypeRegistryServiceMock.Object);
+            void ClassifierClassificationChanged(object sender, ClassificationChangedEventArgs args) => Assert.Fail("This shouldn't be invoked.");
+            classifier.ClassificationChanged -= ClassifierClassificationChanged;
+            classifier.ClassificationChanged += ClassifierClassificationChanged;
             const string text = "WARNING: foobar";
             var span = new Span(0, text.Length);
             var snapshotMock = new Mock<ITextSnapshot>();
@@ -217,6 +219,9 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.OutputClassification
             classificationTypeRegistryServiceMock.Setup(m => m.GetClassificationType(ClassificationTypes.Trace)).Returns(traceClassificationType);
             classificationTypeRegistryServiceMock.Setup(m => m.GetClassificationType(ClassificationTypes.Done)).Returns(doneClassificationType);
             IClassifier classifier = new OutputClassifier(classificationTypeRegistryServiceMock.Object);
+            void ClassifierClassificationChanged(object sender, ClassificationChangedEventArgs args) => Assert.Fail("This shouldn't be invoked.");
+            classifier.ClassificationChanged -= ClassifierClassificationChanged;
+            classifier.ClassificationChanged += ClassifierClassificationChanged;
             const string text = "DEBUG: foobar";
             var span = new Span(0, text.Length);
             var snapshotMock = new Mock<ITextSnapshot>();
@@ -253,6 +258,9 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.OutputClassification
             classificationTypeRegistryServiceMock.Setup(m => m.GetClassificationType(ClassificationTypes.Trace)).Returns(traceClassificationType);
             classificationTypeRegistryServiceMock.Setup(m => m.GetClassificationType(ClassificationTypes.Done)).Returns(doneClassificationType);
             IClassifier classifier = new OutputClassifier(classificationTypeRegistryServiceMock.Object);
+            void ClassifierClassificationChanged(object sender, ClassificationChangedEventArgs args) => Assert.Fail("This shouldn't be invoked.");
+            classifier.ClassificationChanged -= ClassifierClassificationChanged;
+            classifier.ClassificationChanged += ClassifierClassificationChanged;
             const string text = "TRACE: foobar";
             var span = new Span(0, text.Length);
             var snapshotMock = new Mock<ITextSnapshot>();
@@ -289,6 +297,9 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.OutputClassification
             classificationTypeRegistryServiceMock.Setup(m => m.GetClassificationType(ClassificationTypes.Trace)).Returns(traceClassificationType);
             classificationTypeRegistryServiceMock.Setup(m => m.GetClassificationType(ClassificationTypes.Done)).Returns(doneClassificationType);
             IClassifier classifier = new OutputClassifier(classificationTypeRegistryServiceMock.Object);
+            void ClassifierClassificationChanged(object sender, ClassificationChangedEventArgs args) => Assert.Fail("This shouldn't be invoked.");
+            classifier.ClassificationChanged -= ClassifierClassificationChanged;
+            classifier.ClassificationChanged += ClassifierClassificationChanged;
             const string text = "INFO: ========== foobar ==========";
             var span = new Span(0, text.Length);
             var snapshotMock = new Mock<ITextSnapshot>();

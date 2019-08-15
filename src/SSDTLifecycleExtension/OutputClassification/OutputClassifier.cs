@@ -63,10 +63,6 @@
             return spans;
         }
 
-        event EventHandler<ClassificationChangedEventArgs> IClassifier.ClassificationChanged
-        {
-            add => throw new NotSupportedException();
-            remove => throw new NotSupportedException();
-        }
+        public event EventHandler<ClassificationChangedEventArgs> ClassificationChanged;
     }
 }
