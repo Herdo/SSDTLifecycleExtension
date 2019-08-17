@@ -17,13 +17,10 @@
     public class DacAccess : IDacAccess
     {
         private readonly IXmlFormatService _xmlFormatService;
-        private readonly IFileSystemAccess _fileSystemAccess;
 
-        public DacAccess([NotNull] IXmlFormatService xmlFormatService,
-                         [NotNull] IFileSystemAccess fileSystemAccess)
+        public DacAccess([NotNull] IXmlFormatService xmlFormatService)
         {
             _xmlFormatService = xmlFormatService ?? throw new ArgumentNullException(nameof(xmlFormatService));
-            _fileSystemAccess = fileSystemAccess ?? throw new ArgumentNullException(nameof(fileSystemAccess));
         }
 
         private async Task<CreateDeployFilesResult> CreateDeployFilesInternalAsync(string previousVersionDacpacPath,
@@ -39,52 +36,37 @@
                     PublishProfile publishProfile;
                     string preDeploymentScriptContent;
                     string postDeploymentScriptContent;
-                    SecureStreamResult<DacPackage> previousDacpac = null;
-                    SecureStreamResult<DacPackage> newDacpac = null;
-                    SecureStreamResult<DacDeployOptions> deployOptions = null;
                     try
                     {
-                        using (previousDacpac = _fileSystemAccess.ReadFromStream(previousVersionDacpacPath,
-                                                                                 stream => DacPackage.Load(stream, DacSchemaModelStorageType.Memory)))
-                            using (newDacpac = _fileSystemAccess.ReadFromStream(newVersionDacpacPath,
-                                                                                stream => DacPackage.Load(stream, DacSchemaModelStorageType.Memory)))
-                                using (deployOptions = _fileSystemAccess.ReadFromStream(publishProfilePath,
-                                                                                        stream => DacProfile.Load(stream).DeployOptions))
-                                {
-                                    // Check for errors before processing
-                                    var deployInputErrors = ValidateDeployInput(previousDacpac, newDacpac, deployOptions);
-                                    if (deployInputErrors != null)
-                                        return deployInputErrors;
+                        // Get publish profile
+                        var deployOptions = DacProfile.Load(publishProfilePath).DeployOptions;
+                        publishProfile = ConvertPublishProfile(deployOptions);
 
-                                    // Convert publish profile
-                                    publishProfile =  ConvertPublishProfile(deployOptions.Result);
+                        // Read the DACPACs
+                        using (var previousDacpac = DacPackage.Load(previousVersionDacpacPath, DacSchemaModelStorageType.Memory))
+                            using (var newDacpac = DacPackage.Load(newVersionDacpacPath, DacSchemaModelStorageType.Memory))
+                            {
 
-                                    // Read pre-deployment and post-deployment from new DACPAC.
-                                    preDeploymentScriptContent = TryToReadDeploymentScriptContent(newDacpac.Result.PreDeploymentScript);
-                                    postDeploymentScriptContent = TryToReadDeploymentScriptContent(newDacpac.Result.PostDeploymentScript);
+                                // Read pre-deployment and post-deployment from new DACPAC.
+                                preDeploymentScriptContent = TryToReadDeploymentScriptContent(newDacpac.PreDeploymentScript);
+                                postDeploymentScriptContent = TryToReadDeploymentScriptContent(newDacpac.PostDeploymentScript);
 
-                                    // Process the input
-                                    result = DacServices.Script(newDacpac.Result,
-                                                                previousDacpac.Result,
-                                                                "PRODUCTION",
-                                                                new PublishOptions
-                                                                {
-                                                                    GenerateDeploymentScript = createDeployScript,
-                                                                    GenerateDeploymentReport = createDeployReport,
-                                                                    DeployOptions = deployOptions.Result
-                                                                });
-                                }
+                                // Process the input
+                                result = DacServices.Script(newDacpac,
+                                                            previousDacpac,
+                                                            "PRODUCTION",
+                                                            new PublishOptions
+                                                            {
+                                                                GenerateDeploymentScript = createDeployScript,
+                                                                GenerateDeploymentReport = createDeployReport,
+                                                                DeployOptions = deployOptions
+                                                            });
+                            }
 
                     }
                     catch (DacServicesException e)
                     {
                         return new CreateDeployFilesResult(GetErrorList(e));
-                    }
-                    finally
-                    {
-                        previousDacpac?.Dispose();
-                        newDacpac?.Dispose();
-                        deployOptions?.Dispose();
                     }
 
                     return new CreateDeployFilesResult(result?.DatabaseScript,
@@ -93,25 +75,6 @@
                                                        postDeploymentScriptContent,
                                                        publishProfile);
                 });
-        }
-
-        private static CreateDeployFilesResult ValidateDeployInput(SecureStreamResult<DacPackage> previousDacpac,
-                                                                   SecureStreamResult<DacPackage> newDacpac,
-                                                                   SecureStreamResult<DacDeployOptions> deployOptions)
-        {
-            var fileOpenErrors = new List<string>();
-            if (previousDacpac.Exception != null)
-                fileOpenErrors.Add($"Error reading previous DACPAC: {previousDacpac.Exception.Message}");
-            if (newDacpac.Exception != null)
-                fileOpenErrors.Add($"Error reading new DACPAC: {newDacpac.Exception.Message}");
-            if (deployOptions.Exception != null)
-                fileOpenErrors.Add($"Error reading publish profile: {deployOptions.Exception.Message}");
-            if (fileOpenErrors.Any()
-                || previousDacpac.Result == null
-                || newDacpac.Result == null
-                || deployOptions.Result == null)
-                return new CreateDeployFilesResult(fileOpenErrors.ToArray());
-            return null;
         }
 
         private static PublishProfile ConvertPublishProfile(DacDeployOptions deployOptions)
@@ -143,31 +106,24 @@
         {
             var (constraints, errors) = await Task.Run<(DefaultConstraint[] Result, string[] Errors)>(() =>
             {
-                SecureStreamResult<TSqlModel> sqlModel = null;
                 try
                 {
-                    using (sqlModel = _fileSystemAccess.ReadFromStream(dacpacPath,
-                                                                       stream => TSqlModel.LoadFromDacpac(stream, new ModelLoadOptions(DacSchemaModelStorageType.Memory, false))))
+                    using (var sqlModel = TSqlModel.LoadFromDacpac(dacpacPath, new ModelLoadOptions(DacSchemaModelStorageType.Memory, false)))
                     {
-                        // Check for errors before processing
-                        var fileOpenErrors = new List<string>();
-                        if (sqlModel.Exception != null)
-                            fileOpenErrors.Add($"Error reading DACPAC: {sqlModel.Exception.Message}");
-                        if (fileOpenErrors.Any() || sqlModel.Result == null)
-                            return (null, fileOpenErrors.ToArray());
-
                         // Process the input
-                        return (GetDefaultConstraintsFromModel(sqlModel.Result), null);
+                        return (GetDefaultConstraintsFromModel(sqlModel), null);
                     }
-
                 }
-                catch (Exception e) when (e is DacServicesException || e is DacModelException)
+                catch (DacModelException e)
+                {
+                    var errorMessages = new List<string> { e.GetBaseException().Message };
+                    if (e.Messages != null && e.Messages.Any())
+                        errorMessages.AddRange(e.Messages.Select(m => m.ToString()));
+                    return (null, errorMessages.ToArray());
+                }
+                catch (Exception e)
                 {
                     return (null, new[] { e.GetBaseException().Message });
-                }
-                finally
-                {
-                    sqlModel?.Dispose();
                 }
             });
 

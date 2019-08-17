@@ -9,7 +9,6 @@
     using System.Threading.Tasks;
     using JetBrains.Annotations;
     using Microsoft.Win32;
-    using Shared.Contracts;
     using Shared.Contracts.DataAccess;
 
     [UsedImplicitly]
@@ -87,28 +86,6 @@
                 throw new ArgumentNullException(nameof(sourcePath));
 
             return ReadFileInternalAsync(sourcePath);
-        }
-
-        SecureStreamResult<TResult> IFileSystemAccess.ReadFromStream<TResult>(string sourcePath,
-                                                                              Func<Stream, TResult> streamConsumer)
-        {
-            if (sourcePath == null)
-                throw new ArgumentNullException(nameof(sourcePath));
-            if (streamConsumer == null)
-                throw new ArgumentNullException(nameof(streamConsumer));
-
-            Stream stream = null;
-            try
-            {
-                stream = new FileStream(sourcePath, FileMode.OpenOrCreate, FileAccess.Read);
-            }
-            catch (Exception e)
-            {
-                stream?.Dispose();
-                return new SecureStreamResult<TResult>(null, null, e);
-            }
-
-            return new SecureStreamResult<TResult>(stream, streamConsumer(stream), null);
         }
 
         Task IFileSystemAccess.WriteFileAsync(string targetPath,

@@ -3,20 +3,47 @@
 namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
-    using Microsoft.SqlServer.Dac;
-    using Microsoft.SqlServer.Dac.Model;
     using Moq;
     using SSDTLifecycleExtension.DataAccess;
-    using SSDTLifecycleExtension.Shared.Contracts;
     using SSDTLifecycleExtension.Shared.Contracts.DataAccess;
     using SSDTLifecycleExtension.Shared.Contracts.Services;
 
     [TestFixture]
     public class DacAccessTests
     {
+        private static readonly List<string> CreatedFiles;
+
+        static DacAccessTests()
+        {
+            CreatedFiles = new List<string>();
+        }
+
+        /// <summary>
+        /// Writes the embedded resource associated with the <paramref name="resourceName"/> to a temporary file.
+        /// </summary>
+        /// <param name="resourceName">The name of the resource to write to a temporary file.</param>
+        /// <returns>The full path of the temporary file.</returns>
+        private static string WriteEmbeddedResourceToTemporaryFile(string resourceName)
+        {
+            var tempFileName = Path.GetTempPath() + Guid.NewGuid().ToString("N") + ".dacpac";
+            CreatedFiles.Add(tempFileName);
+            using (var sourceStream = GetEmbeddedResourceStream(resourceName))
+            {
+                using (var targetStream = new FileStream(tempFileName, FileMode.Create))
+                {
+                    sourceStream.CopyTo(targetStream);
+                    targetStream.Flush();
+                }
+            }
+
+            return tempFileName;
+        }
+
         private static Stream GetEmbeddedResourceStream(string resourceName)
         {
             var testAssembly = typeof(DacAccessTests).Assembly;
@@ -25,26 +52,37 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
             return testAssembly.GetManifestResourceStream(fullResourceName);
         }
 
+        [TearDown]
+        public static void TearDown()
+        {
+            foreach (var createdFile in CreatedFiles)
+            {
+                var retries = 10;
+                var deleted = false;
+                while (!deleted && retries > 0)
+                {
+                    try
+                    {
+                        File.Delete(createdFile);
+                        deleted = true;
+                    }
+                    catch
+                    {
+                        retries--;
+                        Thread.Sleep(50);
+                    }
+                }
+            }
+            CreatedFiles.Clear();
+        }
+
         [Test]
         public void Constructor_ArgumentNullException_XmlFormatService()
         {
             // Act & Assert
             // ReSharper disable once ObjectCreationAsStatement
             // ReSharper disable AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => new DacAccess(null, null));
-            // ReSharper restore AssignNullToNotNullAttribute
-        }
-
-        [Test]
-        public void Constructor_ArgumentNullException_FileSystemAccess()
-        {
-            // Arrange
-            var xfsMock = Mock.Of<IXmlFormatService>();
-
-            // Act & Assert
-            // ReSharper disable once ObjectCreationAsStatement
-            // ReSharper disable AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => new DacAccess(xfsMock, null));
+            Assert.Throws<ArgumentNullException>(() => new DacAccess(null));
             // ReSharper restore AssignNullToNotNullAttribute
         }
 
@@ -53,8 +91,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
         {
             // Arrange
             var xfsMock = Mock.Of<IXmlFormatService>();
-            var fsaMock = Mock.Of<IFileSystemAccess>();
-            IDacAccess da = new DacAccess(xfsMock, fsaMock);
+            IDacAccess da = new DacAccess(xfsMock);
 
             // Act & Assert
             // ReSharper disable AssignNullToNotNullAttribute
@@ -67,8 +104,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
         {
             // Arrange
             var xfsMock = Mock.Of<IXmlFormatService>();
-            var fsaMock = Mock.Of<IFileSystemAccess>();
-            IDacAccess da = new DacAccess(xfsMock, fsaMock);
+            IDacAccess da = new DacAccess(xfsMock);
             var previousVersionDacpacPath = "path1";
 
             // Act & Assert
@@ -82,8 +118,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
         {
             // Arrange
             var xfsMock = Mock.Of<IXmlFormatService>();
-            var fsaMock = Mock.Of<IFileSystemAccess>();
-            IDacAccess da = new DacAccess(xfsMock, fsaMock);
+            IDacAccess da = new DacAccess(xfsMock);
             var previousVersionDacpacPath = "path1";
             var newVersionDacpacPath = "path2";
 
@@ -98,8 +133,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
         {
             // Arrange
             var xfsMock = Mock.Of<IXmlFormatService>();
-            var fsaMock = Mock.Of<IFileSystemAccess>();
-            IDacAccess da = new DacAccess(xfsMock, fsaMock);
+            IDacAccess da = new DacAccess(xfsMock);
             var previousVersionDacpacPath = "path1";
             var newVersionDacpacPath = "path2";
             var publishProfilePath = "path3";
@@ -109,218 +143,18 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
         }
 
         [Test]
-        public async Task CreateDeployFilesAsync_Errors_ReadFromStreamReturnedNull_Async()
-        {
-            // Arrange
-            var previousVersionDacpacPath = "path1";
-            var newVersionDacpacPath = "path2";
-            var publishProfilePath = "path3";
-            var xfsMock = Mock.Of<IXmlFormatService>();
-            var fileOpenException1 = new Exception("Test exception1");
-            var fileOpenException2 = new Exception("Test exception2");
-            var fileOpenException3 = new Exception("Test exception3");
-            var fsaMock = new Mock<IFileSystemAccess>();
-            fsaMock.Setup(m => m.ReadFromStream(previousVersionDacpacPath, It.IsNotNull<Func<Stream, DacPackage>>()))
-                   .Returns(new SecureStreamResult<DacPackage>(null, null, fileOpenException1));
-            fsaMock.Setup(m => m.ReadFromStream(newVersionDacpacPath, It.IsNotNull<Func<Stream, DacPackage>>()))
-                   .Returns(new SecureStreamResult<DacPackage>(null, null, fileOpenException2));
-            fsaMock.Setup(m => m.ReadFromStream(publishProfilePath, It.IsNotNull<Func<Stream, DacDeployOptions>>()))
-                   .Returns(new SecureStreamResult<DacDeployOptions>(null, null, fileOpenException3));
-            IDacAccess da = new DacAccess(xfsMock, fsaMock.Object);
-
-            // Act
-            var result = await da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, true, true);
-
-            // Assert
-            Assert.IsNull(result.DeployScriptContent);
-            Assert.IsNull(result.DeployReportContent);
-            Assert.IsNotNull(result.Errors);
-            Assert.AreEqual(3, result.Errors.Length);
-            Assert.AreEqual("Error reading previous DACPAC: Test exception1", result.Errors[0]);
-            Assert.AreEqual("Error reading new DACPAC: Test exception2", result.Errors[1]);
-            Assert.AreEqual("Error reading publish profile: Test exception3", result.Errors[2]);
-        }
-
-        [Test]
-        public async Task CreateDeployFilesAsync_Errors_ReadFromStreamReturnedCorruptStream_PreviousDacpac_Async()
-        {
-            // Arrange
-            var previousVersionDacpacPath = "path1";
-            var newVersionDacpacPath = "path2";
-            var publishProfilePath = "path3";
-            var xfsMock = Mock.Of<IXmlFormatService>();
-
-            Stream CreateEmptyStream()
-            {
-                return new MemoryStream(new byte[]
-                {
-                    1,
-                    2,
-                    234,
-                    14
-                });
-            }
-
-            var fsaMock = new Mock<IFileSystemAccess>();
-            fsaMock.Setup(m => m.ReadFromStream(previousVersionDacpacPath, It.IsNotNull<Func<Stream, DacPackage>>()))
-                   .Returns((string path,
-                             Func<Stream, DacPackage> consumer) =>
-                    {
-                        var stream = CreateEmptyStream();
-                        return new SecureStreamResult<DacPackage>(stream, consumer(stream), null);
-                    });
-            IDacAccess da = new DacAccess(xfsMock, fsaMock.Object);
-
-            // Act
-            var result = await da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, true, true);
-
-            // Assert
-            Assert.IsNull(result.DeployScriptContent);
-            Assert.IsNull(result.DeployReportContent);
-            Assert.IsNotNull(result.Errors);
-            Assert.AreEqual(1, result.Errors.Length);
-            Assert.IsNotEmpty(result.Errors[0]);
-        }
-
-        [Test]
-        public async Task CreateDeployFilesAsync_Errors_ReadFromStreamReturnedCorruptStream_NewDacpac_Async()
-        {
-            // Arrange
-            var previousVersionDacpacPath = "path1";
-            var newVersionDacpacPath = "path2";
-            var publishProfilePath = "path3";
-            var xfsMock = Mock.Of<IXmlFormatService>();
-
-            Stream CreateCorruptStream()
-            {
-                return new MemoryStream(new byte[]
-                {
-                    1,
-                    2,
-                    234,
-                    14
-                });
-            }
-
-            var fsaMock = new Mock<IFileSystemAccess>();
-            fsaMock.Setup(m => m.ReadFromStream(previousVersionDacpacPath, It.IsNotNull<Func<Stream, DacPackage>>()))
-                   .Returns((string path,
-                             Func<Stream, DacPackage> consumer) =>
-                    {
-                        var stream = GetEmbeddedResourceStream("TestDatabase_Empty.dacpac");
-                        return new SecureStreamResult<DacPackage>(stream, consumer(stream), null);
-                    });
-            fsaMock.Setup(m => m.ReadFromStream(newVersionDacpacPath, It.IsNotNull<Func<Stream, DacPackage>>()))
-                   .Returns((string path,
-                             Func<Stream, DacPackage> consumer) =>
-                    {
-                        var stream = CreateCorruptStream();
-                        return new SecureStreamResult<DacPackage>(stream, consumer(stream), null);
-                    });
-            IDacAccess da = new DacAccess(xfsMock, fsaMock.Object);
-
-            // Act
-            var result = await da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, true, true);
-
-            // Assert
-            Assert.IsNull(result.DeployScriptContent);
-            Assert.IsNull(result.DeployReportContent);
-            Assert.IsNotNull(result.Errors);
-            Assert.AreEqual(1, result.Errors.Length);
-            Assert.IsNotEmpty(result.Errors[0]);
-        }
-
-        [Test]
-        public async Task CreateDeployFilesAsync_Errors_ReadFromStreamReturnedCorruptStream_PublishProfile_Async()
-        {
-            // Arrange
-            var previousVersionDacpacPath = "path1";
-            var newVersionDacpacPath = "path2";
-            var publishProfilePath = "path3";
-            var xfsMock = Mock.Of<IXmlFormatService>();
-
-            Stream CreateCorruptStream()
-            {
-                return new MemoryStream(new byte[]
-                {
-                    1,
-                    2,
-                    234,
-                    14
-                });
-            }
-
-            var fsaMock = new Mock<IFileSystemAccess>();
-            fsaMock.Setup(m => m.ReadFromStream(previousVersionDacpacPath, It.IsNotNull<Func<Stream, DacPackage>>()))
-                   .Returns((string path,
-                             Func<Stream, DacPackage> consumer) =>
-                    {
-                        var stream = GetEmbeddedResourceStream("TestDatabase_Empty.dacpac");
-                        return new SecureStreamResult<DacPackage>(stream, consumer(stream), null);
-                    });
-            fsaMock.Setup(m => m.ReadFromStream(newVersionDacpacPath, It.IsNotNull<Func<Stream, DacPackage>>()))
-                   .Returns((string path,
-                             Func<Stream, DacPackage> consumer) =>
-                    {
-                        var stream = GetEmbeddedResourceStream("TestDatabase_WithAuthorTable.dacpac");
-                        return new SecureStreamResult<DacPackage>(stream, consumer(stream), null);
-                    });
-            fsaMock.Setup(m => m.ReadFromStream(publishProfilePath, It.IsNotNull<Func<Stream, DacDeployOptions>>()))
-                   .Returns((string path,
-                             Func<Stream, DacDeployOptions> consumer) =>
-                    {
-                        var stream = CreateCorruptStream();
-                        return new SecureStreamResult<DacDeployOptions>(stream, consumer(stream), null);
-                    });
-            IDacAccess da = new DacAccess(xfsMock, fsaMock.Object);
-
-            // Act
-            var result = await da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, true, true);
-
-            // Assert
-            Assert.IsNull(result.DeployScriptContent);
-            Assert.IsNull(result.DeployReportContent);
-            Assert.IsNotNull(result.Errors);
-            Assert.AreEqual(1, result.Errors.Length);
-            Assert.IsNotEmpty(result.Errors[0]);
-        }
-
-        [Test]
         public async Task CreateDeployFilesAsync_CorrectCreation_Async()
         {
             // Arrange
-            var previousVersionDacpacPath = "path1";
-            var newVersionDacpacPath = "path2";
-            var publishProfilePath = "path3";
             var xfsMock = new Mock<IXmlFormatService>();
             xfsMock.Setup(m => m.FormatDeployReport(It.IsNotNull<string>())).Returns((string s) => s);
-
-            var fsaMock = new Mock<IFileSystemAccess>();
-            fsaMock.Setup(m => m.ReadFromStream(previousVersionDacpacPath, It.IsNotNull<Func<Stream, DacPackage>>()))
-                   .Returns((string path,
-                             Func<Stream, DacPackage> consumer) =>
-                    {
-                        var stream = GetEmbeddedResourceStream("TestDatabase_Empty.dacpac");
-                        return new SecureStreamResult<DacPackage>(stream, consumer(stream), null);
-                    });
-            fsaMock.Setup(m => m.ReadFromStream(newVersionDacpacPath, It.IsNotNull<Func<Stream, DacPackage>>()))
-                   .Returns((string path,
-                             Func<Stream, DacPackage> consumer) =>
-                    {
-                        var stream = GetEmbeddedResourceStream("TestDatabase_WithAuthorTable.dacpac");
-                        return new SecureStreamResult<DacPackage>(stream, consumer(stream), null);
-                    });
-            fsaMock.Setup(m => m.ReadFromStream(publishProfilePath, It.IsNotNull<Func<Stream, DacDeployOptions>>()))
-                   .Returns((string path,
-                             Func<Stream, DacDeployOptions> consumer) =>
-                    {
-                        var stream = GetEmbeddedResourceStream("TestDatabase.publish.xml");
-                        return new SecureStreamResult<DacDeployOptions>(stream, consumer(stream), null);
-                    });
-            IDacAccess da = new DacAccess(xfsMock.Object, fsaMock.Object);
+            var tempPreviousVersionDacpacPath = WriteEmbeddedResourceToTemporaryFile("TestDatabase_Empty.dacpac");
+            var tempNewVersionDacpacPath = WriteEmbeddedResourceToTemporaryFile("TestDatabase_WithAuthorTable.dacpac");
+            var tempPublishProfilePath = WriteEmbeddedResourceToTemporaryFile("TestDatabase.publish.xml");
+            IDacAccess da = new DacAccess(xfsMock.Object);
 
             // Act
-            var result = await da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, true, true);
+            var result = await da.CreateDeployFilesAsync(tempPreviousVersionDacpacPath, tempNewVersionDacpacPath, tempPublishProfilePath, true, true);
 
             // Assert
             Assert.IsNotNull(result.DeployScriptContent);
@@ -347,38 +181,15 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
         public async Task CreateDeployFilesAsync_CorrectCreation_WithPreAndPostDeploymentScripts_Async()
         {
             // Arrange
-            var previousVersionDacpacPath = "path1";
-            var newVersionDacpacPath = "path2";
-            var publishProfilePath = "path3";
             var xfsMock = new Mock<IXmlFormatService>();
             xfsMock.Setup(m => m.FormatDeployReport(It.IsNotNull<string>())).Returns((string s) => s);
-
-            var fsaMock = new Mock<IFileSystemAccess>();
-            fsaMock.Setup(m => m.ReadFromStream(previousVersionDacpacPath, It.IsNotNull<Func<Stream, DacPackage>>()))
-                   .Returns((string path,
-                             Func<Stream, DacPackage> consumer) =>
-                   {
-                       var stream = GetEmbeddedResourceStream("TestDatabase_Empty.dacpac");
-                       return new SecureStreamResult<DacPackage>(stream, consumer(stream), null);
-                   });
-            fsaMock.Setup(m => m.ReadFromStream(newVersionDacpacPath, It.IsNotNull<Func<Stream, DacPackage>>()))
-                   .Returns((string path,
-                             Func<Stream, DacPackage> consumer) =>
-                   {
-                       var stream = GetEmbeddedResourceStream("TestDatabase_WithPreAndPostDeployment.dacpac");
-                       return new SecureStreamResult<DacPackage>(stream, consumer(stream), null);
-                   });
-            fsaMock.Setup(m => m.ReadFromStream(publishProfilePath, It.IsNotNull<Func<Stream, DacDeployOptions>>()))
-                   .Returns((string path,
-                             Func<Stream, DacDeployOptions> consumer) =>
-                   {
-                       var stream = GetEmbeddedResourceStream("TestDatabase.publish.xml");
-                       return new SecureStreamResult<DacDeployOptions>(stream, consumer(stream), null);
-                   });
-            IDacAccess da = new DacAccess(xfsMock.Object, fsaMock.Object);
+            var tempPreviousVersionDacpacPath = WriteEmbeddedResourceToTemporaryFile("TestDatabase_Empty.dacpac");
+            var tempNewVersionDacpacPath = WriteEmbeddedResourceToTemporaryFile("TestDatabase_WithPreAndPostDeployment.dacpac");
+            var tempPublishProfilePath = WriteEmbeddedResourceToTemporaryFile("TestDatabase.publish.xml");
+            IDacAccess da = new DacAccess(xfsMock.Object);
 
             // Act
-            var result = await da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, true, true);
+            var result = await da.CreateDeployFilesAsync(tempPreviousVersionDacpacPath, tempNewVersionDacpacPath, tempPublishProfilePath, true, true);
 
             // Assert
             Assert.IsNotNull(result.DeployScriptContent);
@@ -414,8 +225,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
         {
             // Arrange
             var xfsMock = Mock.Of<IXmlFormatService>();
-            var fsaMock = Mock.Of<IFileSystemAccess>();
-            IDacAccess da = new DacAccess(xfsMock, fsaMock);
+            IDacAccess da = new DacAccess(xfsMock);
 
             // Act & Assert
             // ReSharper disable AssignNullToNotNullAttribute
@@ -424,85 +234,15 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
         }
 
         [Test]
-        public async Task GetDefaultConstraintsAsync_Errors_ReadFromStreamReturnedCorruptStream_Async()
-        {
-            // Arrange
-            const string dacpacPath = "pathToDacpac";
-            var xfsMock = Mock.Of<IXmlFormatService>();
-
-            Stream CreateCorruptStream()
-            {
-                return new MemoryStream(new byte[]
-                {
-                    1,
-                    2,
-                    234,
-                    14
-                });
-            }
-
-            var fsaMock = new Mock<IFileSystemAccess>();
-            fsaMock.Setup(m => m.ReadFromStream(dacpacPath, It.IsNotNull<Func<Stream, TSqlModel>>()))
-                   .Returns((string path,
-                             Func<Stream, TSqlModel> consumer) =>
-                   {
-                       var stream = CreateCorruptStream();
-                       return new SecureStreamResult<TSqlModel>(stream, consumer(stream), null);
-                   });
-            IDacAccess da = new DacAccess(xfsMock, fsaMock.Object);
-
-            // Act
-            var (defaultConstraints, errors) = await da.GetDefaultConstraintsAsync(dacpacPath);
-
-            // Assert
-            Assert.IsNull(defaultConstraints);
-            Assert.IsNotNull(errors);
-            Assert.AreEqual(1, errors.Length);
-            Assert.IsNotEmpty(errors[0]);
-        }
-
-        [Test]
-        public async Task GetDefaultConstraintsAsync_Errors_ReadFromStreamReturnedNull_Async()
-        {
-            // Arrange
-            const string dacpacPath = "pathToDacpac";
-            var xfsMock = Mock.Of<IXmlFormatService>();
-
-            var fileOpenException = new Exception("Test exception");
-            var fsaMock = new Mock<IFileSystemAccess>();
-            fsaMock.Setup(m => m.ReadFromStream(dacpacPath, It.IsNotNull<Func<Stream, TSqlModel>>()))
-                   .Returns(new SecureStreamResult<TSqlModel>(null, null, fileOpenException));
-            IDacAccess da = new DacAccess(xfsMock, fsaMock.Object);
-
-            // Act
-            var (defaultConstraints, errors) = await da.GetDefaultConstraintsAsync(dacpacPath);
-
-            // Assert
-            Assert.IsNull(defaultConstraints);
-            Assert.IsNotNull(errors);
-            Assert.AreEqual(1, errors.Length);
-            Assert.AreEqual("Error reading DACPAC: Test exception", errors[0]);
-        }
-
-        [Test]
         public async Task GetDefaultConstraintsAsync_CorrectCreation_MoreConstraints_Async()
         {
             // Arrange
-            const string dacpacPath = "pathToDacpac";
             var xfsMock = Mock.Of<IXmlFormatService>();
-
-            var fsaMock = new Mock<IFileSystemAccess>();
-            fsaMock.Setup(m => m.ReadFromStream(dacpacPath, It.IsNotNull<Func<Stream, TSqlModel>>()))
-                   .Returns((string path,
-                             Func<Stream, TSqlModel> consumer) =>
-                    {
-                        var stream = GetEmbeddedResourceStream("TestDatabase_AuthorWithDefaultConstraints.dacpac");
-                        return new SecureStreamResult<TSqlModel>(stream, consumer(stream), null);
-                    });
-            IDacAccess da = new DacAccess(xfsMock, fsaMock.Object);
+            var tempDacpacPath = WriteEmbeddedResourceToTemporaryFile("TestDatabase_AuthorWithDefaultConstraints.dacpac");
+            IDacAccess da = new DacAccess(xfsMock);
 
             // Act
-            var (defaultConstraints, errors) = await da.GetDefaultConstraintsAsync(dacpacPath);
+            var (defaultConstraints, errors) = await da.GetDefaultConstraintsAsync(tempDacpacPath);
 
             // Assert
             Assert.IsNotNull(defaultConstraints);
@@ -531,21 +271,12 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess
         public async Task GetDefaultConstraintsAsync_CorrectCreation_SingleConstraints_Async()
         {
             // Arrange
-            const string dacpacPath = "pathToDacpac";
             var xfsMock = Mock.Of<IXmlFormatService>();
-
-            var fsaMock = new Mock<IFileSystemAccess>();
-            fsaMock.Setup(m => m.ReadFromStream(dacpacPath, It.IsNotNull<Func<Stream, TSqlModel>>()))
-                   .Returns((string path,
-                             Func<Stream, TSqlModel> consumer) =>
-                    {
-                        var stream = GetEmbeddedResourceStream("TestDatabase_AuthorWithLessDefaultConstraints.dacpac");
-                        return new SecureStreamResult<TSqlModel>(stream, consumer(stream), null);
-                    });
-            IDacAccess da = new DacAccess(xfsMock, fsaMock.Object);
+            var tempDacpacPath = WriteEmbeddedResourceToTemporaryFile("TestDatabase_AuthorWithLessDefaultConstraints.dacpac");
+            IDacAccess da = new DacAccess(xfsMock);
 
             // Act
-            var (defaultConstraints, errors) = await da.GetDefaultConstraintsAsync(dacpacPath);
+            var (defaultConstraints, errors) = await da.GetDefaultConstraintsAsync(tempDacpacPath);
 
             // Assert
             Assert.IsNotNull(defaultConstraints);

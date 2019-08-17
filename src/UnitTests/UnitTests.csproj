@@ -66,7 +66,6 @@
     <Compile Include="Shared\Contracts\DirectoryPathsTests.cs" />
     <Compile Include="Shared\Contracts\PathCollectionTests.cs" />
     <Compile Include="Shared\Contracts\PublishProfileTests.cs" />
-    <Compile Include="Shared\Contracts\SecureResultTests.cs" />
     <Compile Include="Shared\Contracts\SqlProjectPropertiesTests.cs" />
     <Compile Include="Shared\Contracts\SqlProjectTests.cs" />
     <Compile Include="Shared\Enums\ScriptModifierTest.cs" />
