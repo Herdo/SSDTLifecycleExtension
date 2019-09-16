@@ -15,7 +15,7 @@
 
         Task<ConfigurationModel> GetConfigurationOrDefaultAsync([NotNull] string path);
 
-        Task SaveConfigurationAsync([NotNull] SqlProject project,
-                                    [NotNull] ConfigurationModel model);
+        Task<bool> SaveConfigurationAsync([NotNull] SqlProject project,
+                                          [NotNull] ConfigurationModel model);
     }
 }

@@ -43,18 +43,30 @@
                 return;
             }
 
-            await ApplyAllModifiers(project, configuration, paths, previousVersion, createLatest, modifiers);
+            var success = await ApplyAllModifiers(project, configuration, paths, previousVersion, createLatest, modifiers);
+            if (!success)
+                stateModel.Result = false;
             stateModel.CurrentState = StateModelState.ModifiedDeploymentScript;
         }
 
-        private async Task ApplyAllModifiers(SqlProject project,
-                                             ConfigurationModel configuration,
-                                             PathCollection paths,
-                                             Version previousVersion,
-                                             bool createLatest,
-                                             IReadOnlyDictionary<ScriptModifier, IScriptModifier> modifiers)
+        private async Task<bool> ApplyAllModifiers(SqlProject project,
+                                                   ConfigurationModel configuration,
+                                                   PathCollection paths,
+                                                   Version previousVersion,
+                                                   bool createLatest,
+                                                   IReadOnlyDictionary<ScriptModifier, IScriptModifier> modifiers)
         {
-            var initialScript = await _fileSystemAccess.ReadFileAsync(paths.DeployTargets.DeployScriptPath);
+            string initialScript;
+            try
+            {
+                initialScript = await _fileSystemAccess.ReadFileAsync(paths.DeployTargets.DeployScriptPath);
+            }
+            catch (Exception e)
+            {
+                await _logger.LogErrorAsync(e, "Failed to read the generated script");
+                return false;
+            }
+
             var model = new ScriptModificationModel(initialScript, project, configuration, paths, previousVersion, createLatest);
 
             foreach (var m in modifiers.OrderBy(m => m.Key))
@@ -63,7 +75,16 @@
                 await m.Value.ModifyAsync(model);
             }
 
-            await _fileSystemAccess.WriteFileAsync(paths.DeployTargets.DeployScriptPath, model.CurrentScript);
+            try
+            {
+                await _fileSystemAccess.WriteFileAsync(paths.DeployTargets.DeployScriptPath, model.CurrentScript);
+            }
+            catch (Exception e)
+            {
+                await _logger.LogErrorAsync(e, "Failed to write the modified script");
+                return false;
+            }
+            return true;
         }
 
         Task IWorkUnit<ScriptCreationStateModel>.Work(ScriptCreationStateModel stateModel,

@@ -140,7 +140,16 @@
                 return false;
             }
 
-            var content = await _fileSystemAccess.ReadFileAsync(project.FullName);
+            string content;
+            try
+            {
+                content = await _fileSystemAccess.ReadFileAsync(project.FullName);
+            }
+            catch (Exception e)
+            {
+                await _logger.LogErrorAsync(e, "Failed to read the project file");
+                return false;
+            }
             XElement root;
             try
             {

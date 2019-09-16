@@ -124,7 +124,10 @@
         private async Task SaveConfiguration_ExecutedAsync()
         {
             var copy = Model.Copy();
-            await _configurationService.SaveConfigurationAsync(_project, copy);
+            var saved = await _configurationService.SaveConfigurationAsync(_project, copy);
+            if (!saved)
+                return;
+
             _lastSavedModel = copy;
             CheckIfModelIsDirty();
         }

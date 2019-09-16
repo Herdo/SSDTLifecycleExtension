@@ -12,19 +12,21 @@
     using Models;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Serialization;
-    using Task = System.Threading.Tasks.Task;
 
     [UsedImplicitly]
     public class ConfigurationService : DefaultContractResolver, IConfigurationService
     {
         private readonly IFileSystemAccess _fileSystemAccess;
         private readonly IVisualStudioAccess _visualStudioAccess;
+        private readonly ILogger _logger;
 
         public ConfigurationService(IFileSystemAccess fileSystemAccess,
-                                    IVisualStudioAccess visualStudioAccess)
+                                    IVisualStudioAccess visualStudioAccess,
+                                    ILogger logger)
         {
             _fileSystemAccess = fileSystemAccess ?? throw new ArgumentNullException(nameof(fileSystemAccess));
             _visualStudioAccess = visualStudioAccess ?? throw new ArgumentNullException(nameof(visualStudioAccess));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         private static string GetConfigurationPath(SqlProject project)
@@ -33,16 +35,32 @@
             return Path.Combine(directory ?? throw new InvalidOperationException("Cannot find configuration file. Directory is <null>."), "Properties", "ssdtlifecycle.json");
         }
 
+        private static ConfigurationModel GetValidatedDefaultInstance()
+        {
+            var defaultInstance = ConfigurationModel.GetDefault();
+            defaultInstance.ValidateAll();
+            return defaultInstance;
+        }
+
         private async Task<ConfigurationModel> GetConfigurationOrDefaultInternalAsync(SqlProject project,
                                                                                       string path)
         {
             var sourcePath = path ?? GetConfigurationPath(project);
-            var serialized = await _fileSystemAccess.ReadFileAsync(sourcePath);
-            if (serialized == null)
+            string serialized;
+            try
             {
-                var defaultInstance = ConfigurationModel.GetDefault();
-                defaultInstance.ValidateAll();
-                return defaultInstance;
+                if (!_fileSystemAccess.CheckIfFileExists(sourcePath))
+                    return GetValidatedDefaultInstance();
+
+                serialized = await _fileSystemAccess.ReadFileAsync(sourcePath);
+            }
+            catch (Exception e)
+            {
+                await _logger.LogErrorAsync(e, $"Failed to read the configuration from file '{sourcePath}' - please ensure you have access to the file");
+                _visualStudioAccess.ShowModalError("Accessing the configuration file failed. " +
+                                                   "Please check the SSDT Lifecycle output window for more details. " +
+                                                   "Falling back to default configuration.");
+                return GetValidatedDefaultInstance();
             }
 
             var settings = new JsonSerializerSettings
@@ -54,20 +72,31 @@
             return deserialized;
         }
 
-        private async Task SaveConfigurationInternalAsync(SqlProject project,
-                                                          ConfigurationModel model)
+        private async Task<bool> SaveConfigurationInternalAsync(SqlProject project,
+                                                                ConfigurationModel model)
         {
             var targetPath = GetConfigurationPath(project);
             var serialized = JsonConvert.SerializeObject(model, Formatting.Indented);
 
-            // Save configuration physically.
-            await _fileSystemAccess.WriteFileAsync(targetPath, serialized);
+            try
+            {
+                // Save configuration physically.
+                await _fileSystemAccess.WriteFileAsync(targetPath, serialized);
+            }
+            catch (Exception e)
+            {
+                await _logger.LogErrorAsync(e, "Failed to save the configuration");
+                _visualStudioAccess.ShowModalError("Failed to save the configuration. Please check the SSDT Lifecycle output window for details.");
+                return false;
+            }
 
             // Notify about changes
             ConfigurationChanged?.Invoke(this, new ProjectConfigurationChangedEventArgs(project));
 
             // Add configuration to the project, if it hasn't been added before.
             _visualStudioAccess.AddItemToProjectProperties(project, targetPath);
+
+            return true;
         }
 
         protected override JsonProperty CreateProperty(MemberInfo member,
@@ -102,8 +131,8 @@
             return GetConfigurationOrDefaultInternalAsync(null, path);
         }
 
-        Task IConfigurationService.SaveConfigurationAsync(SqlProject project,
-                                                          ConfigurationModel model)
+        Task<bool> IConfigurationService.SaveConfigurationAsync(SqlProject project,
+                                                                ConfigurationModel model)
         {
             if (project == null)
                 throw new ArgumentNullException(nameof(project));

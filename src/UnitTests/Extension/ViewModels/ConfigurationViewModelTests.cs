@@ -671,7 +671,7 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
         }
 
         [Test]
-        public async Task SaveConfiguration_Execute_Async()
+        public async Task SaveConfiguration_Execute_SaveFailed_Async()
         {
             // Arrange
             var model = new ConfigurationModel
@@ -692,7 +692,59 @@ namespace SSDTLifecycleExtension.UnitTests.Extension.ViewModels
             var csMock = new Mock<IConfigurationService>();
             csMock.Setup(m => m.SaveConfigurationAsync(project, It.IsNotNull<ConfigurationModel>()))
                   .Callback((SqlProject p, ConfigurationModel m) => savedModel = m)
-                  .Returns(Task.CompletedTask);
+                  .ReturnsAsync(false);
+            var fsaMock = Mock.Of<IFileSystemAccess>();
+            var ssMock = Mock.Of<IScaffoldingService>();
+            var scsMock = Mock.Of<IScriptCreationService>();
+            var loggerMock = Mock.Of<ILogger>();
+            var vm = new ConfigurationViewModel(project,
+                                                csMock.Object,
+                                                fsaMock,
+                                                ssMock,
+                                                scsMock,
+                                                loggerMock)
+            {
+                Model = model
+            };
+
+            // Act
+            var canSaveBeforeSaving = vm.SaveConfigurationCommand.CanExecute();
+            await vm.SaveConfigurationCommand.ExecuteAsync();
+            var canSaveAfterSaving = vm.SaveConfigurationCommand.CanExecute();
+
+            // Assert
+            Assert.IsTrue(canSaveBeforeSaving);
+            Assert.IsTrue(canSaveAfterSaving);
+            csMock.Verify(m => m.SaveConfigurationAsync(project, It.IsNotNull<ConfigurationModel>()), Times.Once());
+            Assert.IsNotNull(savedModel);
+            Assert.AreNotSame(model, savedModel);
+            Assert.AreEqual(model, savedModel);
+            Assert.AreSame(model, vm.Model);
+        }
+
+        [Test]
+        public async Task SaveConfiguration_Execute_SaveSuccessful_Async()
+        {
+            // Arrange
+            var model = new ConfigurationModel
+            {
+                ArtifactsPath = "foobar",
+                ReplaceUnnamedDefaultConstraintDrops = true,
+                CommentOutUnnamedDefaultConstraintDrops = false,
+                PublishProfilePath = "Test.publish.xml",
+                VersionPattern = "1.2.3.4",
+                CreateDocumentationWithScriptCreation = true,
+                CustomHeader = "awesome header",
+                CustomFooter = "lame footer",
+                BuildBeforeScriptCreation = true,
+                TrackDacpacVersion = false
+            };
+            var project = new SqlProject("", "", "");
+            ConfigurationModel savedModel = null;
+            var csMock = new Mock<IConfigurationService>();
+            csMock.Setup(m => m.SaveConfigurationAsync(project, It.IsNotNull<ConfigurationModel>()))
+                  .Callback((SqlProject p, ConfigurationModel m) => savedModel = m)
+                  .ReturnsAsync(true);
             var fsaMock = Mock.Of<IFileSystemAccess>();
             var ssMock = Mock.Of<IScaffoldingService>();
             var scsMock = Mock.Of<IScriptCreationService>();

@@ -17,16 +17,9 @@
     {
         private static async Task<string> ReadFileInternalAsync(string sourcePath)
         {
-            try
-            {
-                using (var stream = new FileStream(sourcePath, FileMode.Open))
-                    using (var reader = new StreamReader(stream))
-                        return await reader.ReadToEndAsync();
-            }
-            catch (Exception)
-            {
-                return null;
-            }
+            using (var stream = new FileStream(sourcePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                using (var reader = new StreamReader(stream))
+                    return await reader.ReadToEndAsync();
         }
 
         private static async Task WriteFileInternalAsync(string targetPath,
@@ -35,7 +28,7 @@
             Stream stream = null;
             try
             {
-                stream = new FileStream(targetPath, FileMode.Create);
+                stream = new FileStream(targetPath, FileMode.Create, FileAccess.Write, FileShare.None);
                 using (var writer = new StreamWriter(stream))
                     await writer.WriteAsync(content);
             }
