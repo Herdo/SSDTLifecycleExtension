@@ -78,7 +78,7 @@ SELECT @command = 'ALTER TABLE [' + @schema_name + '].[' + @table_name + '] DROP
  JOIN sys.columns c ON c.object_id = t.object_id AND c.column_id = d.parent_column_id
 WHERE t.name = @table_name
   AND t.schema_id = schema_id(@schema_name)
-  AND c.name = column_name
+  AND c.name = @column_name
 
 EXECUTE (@command)
 
@@ -101,7 +101,7 @@ SELECT @command = 'ALTER TABLE [' + @schema_name + '].[' + @table_name + '] DROP
  JOIN sys.columns c ON c.object_id = t.object_id AND c.column_id = d.parent_column_id
 WHERE t.name = @table_name
   AND t.schema_id = schema_id(@schema_name)
-  AND c.name = column_name
+  AND c.name = @column_name
 
 EXECUTE (@command)
 
@@ -135,7 +135,7 @@ SELECT @command = 'ALTER TABLE [' + @schema_name + '].[' + @table_name + '] DROP
  JOIN sys.columns c ON c.object_id = t.object_id AND c.column_id = d.parent_column_id
 WHERE t.name = @table_name
   AND t.schema_id = schema_id(@schema_name)
-  AND c.name = column_name
+  AND c.name = @column_name
 
 EXECUTE (@command)
 
@@ -175,7 +175,7 @@ SELECT @command = 'ALTER TABLE [' + @schema_name + '].[' + @table_name + '] DROP
  JOIN sys.columns c ON c.object_id = t.object_id AND c.column_id = d.parent_column_id
 WHERE t.name = @table_name
   AND t.schema_id = schema_id(@schema_name)
-  AND c.name = column_name
+  AND c.name = @column_name
 
 EXECUTE (@command)
 
