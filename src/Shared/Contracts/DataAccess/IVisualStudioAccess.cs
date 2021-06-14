@@ -7,6 +7,11 @@
     public interface IVisualStudioAccess
     {
         /// <summary>
+        /// Event triggered when the solution is closed.
+        /// </summary>
+        event EventHandler SolutionClosed;
+
+        /// <summary>
         /// Gets the kind of the selected project.
         /// </summary>
         /// <returns>The kind of the currently selected project, or <b><see cref="Guid.Empty"/></b>, if none is selected.</returns>

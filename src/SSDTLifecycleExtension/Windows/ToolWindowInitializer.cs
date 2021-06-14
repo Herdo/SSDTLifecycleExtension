@@ -16,6 +16,7 @@
         {
             _visualStudioAccess = visualStudioAccess ?? throw new ArgumentNullException(nameof(visualStudioAccess));
             _dependencyResolver = dependencyResolver ?? throw new ArgumentNullException(nameof(dependencyResolver));
+            _visualStudioAccess.SolutionClosed += (sender, args) => _dependencyResolver.HandleSolutionClosed();
         }
 
         private async Task<(bool Success, string FullProjectPath)> TryInitializeToolWindowInternalAsync<TViewModel>(IVisualStudioToolWindow window) where TViewModel : IViewModel

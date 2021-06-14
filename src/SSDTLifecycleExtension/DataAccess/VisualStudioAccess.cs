@@ -26,7 +26,9 @@
         public VisualStudioAccess(DTE2 dte2,
                                   AsyncPackage package)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             _dte2 = dte2;
+            _dte2.Events.SolutionEvents.AfterClosing += () => SolutionClosed?.Invoke(this, EventArgs.Empty);
             _package = package;
             _paneGuid = new Guid(Constants.CreationProgressPaneGuid);
         }
@@ -66,6 +68,8 @@
             outputPane.OutputString(message);
             outputPane.OutputString(Environment.NewLine);
         }
+
+        public event EventHandler SolutionClosed;
 
         Guid IVisualStudioAccess.GetSelectedProjectKind()
         {

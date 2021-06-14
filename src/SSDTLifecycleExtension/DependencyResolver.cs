@@ -1,4 +1,6 @@
-﻿namespace SSDTLifecycleExtension
+﻿using System.Collections.Generic;
+
+namespace SSDTLifecycleExtension
 {
     using System;
     using Windows;
@@ -20,6 +22,7 @@
     internal sealed class DependencyResolver : IDependencyResolver
     {
         private readonly IUnityContainer _container;
+        private readonly Dictionary<Type, Dictionary<string, object>> _viewModels;
         private bool _disposed;
 
         internal DependencyResolver([NotNull] IVisualStudioAccess visualStudioAccess,
@@ -36,6 +39,7 @@
             _container = CreateContainer(visualStudioAccess,
                                          logger,
                                          commandService);
+            _viewModels = new Dictionary<Type, Dictionary<string, object>>();
         }
 
         private IUnityContainer CreateContainer(IVisualStudioAccess visualStudioAccess,
@@ -108,13 +112,26 @@
                 throw new ArgumentNullException(nameof(project));
 
             // Check for an existing view model registered with the project.
-            if (_container.IsRegistered(typeof(TViewModel), project.UniqueName))
-                return _container.Resolve<TViewModel>(project.UniqueName);
+            if (_viewModels.TryGetValue(typeof(TViewModel), out var instances)
+                && instances.TryGetValue(project.UniqueName, out var instance)
+                && instance is TViewModel existingViewModel)
+                return existingViewModel;
 
             // Create a new view model and register it with the project.
             var newViewModel = _container.Resolve<TViewModel>(new ParameterOverride("project", project));
-            _container.RegisterInstance(typeof(TViewModel), project.UniqueName, newViewModel, new ContainerControlledLifetimeManager());
+            if (!_viewModels.TryGetValue(typeof(TViewModel), out instances))
+            {
+                instances = new Dictionary<string, object>();
+                _viewModels.Add(typeof(TViewModel), instances);
+            }
+            instances[project.UniqueName] = newViewModel;
+
             return newViewModel;
+        }
+
+        internal void HandleSolutionClosed()
+        {
+            _viewModels.Clear();
         }
 
         public void Dispose()
@@ -122,6 +139,7 @@
             if (_disposed)
                 return;
             _disposed = true;
+            _viewModels.Clear();
             _container.Dispose();
         }
     }
