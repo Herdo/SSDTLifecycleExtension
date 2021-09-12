@@ -32,7 +32,7 @@
                 stateModel.Result = false;
                 stateModel.CurrentState = StateModelState.PathsVerified;
                 await _logger.LogErrorAsync("Failed to find publish profile. " +
-                                            $"The {nameof(ConfigurationModel.PublishProfilePath)} is set to \"{ConfigurationModel.UseSinglePublishProfileSpecialKeyword}\", but there's more than one publish profile in the directory. " +
+                                            $"The {nameof(ConfigurationModel.PublishProfilePath)} is set to \"{ConfigurationModel.UseSinglePublishProfileSpecialKeyword}\", but there's either none, or more than one publish profile in the directory. " +
                                             $"Please read the documentation at {_logger.DocumentationBaseUrl}publish-profile-path for more details.");
                 return;
             }
