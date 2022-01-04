@@ -11,22 +11,12 @@
 
     public abstract class BaseModel : IBaseModel
     {
-        #region Fields
-
         private readonly Dictionary<string, ICollection<string>> _validationErrors;
-
-        #endregion
-
-        #region Constructors
 
         protected BaseModel()
         {
             _validationErrors = new Dictionary<string, ICollection<string>>();
         }
-
-        #endregion
-
-        #region INotifyPropertyChanged
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -36,17 +26,13 @@
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        #endregion
-
-        #region INotifyDataErrorInfo
-
         public IEnumerable GetErrors(string propertyName)
         {
             if (string.IsNullOrWhiteSpace(propertyName))
-                return new string[0];
+                return Array.Empty<string>();
             return _validationErrors.TryGetValue(propertyName, out var errors)
                        ? errors
-                       : new string[0];
+                       : Array.Empty<string>();
         }
 
         [JsonIgnore]
@@ -77,7 +63,5 @@
         {
             ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
         }
-
-        #endregion
     }
 }

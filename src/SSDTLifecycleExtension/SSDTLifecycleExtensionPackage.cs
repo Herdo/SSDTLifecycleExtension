@@ -74,7 +74,7 @@
             return new DependencyResolver(visualStudioAccess, visualStudioLogger, commandService);
         }
 
-        private void AttachToDteEvents()
+        private void AttachToDte2Events()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
             _dte2.Events.SolutionEvents.AfterClosing += SolutionEvents_AfterClosing;
@@ -126,8 +126,6 @@
                 _openedWindowFrames.Remove(key);
         }
 
-        #region Base Overrides
-
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
             // When initialized asynchronously, the current thread may be a background thread at this point.
@@ -143,7 +141,7 @@
             _dependencyResolver.RegisterPackage(this);
 
             // Initialize DTE event handlers
-            AttachToDteEvents();
+            AttachToDte2Events();
 
             // Initialize commands
             ScriptCreationWindowCommand.Initialize(_dependencyResolver.Get<ScriptCreationWindowCommand>());
@@ -193,8 +191,6 @@
                 base.Dispose(disposing);
             }
         }
-
-        #endregion
 
         /// <summary>
         /// Adds the <paramref name="windowFrame"/> to an internal list. When the solution is closed, all registered window frames will be closed.
