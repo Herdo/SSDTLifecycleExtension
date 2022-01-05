@@ -1,19 +1,17 @@
-﻿namespace SSDTLifecycleExtension.ViewModels
-{
-    using System;
-    using System.ComponentModel;
-    using System.Threading.Tasks;
-    using System.Windows.Input;
-    using JetBrains.Annotations;
-    using Microsoft.VisualStudio.PlatformUI;
-    using MVVM;
-    using Properties;
-    using Shared.Contracts;
-    using Shared.Contracts.DataAccess;
-    using Shared.Contracts.Services;
-    using Shared.Models;
-    using Task = System.Threading.Tasks.Task;
+﻿using System;
+using System.ComponentModel;
+using System.Threading.Tasks;
+using System.Windows.Input;
+using JetBrains.Annotations;
+using Microsoft.VisualStudio.PlatformUI;
+using SSDTLifecycleExtension.MVVM;
+using SSDTLifecycleExtension.Shared.Contracts;
+using SSDTLifecycleExtension.Shared.Contracts.DataAccess;
+using SSDTLifecycleExtension.Shared.Contracts.Services;
+using SSDTLifecycleExtension.Shared.Models;
 
+namespace SSDTLifecycleExtension.ViewModels
+{
     [UsedImplicitly]
     public class ConfigurationViewModel : ViewModelBase,
                                           IErrorHandler
@@ -136,7 +134,7 @@
         {
             if (!(param is string anchor))
                 return;
-            _fileSystemAccess.OpenUrl(Settings.Default.DocumentationBaseUrl + anchor);
+            _fileSystemAccess.OpenUrl(Constants.DocumentationBaseUrl + anchor);
         }
 
         private bool ImportConfiguration_CanExecute()

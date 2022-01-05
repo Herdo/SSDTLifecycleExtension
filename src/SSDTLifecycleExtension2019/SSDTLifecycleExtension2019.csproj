@@ -20,8 +20,8 @@
     <ProjectGuid>{33F67B86-F86E-4788-9A94-8E680CF36938}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SSDTLifecycleExtension</RootNamespace>
-    <AssemblyName>SSDTLifecycleExtension</AssemblyName>
+    <RootNamespace>SSDTLifecycleExtension2019</RootNamespace>
+    <AssemblyName>SSDTLifecycleExtension2019</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <GeneratePkgDefFile>true</GeneratePkgDefFile>
     <UseCodebase>true</UseCodebase>
@@ -42,6 +42,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DeployExtension>True</DeployExtension>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -52,59 +53,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Commands\BaseCommand.cs" />
-    <Compile Include="Commands\WindowBaseCommand.cs" />
-    <Compile Include="Constants.cs" />
-    <Compile Include="Converters\BoolInvertConverter.cs" />
-    <Compile Include="Converters\BoolToVisibilityConverter.cs" />
-    <Compile Include="DataAccess\DacAccess.cs" />
-    <Compile Include="DataAccess\FileSystemAccess.cs" />
-    <Compile Include="DataAccess\VisualStudioAccess.cs" />
-    <Compile Include="DependencyResolver.cs" />
-    <Compile Include="IAsyncPackage.cs" />
-    <Compile Include="MVVM\AsyncCommand.cs" />
-    <Compile Include="MVVM\IAsyncCommand.cs" />
-    <Compile Include="MVVM\IErrorHandler.cs" />
-    <Compile Include="MVVM\TaskUtilities.cs" />
-    <Compile Include="OutputClassification\ClassificationTypes.cs" />
-    <Compile Include="OutputClassification\OutputClassifier.cs" />
-    <Compile Include="OutputClassification\OutputClassifierProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
-    <Compile Include="SSDTLifecycleExtensionPackage.cs" />
-    <Compile Include="ViewModels\ConfigurationViewModel.cs" />
-    <Compile Include="ViewModels\IViewModel.cs" />
-    <Compile Include="ViewModels\ScriptCreationViewModel.cs" />
-    <Compile Include="ViewModels\VersionHistoryViewModel.cs" />
-    <Compile Include="ViewModels\ViewModelBase.cs" />
-    <Compile Include="Windows\ConfigurationWindow.cs" />
-    <Compile Include="Commands\ConfigurationWindowCommand.cs" />
-    <Compile Include="Windows\ConfigurationWindowControl.xaml.cs">
-      <DependentUpon>ConfigurationWindowControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Windows\IView.cs" />
-    <Compile Include="Windows\IVisualStudioToolWindow.cs" />
-    <Compile Include="Windows\ScriptCreationWindow.cs" />
-    <Compile Include="Commands\ScriptCreationWindowCommand.cs" />
-    <Compile Include="Windows\ScriptCreationWindowControl.xaml.cs">
-      <DependentUpon>ScriptCreationWindowControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Windows\ToolWindowInitializer.cs" />
-    <Compile Include="Windows\VersionHistoryWindow.cs" />
-    <Compile Include="Commands\VersionHistoryWindowCommand.cs" />
-    <Compile Include="Windows\VersionHistoryWindowControl.xaml.cs">
-      <DependentUpon>VersionHistoryWindowControl.xaml</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
+    <None Include="app.config" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
@@ -121,18 +73,20 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="JetBrains.Annotations">
-      <Version>2019.1.3</Version>
+      <Version>2021.3.0</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.SqlServer.DacFx.x64">
-      <Version>150.4384.2</Version>
+      <Version>150.5282.3</Version>
     </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.SDK" Version="16.0.200" ExcludeAssets="runtime" />
-    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="16.2.3073">
+    <PackageReference Include="Microsoft.VisualStudio.SDK" Version="16.10.31321.278" ExcludeAssets="runtime">
+      <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.0.5232">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
-      <Version>9.0.1</Version>
+      <Version>13.0.1</Version>
     </PackageReference>
     <PackageReference Include="System.Xml.ReaderWriter">
       <Version>4.3.1</Version>
@@ -141,22 +95,14 @@
       <Version>4.3.0</Version>
     </PackageReference>
     <PackageReference Include="Unity">
-      <Version>5.11.1</Version>
+      <Version>5.11.10</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Windows\ConfigurationWindowControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Windows\ScriptCreationWindowControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Windows\VersionHistoryWindowControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
+    <ProjectReference Include="..\Shared\Shared.csproj">
+      <Project>{f5653d93-0053-4b4a-830c-0dfd41b12aa8}</Project>
+      <Name>Shared</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Icon.png">
@@ -170,12 +116,7 @@
       <ResourceName>Menus.ctmenu</ResourceName>
     </VSCTCompile>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Shared\Shared.csproj">
-      <Project>{f5653d93-0053-4b4a-830c-0dfd41b12aa8}</Project>
-      <Name>Shared</Name>
-    </ProjectReference>
-  </ItemGroup>
+  <Import Project="..\SSDTLifecycleExtensionShared\SSDTLifecycleExtensionShared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

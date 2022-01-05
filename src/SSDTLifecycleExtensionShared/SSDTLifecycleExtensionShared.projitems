@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>703656e6-e59a-4571-8465-1b9f3a99a621</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>SSDTLifecycleExtensionShared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Commands\BaseCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Commands\ConfigurationWindowCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Commands\ScriptCreationWindowCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Commands\VersionHistoryWindowCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Commands\WindowBaseCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Constants.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\BoolInvertConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\BoolToVisibilityConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataAccess\DacAccess.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataAccess\FileSystemAccess.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataAccess\VisualStudioAccess.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DependencyResolver.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IAsyncPackage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MVVM\AsyncCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MVVM\IAsyncCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MVVM\IErrorHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MVVM\TaskUtilities.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)OutputClassification\ClassificationTypes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)OutputClassification\OutputClassifier.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)OutputClassification\OutputClassifierProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SSDTLifecycleExtensionPackage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\ConfigurationViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\IViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\ScriptCreationViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\VersionHistoryViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\ViewModelBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Windows\ConfigurationWindow.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Windows\ConfigurationWindowControl.xaml.cs">
+      <DependentUpon>ConfigurationWindowControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Windows\IView.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Windows\IVisualStudioToolWindow.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Windows\ScriptCreationWindow.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Windows\ScriptCreationWindowControl.xaml.cs">
+      <DependentUpon>ScriptCreationWindowControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Windows\ToolWindowInitializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Windows\VersionHistoryWindow.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Windows\VersionHistoryWindowControl.xaml.cs">
+      <DependentUpon>VersionHistoryWindowControl.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="$(MSBuildThisFileDirectory)Windows\ConfigurationWindowControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)Windows\ScriptCreationWindowControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)Windows\VersionHistoryWindowControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+</Project>

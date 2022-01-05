@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28917.181
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SSDTLifecycleExtension", "SSDTLifecycleExtension\SSDTLifecycleExtension.csproj", "{33F67B86-F86E-4788-9A94-8E680CF36938}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SSDTLifecycleExtension2019", "SSDTLifecycleExtension2019\SSDTLifecycleExtension2019.csproj", "{33F67B86-F86E-4788-9A94-8E680CF36938}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "Shared\Shared.csproj", "{F5653D93-0053-4B4A-830C-0DFD41B12AA8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{BF5937A9-8E34-4E88-9B7D-3ADA04C5D1B6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests2019", "UnitTests2019\UnitTests2019.csproj", "{BF5937A9-8E34-4E88-9B7D-3ADA04C5D1B6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deployment", "Deployment", "{12F46FDE-FF67-4CE6-9360-FF7F46C61F11}"
 	ProjectSection(SolutionItems) = preProject
@@ -17,7 +17,25 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deployment", "Deployment", 
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "TestDatabase", "TestDatabase\TestDatabase.sqlproj", "{75DBDF92-497E-4FD9-801D-F54171507D29}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SSDTLifecycleExtensionShared", "SSDTLifecycleExtensionShared\SSDTLifecycleExtensionShared.shproj", "{703656E6-E59A-4571-8465-1B9F3A99A621}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SSDTLifecycleExtension2022", "SSDTLifecycleExtension2022\SSDTLifecycleExtension2022.csproj", "{8D06921F-CA4D-4ABD-89FD-5228DF996F60}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SSDTLifecycleExtensionPack", "SSDTLifecycleExtensionPack\SSDTLifecycleExtensionPack.csproj", "{6802CF7D-DE19-4E2F-A55B-7FDB83CEA4EE}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "UnitTestsShared", "UnitTestsShared\UnitTestsShared.shproj", "{D6D569E9-92A4-4FFC-AA93-0AE13D7773BD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests2022", "UnitTests2022\UnitTests2022.csproj", "{BF5937A9-8E34-4E88-9B7D-3ADA04C5D1B7}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		SSDTLifecycleExtensionShared\SSDTLifecycleExtensionShared.projitems*{33f67b86-f86e-4788-9a94-8e680cf36938}*SharedItemsImports = 4
+		SSDTLifecycleExtensionShared\SSDTLifecycleExtensionShared.projitems*{703656e6-e59a-4571-8465-1b9f3a99a621}*SharedItemsImports = 13
+		SSDTLifecycleExtensionShared\SSDTLifecycleExtensionShared.projitems*{8d06921f-ca4d-4abd-89fd-5228df996f60}*SharedItemsImports = 4
+		UnitTestsShared\UnitTestsShared.projitems*{bf5937a9-8e34-4e88-9b7d-3ada04c5d1b6}*SharedItemsImports = 4
+		UnitTestsShared\UnitTestsShared.projitems*{bf5937a9-8e34-4e88-9b7d-3ada04c5d1b7}*SharedItemsImports = 4
+		UnitTestsShared\UnitTestsShared.projitems*{d6d569e9-92a4-4ffc-aa93-0ae13d7773bd}*SharedItemsImports = 13
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -41,6 +59,18 @@ Global
 		{75DBDF92-497E-4FD9-801D-F54171507D29}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{75DBDF92-497E-4FD9-801D-F54171507D29}.Release|Any CPU.Build.0 = Release|Any CPU
 		{75DBDF92-497E-4FD9-801D-F54171507D29}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{8D06921F-CA4D-4ABD-89FD-5228DF996F60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D06921F-CA4D-4ABD-89FD-5228DF996F60}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D06921F-CA4D-4ABD-89FD-5228DF996F60}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D06921F-CA4D-4ABD-89FD-5228DF996F60}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6802CF7D-DE19-4E2F-A55B-7FDB83CEA4EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6802CF7D-DE19-4E2F-A55B-7FDB83CEA4EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6802CF7D-DE19-4E2F-A55B-7FDB83CEA4EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6802CF7D-DE19-4E2F-A55B-7FDB83CEA4EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF5937A9-8E34-4E88-9B7D-3ADA04C5D1B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF5937A9-8E34-4E88-9B7D-3ADA04C5D1B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF5937A9-8E34-4E88-9B7D-3ADA04C5D1B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF5937A9-8E34-4E88-9B7D-3ADA04C5D1B7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

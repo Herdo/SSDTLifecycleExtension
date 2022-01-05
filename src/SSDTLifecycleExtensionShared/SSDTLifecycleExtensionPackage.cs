@@ -1,32 +1,33 @@
-﻿namespace SSDTLifecycleExtension
-{
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel.Design;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
-    using System.Runtime.InteropServices;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Windows;
-    using Commands;
-    using DataAccess;
-    using EnvDTE;
-    using EnvDTE80;
-    using JetBrains.Annotations;
-    using Microsoft.VisualStudio;
-    using Microsoft.VisualStudio.Shell;
-    using Microsoft.VisualStudio.Shell.Interop;
-    using Properties;
-    using Shared.Services;
-    using Task = System.Threading.Tasks.Task;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.Design;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
+using EnvDTE;
+using EnvDTE80;
+using JetBrains.Annotations;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+using SSDTLifecycleExtension.Commands;
+using SSDTLifecycleExtension.DataAccess;
+using SSDTLifecycleExtension.Shared.Services;
+using SSDTLifecycleExtension.Windows;
+using Task = System.Threading.Tasks.Task;
 
+namespace SSDTLifecycleExtension
+{
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [Guid(PackageGuidString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    [ProvideToolWindow(typeof(ScriptCreationWindow), Transient = true, Style = VsDockStyle.Tabbed, MultiInstances = false)]
-    [ProvideToolWindow(typeof(VersionHistoryWindow), Transient = true, Style = VsDockStyle.Tabbed, MultiInstances = false)]
-    [ProvideToolWindow(typeof(ConfigurationWindow), Transient = true, Style = VsDockStyle.Tabbed, MultiInstances = false)]
+    [ProvideToolWindow(typeof(ScriptCreationWindow), Transient = true, Window = EnvDTE.Constants.vsWindowKindMainWindow, Style = VsDockStyle.Tabbed, MultiInstances = false,
+                       Height = 900, Width = 900, DockedHeight = 900, DockedWidth = 900)]
+    [ProvideToolWindow(typeof(VersionHistoryWindow), Transient = true, Window = EnvDTE.Constants.vsWindowKindMainWindow, Style = VsDockStyle.Tabbed, MultiInstances = false)]
+    [ProvideToolWindow(typeof(ConfigurationWindow), Transient = true, Window = EnvDTE.Constants.vsWindowKindMainWindow, Style = VsDockStyle.Tabbed, MultiInstances = false,
+                       Height = 900, Width = 900, DockedHeight = 900, DockedWidth = 900)]
     [ProvideAutoLoad(SqlProjectContextGuid, PackageAutoLoadFlags.BackgroundLoad)]
     [ProvideUIContextRule(SqlProjectContextGuid,
         name: "SqlProject auto load",
@@ -70,11 +71,11 @@
                 throw new InvalidOperationException($"Cannot initialize {nameof(SSDTLifecycleExtensionPackage)} without the {nameof(OleMenuCommandService)}.");
 
             var visualStudioAccess = new VisualStudioAccess(_dte2, this);
-            var visualStudioLogger = new VisualStudioLogger(visualStudioAccess, Settings.Default.DocumentationBaseUrl);
+            var visualStudioLogger = new VisualStudioLogger(visualStudioAccess, Constants.DocumentationBaseUrl);
             return new DependencyResolver(visualStudioAccess, visualStudioLogger, commandService);
         }
 
-        private void AttachToDteEvents()
+        private void AttachToDte2Events()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
             _dte2.Events.SolutionEvents.AfterClosing += SolutionEvents_AfterClosing;
@@ -126,8 +127,6 @@
                 _openedWindowFrames.Remove(key);
         }
 
-        #region Base Overrides
-
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
             // When initialized asynchronously, the current thread may be a background thread at this point.
@@ -143,7 +142,7 @@
             _dependencyResolver.RegisterPackage(this);
 
             // Initialize DTE event handlers
-            AttachToDteEvents();
+            AttachToDte2Events();
 
             // Initialize commands
             ScriptCreationWindowCommand.Initialize(_dependencyResolver.Get<ScriptCreationWindowCommand>());
@@ -193,8 +192,6 @@
                 base.Dispose(disposing);
             }
         }
-
-        #endregion
 
         /// <summary>
         /// Adds the <paramref name="windowFrame"/> to an internal list. When the solution is closed, all registered window frames will be closed.

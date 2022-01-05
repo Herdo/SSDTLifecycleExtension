@@ -13,74 +13,97 @@ pr:
    include:
      - master
 
-pool:
-  vmImage: 'windows-2019'
-
 variables:
+  isPullRequest: $[eq(variables['Build.Reason'], 'PullRequest')]
   solution: '**/*.sln'
-  buildPlatform: 'Any CPU'
+  buildPlatform: 'AnyCPU'
   buildConfiguration: 'Release'
 
-steps:
-- task: SonarCloudPrepare@1
-  displayName: Prepare SonarCloud
-  inputs:
-    projectName: 'SSDT Lifecycle Extension'
-    projectKey: 'SSDTLifecycleExtension'
-    projectVersion: '$(Build.BuildNumber)'
-    organization: 'herdo-github'
-    SonarCloud: 'SonarCloud-CodeAnalysis-Server'
-    extraProperties: |
-     sonar.exclusions=src\TestDatabase\**\*
-
-- task: NuGetToolInstaller@0
-  displayName: NuGet Tool Installer
-
-- task: NuGetCommand@2
-  displayName: Restore NuGet packages
-  inputs:
-    restoreSolution: '$(solution)'
-
-- task: VSBuild@1
-  displayName: Build solution
-  inputs:
-    solution: '$(solution)'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-
-- task: VSTest@2
-  displayName: Run tests
-  continueOnError: true
-  inputs:
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-    codeCoverageEnabled: true
-
-- task: SonarCloudAnalyze@1 
-  displayName: Run SonarCloud Analyzer
-
-- task: CopyFiles@2
-  name: CopyDeploymentData
-  displayName: Copy deployment data to artifact staging directory
-  inputs:
-    SourceFolder: '$(Build.SourcesDirectory)'
-    Contents: |
-     deployment\*
-     README.md
-    TargetFolder: '$(Build.ArtifactStagingDirectory)'
-
-- task: CopyFiles@2
-  name: CopyVSIX
-  displayName: Copy VSIX to artifact staging directory
-  inputs:
-    SourceFolder: '$(Build.SourcesDirectory)'
-    Contents: |
-     **\bin\Release\*.vsix
-    TargetFolder: '$(Build.ArtifactStagingDirectory)'
-    flattenFolders: true
-
-- task: PublishBuildArtifacts@1
-  displayName: Publish VSIX build artifact
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: VSIX
+jobs:
+- job: Build
+  strategy:
+    matrix:
+      2019:
+        imageName: 'windows-2019'
+        extensionVersion: '2019'
+        vsVersion: '16.0'
+      2022:
+        imageName: 'windows-2022'
+        extensionVersion: '2022'
+        vsVersion: '17.0'
+  pool:
+    vmImage: $(imageName)
+  steps:
+  - task: SonarCloudPrepare@1
+    displayName: Prepare SonarCloud
+    condition: eq(variables.isPullRequest, False)
+    inputs:
+      projectName: 'SSDT Lifecycle Extension'
+      projectKey: 'SSDTLifecycleExtension'
+      projectVersion: '$(Build.BuildNumber)'
+      organization: 'herdo-github'
+      SonarCloud: 'SonarCloud-CodeAnalysis-Server'
+      extraProperties: |
+       sonar.exclusions=src\TestDatabase\**\*
+  
+  - task: NuGetToolInstaller@0
+    displayName: NuGet Tool Installer
+  
+  - task: NuGetCommand@2
+    displayName: Restore NuGet packages
+    inputs:
+      restoreSolution: '$(solution)'
+  
+  - task: VSBuild@1
+    displayName: Build $(extensionVersion) version of extension
+    inputs:
+      solution: '**/*$(extensionVersion).csproj'
+      vsVersion: '$(vsVersion)'
+      platform: '$(buildPlatform)'
+      configuration: '$(buildConfiguration)'
+  
+  - task: VSBuild@1
+    displayName: Build sqlproj for tests
+    inputs:
+      solution: '**/*.sqlproj'
+      vsVersion: '$(vsVersion)'
+      platform: '$(buildPlatform)'
+      configuration: '$(buildConfiguration)'
+  
+  - task: VSTest@2
+    displayName: Run tests
+    continueOnError: true
+    inputs:
+      platform: '$(buildPlatform)'
+      configuration: '$(buildConfiguration)'
+      codeCoverageEnabled: true
+  
+  - task: SonarCloudAnalyze@1 
+    displayName: Run SonarCloud Analyzer
+    condition: eq(variables.isPullRequest, False)
+  
+  - task: CopyFiles@2
+    name: CopyDeploymentData
+    displayName: Copy deployment data to artifact staging directory
+    inputs:
+      SourceFolder: '$(Build.SourcesDirectory)'
+      Contents: |
+       deployment\*
+       README.md
+      TargetFolder: '$(Build.ArtifactStagingDirectory)'
+  
+  - task: CopyFiles@2
+    name: CopyVSIX
+    displayName: Copy VSIX to artifact staging directory
+    inputs:
+      SourceFolder: '$(Build.SourcesDirectory)'
+      Contents: |
+       **\bin\Release\*.vsix
+      TargetFolder: '$(Build.ArtifactStagingDirectory)'
+      flattenFolders: true
+  
+  - task: PublishBuildArtifacts@1
+    displayName: Publish VSIX build artifact
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      ArtifactName: VSIX
