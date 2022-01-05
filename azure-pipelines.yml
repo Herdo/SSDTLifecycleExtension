@@ -13,14 +13,23 @@ pr:
    include:
      - master
 
+strategy:
+matrix:
+  2019:
+    imageName: 'windows-2019'
+    extensionVersion: '2019'
+  2022:
+    imageName: 'windows-2022'
+    extensionVersion: '2022'
+
 pool:
-  vmImage: 'windows-2022'
+  vmImage: $(imageName)
 
 variables:
   solution: '**/*.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
-
+        
 steps:
 - task: SonarCloudPrepare@1
   displayName: Prepare SonarCloud
@@ -42,9 +51,9 @@ steps:
     restoreSolution: '$(solution)'
 
 - task: VSBuild@1
-  displayName: Build solution
+  displayName: Build $(extensionVersion) version of extension
   inputs:
-    solution: '$(solution)'
+    solution: '**/*$(extensionVersion).csproj;**/*.sqlproj'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
 
