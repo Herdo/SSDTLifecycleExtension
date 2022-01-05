@@ -11,8 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests2019", "UnitTests2
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deployment", "Deployment", "{12F46FDE-FF67-4CE6-9360-FF7F46C61F11}"
 	ProjectSection(SolutionItems) = preProject
-		..\deployment\extension-manifest.json = ..\deployment\extension-manifest.json
-		..\deployment\publish-vsix.ps1 = ..\deployment\publish-vsix.ps1
+		..\deployment\extension-manifest2019.json = ..\deployment\extension-manifest2019.json
+		..\deployment\extension-manifest2022.json = ..\deployment\extension-manifest2022.json
+		..\deployment\publish-2019-vsix.ps1 = ..\deployment\publish-2019-vsix.ps1
+		..\deployment\publish-2022-vsix.ps1 = ..\deployment\publish-2022-vsix.ps1
 	EndProjectSection
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "TestDatabase", "TestDatabase\TestDatabase.sqlproj", "{75DBDF92-497E-4FD9-801D-F54171507D29}"
