@@ -14,6 +14,7 @@ pr:
      - master
 
 variables:
+  isPullRequest: $[eq(variables['Build.Reason'], 'PullRequest')]
   solution: '**/*.sln'
   buildPlatform: 'AnyCPU'
   buildConfiguration: 'Release'
@@ -35,6 +36,7 @@ jobs:
   steps:
   - task: SonarCloudPrepare@1
     displayName: Prepare SonarCloud
+    condition: eq(variables.isPullRequest, False)
     inputs:
       projectName: 'SSDT Lifecycle Extension'
       projectKey: 'SSDTLifecycleExtension'
@@ -78,6 +80,7 @@ jobs:
   
   - task: SonarCloudAnalyze@1 
     displayName: Run SonarCloud Analyzer
+    condition: eq(variables.isPullRequest, False)
   
   - task: CopyFiles@2
     name: CopyDeploymentData
