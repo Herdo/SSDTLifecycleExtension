@@ -9,11 +9,6 @@
     <Import_RootNamespace>SSDTLifecycleExtensionShared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="$(MSBuildThisFileDirectory)Icon.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Commands\BaseCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\ConfigurationWindowCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\ScriptCreationWindowCommand.cs" />
@@ -69,8 +64,5 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)SSDTLifecycleExtensionPackage.vsct" />
   </ItemGroup>
 </Project>
