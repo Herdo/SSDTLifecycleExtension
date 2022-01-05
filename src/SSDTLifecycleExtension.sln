@@ -23,8 +23,6 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SSDTLifecycleExtensionShare
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SSDTLifecycleExtension2022", "SSDTLifecycleExtension2022\SSDTLifecycleExtension2022.csproj", "{8D06921F-CA4D-4ABD-89FD-5228DF996F60}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SSDTLifecycleExtensionPack", "SSDTLifecycleExtensionPack\SSDTLifecycleExtensionPack.csproj", "{6802CF7D-DE19-4E2F-A55B-7FDB83CEA4EE}"
-EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "UnitTestsShared", "UnitTestsShared\UnitTestsShared.shproj", "{D6D569E9-92A4-4FFC-AA93-0AE13D7773BD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests2022", "UnitTests2022\UnitTests2022.csproj", "{BF5937A9-8E34-4E88-9B7D-3ADA04C5D1B7}"
@@ -65,10 +63,6 @@ Global
 		{8D06921F-CA4D-4ABD-89FD-5228DF996F60}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8D06921F-CA4D-4ABD-89FD-5228DF996F60}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8D06921F-CA4D-4ABD-89FD-5228DF996F60}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6802CF7D-DE19-4E2F-A55B-7FDB83CEA4EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6802CF7D-DE19-4E2F-A55B-7FDB83CEA4EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6802CF7D-DE19-4E2F-A55B-7FDB83CEA4EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6802CF7D-DE19-4E2F-A55B-7FDB83CEA4EE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BF5937A9-8E34-4E88-9B7D-3ADA04C5D1B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BF5937A9-8E34-4E88-9B7D-3ADA04C5D1B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BF5937A9-8E34-4E88-9B7D-3ADA04C5D1B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
