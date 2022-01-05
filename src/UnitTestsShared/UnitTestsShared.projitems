@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>d6d569e9-92a4-4ffc-aa93-0ae13d7773bd</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>UnitTestsShared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Extension\Commands\BaseCommandTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extension\Converters\BoolInvertConverterTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extension\Converters\BoolToVisibilityConverterTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extension\DataAccess\DacAccessTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extension\DependencyResolverTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extension\MVVM\AsyncCommandTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extension\MVVM\TaskUtilitiesTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extension\OutputClassification\ClassificationTypesTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extension\OutputClassification\OutputClassifierProviderTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extension\OutputClassification\OutputClassifierTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extension\ViewModels\ConfigurationViewModelTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extension\ViewModels\ScriptCreationViewModelTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extension\ViewModels\ViewModelBaseTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extension\Windows\ToolWindowInitializerTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\Contracts\CreateDeployFilesResultTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\Contracts\DefaultConstraintTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\Contracts\DeploySourcePathsTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\Contracts\DeployTargetPathsTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\Contracts\DirectoryPathsTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\Contracts\PathCollectionTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\Contracts\PublishProfileTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\Contracts\SqlProjectPropertiesTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\Contracts\SqlProjectTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\Enums\ScriptModifierTest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\Models\BaseModelTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\Models\BaseStateModelTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\Models\ConfigurationModelTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\Models\ScaffoldingStateModelTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\Models\ScriptCreationStateModelTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\Models\ScriptModificationModelTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\Models\VersionModelTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\ModelValidations\ConfigurationModelValidationsTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\ScriptModifiers\AddCustomFooterModifierTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\ScriptModifiers\AddCustomHeaderModifierTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\ScriptModifiers\CommentOutUnnamedDefaultConstraintDropsModifierTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\ScriptModifiers\RemoveSqlCmdStatementsModifierTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\ScriptModifiers\ReplaceUnnamedDefaultConstraintDropsModifierTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\ScriptModifiers\ScriptModifierFactoryTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\ScriptModifiers\StringSearchModifierBaseTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\ScriptModifiers\TrackDacpacVersionModifierTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\Services\ArtifactsServiceTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\Services\AsyncExecutorBaseTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\Services\BuildServiceTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\Services\CommandAvailabilityServiceTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\Services\ConfigurationServiceTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\Services\ScaffoldingServiceTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\Services\ScriptCreationServiceTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\Services\ScriptModifierProviderServiceTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\Services\SqlProjectServiceTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\Services\VersionServiceTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\Services\VisualStudioLoggerTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\Services\XmlFormatServiceTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\WorkUnits\BuildProjectUnitTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\WorkUnits\CleanLatestArtifactsDirectoryUnitTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\WorkUnits\CleanNewArtifactsDirectoryUnitTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\WorkUnits\CopyBuildResultUnitTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\WorkUnits\CopyDacpacToSharedDacpacRepositoryUnitTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\WorkUnits\CreateDeploymentFilesUnitTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\WorkUnits\DeleteRefactorLogUnitTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\WorkUnits\FormatTargetVersionUnitTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\WorkUnits\LoadPathsUnitTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\WorkUnits\LoadSqlProjectPropertiesUnitTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\WorkUnits\ModifyDeploymentScriptUnitTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\WorkUnits\ValidateTargetVersionUnitTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\WorkUnits\VerifyPathsUnitTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\WorkUnits\WorkUnitFactoryTests.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)Resources\TestDatabase.publish.xml" />
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)Resources\TestDatabase_AuthorWithDefaultConstraints.dacpac" />
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)Resources\TestDatabase_AuthorWithLessDefaultConstraints.dacpac" />
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)Resources\TestDatabase_Empty.dacpac" />
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)Resources\TestDatabase_WithAuthorTable.dacpac" />
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)Resources\TestDatabase_WithPreAndPostDeployment.dacpac" />
+  </ItemGroup>
+</Project>

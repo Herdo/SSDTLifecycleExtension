@@ -1,26 +1,25 @@
-﻿namespace SSDTLifecycleExtension
-{
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel.Design;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
-    using System.Runtime.InteropServices;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Windows;
-    using Commands;
-    using DataAccess;
-    using EnvDTE;
-    using EnvDTE80;
-    using JetBrains.Annotations;
-    using Microsoft.VisualStudio;
-    using Microsoft.VisualStudio.Shell;
-    using Microsoft.VisualStudio.Shell.Interop;
-    using Properties;
-    using Shared.Services;
-    using Task = System.Threading.Tasks.Task;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.Design;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
+using EnvDTE;
+using EnvDTE80;
+using JetBrains.Annotations;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+using SSDTLifecycleExtension.Commands;
+using SSDTLifecycleExtension.DataAccess;
+using SSDTLifecycleExtension.Shared.Services;
+using SSDTLifecycleExtension.Windows;
+using Task = System.Threading.Tasks.Task;
 
+namespace SSDTLifecycleExtension
+{
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [Guid(PackageGuidString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
@@ -72,7 +71,7 @@
                 throw new InvalidOperationException($"Cannot initialize {nameof(SSDTLifecycleExtensionPackage)} without the {nameof(OleMenuCommandService)}.");
 
             var visualStudioAccess = new VisualStudioAccess(_dte2, this);
-            var visualStudioLogger = new VisualStudioLogger(visualStudioAccess, Settings.Default.DocumentationBaseUrl);
+            var visualStudioLogger = new VisualStudioLogger(visualStudioAccess, Constants.DocumentationBaseUrl);
             return new DependencyResolver(visualStudioAccess, visualStudioLogger, commandService);
         }
 
