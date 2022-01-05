@@ -14,13 +14,13 @@ pr:
      - master
 
 strategy:
-matrix:
-  2019:
-    imageName: 'windows-2019'
-    extensionVersion: '2019'
-  2022:
-    imageName: 'windows-2022'
-    extensionVersion: '2022'
+  matrix:
+    2019:
+      imageName: 'windows-2019'
+      extensionVersion: '2019'
+    2022:
+      imageName: 'windows-2022'
+      extensionVersion: '2022'
 
 pool:
   vmImage: $(imageName)
