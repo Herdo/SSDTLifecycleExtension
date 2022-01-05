@@ -24,9 +24,11 @@
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [Guid(PackageGuidString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    [ProvideToolWindow(typeof(ScriptCreationWindow), Transient = true, Style = VsDockStyle.Tabbed, MultiInstances = false)]
-    [ProvideToolWindow(typeof(VersionHistoryWindow), Transient = true, Style = VsDockStyle.Tabbed, MultiInstances = false)]
-    [ProvideToolWindow(typeof(ConfigurationWindow), Transient = true, Style = VsDockStyle.Tabbed, MultiInstances = false)]
+    [ProvideToolWindow(typeof(ScriptCreationWindow), Transient = true, Window = EnvDTE.Constants.vsWindowKindMainWindow, Style = VsDockStyle.Tabbed, MultiInstances = false,
+                       Height = 900, Width = 900, DockedHeight = 900, DockedWidth = 900)]
+    [ProvideToolWindow(typeof(VersionHistoryWindow), Transient = true, Window = EnvDTE.Constants.vsWindowKindMainWindow, Style = VsDockStyle.Tabbed, MultiInstances = false)]
+    [ProvideToolWindow(typeof(ConfigurationWindow), Transient = true, Window = EnvDTE.Constants.vsWindowKindMainWindow, Style = VsDockStyle.Tabbed, MultiInstances = false,
+                       Height = 900, Width = 900, DockedHeight = 900, DockedWidth = 900)]
     [ProvideAutoLoad(SqlProjectContextGuid, PackageAutoLoadFlags.BackgroundLoad)]
     [ProvideUIContextRule(SqlProjectContextGuid,
         name: "SqlProject auto load",
