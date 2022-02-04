@@ -23,10 +23,10 @@ jobs:
 - job: Build
   strategy:
     matrix:
-      2019:
-        imageName: 'windows-2019'
-        extensionVersion: '2019'
-        vsVersion: '16.0'
+      # 2019:
+      #   imageName: 'windows-2019'
+      #   extensionVersion: '2019'
+      #   vsVersion: '16.0'
       2022:
         imageName: 'windows-2022'
         extensionVersion: '2022'
@@ -78,8 +78,13 @@ jobs:
       configuration: '$(buildConfiguration)'
       codeCoverageEnabled: true
 
+  - task: SonarCloudAnalyze@1 
+    displayName: Run SonarCloud Analyzer
+    condition: eq(variables.isPullRequest, False)
+
   - task: CopyFiles@2
     displayName: Copy test results to artifacts
+    condition: always()
     inputs:
       SourceFolder: 'D:\a\'
       Contents: '_temp/TestResults/**'
@@ -87,14 +92,11 @@ jobs:
 
   - task: PublishBuildArtifacts@1
     displayName: Publish build artifacts
+    condition: always()
     inputs:
       PathtoPublish: '$(Build.ArtifactStagingDirectory)'
       ArtifactName: 'drop'
       publishLocation: 'Container'
-
-  - task: SonarCloudAnalyze@1 
-    displayName: Run SonarCloud Analyzer
-    condition: eq(variables.isPullRequest, False)
 
   # - task: CopyFiles@2
   #   name: CopyDeploymentData
