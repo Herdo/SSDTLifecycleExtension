@@ -1,8 +1,3 @@
-# .NET Desktop
-# Build and run tests for .NET Desktop or Windows classic desktop solutions.
-# Add steps that publish symbols, save build artifacts, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/apps/windows/dot-net
-
 trigger:
  branches:
    include:
@@ -45,15 +40,15 @@ jobs:
       SonarCloud: 'SonarCloud-CodeAnalysis-Server'
       extraProperties: |
        sonar.exclusions=src\TestDatabase\**\*
-  
+
   - task: NuGetToolInstaller@0
     displayName: NuGet Tool Installer
-  
+
   - task: NuGetCommand@2
     displayName: Restore NuGet packages
     inputs:
       restoreSolution: '$(solution)'
-  
+
   - task: VSBuild@1
     displayName: Build $(extensionVersion) version of extension
     inputs:
@@ -61,7 +56,7 @@ jobs:
       vsVersion: '$(vsVersion)'
       platform: '$(buildPlatform)'
       configuration: '$(buildConfiguration)'
-  
+
   - task: VSBuild@1
     displayName: Build sqlproj for tests
     inputs:
@@ -69,19 +64,25 @@ jobs:
       vsVersion: '$(vsVersion)'
       platform: '$(buildPlatform)'
       configuration: '$(buildConfiguration)'
-  
+
   - task: VSTest@2
     displayName: Run tests
     continueOnError: true
     inputs:
+      testSelector: 'testAssemblies'
+      testAssemblyVer2: '**\*UnitTests*.dll'
+      searchFolder: '$(System.DefaultWorkingDirectory)'
+      runSettingsFile: '$(Build.SourcesDirectory)\src\UnitTestsShared\test.runsettings'
+      codeCoverageEnabled: true
       platform: '$(buildPlatform)'
       configuration: '$(buildConfiguration)'
-      codeCoverageEnabled: true
-  
+      minimumExpectedTests: 500
+      failOnMinTestsNotRun: true
+
   - task: SonarCloudAnalyze@1 
     displayName: Run SonarCloud Analyzer
     condition: eq(variables.isPullRequest, False)
-  
+
   - task: CopyFiles@2
     name: CopyDeploymentData
     displayName: Copy deployment data to artifact staging directory
@@ -91,7 +92,7 @@ jobs:
        deployment\*
        README.md
       TargetFolder: '$(Build.ArtifactStagingDirectory)'
-  
+
   - task: CopyFiles@2
     name: CopyVSIX
     displayName: Copy VSIX to artifact staging directory
@@ -101,7 +102,7 @@ jobs:
        **\bin\Release\*.vsix
       TargetFolder: '$(Build.ArtifactStagingDirectory)'
       flattenFolders: true
-  
+
   - task: PublishBuildArtifacts@1
     displayName: Publish VSIX build artifact
     inputs:
