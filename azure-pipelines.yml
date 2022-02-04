@@ -31,7 +31,8 @@ jobs:
   steps:
   - task: SonarCloudPrepare@1
     displayName: Prepare SonarCloud
-    #condition: eq(variables.isPullRequest, False)
+    # Pull Requests don't have access to secrets and therefore cannot use SonarCloud
+    condition: eq(variables.isPullRequest, False)
     inputs:
       projectName: 'SSDT Lifecycle Extension'
       projectKey: 'SSDTLifecycleExtension'
@@ -81,7 +82,8 @@ jobs:
 
   - task: SonarCloudAnalyze@1 
     displayName: Run SonarCloud Analyzer
-    #condition: eq(variables.isPullRequest, False)
+    # Pull Requests don't have access to secrets and therefore cannot use SonarCloud
+    condition: eq(variables.isPullRequest, False)
 
   - task: CopyFiles@2
     name: CopyDeploymentData
