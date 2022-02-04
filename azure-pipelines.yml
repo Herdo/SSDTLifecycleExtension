@@ -76,7 +76,7 @@ jobs:
       testSelector: 'testAssemblies'
       testAssemblyVer2: '**\*UnitTests*.dll'
       searchFolder: '$(System.DefaultWorkingDirectory)'
-      runSettingsFile: '$(Build.SourcesDirectory)\src\UnitTestsShared\test.runsettings'
+      #runSettingsFile: '$(Build.SourcesDirectory)\src\UnitTestsShared\test.runsettings'
       codeCoverageEnabled: true
       platform: '$(buildPlatform)'
       configuration: '$(buildConfiguration)'
