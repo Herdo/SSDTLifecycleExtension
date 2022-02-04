@@ -70,12 +70,14 @@ jobs:
     continueOnError: true
     inputs:
       testSelector: 'testAssemblies'
-      testAssemblyVer2: '**\*UnitTests$(vsVersion).dll'
+      testAssemblyVer2: '**\*UnitTests*.dll'
       searchFolder: '$(System.DefaultWorkingDirectory)'
       runSettingsFile: '$(Build.SourcesDirectory)\src\UnitTestsShared\test.runsettings'
       codeCoverageEnabled: true
       platform: '$(buildPlatform)'
       configuration: '$(buildConfiguration)'
+      minimumExpectedTests: 500
+      failOnMinTestsNotRun: true
 
   - task: SonarCloudAnalyze@1 
     displayName: Run SonarCloud Analyzer
