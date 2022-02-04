@@ -109,16 +109,6 @@ jobs:
       TargetFolder: '$(Build.ArtifactStagingDirectory)'
       flattenFolders: true
 
-  - task: CopyFiles@2
-    name: CopyCoverage
-    displayName: Copy coverage report to artifact staging directory
-    condition: always()
-    inputs:
-      SourceFolder: 'D:\a\'
-      Contents: '_temp/TestResults/**'
-      TargetFolder: '$(Build.ArtifactStagingDirectory)'
-      flattenFolders: false
-
   - task: PublishBuildArtifacts@1
     displayName: Publish VSIX build artifact
     inputs:
