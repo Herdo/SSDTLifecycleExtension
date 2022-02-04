@@ -69,10 +69,13 @@ jobs:
     displayName: Run tests
     continueOnError: true
     inputs:
+      testSelector: 'testAssemblies'
+      testAssemblyVer2: '**\*UnitTests$(vsVersion).dll'
+      searchFolder: '$(System.DefaultWorkingDirectory)'
+      runSettingsFile: '$(Build.SourcesDirectory)\src\UnitTestsShared\test.runsettings'
+      codeCoverageEnabled: true
       platform: '$(buildPlatform)'
       configuration: '$(buildConfiguration)'
-      codeCoverageEnabled: true
-      runSettingsFile: '$(Build.SourcesDirectory)\src\UnitTestsShared\test.runsettings'
 
   - task: SonarCloudAnalyze@1 
     displayName: Run SonarCloud Analyzer
