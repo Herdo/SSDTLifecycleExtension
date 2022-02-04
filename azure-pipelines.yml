@@ -75,9 +75,7 @@ jobs:
     inputs:
       testSelector: 'testAssemblies'
       testAssemblyVer2: |
-        **\*test*.dll
-        !**\*TestAdapter.dll
-        !**\obj\**
+        **\SSDTLifecycleExtension.UnitTests*.dll
       searchFolder: '$(System.DefaultWorkingDirectory)'
       runSettingsFile: '$(Build.SourcesDirectory)\src\UnitTestsShared\test.runsettings'
       codeCoverageEnabled: true

@@ -19,9 +19,6 @@
 							<Include>
 								<ModulePath>.*SSDTLifecycleExtension.*\.dll$</ModulePath>
 							</Include>
-							<Exclude>
-								<ModulePath>.*UnitTests.*</ModulePath>
-							</Exclude>
 						</ModulePaths>
 
 					</CodeCoverage>
