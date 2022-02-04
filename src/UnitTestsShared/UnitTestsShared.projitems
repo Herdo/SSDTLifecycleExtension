@@ -84,4 +84,7 @@
     <EmbeddedResource Include="$(MSBuildThisFileDirectory)Resources\TestDatabase_WithAuthorTable.dacpac" />
     <EmbeddedResource Include="$(MSBuildThisFileDirectory)Resources\TestDatabase_WithPreAndPostDeployment.dacpac" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)test.runsettings" />
+  </ItemGroup>
 </Project>
