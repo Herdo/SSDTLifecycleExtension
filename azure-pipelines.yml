@@ -44,6 +44,9 @@ jobs:
 
   - task: NuGetToolInstaller@0
     displayName: NuGet Tool Installer
+    inputs:
+      versionSpec: '6.x'
+      checkLatest: true
 
   - task: NuGetCommand@2
     displayName: Restore NuGet packages
