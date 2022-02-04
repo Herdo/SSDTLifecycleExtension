@@ -77,6 +77,7 @@ jobs:
       platform: '$(buildPlatform)'
       configuration: '$(buildConfiguration)'
       codeCoverageEnabled: true
+      runSettingsFile: '$(Build.SourcesDirectory)\src\UnitTestsShared\test.runsettings'
 
   - task: SonarCloudAnalyze@1 
     displayName: Run SonarCloud Analyzer
