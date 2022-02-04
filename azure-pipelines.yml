@@ -45,15 +45,15 @@ jobs:
       SonarCloud: 'SonarCloud-CodeAnalysis-Server'
       extraProperties: |
        sonar.exclusions=src\TestDatabase\**\*
-  
+
   - task: NuGetToolInstaller@0
     displayName: NuGet Tool Installer
-  
+
   - task: NuGetCommand@2
     displayName: Restore NuGet packages
     inputs:
       restoreSolution: '$(solution)'
-  
+
   - task: VSBuild@1
     displayName: Build $(extensionVersion) version of extension
     inputs:
@@ -61,7 +61,7 @@ jobs:
       vsVersion: '$(vsVersion)'
       platform: '$(buildPlatform)'
       configuration: '$(buildConfiguration)'
-  
+
   - task: VSBuild@1
     displayName: Build sqlproj for tests
     inputs:
@@ -69,7 +69,7 @@ jobs:
       vsVersion: '$(vsVersion)'
       platform: '$(buildPlatform)'
       configuration: '$(buildConfiguration)'
-  
+
   - task: VSTest@2
     displayName: Run tests
     continueOnError: true
@@ -77,33 +77,47 @@ jobs:
       platform: '$(buildPlatform)'
       configuration: '$(buildConfiguration)'
       codeCoverageEnabled: true
-  
+
+  - task: CopyFiles@2
+    displayName: Copy test results to artifacts
+    inputs:
+      SourceFolder: 'D:\a\'
+      Contents: '_temp/TestResults/**'
+      TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+  - task: PublishBuildArtifacts@1
+    displayName: Publish build artifacts
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      ArtifactName: 'drop'
+      publishLocation: 'Container'
+
   - task: SonarCloudAnalyze@1 
     displayName: Run SonarCloud Analyzer
     condition: eq(variables.isPullRequest, False)
-  
-  - task: CopyFiles@2
-    name: CopyDeploymentData
-    displayName: Copy deployment data to artifact staging directory
-    inputs:
-      SourceFolder: '$(Build.SourcesDirectory)'
-      Contents: |
-       deployment\*
-       README.md
-      TargetFolder: '$(Build.ArtifactStagingDirectory)'
-  
-  - task: CopyFiles@2
-    name: CopyVSIX
-    displayName: Copy VSIX to artifact staging directory
-    inputs:
-      SourceFolder: '$(Build.SourcesDirectory)'
-      Contents: |
-       **\bin\Release\*.vsix
-      TargetFolder: '$(Build.ArtifactStagingDirectory)'
-      flattenFolders: true
-  
-  - task: PublishBuildArtifacts@1
-    displayName: Publish VSIX build artifact
-    inputs:
-      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-      ArtifactName: VSIX
+
+  # - task: CopyFiles@2
+  #   name: CopyDeploymentData
+  #   displayName: Copy deployment data to artifact staging directory
+  #   inputs:
+  #     SourceFolder: '$(Build.SourcesDirectory)'
+  #     Contents: |
+  #      deployment\*
+  #      README.md
+  #     TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+  # - task: CopyFiles@2
+  #   name: CopyVSIX
+  #   displayName: Copy VSIX to artifact staging directory
+  #   inputs:
+  #     SourceFolder: '$(Build.SourcesDirectory)'
+  #     Contents: |
+  #      **\bin\Release\*.vsix
+  #     TargetFolder: '$(Build.ArtifactStagingDirectory)'
+  #     flattenFolders: true
+
+  # - task: PublishBuildArtifacts@1
+  #   displayName: Publish VSIX build artifact
+  #   inputs:
+  #     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+  #     ArtifactName: VSIX
