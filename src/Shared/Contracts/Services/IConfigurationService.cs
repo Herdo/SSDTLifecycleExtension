@@ -1,21 +1,13 @@
-﻿namespace SSDTLifecycleExtension.Shared.Contracts.Services
+﻿namespace SSDTLifecycleExtension.Shared.Contracts.Services;
+
+public interface IConfigurationService
 {
-    using System;
-    using System.Threading.Tasks;
-    using Contracts;
-    using Events;
-    using JetBrains.Annotations;
-    using Shared.Models;
+    event EventHandler<ProjectConfigurationChangedEventArgs> ConfigurationChanged;
 
-    public interface IConfigurationService
-    {
-        event EventHandler<ProjectConfigurationChangedEventArgs> ConfigurationChanged;
+    Task<ConfigurationModel> GetConfigurationOrDefaultAsync([NotNull] SqlProject project);
 
-        Task<ConfigurationModel> GetConfigurationOrDefaultAsync([NotNull] SqlProject project);
+    Task<ConfigurationModel> GetConfigurationOrDefaultAsync([NotNull] string path);
 
-        Task<ConfigurationModel> GetConfigurationOrDefaultAsync([NotNull] string path);
-
-        Task<bool> SaveConfigurationAsync([NotNull] SqlProject project,
-                                          [NotNull] ConfigurationModel model);
-    }
+    Task<bool> SaveConfigurationAsync([NotNull] SqlProject project,
+                                      [NotNull] ConfigurationModel model);
 }

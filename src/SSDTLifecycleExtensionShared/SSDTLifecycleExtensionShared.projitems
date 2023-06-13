@@ -21,6 +21,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)DataAccess\FileSystemAccess.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataAccess\VisualStudioAccess.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DependencyResolver.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlobalUsings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IAsyncPackage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MVVM\AsyncCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MVVM\IAsyncCommand.cs" />

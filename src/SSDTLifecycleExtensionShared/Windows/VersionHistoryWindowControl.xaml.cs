@@ -1,19 +1,15 @@
-﻿namespace SSDTLifecycleExtension.Windows
+﻿namespace SSDTLifecycleExtension.Windows;
+
+[ExcludeFromCodeCoverage] // Test would require a UI thread.
+public partial class VersionHistoryWindowControl : IView
 {
-    using System.Diagnostics.CodeAnalysis;
-    using ViewModels;
-
-    [ExcludeFromCodeCoverage] // Test would require a UI thread.
-    public partial class VersionHistoryWindowControl : IView
+    public VersionHistoryWindowControl()
     {
-        public VersionHistoryWindowControl()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
+    }
 
-        void IView.SetDataContext(IViewModel viewModel)
-        {
-            DataContext = viewModel;
-        }
+    void IView.SetDataContext(IViewModel viewModel)
+    {
+        DataContext = viewModel;
     }
 }

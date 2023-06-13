@@ -1,13 +1,10 @@
-﻿namespace SSDTLifecycleExtension.ViewModels
-{
-    using System.Threading.Tasks;
+﻿namespace SSDTLifecycleExtension.ViewModels;
 
-    public class VersionHistoryViewModel : ViewModelBase
+public class VersionHistoryViewModel : ViewModelBase
+{
+    public override async Task<bool> InitializeAsync()
     {
-        public override async Task<bool> InitializeAsync()
-        {
-            // TODO: Implement
-            return true;
-        }
+        // TODO: Implement
+        return true;
     }
 }

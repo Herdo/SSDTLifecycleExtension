@@ -1,16 +1,12 @@
-﻿namespace SSDTLifecycleExtension.Shared.Contracts.DataAccess
+﻿namespace SSDTLifecycleExtension.Shared.Contracts.DataAccess;
+
+public interface IDacAccess
 {
-    using System.Threading.Tasks;
-    using JetBrains.Annotations;
+    Task<CreateDeployFilesResult> CreateDeployFilesAsync([NotNull] string previousVersionDacpacPath,
+                                                         [NotNull] string newVersionDacpacPath,
+                                                         [NotNull] string publishProfilePath,
+                                                         bool createDeployScript,
+                                                         bool createDeployReport);
 
-    public interface IDacAccess
-    {
-        Task<CreateDeployFilesResult> CreateDeployFilesAsync([NotNull] string previousVersionDacpacPath,
-                                                             [NotNull] string newVersionDacpacPath,
-                                                             [NotNull] string publishProfilePath,
-                                                             bool createDeployScript,
-                                                             bool createDeployReport);
-
-        Task<(DefaultConstraint[] DefaultConstraints, string[] Errors)> GetDefaultConstraintsAsync([NotNull] string dacpacPath);
-    }
+    Task<(DefaultConstraint[] DefaultConstraints, string[] Errors)> GetDefaultConstraintsAsync([NotNull] string dacpacPath);
 }

@@ -1,7 +1,6 @@
-﻿namespace SSDTLifecycleExtension.Shared.Contracts.Services
+﻿namespace SSDTLifecycleExtension.Shared.Contracts.Services;
+
+public interface IXmlFormatService
 {
-    public interface IXmlFormatService
-    {
-        string FormatDeployReport(string report);
-    }
+    string FormatDeployReport(string report);
 }

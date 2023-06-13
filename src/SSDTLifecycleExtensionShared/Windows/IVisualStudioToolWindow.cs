@@ -1,9 +1,8 @@
-﻿namespace SSDTLifecycleExtension.Windows
-{
-    public interface IVisualStudioToolWindow
-    {
-        object Content { get; set; }
+﻿namespace SSDTLifecycleExtension.Windows;
 
-        void SetCaption(string projectName);
-    }
+public interface IVisualStudioToolWindow
+{
+    object Content { get; set; }
+
+    void SetCaption(string projectName);
 }

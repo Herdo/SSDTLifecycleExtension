@@ -1,16 +1,11 @@
-﻿namespace SSDTLifecycleExtension.Shared.Events
+﻿namespace SSDTLifecycleExtension.Shared.Events;
+
+public class ProjectConfigurationChangedEventArgs : EventArgs
 {
-    using System;
-    using Contracts;
-    using JetBrains.Annotations;
+    public SqlProject Project { get; }
 
-    public class ProjectConfigurationChangedEventArgs : EventArgs
+    public ProjectConfigurationChangedEventArgs([NotNull] SqlProject project)
     {
-        public SqlProject Project { get; }
-
-        public ProjectConfigurationChangedEventArgs([NotNull] SqlProject project)
-        {
-            Project = project ?? throw new ArgumentNullException(nameof(project));
-        }
+        Project = project ?? throw new ArgumentNullException(nameof(project));
     }
 }

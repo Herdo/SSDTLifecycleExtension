@@ -23,6 +23,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Extension\ViewModels\ScriptCreationViewModelTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extension\ViewModels\ViewModelBaseTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extension\Windows\ToolWindowInitializerTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlobalUsings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Shared\Contracts\CreateDeployFilesResultTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Shared\Contracts\DefaultConstraintTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Shared\Contracts\DeploySourcePathsTests.cs" />

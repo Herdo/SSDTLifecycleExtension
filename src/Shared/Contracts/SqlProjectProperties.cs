@@ -1,13 +1,10 @@
-﻿namespace SSDTLifecycleExtension.Shared.Contracts
+﻿namespace SSDTLifecycleExtension.Shared.Contracts;
+
+public class SqlProjectProperties
 {
-    using System;
+    public string SqlTargetName { get; set; }
 
-    public class SqlProjectProperties
-    {
-        public string SqlTargetName { get; set; }
+    public string BinaryDirectory { get; set; }
 
-        public string BinaryDirectory { get; set; }
-
-        public Version DacVersion { get; set; }
-    }
+    public Version DacVersion { get; set; }
 }

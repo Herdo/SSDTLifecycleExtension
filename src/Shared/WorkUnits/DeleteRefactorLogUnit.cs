@@ -1,70 +1,55 @@
-﻿namespace SSDTLifecycleExtension.Shared.WorkUnits
+﻿namespace SSDTLifecycleExtension.Shared.WorkUnits;
+
+[UsedImplicitly]
+public class DeleteRefactorLogUnit : IWorkUnit<ScriptCreationStateModel>
 {
-    using System;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Contracts;
-    using Contracts.DataAccess;
-    using Contracts.Enums;
-    using Contracts.Models;
-    using JetBrains.Annotations;
-    using Models;
+    [NotNull] private readonly IFileSystemAccess _fileSystemAccess;
+    [NotNull] private readonly IVisualStudioAccess _visualStudioAccess;
+    [NotNull] private readonly ILogger _logger;
 
-    [UsedImplicitly]
-    public class DeleteRefactorLogUnit : IWorkUnit<ScriptCreationStateModel>
+    public DeleteRefactorLogUnit([NotNull] IFileSystemAccess fileSystemAccess,
+                                 [NotNull] IVisualStudioAccess visualStudioAccess,
+                                 [NotNull] ILogger logger)
     {
-        [NotNull] private readonly IFileSystemAccess _fileSystemAccess;
-        [NotNull] private readonly IVisualStudioAccess _visualStudioAccess;
-        [NotNull] private readonly ILogger _logger;
+        _fileSystemAccess = fileSystemAccess ?? throw new ArgumentNullException(nameof(fileSystemAccess));
+        _visualStudioAccess = visualStudioAccess ?? throw new ArgumentNullException(nameof(visualStudioAccess));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
 
-        public DeleteRefactorLogUnit([NotNull] IFileSystemAccess fileSystemAccess,
-                                     [NotNull] IVisualStudioAccess visualStudioAccess,
-                                     [NotNull] ILogger logger)
+    private async Task TryToDeleteRefactorLogInternal(IStateModel stateModel,
+                                                      SqlProject project,
+                                                      ConfigurationModel configuration,
+                                                      PathCollection paths)
+    {
+        if (!configuration.DeleteRefactorlogAfterVersionedScriptGeneration)
         {
-            _fileSystemAccess = fileSystemAccess ?? throw new ArgumentNullException(nameof(fileSystemAccess));
-            _visualStudioAccess = visualStudioAccess ?? throw new ArgumentNullException(nameof(visualStudioAccess));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
-
-        private async Task TryToDeleteRefactorLogInternal(IStateModel stateModel,
-                                                          SqlProject project,
-                                                          ConfigurationModel configuration,
-                                                          PathCollection paths)
-        {
-            if (!configuration.DeleteRefactorlogAfterVersionedScriptGeneration)
-            {
-                stateModel.CurrentState = StateModelState.DeletedRefactorLog;
-                return;
-            }
-
-            await _logger.LogInfoAsync("Deleting refactorlog files ...");
-            var deletedFiles = _fileSystemAccess.TryToCleanDirectory(paths.Directories.ProjectDirectory, "*.refactorlog");
-            if (deletedFiles.Length == 0)
-            {
-                await _logger.LogTraceAsync("No files were deleted.");
-            }
-            else
-            {
-                foreach (var deletedFile in deletedFiles)
-                {
-                    _visualStudioAccess.RemoveItemFromProjectRoot(project, deletedFile);
-                    await _logger.LogTraceAsync($"Deleted file {deletedFile} ...");
-                }
-            }
-
             stateModel.CurrentState = StateModelState.DeletedRefactorLog;
+            return;
         }
 
-        Task IWorkUnit<ScriptCreationStateModel>.Work(ScriptCreationStateModel stateModel,
-                                                      CancellationToken cancellationToken)
-        {
-            if (stateModel == null)
-                throw new ArgumentNullException(nameof(stateModel));
+        await _logger.LogInfoAsync("Deleting refactorlog files ...");
+        var deletedFiles = _fileSystemAccess.TryToCleanDirectory(paths.Directories.ProjectDirectory, "*.refactorlog");
+        if (deletedFiles.Length == 0)
+            await _logger.LogTraceAsync("No files were deleted.");
+        else
+            foreach (var deletedFile in deletedFiles)
+            {
+                _visualStudioAccess.RemoveItemFromProjectRoot(project, deletedFile);
+                await _logger.LogTraceAsync($"Deleted file {deletedFile} ...");
+            }
 
-            return TryToDeleteRefactorLogInternal(stateModel,
-                                                  stateModel.Project,
-                                                  stateModel.Configuration,
-                                                  stateModel.Paths);
-        }
+        stateModel.CurrentState = StateModelState.DeletedRefactorLog;
+    }
+
+    Task IWorkUnit<ScriptCreationStateModel>.Work(ScriptCreationStateModel stateModel,
+                                                  CancellationToken cancellationToken)
+    {
+        if (stateModel == null)
+            throw new ArgumentNullException(nameof(stateModel));
+
+        return TryToDeleteRefactorLogInternal(stateModel,
+                                              stateModel.Project,
+                                              stateModel.Configuration,
+                                              stateModel.Paths);
     }
 }

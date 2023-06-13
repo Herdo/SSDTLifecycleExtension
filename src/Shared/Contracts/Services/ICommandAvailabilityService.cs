@@ -1,10 +1,7 @@
-﻿namespace SSDTLifecycleExtension.Shared.Contracts.Services
-{
-    using System;
+﻿namespace SSDTLifecycleExtension.Shared.Contracts.Services;
 
-    public interface ICommandAvailabilityService
-    {
-        void HandleCommandAvailability(Action<bool> setVisible,
-                                       Action<bool> setEnabled);
-    }
+public interface ICommandAvailabilityService
+{
+    void HandleCommandAvailability(Action<bool> setVisible,
+                                   Action<bool> setEnabled);
 }
