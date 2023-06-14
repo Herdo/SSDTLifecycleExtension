@@ -140,24 +140,25 @@ public class DacAccessTests
         var result = await da.CreateDeployFilesAsync(tempPreviousVersionDacpacPath, tempNewVersionDacpacPath, tempPublishProfilePath, true, true);
 
         // Assert
-        Assert.IsNotNull(result.DeployScriptContent);
-        Assert.IsNotNull(result.DeployReportContent);
-        Assert.IsNull(result.Errors);
+        result.DeployScriptContent.Should().NotBeNull();
+        result.DeployReportContent.Should().NotBeNull();
+        result.Errors.Should().BeNull();
         xfsMock.Verify(m => m.FormatDeployReport(It.IsNotNull<string>()), Times.Once);
         // Verify script
         var productionIndex = result.DeployScriptContent.IndexOf("PRODUCTION", StringComparison.InvariantCulture);
-        Assert.IsTrue(productionIndex > 0);
+        productionIndex.Should().BeGreaterThan(0);
         var onErrorIndex = result.DeployScriptContent.IndexOf(":on error exit", StringComparison.InvariantCulture);
-        Assert.IsTrue(onErrorIndex > productionIndex);
+        onErrorIndex.Should().BeGreaterThan(productionIndex);
         var changeDatabaseIndex = result.DeployScriptContent.IndexOf("USE [$(DatabaseName)]", StringComparison.InvariantCulture);
-        Assert.IsTrue(changeDatabaseIndex > onErrorIndex);
+        changeDatabaseIndex.Should().BeGreaterThan(onErrorIndex);
         var createAuthorPrintIndex = result.DeployScriptContent.IndexOf("[dbo].[Author]...';", StringComparison.InvariantCulture);
-        Assert.IsTrue(createAuthorPrintIndex > changeDatabaseIndex);
+        createAuthorPrintIndex.Should().BeGreaterThan(changeDatabaseIndex);
         var createAuthorTableIndex = result.DeployScriptContent.IndexOf("CREATE TABLE [dbo].[Author]", StringComparison.InvariantCulture);
-        Assert.IsTrue(createAuthorTableIndex > createAuthorPrintIndex);
+        createAuthorTableIndex.Should().BeGreaterThan(createAuthorPrintIndex);
         // Verify report
-        Assert.AreEqual(@"<?xml version=""1.0"" encoding=""utf-8""?><DeploymentReport xmlns=""http://schemas.microsoft.com/sqlserver/dac/DeployReport/2012/02""><Alerts /><Operations><Operation Name=""Create""><Item Value=""[dbo].[Author]"" Type=""SqlTable"" /></Operation></Operations></DeploymentReport>",
-                        result.DeployReportContent);
+        result.DeployReportContent.Should()
+              .Be(
+                  @"<?xml version=""1.0"" encoding=""utf-8""?><DeploymentReport xmlns=""http://schemas.microsoft.com/sqlserver/dac/DeployReport/2012/02""><Alerts /><Operations><Operation Name=""Create""><Item Value=""[dbo].[Author]"" Type=""SqlTable"" /></Operation></Operations></DeploymentReport>");
     }
 
     [Test]
