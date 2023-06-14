@@ -1,52 +1,45 @@
-﻿namespace SSDTLifecycleExtension.Windows
+﻿namespace SSDTLifecycleExtension.Windows;
+
+internal class ToolWindowInitializer
 {
-    using System;
-    using System.Threading.Tasks;
-    using JetBrains.Annotations;
-    using Shared.Contracts.DataAccess;
-    using ViewModels;
+    private readonly IVisualStudioAccess _visualStudioAccess;
+    [NotNull] private readonly DependencyResolver _dependencyResolver;
 
-    internal class ToolWindowInitializer
+    public ToolWindowInitializer([NotNull] IVisualStudioAccess visualStudioAccess,
+                                 [NotNull] DependencyResolver dependencyResolver)
     {
-        private readonly IVisualStudioAccess _visualStudioAccess;
-        [NotNull] private readonly DependencyResolver _dependencyResolver;
+        _visualStudioAccess = visualStudioAccess ?? throw new ArgumentNullException(nameof(visualStudioAccess));
+        _dependencyResolver = dependencyResolver ?? throw new ArgumentNullException(nameof(dependencyResolver));
+        _visualStudioAccess.SolutionClosed += (sender, args) => _dependencyResolver.HandleSolutionClosed();
+    }
 
-        public ToolWindowInitializer([NotNull] IVisualStudioAccess visualStudioAccess,
-                                     [NotNull] DependencyResolver dependencyResolver)
-        {
-            _visualStudioAccess = visualStudioAccess ?? throw new ArgumentNullException(nameof(visualStudioAccess));
-            _dependencyResolver = dependencyResolver ?? throw new ArgumentNullException(nameof(dependencyResolver));
-            _visualStudioAccess.SolutionClosed += (sender, args) => _dependencyResolver.HandleSolutionClosed();
-        }
+    private async Task<(bool Success, string FullProjectPath)> TryInitializeToolWindowInternalAsync<TViewModel>(IVisualStudioToolWindow window) where TViewModel : IViewModel
+    {
+        // Set caption
+        var project = _visualStudioAccess.GetSelectedSqlProject();
+        if (project == null)
+            return (false, null);
+        window.SetCaption(project.Name);
 
-        private async Task<(bool Success, string FullProjectPath)> TryInitializeToolWindowInternalAsync<TViewModel>(IVisualStudioToolWindow window) where TViewModel : IViewModel
-        {
-            // Set caption
-            var project = _visualStudioAccess.GetSelectedSqlProject();
-            if (project == null)
-                return (false, null);
-            window.SetCaption(project.Name);
-
-            // Set data context
-            if (!(window.Content is IView windowContent))
-                return (true, project.FullName);
-
-            var viewModel = _dependencyResolver.GetViewModel<TViewModel>(project);
-            var initializedSuccessfully = await viewModel.InitializeAsync();
-            if (!initializedSuccessfully)
-                return (false, project.FullName);
-            windowContent.SetDataContext(viewModel);
-
+        // Set data context
+        if (!(window.Content is IView windowContent))
             return (true, project.FullName);
-        }
 
-        internal Task<(bool Success, string FullProjectPath)> TryInitializeToolWindowAsync<TViewModel>([NotNull] IVisualStudioToolWindow window)
-            where TViewModel : IViewModel
-        {
-            if (window == null)
-                throw new ArgumentNullException(nameof(window));
+        var viewModel = _dependencyResolver.GetViewModel<TViewModel>(project);
+        var initializedSuccessfully = await viewModel.InitializeAsync();
+        if (!initializedSuccessfully)
+            return (false, project.FullName);
+        windowContent.SetDataContext(viewModel);
 
-            return TryInitializeToolWindowInternalAsync<TViewModel>(window);
-        }
+        return (true, project.FullName);
+    }
+
+    internal Task<(bool Success, string FullProjectPath)> TryInitializeToolWindowAsync<TViewModel>([NotNull] IVisualStudioToolWindow window)
+        where TViewModel : IViewModel
+    {
+        if (window == null)
+            throw new ArgumentNullException(nameof(window));
+
+        return TryInitializeToolWindowInternalAsync<TViewModel>(window);
     }
 }

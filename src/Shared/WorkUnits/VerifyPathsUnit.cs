@@ -1,61 +1,50 @@
-﻿namespace SSDTLifecycleExtension.Shared.WorkUnits
+﻿namespace SSDTLifecycleExtension.Shared.WorkUnits;
+
+[UsedImplicitly]
+public class VerifyPathsUnit : IWorkUnit<ScriptCreationStateModel>
 {
-    using System;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Contracts;
-    using Contracts.DataAccess;
-    using Contracts.Enums;
-    using Contracts.Models;
-    using JetBrains.Annotations;
-    using Models;
+    [NotNull] private readonly IFileSystemAccess _fileSystemAccess;
+    [NotNull] private readonly ILogger _logger;
 
-    [UsedImplicitly]
-    public class VerifyPathsUnit : IWorkUnit<ScriptCreationStateModel>
+    public VerifyPathsUnit([NotNull] IFileSystemAccess fileSystemAccess,
+                           [NotNull] ILogger logger)
     {
-        [NotNull] private readonly IFileSystemAccess _fileSystemAccess;
-        [NotNull] private readonly ILogger _logger;
+        _fileSystemAccess = fileSystemAccess ?? throw new ArgumentNullException(nameof(fileSystemAccess));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
 
-        public VerifyPathsUnit([NotNull] IFileSystemAccess fileSystemAccess,
-                               [NotNull] ILogger logger)
+    private async Task VerifyPathsInternal(IStateModel stateModel,
+                                           PathCollection paths)
+    {
+        await _logger.LogInfoAsync("Verifying paths ...");
+        if (string.IsNullOrWhiteSpace(paths.DeploySources.PublishProfilePath))
         {
-            _fileSystemAccess = fileSystemAccess ?? throw new ArgumentNullException(nameof(fileSystemAccess));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
-
-        private async Task VerifyPathsInternal(IStateModel stateModel,
-                                               PathCollection paths)
-        {
-            await _logger.LogInfoAsync("Verifying paths ...");
-            if (string.IsNullOrWhiteSpace(paths.DeploySources.PublishProfilePath))
-            {
-                stateModel.Result = false;
-                stateModel.CurrentState = StateModelState.PathsVerified;
-                await _logger.LogErrorAsync("Failed to find publish profile. " +
-                                            $"The {nameof(ConfigurationModel.PublishProfilePath)} is set to \"{ConfigurationModel.UseSinglePublishProfileSpecialKeyword}\", but there's either none, or more than one publish profile in the directory. " +
-                                            $"Please read the documentation at {_logger.DocumentationBaseUrl}publish-profile-path for more details.");
-                return;
-            }
-            
-            if (_fileSystemAccess.CheckIfFileExists(paths.DeploySources.PublishProfilePath))
-            {
-                stateModel.CurrentState = StateModelState.PathsVerified;
-                return;
-            }
-
             stateModel.Result = false;
             stateModel.CurrentState = StateModelState.PathsVerified;
-            await _logger.LogErrorAsync($"Failed to find publish profile at \"{paths.DeploySources.PublishProfilePath}\". " +
-                                        $"Please read the documentation at {_logger.DocumentationBaseUrl}publish-profile-path for more details.");
+            await _logger.LogErrorAsync("Failed to find publish profile. "
+                                      + $"The {nameof(ConfigurationModel.PublishProfilePath)} is set to \"{ConfigurationModel.UseSinglePublishProfileSpecialKeyword}\", but there's either none, or more than one publish profile in the directory. "
+                                      + $"Please read the documentation at {_logger.DocumentationBaseUrl}publish-profile-path for more details.");
+            return;
         }
 
-        Task IWorkUnit<ScriptCreationStateModel>.Work(ScriptCreationStateModel stateModel,
-                                                      CancellationToken cancellationToken)
+        if (_fileSystemAccess.CheckIfFileExists(paths.DeploySources.PublishProfilePath))
         {
-            if (stateModel == null)
-                throw new ArgumentNullException(nameof(stateModel));
-
-            return VerifyPathsInternal(stateModel, stateModel.Paths);
+            stateModel.CurrentState = StateModelState.PathsVerified;
+            return;
         }
+
+        stateModel.Result = false;
+        stateModel.CurrentState = StateModelState.PathsVerified;
+        await _logger.LogErrorAsync($"Failed to find publish profile at \"{paths.DeploySources.PublishProfilePath}\". "
+                                  + $"Please read the documentation at {_logger.DocumentationBaseUrl}publish-profile-path for more details.");
+    }
+
+    Task IWorkUnit<ScriptCreationStateModel>.Work(ScriptCreationStateModel stateModel,
+                                                  CancellationToken cancellationToken)
+    {
+        if (stateModel == null)
+            throw new ArgumentNullException(nameof(stateModel));
+
+        return VerifyPathsInternal(stateModel, stateModel.Paths);
     }
 }

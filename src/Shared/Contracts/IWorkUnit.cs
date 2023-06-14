@@ -1,14 +1,8 @@
-﻿namespace SSDTLifecycleExtension.Shared.Contracts
-{
-    using System.Threading;
-    using System.Threading.Tasks;
-    using JetBrains.Annotations;
-    using Models;
+﻿namespace SSDTLifecycleExtension.Shared.Contracts;
 
-    public interface IWorkUnit<in TStateModel>
-        where TStateModel : IStateModel
-    {
-        Task Work([NotNull] TStateModel stateModel,
-                  CancellationToken cancellationToken);
-    }
+public interface IWorkUnit<in TStateModel>
+    where TStateModel : IStateModel
+{
+    Task Work([NotNull] TStateModel stateModel,
+              CancellationToken cancellationToken);
 }

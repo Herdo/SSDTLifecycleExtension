@@ -1,188 +1,168 @@
-﻿namespace SSDTLifecycleExtension.DataAccess
+﻿namespace SSDTLifecycleExtension.DataAccess;
+
+[UsedImplicitly]
+public class DacAccess : IDacAccess
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using JetBrains.Annotations;
-    using Microsoft.SqlServer.Dac;
-    using Microsoft.SqlServer.Dac.Model;
-    using Shared.Contracts;
-    using Shared.Contracts.DataAccess;
-    using Shared.Contracts.Services;
-    using DefaultConstraint = Shared.Contracts.DefaultConstraint;
+    private readonly IXmlFormatService _xmlFormatService;
 
-    [UsedImplicitly]
-    public class DacAccess : IDacAccess
+    public DacAccess([NotNull] IXmlFormatService xmlFormatService)
     {
-        private readonly IXmlFormatService _xmlFormatService;
+        _xmlFormatService = xmlFormatService ?? throw new ArgumentNullException(nameof(xmlFormatService));
+    }
 
-        public DacAccess([NotNull] IXmlFormatService xmlFormatService)
-        {
-            _xmlFormatService = xmlFormatService ?? throw new ArgumentNullException(nameof(xmlFormatService));
-        }
-
-        private async Task<CreateDeployFilesResult> CreateDeployFilesInternalAsync(string previousVersionDacpacPath,
-                                                                                   string newVersionDacpacPath,
-                                                                                   string publishProfilePath,
-                                                                                   bool createDeployScript,
-                                                                                   bool createDeployReport)
-        {
-            return
-                await Task.Run(() =>
-                {
-                    PublishResult result;
-                    PublishProfile publishProfile;
-                    string preDeploymentScriptContent;
-                    string postDeploymentScriptContent;
-                    try
-                    {
-                        // Get publish profile
-                        var deployOptions = DacProfile.Load(publishProfilePath).DeployOptions;
-                        publishProfile = ConvertPublishProfile(deployOptions);
-
-                        // Read the DACPACs
-                        using (var previousDacpac = DacPackage.Load(previousVersionDacpacPath, DacSchemaModelStorageType.Memory))
-                            using (var newDacpac = DacPackage.Load(newVersionDacpacPath, DacSchemaModelStorageType.Memory))
-                            {
-
-                                // Read pre-deployment and post-deployment from new DACPAC.
-                                preDeploymentScriptContent = TryToReadDeploymentScriptContent(newDacpac.PreDeploymentScript);
-                                postDeploymentScriptContent = TryToReadDeploymentScriptContent(newDacpac.PostDeploymentScript);
-
-                                // Process the input
-                                result = DacServices.Script(newDacpac,
-                                                            previousDacpac,
-                                                            "PRODUCTION",
-                                                            new PublishOptions
-                                                            {
-                                                                GenerateDeploymentScript = createDeployScript,
-                                                                GenerateDeploymentReport = createDeployReport,
-                                                                DeployOptions = deployOptions
-                                                            });
-                            }
-
-                    }
-                    catch (DacServicesException e)
-                    {
-                        return new CreateDeployFilesResult(GetErrorList(e));
-                    }
-
-                    return new CreateDeployFilesResult(result?.DatabaseScript,
-                                                       _xmlFormatService.FormatDeployReport(result?.DeploymentReport),
-                                                       preDeploymentScriptContent,
-                                                       postDeploymentScriptContent,
-                                                       publishProfile);
-                });
-        }
-
-        private static PublishProfile ConvertPublishProfile(DacDeployOptions deployOptions)
-        {
-            return new PublishProfile
+    private async Task<CreateDeployFilesResult> CreateDeployFilesInternalAsync(string previousVersionDacpacPath,
+                                                                               string newVersionDacpacPath,
+                                                                               string publishProfilePath,
+                                                                               bool createDeployScript,
+                                                                               bool createDeployReport)
+    {
+        return
+            await Task.Run(() =>
             {
-                CreateNewDatabase = deployOptions.CreateNewDatabase,
-                BackupDatabaseBeforeChanges = deployOptions.BackupDatabaseBeforeChanges,
-                ScriptDatabaseOptions = deployOptions.ScriptDatabaseOptions,
-                ScriptDeployStateChecks = deployOptions.ScriptDeployStateChecks
-            };
-        }
-
-        private static string TryToReadDeploymentScriptContent(Stream stream)
-        {
-            if (stream == null)
-                return null;
-
-            using (stream)
-            {
-                using (var streamReader = new StreamReader(stream))
-                {
-                    return streamReader.ReadToEnd();
-                }
-            }
-        }
-
-        private async Task<(DefaultConstraint[] DefaultConstraints, string[] Errors)> GetDefaultConstraintsInternalAsync(string dacpacPath)
-        {
-            var (constraints, errors) = await Task.Run<(DefaultConstraint[] Result, string[] Errors)>(() =>
-            {
+                PublishResult result;
+                PublishProfile publishProfile;
+                string preDeploymentScriptContent;
+                string postDeploymentScriptContent;
                 try
                 {
-                    using (var sqlModel = TSqlModel.LoadFromDacpac(dacpacPath, new ModelLoadOptions(DacSchemaModelStorageType.Memory, false)))
-                    {
-                        // Process the input
-                        return (GetDefaultConstraintsFromModel(sqlModel), null);
-                    }
+                    // Get publish profile
+                    var deployOptions = DacProfile.Load(publishProfilePath).DeployOptions;
+                    publishProfile = ConvertPublishProfile(deployOptions);
+
+                    // Read the DACPACs
+                    using var previousDacpac = DacPackage.Load(previousVersionDacpacPath, DacSchemaModelStorageType.Memory);
+                    using var newDacpac = DacPackage.Load(newVersionDacpacPath, DacSchemaModelStorageType.Memory);
+                    // Read pre-deployment and post-deployment from new DACPAC.
+                    preDeploymentScriptContent = TryToReadDeploymentScriptContent(newDacpac.PreDeploymentScript);
+                    postDeploymentScriptContent = TryToReadDeploymentScriptContent(newDacpac.PostDeploymentScript);
+
+                    // Process the input
+                    result = DacServices.Script(newDacpac,
+                                                previousDacpac,
+                                                "PRODUCTION",
+                                                new PublishOptions
+                                                {
+                                                    GenerateDeploymentScript = createDeployScript,
+                                                    GenerateDeploymentReport = createDeployReport,
+                                                    DeployOptions = deployOptions
+                                                });
                 }
-                catch (DacModelException e)
+                catch (DacServicesException e)
                 {
-                    var errorMessages = new List<string> { e.GetBaseException().Message };
-                    if (e.Messages != null && e.Messages.Any())
-                        errorMessages.AddRange(e.Messages.Select(m => m.ToString()));
-                    return (null, errorMessages.ToArray());
+                    return new CreateDeployFilesResult(GetErrorList(e));
                 }
-                catch (Exception e)
-                {
-                    return (null, new[] { e.GetBaseException().Message });
-                }
+
+                return new CreateDeployFilesResult(result?.DatabaseScript,
+                                                   _xmlFormatService.FormatDeployReport(result?.DeploymentReport),
+                                                   preDeploymentScriptContent,
+                                                   postDeploymentScriptContent,
+                                                   publishProfile);
             });
+    }
 
-            return (constraints, errors);
-        }
-
-        private static DefaultConstraint[] GetDefaultConstraintsFromModel(TSqlModel sqlModel)
+    private static PublishProfile ConvertPublishProfile(DacDeployOptions deployOptions)
+    {
+        return new PublishProfile
         {
-            var defaultConstraints = sqlModel.GetObjects(DacQueryScopes.UserDefined, ModelSchema.DefaultConstraint);
-            var result = new List<DefaultConstraint>();
-            foreach (var defaultConstraint in defaultConstraints)
+            CreateNewDatabase = deployOptions.CreateNewDatabase,
+            BackupDatabaseBeforeChanges = deployOptions.BackupDatabaseBeforeChanges,
+            ScriptDatabaseOptions = deployOptions.ScriptDatabaseOptions,
+            ScriptDeployStateChecks = deployOptions.ScriptDeployStateChecks
+        };
+    }
+
+    private static string TryToReadDeploymentScriptContent(Stream stream)
+    {
+        if (stream == null)
+            return null;
+
+        using (stream)
+        {
+            using (var streamReader = new StreamReader(stream))
             {
-                var targetColumn = defaultConstraint.GetReferenced(Microsoft.SqlServer.Dac.Model.DefaultConstraint.TargetColumn)?.SingleOrDefault();
-                if (targetColumn != null && targetColumn.Name.Parts.Count == 3)
-                    result.Add(new DefaultConstraint(targetColumn.Name.Parts[0],
-                                                     targetColumn.Name.Parts[1],
-                                                     targetColumn.Name.Parts[2],
-                                                     defaultConstraint.Name.HasName
-                                                         ? defaultConstraint.Name.Parts[1] // Part[0] is the schema of the constraint
-                                                         : null));
+                return streamReader.ReadToEnd();
             }
-
-            return result.ToArray();
         }
+    }
 
-        private static string[] GetErrorList(DacServicesException e)
+    private async Task<(DefaultConstraint[] DefaultConstraints, string[] Errors)> GetDefaultConstraintsInternalAsync(string dacpacPath)
+    {
+        var (constraints, errors) = await Task.Run<(DefaultConstraint[] Result, string[] Errors)>(() =>
         {
-            var errorList = new List<string>
+            try
             {
-                e.GetBaseException().Message
-            };
-            errorList.AddRange(e.Messages.Select(dacMessage => dacMessage.ToString()));
-            return errorList.ToArray();
-        }
+                using var sqlModel = TSqlModel.LoadFromDacpac(dacpacPath, new ModelLoadOptions(DacSchemaModelStorageType.Memory, false));
+                // Process the input
+                return (GetDefaultConstraintsFromModel(sqlModel), null);
+            }
+            catch (DacModelException e)
+            {
+                var errorMessages = new List<string> { e.GetBaseException().Message };
+                if (e.Messages != null && e.Messages.Any())
+                    errorMessages.AddRange(e.Messages.Select(m => m.ToString()));
+                return (null, errorMessages.ToArray());
+            }
+            catch (Exception e)
+            {
+                return (null, new[] { e.GetBaseException().Message });
+            }
+        });
 
-        Task<CreateDeployFilesResult> IDacAccess.CreateDeployFilesAsync(string previousVersionDacpacPath,
-                                                                        string newVersionDacpacPath,
-                                                                        string publishProfilePath,
-                                                                        bool createDeployScript,
-                                                                        bool createDeployReport)
+        return (constraints, errors);
+    }
+
+    private static DefaultConstraint[] GetDefaultConstraintsFromModel(TSqlModel sqlModel)
+    {
+        var defaultConstraints = sqlModel.GetObjects(DacQueryScopes.UserDefined, ModelSchema.DefaultConstraint);
+        var result = new List<DefaultConstraint>();
+        foreach (var defaultConstraint in defaultConstraints)
         {
-            if (previousVersionDacpacPath == null)
-                throw new ArgumentNullException(nameof(previousVersionDacpacPath));
-            if (newVersionDacpacPath == null)
-                throw new ArgumentNullException(nameof(newVersionDacpacPath));
-            if (publishProfilePath == null)
-                throw new ArgumentNullException(nameof(publishProfilePath));
-            if (!createDeployScript && !createDeployReport)
-                throw new InvalidOperationException($"Either {nameof(createDeployScript)} or {nameof(createDeployReport)} must be true.");
-
-            return CreateDeployFilesInternalAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, createDeployScript, createDeployReport);
+            var targetColumn = defaultConstraint.GetReferenced(Microsoft.SqlServer.Dac.Model.DefaultConstraint.TargetColumn)?.SingleOrDefault();
+            if (targetColumn != null && targetColumn.Name.Parts.Count == 3)
+                result.Add(new DefaultConstraint(targetColumn.Name.Parts[0],
+                                                 targetColumn.Name.Parts[1],
+                                                 targetColumn.Name.Parts[2],
+                                                 defaultConstraint.Name.HasName
+                                                     ? defaultConstraint.Name.Parts[1] // Part[0] is the schema of the constraint
+                                                     : null));
         }
 
-        Task<(DefaultConstraint[] DefaultConstraints, string[] Errors)> IDacAccess.GetDefaultConstraintsAsync(string dacpacPath)
+        return result.ToArray();
+    }
+
+    private static string[] GetErrorList(DacServicesException e)
+    {
+        var errorList = new List<string>
         {
-            if (dacpacPath == null)
-                throw new ArgumentNullException(nameof(dacpacPath));
+            e.GetBaseException().Message
+        };
+        errorList.AddRange(e.Messages.Select(dacMessage => dacMessage.ToString()));
+        return errorList.ToArray();
+    }
 
-            return GetDefaultConstraintsInternalAsync(dacpacPath);
-        }
+    Task<CreateDeployFilesResult> IDacAccess.CreateDeployFilesAsync(string previousVersionDacpacPath,
+                                                                    string newVersionDacpacPath,
+                                                                    string publishProfilePath,
+                                                                    bool createDeployScript,
+                                                                    bool createDeployReport)
+    {
+        if (previousVersionDacpacPath == null)
+            throw new ArgumentNullException(nameof(previousVersionDacpacPath));
+        if (newVersionDacpacPath == null)
+            throw new ArgumentNullException(nameof(newVersionDacpacPath));
+        if (publishProfilePath == null)
+            throw new ArgumentNullException(nameof(publishProfilePath));
+        if (!createDeployScript && !createDeployReport)
+            throw new InvalidOperationException($"Either {nameof(createDeployScript)} or {nameof(createDeployReport)} must be true.");
+
+        return CreateDeployFilesInternalAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, createDeployScript, createDeployReport);
+    }
+
+    Task<(DefaultConstraint[] DefaultConstraints, string[] Errors)> IDacAccess.GetDefaultConstraintsAsync(string dacpacPath)
+    {
+        if (dacpacPath == null)
+            throw new ArgumentNullException(nameof(dacpacPath));
+
+        return GetDefaultConstraintsInternalAsync(dacpacPath);
     }
 }

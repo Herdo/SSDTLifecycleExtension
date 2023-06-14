@@ -1,482 +1,474 @@
-﻿using NUnit.Framework;
+﻿namespace SSDTLifecycleExtension.UnitTests.Shared.ModelValidations;
 
-namespace SSDTLifecycleExtension.UnitTests.Shared.ModelValidations
+[TestFixture]
+public class ConfigurationModelValidationsTests
 {
-    using System;
-    using System.IO;
-    using SSDTLifecycleExtension.Shared.Models;
-    using SSDTLifecycleExtension.Shared.ModelValidations;
-
-    [TestFixture]
-    public class ConfigurationModelValidationsTests
+    [Test]
+    public void ValidateArtifactsPath_ArgumentNullException_Model()
     {
-        [Test]
-        public void ValidateArtifactsPath_ArgumentNullException_Model()
+        // Act & Assert
+        // ReSharper disable once AssignNullToNotNullAttribute
+        Assert.Throws<ArgumentNullException>(() => ConfigurationModelValidations.ValidateArtifactsPath(null));
+    }
+
+    [Test]
+    [TestCase(null)]
+    [TestCase("")]
+    [TestCase("    ")]
+    public void ValidateArtifactsPath_Errors_EmptyPath(string path)
+    {
+        // Arrange
+        var model = new ConfigurationModel
         {
-            // Act & Assert
-            // ReSharper disable once AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => ConfigurationModelValidations.ValidateArtifactsPath(null));
-        }
+            ArtifactsPath = path
+        };
 
-        [Test]
-        [TestCase(null)]
-        [TestCase("")]
-        [TestCase("    ")]
-        public void ValidateArtifactsPath_Errors_EmptyPath(string path)
+        // Act
+        var errors = ConfigurationModelValidations.ValidateArtifactsPath(model);
+
+        // Assert
+        Assert.IsNotNull(errors);
+        Assert.AreEqual(1, errors.Count);
+        Assert.AreEqual("Path cannot be empty.", errors[0]);
+    }
+
+    [Test]
+    public void ValidateArtifactsPath_Errors_InvalidCharacters()
+    {
+        // Arrange
+        var model = new ConfigurationModel
         {
-            // Arrange
-            var model = new ConfigurationModel
-            {
-                ArtifactsPath = path
-            };
+            ArtifactsPath = new string(Path.GetInvalidPathChars())
+        };
 
-            // Act
-            var errors = ConfigurationModelValidations.ValidateArtifactsPath(model);
+        // Act
+        var errors = ConfigurationModelValidations.ValidateArtifactsPath(model);
 
-            // Assert
-            Assert.IsNotNull(errors);
-            Assert.AreEqual(1, errors.Count);
-            Assert.AreEqual("Path cannot be empty.", errors[0]);
-        }
+        // Assert
+        Assert.IsNotNull(errors);
+        Assert.AreEqual(1, errors.Count);
+        Assert.AreEqual("Path contains invalid characters.", errors[0]);
+    }
 
-        [Test]
-        public void ValidateArtifactsPath_Errors_InvalidCharacters()
+    [Test]
+    public void ValidateArtifactsPath_Errors_NoRelativePath()
+    {
+        // Arrange
+        var model = new ConfigurationModel
         {
-            // Arrange
-            var model = new ConfigurationModel
-            {
-                ArtifactsPath = new string(Path.GetInvalidPathChars())
-            };
+            ArtifactsPath = @"C:\Temp\_Deployment"
+        };
 
-            // Act
-            var errors = ConfigurationModelValidations.ValidateArtifactsPath(model);
+        // Act
+        var errors = ConfigurationModelValidations.ValidateArtifactsPath(model);
 
-            // Assert
-            Assert.IsNotNull(errors);
-            Assert.AreEqual(1, errors.Count);
-            Assert.AreEqual("Path contains invalid characters.", errors[0]);
-        }
+        // Assert
+        Assert.IsNotNull(errors);
+        Assert.AreEqual(1, errors.Count);
+        Assert.AreEqual("Path must be a relative path.", errors[0]);
+    }
 
-        [Test]
-        public void ValidateArtifactsPath_Errors_NoRelativePath()
+    [Test]
+    public void ValidateArtifactsPath_NoErrors()
+    {
+        // Arrange
+        var model = new ConfigurationModel
         {
-            // Arrange
-            var model = new ConfigurationModel
-            {
-                ArtifactsPath = @"C:\Temp\_Deployment"
-            };
+            ArtifactsPath = @"..\_Deployment"
+        };
 
-            // Act
-            var errors = ConfigurationModelValidations.ValidateArtifactsPath(model);
+        // Act
+        var errors = ConfigurationModelValidations.ValidateArtifactsPath(model);
 
-            // Assert
-            Assert.IsNotNull(errors);
-            Assert.AreEqual(1, errors.Count);
-            Assert.AreEqual("Path must be a relative path.", errors[0]);
-        }
+        // Assert
+        Assert.IsNotNull(errors);
+        Assert.AreEqual(0, errors.Count);
+    }
 
-        [Test]
-        public void ValidateArtifactsPath_NoErrors()
+    [Test]
+    public void ValidatePublishProfilePath_ArgumentNullException_Model()
+    {
+        // Act & Assert
+        // ReSharper disable once AssignNullToNotNullAttribute
+        Assert.Throws<ArgumentNullException>(() => ConfigurationModelValidations.ValidatePublishProfilePath(null));
+    }
+
+    [Test]
+    [TestCase(null)]
+    [TestCase("")]
+    [TestCase("    ")]
+    public void ValidatePublishProfilePath_Errors_EmptyPath(string path)
+    {
+        // Arrange
+        var model = new ConfigurationModel
         {
-            // Arrange
-            var model = new ConfigurationModel
-            {
-                ArtifactsPath = @"..\_Deployment"
-            };
+            PublishProfilePath = path
+        };
 
-            // Act
-            var errors = ConfigurationModelValidations.ValidateArtifactsPath(model);
+        // Act
+        var errors = ConfigurationModelValidations.ValidatePublishProfilePath(model);
 
-            // Assert
-            Assert.IsNotNull(errors);
-            Assert.AreEqual(0, errors.Count);
-        }
+        // Assert
+        Assert.IsNotNull(errors);
+        Assert.AreEqual(1, errors.Count);
+        Assert.AreEqual("Path cannot be empty.", errors[0]);
+    }
 
-        [Test]
-        public void ValidatePublishProfilePath_ArgumentNullException_Model()
+    [Test]
+    [TestCase(".publish.xml")] // Just the ending is not OK.
+    [TestCase("Database.pub.xml")] // Wrong ending is not OK.
+    public void ValidatePublishProfilePath_Errors_DoesNotEndCorrectly(string path)
+    {
+        // Arrange
+        var model = new ConfigurationModel
         {
-            // Act & Assert
-            // ReSharper disable once AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => ConfigurationModelValidations.ValidatePublishProfilePath(null));
-        }
+            PublishProfilePath = path
+        };
 
-        [Test]
-        [TestCase(null)]
-        [TestCase("")]
-        [TestCase("    ")]
-        public void ValidatePublishProfilePath_Errors_EmptyPath(string path)
+        // Act
+        var errors = ConfigurationModelValidations.ValidatePublishProfilePath(model);
+
+        // Assert
+        Assert.IsNotNull(errors);
+        Assert.AreEqual(1, errors.Count);
+        Assert.AreEqual("Profile file name must end with *.publish.xml.", errors[0]);
+    }
+
+    [Test]
+    public void ValidatePublishProfilePath_Errors_InvalidCharacters()
+    {
+        // Arrange
+        var model = new ConfigurationModel
         {
-            // Arrange
-            var model = new ConfigurationModel
-            {
-                PublishProfilePath = path
-            };
+            PublishProfilePath = new string(Path.GetInvalidPathChars()) + ".publish.xml"
+        };
 
-            // Act
-            var errors = ConfigurationModelValidations.ValidatePublishProfilePath(model);
+        // Act
+        var errors = ConfigurationModelValidations.ValidatePublishProfilePath(model);
 
-            // Assert
-            Assert.IsNotNull(errors);
-            Assert.AreEqual(1, errors.Count);
-            Assert.AreEqual("Path cannot be empty.", errors[0]);
-        }
+        // Assert
+        Assert.IsNotNull(errors);
+        Assert.AreEqual(1, errors.Count);
+        Assert.AreEqual("Path contains invalid characters.", errors[0]);
+    }
 
-        [Test]
-        [TestCase(".publish.xml")] // Just the ending is not OK.
-        [TestCase("Database.pub.xml")] // Wrong ending is not OK.
-        public void ValidatePublishProfilePath_Errors_DoesNotEndCorrectly(string path)
+    [Test]
+    public void ValidatePublishProfilePath_Errors_NoRelativePath()
+    {
+        // Arrange
+        var model = new ConfigurationModel
         {
-            // Arrange
-            var model = new ConfigurationModel
-            {
-                PublishProfilePath = path
-            };
+            PublishProfilePath = @"C:\Temp\Database.publish.xml"
+        };
 
-            // Act
-            var errors = ConfigurationModelValidations.ValidatePublishProfilePath(model);
+        // Act
+        var errors = ConfigurationModelValidations.ValidatePublishProfilePath(model);
 
-            // Assert
-            Assert.IsNotNull(errors);
-            Assert.AreEqual(1, errors.Count);
-            Assert.AreEqual("Profile file name must end with *.publish.xml.", errors[0]);
-        }
+        // Assert
+        Assert.IsNotNull(errors);
+        Assert.AreEqual(1, errors.Count);
+        Assert.AreEqual("Path must be a relative path.", errors[0]);
+    }
 
-        [Test]
-        public void ValidatePublishProfilePath_Errors_InvalidCharacters()
+    [Test]
+    [TestCase(@"..\Database.publish.xml")]
+    [TestCase(ConfigurationModel.UseSinglePublishProfileSpecialKeyword)]
+    public void ValidatePublishProfilePath_NoErrors(string publishProfilePath)
+    {
+        // Arrange
+        var model = new ConfigurationModel
         {
-            // Arrange
-            var model = new ConfigurationModel
-            {
-                PublishProfilePath = new string(Path.GetInvalidPathChars()) + ".publish.xml"
-            };
+            PublishProfilePath = publishProfilePath
+        };
 
-            // Act
-            var errors = ConfigurationModelValidations.ValidatePublishProfilePath(model);
+        // Act
+        var errors = ConfigurationModelValidations.ValidatePublishProfilePath(model);
 
-            // Assert
-            Assert.IsNotNull(errors);
-            Assert.AreEqual(1, errors.Count);
-            Assert.AreEqual("Path contains invalid characters.", errors[0]);
-        }
+        // Assert
+        Assert.IsNotNull(errors);
+        Assert.AreEqual(0, errors.Count);
+    }
 
-        [Test]
-        public void ValidatePublishProfilePath_Errors_NoRelativePath()
+    [Test]
+    public void ValidateSharedDacpacRepositoryPath_ArgumentNullException_Model()
+    {
+        // Act & Assert
+        // ReSharper disable once AssignNullToNotNullAttribute
+        Assert.Throws<ArgumentNullException>(() => ConfigurationModelValidations.ValidateSharedDacpacRepositoryPath(null));
+    }
+
+    [Test]
+    public void ValidateSharedDacpacRepositoryPath_Errors_InvalidCharacters()
+    {
+        // Arrange
+        var model = new ConfigurationModel
         {
-            // Arrange
-            var model = new ConfigurationModel
-            {
-                PublishProfilePath = @"C:\Temp\Database.publish.xml"
-            };
+            SharedDacpacRepositoryPath = "C:\\" + new string(Path.GetInvalidPathChars()) + "\\Test\\"
+        };
 
-            // Act
-            var errors = ConfigurationModelValidations.ValidatePublishProfilePath(model);
+        // Act
+        var errors = ConfigurationModelValidations.ValidateSharedDacpacRepositoryPath(model);
 
-            // Assert
-            Assert.IsNotNull(errors);
-            Assert.AreEqual(1, errors.Count);
-            Assert.AreEqual("Path must be a relative path.", errors[0]);
-        }
+        // Assert
+        Assert.IsNotNull(errors);
+        Assert.AreEqual(1, errors.Count);
+        Assert.AreEqual("Path contains invalid characters.", errors[0]);
+    }
 
-        [Test]
-        [TestCase(@"..\Database.publish.xml")]
-        [TestCase(ConfigurationModel.UseSinglePublishProfileSpecialKeyword)]
-        public void ValidatePublishProfilePath_NoErrors(string publishProfilePath)
+    [Test]
+    [TestCase(@"C:\Temp\.")]
+    [TestCase(@"C:\Temp\test.foo")]
+    [TestCase(@"C:\Temp\.foo")]
+    public void ValidateSharedDacpacRepositoryPath_Errors_MustBeDirectory(string path)
+    {
+        // Arrange
+        var model = new ConfigurationModel
         {
-            // Arrange
-            var model = new ConfigurationModel
-            {
-                PublishProfilePath = publishProfilePath
-            };
+            SharedDacpacRepositoryPath = path
+        };
 
-            // Act
-            var errors = ConfigurationModelValidations.ValidatePublishProfilePath(model);
+        // Act
+        var errors = ConfigurationModelValidations.ValidateSharedDacpacRepositoryPath(model);
 
-            // Assert
-            Assert.IsNotNull(errors);
-            Assert.AreEqual(0, errors.Count);
-        }
+        // Assert
+        Assert.IsNotNull(errors);
+        Assert.AreEqual(1, errors.Count);
+        Assert.AreEqual("Path must be a directory.", errors[0]);
+    }
 
-        [Test]
-        public void ValidateSharedDacpacRepositoryPath_ArgumentNullException_Model()
+    [Test]
+    public void ValidateSharedDacpacRepositoryPath_Errors_NoAbsolutePath()
+    {
+        // Arrange
+        var model = new ConfigurationModel
         {
-            // Act & Assert
-            // ReSharper disable once AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => ConfigurationModelValidations.ValidateSharedDacpacRepositoryPath(null));
-        }
+            SharedDacpacRepositoryPath = @"..\Repository"
+        };
 
-        [Test]
-        public void ValidateSharedDacpacRepositoryPath_Errors_InvalidCharacters()
+        // Act
+        var errors = ConfigurationModelValidations.ValidateSharedDacpacRepositoryPath(model);
+
+        // Assert
+        Assert.IsNotNull(errors);
+        Assert.AreEqual(1, errors.Count);
+        Assert.AreEqual("Path must be an absolute path.", errors[0]);
+    }
+
+    [Test]
+    [TestCase(null)]
+    [TestCase("")]
+    [TestCase("    ")]
+    public void ValidateSharedDacpacRepositoryPath_NoErrors_EmptyPath(string path)
+    {
+        // Arrange
+        var model = new ConfigurationModel
         {
-            // Arrange
-            var model = new ConfigurationModel
-            {
-                SharedDacpacRepositoryPath = "C:\\" + new string(Path.GetInvalidPathChars()) + "\\Test\\"
-            };
+            SharedDacpacRepositoryPath = path
+        };
 
-            // Act
-            var errors = ConfigurationModelValidations.ValidateSharedDacpacRepositoryPath(model);
+        // Act
+        var errors = ConfigurationModelValidations.ValidateSharedDacpacRepositoryPath(model);
 
-            // Assert
-            Assert.IsNotNull(errors);
-            Assert.AreEqual(1, errors.Count);
-            Assert.AreEqual("Path contains invalid characters.", errors[0]);
-        }
+        // Assert
+        Assert.IsNotNull(errors);
+        Assert.AreEqual(0, errors.Count);
+    }
 
-        [Test]
-        [TestCase(@"C:\Temp\.")]
-        [TestCase(@"C:\Temp\test.foo")]
-        [TestCase(@"C:\Temp\.foo")]
-        public void ValidateSharedDacpacRepositoryPath_Errors_MustBeDirectory(string path)
+    [Test]
+    public void ValidateSharedDacpacRepositoryPath_NoErrors()
+    {
+        // Arrange
+        var model = new ConfigurationModel
         {
-            // Arrange
-            var model = new ConfigurationModel
-            {
-                SharedDacpacRepositoryPath = path
-            };
+            SharedDacpacRepositoryPath = @"C:\Test\Repository\"
+        };
 
-            // Act
-            var errors = ConfigurationModelValidations.ValidateSharedDacpacRepositoryPath(model);
+        // Act
+        var errors = ConfigurationModelValidations.ValidateSharedDacpacRepositoryPath(model);
 
-            // Assert
-            Assert.IsNotNull(errors);
-            Assert.AreEqual(1, errors.Count);
-            Assert.AreEqual("Path must be a directory.", errors[0]);
-        }
+        // Assert
+        Assert.IsNotNull(errors);
+        Assert.AreEqual(0, errors.Count);
+    }
 
-        [Test]
-        public void ValidateSharedDacpacRepositoryPath_Errors_NoAbsolutePath()
+    [Test]
+    public void ValidateUnnamedDefaultConstraintDropsBehavior_ArgumentNullException_Model()
+    {
+        // Act & Assert
+        // ReSharper disable once AssignNullToNotNullAttribute
+        Assert.Throws<ArgumentNullException>(() => ConfigurationModelValidations.ValidateUnnamedDefaultConstraintDropsBehavior(null));
+    }
+
+    [Test]
+    public void ValidateUnnamedDefaultConstraintDropsBehavior_Errors_BothSetToTrue()
+    {
+        // Arrange
+        var model = new ConfigurationModel
         {
-            // Arrange
-            var model = new ConfigurationModel
-            {
-                SharedDacpacRepositoryPath = @"..\Repository"
-            };
+            CommentOutUnnamedDefaultConstraintDrops = true,
+            ReplaceUnnamedDefaultConstraintDrops = true
+        };
 
-            // Act
-            var errors = ConfigurationModelValidations.ValidateSharedDacpacRepositoryPath(model);
+        // Act
+        var errors = ConfigurationModelValidations.ValidateUnnamedDefaultConstraintDropsBehavior(model);
 
-            // Assert
-            Assert.IsNotNull(errors);
-            Assert.AreEqual(1, errors.Count);
-            Assert.AreEqual("Path must be an absolute path.", errors[0]);
-        }
+        // Assert
+        Assert.IsNotNull(errors);
+        Assert.AreEqual(1, errors.Count);
+        Assert.AreEqual("Behavior for unnamed default constraint drops is ambiguous.", errors[0]);
+    }
 
-        [Test]
-        [TestCase(null)]
-        [TestCase("")]
-        [TestCase("    ")]
-        public void ValidateSharedDacpacRepositoryPath_NoErrors_EmptyPath(string path)
+    [Test]
+    [TestCase(true, false)]
+    [TestCase(false, true)]
+    [TestCase(false, false)]
+    public void ValidateUnnamedDefaultConstraintDropsBehavior_NoErrors(bool commentOut, bool replace)
+    {
+        // Arrange
+        var model = new ConfigurationModel
         {
-            // Arrange
-            var model = new ConfigurationModel
-            {
-                SharedDacpacRepositoryPath = path
-            };
+            CommentOutUnnamedDefaultConstraintDrops = commentOut,
+            ReplaceUnnamedDefaultConstraintDrops = replace
+        };
 
-            // Act
-            var errors = ConfigurationModelValidations.ValidateSharedDacpacRepositoryPath(model);
+        // Act
+        var errors = ConfigurationModelValidations.ValidateUnnamedDefaultConstraintDropsBehavior(model);
 
-            // Assert
-            Assert.IsNotNull(errors);
-            Assert.AreEqual(0, errors.Count);
-        }
+        // Assert
+        Assert.IsNotNull(errors);
+        Assert.AreEqual(0, errors.Count);
+    }
 
-        [Test]
-        public void ValidateSharedDacpacRepositoryPath_NoErrors()
+    [Test]
+    public void ValidateVersionPattern_ArgumentNullException_Model()
+    {
+        // Act & Assert
+        // ReSharper disable once AssignNullToNotNullAttribute
+        Assert.Throws<ArgumentNullException>(() => ConfigurationModelValidations.ValidateVersionPattern(null));
+    }
+
+    [Test]
+    [TestCase(null)]
+    [TestCase("")]
+    [TestCase("    ")]
+    public void ValidateVersionPattern_Errors_EmptyPattern(string pattern)
+    {
+        // Arrange
+        var model = new ConfigurationModel
         {
-            // Arrange
-            var model = new ConfigurationModel
-            {
-                SharedDacpacRepositoryPath = @"C:\Test\Repository\"
-            };
+            VersionPattern = pattern
+        };
 
-            // Act
-            var errors = ConfigurationModelValidations.ValidateSharedDacpacRepositoryPath(model);
+        // Act
+        var errors = ConfigurationModelValidations.ValidateVersionPattern(model);
 
-            // Assert
-            Assert.IsNotNull(errors);
-            Assert.AreEqual(0, errors.Count);
-        }
+        // Assert
+        Assert.IsNotNull(errors);
+        Assert.AreEqual(1, errors.Count);
+        Assert.AreEqual("Pattern cannot be empty.", errors[0]);
+    }
 
-        [Test]
-        public void ValidateUnnamedDefaultConstraintDropsBehavior_ArgumentNullException_Model()
+    [Test]
+    [TestCase("1")]
+    [TestCase("{MAJOR}")]
+    public void ValidateVersionPattern_Errors_PatternTooShort(string pattern)
+    {
+        // Arrange
+        var model = new ConfigurationModel
         {
-            // Act & Assert
-            // ReSharper disable once AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => ConfigurationModelValidations.ValidateUnnamedDefaultConstraintDropsBehavior(null));
-        }
+            VersionPattern = pattern
+        };
 
-        [Test]
-        public void ValidateUnnamedDefaultConstraintDropsBehavior_Errors_BothSetToTrue()
+        // Act
+        var errors = ConfigurationModelValidations.ValidateVersionPattern(model);
+
+        // Assert
+        Assert.IsNotNull(errors);
+        Assert.AreEqual(1, errors.Count);
+        Assert.AreEqual("Pattern doesn't contain enough parts.", errors[0]);
+    }
+
+    [Test]
+    [TestCase("1.2.3.4.5")]
+    [TestCase("{MAJOR}.{MINOR}.{BUILD}.{REVISION}.0")]
+    public void ValidateVersionPattern_Errors_PatternTooLong(string pattern)
+    {
+        // Arrange
+        var model = new ConfigurationModel
         {
-            // Arrange
-            var model = new ConfigurationModel
-            {
-                CommentOutUnnamedDefaultConstraintDrops = true,
-                ReplaceUnnamedDefaultConstraintDrops = true
-            };
+            VersionPattern = pattern
+        };
 
-            // Act
-            var errors = ConfigurationModelValidations.ValidateUnnamedDefaultConstraintDropsBehavior(model);
+        // Act
+        var errors = ConfigurationModelValidations.ValidateVersionPattern(model);
 
-            // Assert
-            Assert.IsNotNull(errors);
-            Assert.AreEqual(1, errors.Count);
-            Assert.AreEqual("Behavior for unnamed default constraint drops is ambiguous.", errors[0]);
-        }
+        // Assert
+        Assert.IsNotNull(errors);
+        Assert.AreEqual(1, errors.Count);
+        Assert.AreEqual("Pattern contains too many parts.", errors[0]);
+    }
 
-        [Test]
-        [TestCase(true, false)]
-        [TestCase(false, true)]
-        [TestCase(false, false)]
-        public void ValidateUnnamedDefaultConstraintDropsBehavior_NoErrors(bool commentOut, bool replace)
+    [Test]
+    public void ValidateVersionPattern_Errors_NegativeNumbers()
+    {
+        // Arrange
+        var model = new ConfigurationModel
         {
-            // Arrange
-            var model = new ConfigurationModel
-            {
-                CommentOutUnnamedDefaultConstraintDrops = commentOut,
-                ReplaceUnnamedDefaultConstraintDrops = replace
-            };
+            VersionPattern = "-1.-1.-1.-1"
+        };
 
-            // Act
-            var errors = ConfigurationModelValidations.ValidateUnnamedDefaultConstraintDropsBehavior(model);
+        // Act
+        var errors = ConfigurationModelValidations.ValidateVersionPattern(model);
 
-            // Assert
-            Assert.IsNotNull(errors);
-            Assert.AreEqual(0, errors.Count);
-        }
+        // Assert
+        Assert.IsNotNull(errors);
+        Assert.AreEqual(4, errors.Count);
+        Assert.AreEqual("Major number cannot be negative.", errors[0]);
+        Assert.AreEqual("Minor number cannot be negative.", errors[1]);
+        Assert.AreEqual("Build number cannot be negative.", errors[2]);
+        Assert.AreEqual("Revision number cannot be negative.", errors[3]);
+    }
 
-        [Test]
-        public void ValidateVersionPattern_ArgumentNullException_Model()
+    [Test]
+    public void ValidateVersionPattern_Errors_InvalidSpecialKeywords()
+    {
+        // Arrange
+        var model = new ConfigurationModel
         {
-            // Act & Assert
-            // ReSharper disable once AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => ConfigurationModelValidations.ValidateVersionPattern(null));
-        }
+            VersionPattern = "{REVISION}.{BUILD}.{MINOR}.{MAJOR}"
+        };
 
-        [Test]
-        [TestCase(null)]
-        [TestCase("")]
-        [TestCase("    ")]
-        public void ValidateVersionPattern_Errors_EmptyPattern(string pattern)
+        // Act
+        var errors = ConfigurationModelValidations.ValidateVersionPattern(model);
+
+        // Assert
+        Assert.IsNotNull(errors);
+        Assert.AreEqual(4, errors.Count);
+        Assert.AreEqual("Invalid special keyword for major number.", errors[0]);
+        Assert.AreEqual("Invalid special keyword for minor number.", errors[1]);
+        Assert.AreEqual("Invalid special keyword for build number.", errors[2]);
+        Assert.AreEqual("Invalid special keyword for revision number.", errors[3]);
+    }
+
+    [Test]
+    [TestCase("1.2.3.4")]
+    [TestCase("{MAJOR}.{MINOR}.{BUILD}.{REVISION}")]
+    [TestCase("{MAJOR}.1.{BUILD}.{REVISION}")]
+    [TestCase("{MAJOR}.1.{BUILD}.0")]
+    [TestCase("1.0.{BUILD}.0")]
+    public void ValidateVersionPattern_NoErrors(string pattern)
+    {
+        // Arrange
+        var model = new ConfigurationModel
         {
-            // Arrange
-            var model = new ConfigurationModel
-            {
-                VersionPattern = pattern
-            };
+            VersionPattern = pattern
+        };
 
-            // Act
-            var errors = ConfigurationModelValidations.ValidateVersionPattern(model);
+        // Act
+        var errors = ConfigurationModelValidations.ValidateVersionPattern(model);
 
-            // Assert
-            Assert.IsNotNull(errors);
-            Assert.AreEqual(1, errors.Count);
-            Assert.AreEqual("Pattern cannot be empty.", errors[0]);
-        }
-
-        [Test]
-        [TestCase("1")]
-        [TestCase("{MAJOR}")]
-        public void ValidateVersionPattern_Errors_PatternTooShort(string pattern)
-        {
-            // Arrange
-            var model = new ConfigurationModel
-            {
-                VersionPattern = pattern
-            };
-
-            // Act
-            var errors = ConfigurationModelValidations.ValidateVersionPattern(model);
-
-            // Assert
-            Assert.IsNotNull(errors);
-            Assert.AreEqual(1, errors.Count);
-            Assert.AreEqual("Pattern doesn't contain enough parts.", errors[0]);
-        }
-
-        [Test]
-        [TestCase("1.2.3.4.5")]
-        [TestCase("{MAJOR}.{MINOR}.{BUILD}.{REVISION}.0")]
-        public void ValidateVersionPattern_Errors_PatternTooLong(string pattern)
-        {
-            // Arrange
-            var model = new ConfigurationModel
-            {
-                VersionPattern = pattern
-            };
-
-            // Act
-            var errors = ConfigurationModelValidations.ValidateVersionPattern(model);
-
-            // Assert
-            Assert.IsNotNull(errors);
-            Assert.AreEqual(1, errors.Count);
-            Assert.AreEqual("Pattern contains too many parts.", errors[0]);
-        }
-
-        [Test]
-        public void ValidateVersionPattern_Errors_NegativeNumbers()
-        {
-            // Arrange
-            var model = new ConfigurationModel
-            {
-                VersionPattern = "-1.-1.-1.-1"
-            };
-
-            // Act
-            var errors = ConfigurationModelValidations.ValidateVersionPattern(model);
-
-            // Assert
-            Assert.IsNotNull(errors);
-            Assert.AreEqual(4, errors.Count);
-            Assert.AreEqual("Major number cannot be negative.", errors[0]);
-            Assert.AreEqual("Minor number cannot be negative.", errors[1]);
-            Assert.AreEqual("Build number cannot be negative.", errors[2]);
-            Assert.AreEqual("Revision number cannot be negative.", errors[3]);
-        }
-
-        [Test]
-        public void ValidateVersionPattern_Errors_InvalidSpecialKeywords()
-        {
-            // Arrange
-            var model = new ConfigurationModel
-            {
-                VersionPattern = "{REVISION}.{BUILD}.{MINOR}.{MAJOR}"
-            };
-
-            // Act
-            var errors = ConfigurationModelValidations.ValidateVersionPattern(model);
-
-            // Assert
-            Assert.IsNotNull(errors);
-            Assert.AreEqual(4, errors.Count);
-            Assert.AreEqual("Invalid special keyword for major number.", errors[0]);
-            Assert.AreEqual("Invalid special keyword for minor number.", errors[1]);
-            Assert.AreEqual("Invalid special keyword for build number.", errors[2]);
-            Assert.AreEqual("Invalid special keyword for revision number.", errors[3]);
-        }
-
-        [Test]
-        [TestCase("1.2.3.4")]
-        [TestCase("{MAJOR}.{MINOR}.{BUILD}.{REVISION}")]
-        [TestCase("{MAJOR}.1.{BUILD}.{REVISION}")]
-        [TestCase("{MAJOR}.1.{BUILD}.0")]
-        [TestCase("1.0.{BUILD}.0")]
-        public void ValidateVersionPattern_NoErrors(string pattern)
-        {
-            // Arrange
-            var model = new ConfigurationModel
-            {
-                VersionPattern = pattern
-            };
-
-            // Act
-            var errors = ConfigurationModelValidations.ValidateVersionPattern(model);
-
-            // Assert
-            Assert.IsNotNull(errors);
-            Assert.AreEqual(0, errors.Count);
-        }
+        // Assert
+        Assert.IsNotNull(errors);
+        Assert.AreEqual(0, errors.Count);
     }
 }

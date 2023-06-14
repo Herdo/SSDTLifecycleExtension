@@ -1,111 +1,104 @@
-﻿
+﻿namespace SSDTLifecycleExtension.Shared.Services;
 
-namespace SSDTLifecycleExtension.Shared.Services
+[UsedImplicitly]
+public class ScriptCreationService : AsyncExecutorBase<ScriptCreationStateModel>, IScriptCreationService
 {
-    using System;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Contracts;
-    using Contracts.DataAccess;
-    using Contracts.Factories;
-    using Contracts.Services;
-    using JetBrains.Annotations;
-    using Models;
+    [NotNull] private readonly IWorkUnitFactory _workUnitFactory;
+    [NotNull] private readonly IVisualStudioAccess _visualStudioAccess;
 
-    [UsedImplicitly]
-    public class ScriptCreationService : AsyncExecutorBase<ScriptCreationStateModel>, IScriptCreationService
+    private bool _isCreating;
+
+    public ScriptCreationService([NotNull] IWorkUnitFactory workUnitFactory,
+                                 [NotNull] IVisualStudioAccess visualStudioAccess,
+                                 [NotNull] ILogger logger)
+        : base(logger)
     {
-        [NotNull] private readonly IWorkUnitFactory _workUnitFactory;
-        [NotNull] private readonly IVisualStudioAccess _visualStudioAccess;
+        _workUnitFactory = workUnitFactory ?? throw new ArgumentNullException(nameof(workUnitFactory));
+        _visualStudioAccess = visualStudioAccess ?? throw new ArgumentNullException(nameof(visualStudioAccess));
+    }
 
-        private bool _isCreating;
+    private async Task<bool> CreateInternalAsync(SqlProject project,
+                                                 ConfigurationModel configuration,
+                                                 Version previousVersion,
+                                                 bool latest,
+                                                 CancellationToken cancellationToken)
+    {
+        var stateModel = new ScriptCreationStateModel(project, configuration, previousVersion, latest, StateModelHandleWorkInProgressChanged);
+        await DoWorkAsync(stateModel, cancellationToken);
+        return stateModel.Result ?? false;
+    }
 
-        public ScriptCreationService([NotNull] IWorkUnitFactory workUnitFactory,
-                                     [NotNull] IVisualStudioAccess visualStudioAccess,
-                                     [NotNull] ILogger logger)
-            : base(logger)
+    protected override string GetOperationStartedMessage()
+    {
+        return "Initializing script creation ...";
+    }
+
+    protected override string GetOperationCompletedMessage(ScriptCreationStateModel stateModel, long elapsedMilliseconds)
+    {
+        return $"========== Script creation finished after {elapsedMilliseconds} milliseconds. ==========";
+    }
+
+    protected override string GetOperationFailedMessage()
+    {
+        return "Script creation failed.";
+    }
+
+    protected override IWorkUnit<ScriptCreationStateModel> GetNextWorkUnitForStateModel(ScriptCreationStateModel stateModel)
+    {
+        return _workUnitFactory.GetNextWorkUnit(stateModel);
+    }
+
+    private async Task StateModelHandleWorkInProgressChanged(bool workInProgress)
+    {
+        IsCreating = workInProgress;
+        if (IsCreating)
         {
-            _workUnitFactory = workUnitFactory ?? throw new ArgumentNullException(nameof(workUnitFactory));
-            _visualStudioAccess = visualStudioAccess ?? throw new ArgumentNullException(nameof(visualStudioAccess));
+            await _visualStudioAccess.StartLongRunningTaskIndicatorAsync();
+            await _visualStudioAccess.ClearSSDTLifecycleOutputAsync();
         }
-
-        private async Task<bool> CreateInternalAsync(SqlProject project,
-                                                     ConfigurationModel configuration,
-                                                     Version previousVersion,
-                                                     bool latest,
-                                                     CancellationToken cancellationToken)
+        else
         {
-            var stateModel = new ScriptCreationStateModel(project, configuration, previousVersion, latest, StateModelHandleWorkInProgressChanged);
-            await DoWorkAsync(stateModel, cancellationToken);
-            return stateModel.Result ?? false;
-        }
-
-        protected override string GetOperationStartedMessage() => "Initializing script creation ...";
-
-        protected override string GetOperationCompletedMessage(ScriptCreationStateModel stateModel, long elapsedMilliseconds)
-        {
-            return $"========== Script creation finished after {elapsedMilliseconds} milliseconds. ==========";
-        }
-
-        protected override string GetOperationFailedMessage() => "Script creation failed.";
-
-        protected override IWorkUnit<ScriptCreationStateModel> GetNextWorkUnitForStateModel(ScriptCreationStateModel stateModel)
-        {
-            return _workUnitFactory.GetNextWorkUnit(stateModel);
-        }
-
-        private async Task StateModelHandleWorkInProgressChanged(bool workInProgress)
-        {
-            IsCreating = workInProgress;
-            if (IsCreating)
+            try
             {
-                await _visualStudioAccess.StartLongRunningTaskIndicatorAsync();
-                await _visualStudioAccess.ClearSSDTLifecycleOutputAsync();
+                await _visualStudioAccess.StopLongRunningTaskIndicatorAsync();
             }
-            else
+            catch
             {
-                try
-                {
-                    await _visualStudioAccess.StopLongRunningTaskIndicatorAsync();
-                }
-                catch
-                {
-                    // ignored
-                }
+                // ignored
             }
         }
+    }
 
-        public event EventHandler IsCreatingChanged;
+    public event EventHandler IsCreatingChanged;
 
-        private bool IsCreating
+    private bool IsCreating
+    {
+        get => _isCreating;
+        set
         {
-            get => _isCreating;
-            set
-            {
-                if (value == _isCreating) return;
-                _isCreating = value;
-                IsCreatingChanged?.Invoke(this, EventArgs.Empty);
-            }
+            if (value == _isCreating) return;
+            _isCreating = value;
+            IsCreatingChanged?.Invoke(this, EventArgs.Empty);
         }
+    }
 
-        bool IScriptCreationService.IsCreating => IsCreating;
+    bool IScriptCreationService.IsCreating => IsCreating;
 
-        Task<bool> IScriptCreationService.CreateAsync(SqlProject project,
-                                                      ConfigurationModel configuration,
-                                                      Version previousVersion,
-                                                      bool latest,
-                                                      CancellationToken cancellationToken)
-        {
-            if (project == null)
-                throw new ArgumentNullException(nameof(project));
-            if (configuration == null)
-                throw new ArgumentNullException(nameof(configuration));
-            if (previousVersion == null)
-                throw new ArgumentNullException(nameof(previousVersion));
-            if (IsCreating)
-                throw new InvalidOperationException($"Service is already running a {nameof(IScriptCreationService.CreateAsync)} task.");
+    Task<bool> IScriptCreationService.CreateAsync(SqlProject project,
+                                                  ConfigurationModel configuration,
+                                                  Version previousVersion,
+                                                  bool latest,
+                                                  CancellationToken cancellationToken)
+    {
+        if (project == null)
+            throw new ArgumentNullException(nameof(project));
+        if (configuration == null)
+            throw new ArgumentNullException(nameof(configuration));
+        if (previousVersion == null)
+            throw new ArgumentNullException(nameof(previousVersion));
+        if (IsCreating)
+            throw new InvalidOperationException($"Service is already running a {nameof(IScriptCreationService.CreateAsync)} task.");
 
-            return CreateInternalAsync(project, configuration, previousVersion, latest, cancellationToken);
-        }
+        return CreateInternalAsync(project, configuration, previousVersion, latest, cancellationToken);
     }
 }

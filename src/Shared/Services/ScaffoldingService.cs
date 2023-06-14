@@ -1,107 +1,102 @@
-﻿namespace SSDTLifecycleExtension.Shared.Services
+﻿namespace SSDTLifecycleExtension.Shared.Services;
+
+[UsedImplicitly]
+public class ScaffoldingService : AsyncExecutorBase<ScaffoldingStateModel>, IScaffoldingService
 {
-    using System;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Contracts.Services;
-    using Contracts;
-    using Contracts.DataAccess;
-    using Contracts.Factories;
-    using JetBrains.Annotations;
-    using Models;
+    [NotNull] private readonly IWorkUnitFactory _workUnitFactory;
+    [NotNull] private readonly IVisualStudioAccess _visualStudioAccess;
 
-    [UsedImplicitly]
-    public class ScaffoldingService : AsyncExecutorBase<ScaffoldingStateModel>, IScaffoldingService
+    private bool _isScaffolding;
+
+    public ScaffoldingService([NotNull] IWorkUnitFactory workUnitFactory,
+                              [NotNull] IVisualStudioAccess visualStudioAccess,
+                              [NotNull] ILogger logger)
+        : base(logger)
     {
-        [NotNull] private readonly IWorkUnitFactory _workUnitFactory;
-        [NotNull] private readonly IVisualStudioAccess _visualStudioAccess;
+        _workUnitFactory = workUnitFactory ?? throw new ArgumentNullException(nameof(workUnitFactory));
+        _visualStudioAccess = visualStudioAccess ?? throw new ArgumentNullException(nameof(visualStudioAccess));
+    }
 
-        private bool _isScaffolding;
+    private async Task<bool> ScaffoldInternalAsync(SqlProject project,
+                                                   ConfigurationModel configuration,
+                                                   Version targetVersion,
+                                                   CancellationToken cancellationToken)
+    {
+        var stateModel = new ScaffoldingStateModel(project, configuration, targetVersion, StateModelHandleWorkInProgressChanged);
+        await DoWorkAsync(stateModel, cancellationToken);
+        return stateModel.Result ?? false;
+    }
 
-        public ScaffoldingService([NotNull] IWorkUnitFactory workUnitFactory,
-                                  [NotNull] IVisualStudioAccess visualStudioAccess,
-                                  [NotNull] ILogger logger)
-            : base(logger)
+    protected override string GetOperationStartedMessage()
+    {
+        return "Initializing scaffolding ...";
+    }
+
+    protected override string GetOperationCompletedMessage(ScaffoldingStateModel stateModel, long elapsedMilliseconds)
+    {
+        return $"========== Scaffolding version {stateModel.FormattedTargetVersion} finished after {elapsedMilliseconds} milliseconds. ==========";
+    }
+
+    protected override string GetOperationFailedMessage()
+    {
+        return "DACPAC scaffolding failed.";
+    }
+
+    protected override IWorkUnit<ScaffoldingStateModel> GetNextWorkUnitForStateModel(ScaffoldingStateModel stateModel)
+    {
+        return _workUnitFactory.GetNextWorkUnit(stateModel);
+    }
+
+    private async Task StateModelHandleWorkInProgressChanged(bool workInProgress)
+    {
+        IsScaffolding = workInProgress;
+        if (IsScaffolding)
         {
-            _workUnitFactory = workUnitFactory ?? throw new ArgumentNullException(nameof(workUnitFactory));
-            _visualStudioAccess = visualStudioAccess ?? throw new ArgumentNullException(nameof(visualStudioAccess));
+            await _visualStudioAccess.StartLongRunningTaskIndicatorAsync();
+            await _visualStudioAccess.ClearSSDTLifecycleOutputAsync();
         }
-
-        private async Task<bool> ScaffoldInternalAsync(SqlProject project,
-                                                       ConfigurationModel configuration,
-                                                       Version targetVersion,
-                                                       CancellationToken cancellationToken)
+        else
         {
-            var stateModel = new ScaffoldingStateModel(project, configuration, targetVersion, StateModelHandleWorkInProgressChanged);
-            await DoWorkAsync(stateModel, cancellationToken);
-            return stateModel.Result ?? false;
-        }
-
-        protected override string GetOperationStartedMessage() => "Initializing scaffolding ...";
-
-        protected override string GetOperationCompletedMessage(ScaffoldingStateModel stateModel, long elapsedMilliseconds)
-        {
-            return $"========== Scaffolding version {stateModel.FormattedTargetVersion} finished after {elapsedMilliseconds} milliseconds. ==========";
-        }
-
-        protected override string GetOperationFailedMessage() => "DACPAC scaffolding failed.";
-
-        protected override IWorkUnit<ScaffoldingStateModel> GetNextWorkUnitForStateModel(ScaffoldingStateModel stateModel)
-        {
-            return _workUnitFactory.GetNextWorkUnit(stateModel);
-        }
-
-        private async Task StateModelHandleWorkInProgressChanged(bool workInProgress)
-        {
-            IsScaffolding = workInProgress;
-            if (IsScaffolding)
+            try
             {
-                await _visualStudioAccess.StartLongRunningTaskIndicatorAsync();
-                await _visualStudioAccess.ClearSSDTLifecycleOutputAsync();
+                await _visualStudioAccess.StopLongRunningTaskIndicatorAsync();
             }
-            else
+            catch
             {
-                try
-                {
-                    await _visualStudioAccess.StopLongRunningTaskIndicatorAsync();
-                }
-                catch
-                {
-                    // ignored
-                }
+                // ignored
             }
         }
+    }
 
-        public event EventHandler IsScaffoldingChanged;
+    public event EventHandler IsScaffoldingChanged;
 
-        private bool IsScaffolding
+    private bool IsScaffolding
+    {
+        get => _isScaffolding;
+        set
         {
-            get => _isScaffolding;
-            set
-            {
-                if (value == _isScaffolding) return;
-                _isScaffolding = value;
-                IsScaffoldingChanged?.Invoke(this, EventArgs.Empty);
-            }
+            if (value == _isScaffolding) return;
+            _isScaffolding = value;
+            IsScaffoldingChanged?.Invoke(this, EventArgs.Empty);
         }
+    }
 
-        bool IScaffoldingService.IsScaffolding => IsScaffolding;
+    bool IScaffoldingService.IsScaffolding => IsScaffolding;
 
-        Task<bool> IScaffoldingService.ScaffoldAsync(SqlProject project,
-                                                     ConfigurationModel configuration,
-                                                     Version targetVersion,
-                                                     CancellationToken cancellationToken)
-        {
-            if (project == null)
-                throw new ArgumentNullException(nameof(project));
-            if (configuration == null)
-                throw new ArgumentNullException(nameof(configuration));
-            if (targetVersion == null)
-                throw new ArgumentNullException(nameof(targetVersion));
-            if (IsScaffolding)
-                throw new InvalidOperationException($"Service is already running a {nameof(IScriptCreationService.CreateAsync)} task.");
+    Task<bool> IScaffoldingService.ScaffoldAsync(SqlProject project,
+                                                 ConfigurationModel configuration,
+                                                 Version targetVersion,
+                                                 CancellationToken cancellationToken)
+    {
+        if (project == null)
+            throw new ArgumentNullException(nameof(project));
+        if (configuration == null)
+            throw new ArgumentNullException(nameof(configuration));
+        if (targetVersion == null)
+            throw new ArgumentNullException(nameof(targetVersion));
+        if (IsScaffolding)
+            throw new InvalidOperationException($"Service is already running a {nameof(IScriptCreationService.CreateAsync)} task.");
 
-            return ScaffoldInternalAsync(project, configuration, targetVersion, cancellationToken);
-        }
+        return ScaffoldInternalAsync(project, configuration, targetVersion, cancellationToken);
     }
 }

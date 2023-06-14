@@ -1,18 +1,10 @@
-﻿using NUnit.Framework;
+﻿namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers;
 
-namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers
+[TestFixture]
+public class CommentOutUnnamedDefaultConstraintDropsModifierTests
 {
-    using System;
-    using System.Threading.Tasks;
-    using SSDTLifecycleExtension.Shared.Contracts;
-    using SSDTLifecycleExtension.Shared.Models;
-    using SSDTLifecycleExtension.Shared.ScriptModifiers;
-
-    [TestFixture]
-    public class CommentOutUnnamedDefaultConstraintDropsModifierTests
-    {
-        private const string MultipleDropDefaultConstraintStatements =
-@"PRINT 'Dropping unnamed DEFAULT constraint on dbo.Author ...';
+    private const string MultipleDropDefaultConstraintStatements =
+        @"PRINT 'Dropping unnamed DEFAULT constraint on dbo.Author ...';
 
 GO
 ALTER TABLE [dbo].[Author] DROP CONSTRAINT ;
@@ -34,8 +26,8 @@ PRINT 'Update complete'
 
 GO";
 
-        private const string MultipleDropDefaultConstraintStatementsCommented =
-@"-- PRINT 'Dropping unnamed DEFAULT constraint on dbo.Author ...';
+    private const string MultipleDropDefaultConstraintStatementsCommented =
+        @"-- PRINT 'Dropping unnamed DEFAULT constraint on dbo.Author ...';
 
 -- GO
 -- ALTER TABLE [dbo].[Author] DROP CONSTRAINT ;
@@ -57,36 +49,35 @@ PRINT 'Update complete'
 
 GO";
 
-        [Test]
-        public void Modify_ArgumentNullException_Model()
-        {
-            // Arrange
-            IScriptModifier modifier = new CommentOutUnnamedDefaultConstraintDropsModifier();
+    [Test]
+    public void Modify_ArgumentNullException_Model()
+    {
+        // Arrange
+        IScriptModifier modifier = new CommentOutUnnamedDefaultConstraintDropsModifier();
 
-            // Act & Assert
-            // ReSharper disable AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => modifier.ModifyAsync(null));
-            // ReSharper restore AssignNullToNotNullAttribute
-        }
+        // Act & Assert
+        // ReSharper disable AssignNullToNotNullAttribute
+        Assert.Throws<ArgumentNullException>(() => modifier.ModifyAsync(null));
+        // ReSharper restore AssignNullToNotNullAttribute
+    }
 
-        [Test]
-        public async Task Modify_CorrectModification_Async()
-        {
-            // Arrange
-            IScriptModifier modifier = new CommentOutUnnamedDefaultConstraintDropsModifier();
-            var project = new SqlProject("", "", "");
-            var configuration = new ConfigurationModel();
-            var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
-            var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
-            var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
-            var paths = new PathCollection(directories, sourcePaths, targetPaths);
-            var model = new ScriptModificationModel(MultipleDropDefaultConstraintStatements, project, configuration, paths, new Version(1, 0, 0), false);
+    [Test]
+    public async Task Modify_CorrectModification_Async()
+    {
+        // Arrange
+        IScriptModifier modifier = new CommentOutUnnamedDefaultConstraintDropsModifier();
+        var project = new SqlProject("", "", "");
+        var configuration = new ConfigurationModel();
+        var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
+        var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
+        var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
+        var paths = new PathCollection(directories, sourcePaths, targetPaths);
+        var model = new ScriptModificationModel(MultipleDropDefaultConstraintStatements, project, configuration, paths, new Version(1, 0, 0), false);
 
-            // Act
-            await modifier.ModifyAsync(model);
+        // Act
+        await modifier.ModifyAsync(model);
 
-            // Assert
-            Assert.AreEqual(MultipleDropDefaultConstraintStatementsCommented, model.CurrentScript);
-        }
+        // Assert
+        Assert.AreEqual(MultipleDropDefaultConstraintStatementsCommented, model.CurrentScript);
     }
 }

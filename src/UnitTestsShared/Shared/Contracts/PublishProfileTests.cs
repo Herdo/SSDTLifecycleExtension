@@ -1,74 +1,69 @@
-﻿using NUnit.Framework;
+﻿namespace SSDTLifecycleExtension.UnitTests.Shared.Contracts;
 
-namespace SSDTLifecycleExtension.UnitTests.Shared.Contracts
+[TestFixture]
+public class PublishProfileTests
 {
-    using SSDTLifecycleExtension.Shared.Contracts;
-
-    [TestFixture]
-    public class PublishProfileTests
+    [Test]
+    public void CreateNewDatabase_Get_Set()
     {
-        [Test]
-        public void CreateNewDatabase_Get_Set()
+        // Arrange
+        var instance = new PublishProfile
         {
-            // Arrange
-            var instance = new PublishProfile
-            {
-                CreateNewDatabase = false
-            };
+            CreateNewDatabase = false
+        };
 
-            // Act
-            instance.CreateNewDatabase = true;
+        // Act
+        instance.CreateNewDatabase = true;
 
-            // Assert
-            Assert.IsTrue(instance.CreateNewDatabase);
-        }
+        // Assert
+        Assert.IsTrue(instance.CreateNewDatabase);
+    }
 
-        [Test]
-        public void BackupDatabaseBeforeChanges_Get_Set()
+    [Test]
+    public void BackupDatabaseBeforeChanges_Get_Set()
+    {
+        // Arrange
+        var instance = new PublishProfile
         {
-            // Arrange
-            var instance = new PublishProfile
-            {
-                BackupDatabaseBeforeChanges = false
-            };
+            BackupDatabaseBeforeChanges = false
+        };
 
-            // Act
-            instance.BackupDatabaseBeforeChanges = true;
+        // Act
+        instance.BackupDatabaseBeforeChanges = true;
 
-            // Assert
-            Assert.IsTrue(instance.BackupDatabaseBeforeChanges);
-        }
+        // Assert
+        Assert.IsTrue(instance.BackupDatabaseBeforeChanges);
+    }
 
-        [Test]
-        public void ScriptDatabaseOptions_Get_Set()
+    [Test]
+    public void ScriptDatabaseOptions_Get_Set()
+    {
+        // Arrange
+        var instance = new PublishProfile
         {
-            // Arrange
-            var instance = new PublishProfile
-            {
-                ScriptDatabaseOptions = false
-            };
+            ScriptDatabaseOptions = false
+        };
 
-            // Act
-            instance.ScriptDatabaseOptions = true;
+        // Act
+        instance.ScriptDatabaseOptions = true;
 
-            // Assert
-            Assert.IsTrue(instance.ScriptDatabaseOptions);
-        }
+        // Assert
+        Assert.IsTrue(instance.ScriptDatabaseOptions);
+    }
 
-        [Test]
-        public void ScriptDeployStateChecks_Get_Set()
+    [Test]
+    public void ScriptDeployStateChecks_Get_Set()
+    {
+        // Arrange
+        var instance = new PublishProfile
         {
-            // Arrange
-            var instance = new PublishProfile
-            {
-                ScriptDeployStateChecks = false
-            };
+            ScriptDeployStateChecks = false
+        };
 
-            // Act
-            instance.ScriptDeployStateChecks = true;
+        // Act
+        instance.ScriptDeployStateChecks = true;
 
-            // Assert
-            Assert.IsTrue(instance.ScriptDeployStateChecks);
-        }
+        // Assert
+        Assert.IsTrue(instance.ScriptDeployStateChecks);
     }
 }

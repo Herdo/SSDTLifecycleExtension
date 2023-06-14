@@ -1,55 +1,44 @@
-﻿namespace SSDTLifecycleExtension.Shared.WorkUnits
+﻿namespace SSDTLifecycleExtension.Shared.WorkUnits;
+
+[UsedImplicitly]
+public class CleanLatestArtifactsDirectoryUnit : IWorkUnit<ScriptCreationStateModel>
 {
-    using System;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Contracts;
-    using Contracts.DataAccess;
-    using Contracts.Enums;
-    using Contracts.Models;
-    using JetBrains.Annotations;
-    using Models;
+    [NotNull] private readonly IFileSystemAccess _fileSystemAccess;
+    [NotNull] private readonly ILogger _logger;
 
-    [UsedImplicitly]
-    public class CleanLatestArtifactsDirectoryUnit : IWorkUnit<ScriptCreationStateModel>
+    public CleanLatestArtifactsDirectoryUnit([NotNull] IFileSystemAccess fileSystemAccess,
+                                             [NotNull] ILogger logger)
     {
-        [NotNull] private readonly IFileSystemAccess _fileSystemAccess;
-        [NotNull] private readonly ILogger _logger;
+        _fileSystemAccess = fileSystemAccess ?? throw new ArgumentNullException(nameof(fileSystemAccess));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
 
-        public CleanLatestArtifactsDirectoryUnit([NotNull] IFileSystemAccess fileSystemAccess,
-                                                 [NotNull] ILogger logger)
+    private async Task CleanArtifactsDirectoryInternal(IStateModel stateModel,
+                                                       ConfigurationModel configuration,
+                                                       PathCollection paths)
+    {
+        if (!configuration.DeleteLatestAfterVersionedScriptGeneration)
         {
-            _fileSystemAccess = fileSystemAccess ?? throw new ArgumentNullException(nameof(fileSystemAccess));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
-
-        private async Task CleanArtifactsDirectoryInternal(IStateModel stateModel,
-                                                           ConfigurationModel configuration,
-                                                           PathCollection paths)
-        {
-            if (!configuration.DeleteLatestAfterVersionedScriptGeneration)
-            {
-                stateModel.CurrentState = StateModelState.DeletedLatestArtifacts;
-                return;
-            }
-
-            await _logger.LogInfoAsync("Cleaning latest artifacts directory ...");
-            // Even if this operation fails, there's no reason to make the whole process fail.
-            // Therefore this will not set the stateModel.Result property.
-            _fileSystemAccess.TryToCleanDirectory(paths.Directories.LatestArtifactsDirectory);
-
             stateModel.CurrentState = StateModelState.DeletedLatestArtifacts;
+            return;
         }
 
-        Task IWorkUnit<ScriptCreationStateModel>.Work(ScriptCreationStateModel stateModel,
-                                                      CancellationToken cancellationToken)
-        {
-            if (stateModel == null)
-                throw new ArgumentNullException(nameof(stateModel));
+        await _logger.LogInfoAsync("Cleaning latest artifacts directory ...");
+        // Even if this operation fails, there's no reason to make the whole process fail.
+        // Therefore this will not set the stateModel.Result property.
+        _fileSystemAccess.TryToCleanDirectory(paths.Directories.LatestArtifactsDirectory);
 
-            return CleanArtifactsDirectoryInternal(stateModel,
-                                                   stateModel.Configuration,
-                                                   stateModel.Paths);
-        }
+        stateModel.CurrentState = StateModelState.DeletedLatestArtifacts;
+    }
+
+    Task IWorkUnit<ScriptCreationStateModel>.Work(ScriptCreationStateModel stateModel,
+                                                  CancellationToken cancellationToken)
+    {
+        if (stateModel == null)
+            throw new ArgumentNullException(nameof(stateModel));
+
+        return CleanArtifactsDirectoryInternal(stateModel,
+                                               stateModel.Configuration,
+                                               stateModel.Paths);
     }
 }

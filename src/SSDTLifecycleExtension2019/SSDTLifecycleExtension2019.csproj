@@ -23,6 +23,7 @@
     <RootNamespace>SSDTLifecycleExtension2019</RootNamespace>
     <AssemblyName>SSDTLifecycleExtension2019</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <LangVersion>latest</LangVersion>
     <GeneratePkgDefFile>true</GeneratePkgDefFile>
     <UseCodebase>true</UseCodebase>
     <IncludeAssemblyInVSIXContainer>true</IncludeAssemblyInVSIXContainer>
@@ -73,10 +74,10 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="JetBrains.Annotations">
-      <Version>2021.3.0</Version>
+      <Version>2022.3.1</Version>
     </PackageReference>
-    <PackageReference Include="Microsoft.SqlServer.DacFx.x64">
-      <Version>150.5282.3</Version>
+    <PackageReference Include="Microsoft.SqlServer.DacFx">
+      <Version>162.0.52</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.SDK" Version="16.10.31321.278" ExcludeAssets="runtime">
       <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

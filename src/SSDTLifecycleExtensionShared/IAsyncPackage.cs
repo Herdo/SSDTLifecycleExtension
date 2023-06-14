@@ -1,7 +1,6 @@
-﻿namespace SSDTLifecycleExtension
+﻿namespace SSDTLifecycleExtension;
+
+public interface IAsyncPackage
 {
-    public interface IAsyncPackage
-    {
         
-    }
 }

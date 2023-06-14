@@ -1,17 +1,10 @@
-﻿namespace SSDTLifecycleExtension.Shared.Contracts.Models
+﻿namespace SSDTLifecycleExtension.Shared.Contracts.Models;
+
+public interface IStateModel : IBaseModel
 {
-    using System;
-    using System.Threading.Tasks;
-    using Enums;
-    using JetBrains.Annotations;
+    [NotNull] Func<bool, Task> HandleWorkInProgressChanged { get; }
 
-    public interface IStateModel : IBaseModel
-    {
-        [NotNull]
-        Func<bool, Task> HandleWorkInProgressChanged { get; }
+    StateModelState CurrentState { get; set; }
 
-        StateModelState CurrentState { get; set; }
-
-        bool? Result { get; set; }
-    }
+    bool? Result { get; set; }
 }

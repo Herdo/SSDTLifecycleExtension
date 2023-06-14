@@ -1,50 +1,42 @@
-﻿namespace SSDTLifecycleExtension.Shared.Services
+﻿namespace SSDTLifecycleExtension.Shared.Services;
+
+[UsedImplicitly]
+public class ScriptModifierProviderService : IScriptModifierProviderService
 {
-    using System;
-    using System.Collections.Generic;
-    using Contracts.Services;
-    using Contracts;
-    using Contracts.Enums;
-    using Contracts.Factories;
-    using JetBrains.Annotations;
-    using Models;
+    [NotNull] private readonly IScriptModifierFactory _scriptModifierFactory;
 
-    [UsedImplicitly]
-    public class ScriptModifierProviderService : IScriptModifierProviderService
+    public ScriptModifierProviderService([NotNull] IScriptModifierFactory scriptModifierFactory)
     {
-        [NotNull] private readonly IScriptModifierFactory _scriptModifierFactory;
+        _scriptModifierFactory = scriptModifierFactory ?? throw new ArgumentNullException(nameof(scriptModifierFactory));
+    }
 
-        public ScriptModifierProviderService([NotNull] IScriptModifierFactory scriptModifierFactory)
-        {
-            _scriptModifierFactory = scriptModifierFactory ?? throw new ArgumentNullException(nameof(scriptModifierFactory));
-        }
+    IReadOnlyDictionary<ScriptModifier, IScriptModifier> IScriptModifierProviderService.GetScriptModifiers(ConfigurationModel configuration)
+    {
+        if (configuration == null)
+            throw new ArgumentNullException(nameof(configuration));
 
-        IReadOnlyDictionary<ScriptModifier, IScriptModifier> IScriptModifierProviderService.GetScriptModifiers(ConfigurationModel configuration)
-        {
-            if (configuration == null)
-                throw new ArgumentNullException(nameof(configuration));
+        var result = new Dictionary<ScriptModifier, IScriptModifier>();
 
-            var result = new Dictionary<ScriptModifier, IScriptModifier>();
+        if (configuration.CommentOutUnnamedDefaultConstraintDrops)
+            result[ScriptModifier.CommentOutUnnamedDefaultConstraintDrops] =
+                _scriptModifierFactory.CreateScriptModifier(ScriptModifier.CommentOutUnnamedDefaultConstraintDrops);
 
-            if (configuration.CommentOutUnnamedDefaultConstraintDrops)
-                result[ScriptModifier.CommentOutUnnamedDefaultConstraintDrops] = _scriptModifierFactory.CreateScriptModifier(ScriptModifier.CommentOutUnnamedDefaultConstraintDrops);
+        if (configuration.ReplaceUnnamedDefaultConstraintDrops)
+            result[ScriptModifier.ReplaceUnnamedDefaultConstraintDrops] =
+                _scriptModifierFactory.CreateScriptModifier(ScriptModifier.ReplaceUnnamedDefaultConstraintDrops);
 
-            if (configuration.ReplaceUnnamedDefaultConstraintDrops)
-                result[ScriptModifier.ReplaceUnnamedDefaultConstraintDrops] = _scriptModifierFactory.CreateScriptModifier(ScriptModifier.ReplaceUnnamedDefaultConstraintDrops);
+        if (!string.IsNullOrWhiteSpace(configuration.CustomHeader))
+            result[ScriptModifier.AddCustomHeader] = _scriptModifierFactory.CreateScriptModifier(ScriptModifier.AddCustomHeader);
 
-            if (!string.IsNullOrWhiteSpace(configuration.CustomHeader))
-                result[ScriptModifier.AddCustomHeader] = _scriptModifierFactory.CreateScriptModifier(ScriptModifier.AddCustomHeader);
+        if (!string.IsNullOrWhiteSpace(configuration.CustomFooter))
+            result[ScriptModifier.AddCustomFooter] = _scriptModifierFactory.CreateScriptModifier(ScriptModifier.AddCustomFooter);
 
-            if (!string.IsNullOrWhiteSpace(configuration.CustomFooter))
-                result[ScriptModifier.AddCustomFooter] = _scriptModifierFactory.CreateScriptModifier(ScriptModifier.AddCustomFooter);
+        if (configuration.TrackDacpacVersion)
+            result[ScriptModifier.TrackDacpacVersion] = _scriptModifierFactory.CreateScriptModifier(ScriptModifier.TrackDacpacVersion);
 
-            if (configuration.TrackDacpacVersion)
-                result[ScriptModifier.TrackDacpacVersion] = _scriptModifierFactory.CreateScriptModifier(ScriptModifier.TrackDacpacVersion);
+        if (configuration.RemoveSqlCmdStatements)
+            result[ScriptModifier.RemoveSqlCmdStatements] = _scriptModifierFactory.CreateScriptModifier(ScriptModifier.RemoveSqlCmdStatements);
 
-            if (configuration.RemoveSqlCmdStatements)
-                result[ScriptModifier.RemoveSqlCmdStatements] = _scriptModifierFactory.CreateScriptModifier(ScriptModifier.RemoveSqlCmdStatements);
-
-            return result;
-        }
+        return result;
     }
 }

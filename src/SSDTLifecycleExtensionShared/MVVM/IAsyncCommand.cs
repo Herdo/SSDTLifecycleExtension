@@ -1,12 +1,8 @@
-﻿namespace SSDTLifecycleExtension.MVVM
-{
-    using System.Threading.Tasks;
-    using System.Windows.Input;
+﻿namespace SSDTLifecycleExtension.MVVM;
 
-    public interface IAsyncCommand : ICommand
-    {
-        Task ExecuteAsync();
-        bool CanExecute();
-        void RaiseCanExecuteChanged();
-    }
+public interface IAsyncCommand : ICommand
+{
+    Task ExecuteAsync();
+    bool CanExecute();
+    void RaiseCanExecuteChanged();
 }

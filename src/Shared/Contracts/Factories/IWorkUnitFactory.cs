@@ -1,12 +1,8 @@
-﻿namespace SSDTLifecycleExtension.Shared.Contracts.Factories
+﻿namespace SSDTLifecycleExtension.Shared.Contracts.Factories;
+
+public interface IWorkUnitFactory
 {
-    using JetBrains.Annotations;
-    using Shared.Models;
+    IWorkUnit<ScaffoldingStateModel> GetNextWorkUnit([NotNull] ScaffoldingStateModel stateModel);
 
-    public interface IWorkUnitFactory
-    {
-        IWorkUnit<ScaffoldingStateModel> GetNextWorkUnit([NotNull] ScaffoldingStateModel stateModel);
-
-        IWorkUnit<ScriptCreationStateModel> GetNextWorkUnit([NotNull] ScriptCreationStateModel stateModel);
-    }
+    IWorkUnit<ScriptCreationStateModel> GetNextWorkUnit([NotNull] ScriptCreationStateModel stateModel);
 }

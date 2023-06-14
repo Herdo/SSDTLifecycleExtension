@@ -1,10 +1,6 @@
-﻿namespace SSDTLifecycleExtension.ViewModels
-{
-    using System.ComponentModel;
-    using System.Threading.Tasks;
+﻿namespace SSDTLifecycleExtension.ViewModels;
 
-    public interface IViewModel : INotifyPropertyChanged
-    {
-        Task<bool> InitializeAsync();
-    }
+public interface IViewModel : INotifyPropertyChanged
+{
+    Task<bool> InitializeAsync();
 }

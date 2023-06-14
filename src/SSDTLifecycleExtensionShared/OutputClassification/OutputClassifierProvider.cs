@@ -1,21 +1,15 @@
-﻿namespace SSDTLifecycleExtension.OutputClassification
+﻿namespace SSDTLifecycleExtension.OutputClassification;
+
+[ContentType("output")]
+[Export(typeof(IClassifierProvider))]
+public class OutputClassifierProvider : IClassifierProvider
 {
-    using System.ComponentModel.Composition;
-    using Microsoft.VisualStudio.Text;
-    using Microsoft.VisualStudio.Text.Classification;
-    using Microsoft.VisualStudio.Utilities;
+    [Import] internal IClassificationTypeRegistryService ClassificationTypeRegistryService;
 
-    [ContentType("output")]
-    [Export(typeof(IClassifierProvider))]
-    public class OutputClassifierProvider : IClassifierProvider
+    private OutputClassifier _outputClassifier;
+
+    IClassifier IClassifierProvider.GetClassifier(ITextBuffer textBuffer)
     {
-        [Import] internal IClassificationTypeRegistryService ClassificationTypeRegistryService;
-
-        private OutputClassifier _outputClassifier;
-
-        IClassifier IClassifierProvider.GetClassifier(ITextBuffer textBuffer)
-        {
-            return _outputClassifier ?? (_outputClassifier = new OutputClassifier(ClassificationTypeRegistryService));
-        }
+        return _outputClassifier ?? (_outputClassifier = new OutputClassifier(ClassificationTypeRegistryService));
     }
 }

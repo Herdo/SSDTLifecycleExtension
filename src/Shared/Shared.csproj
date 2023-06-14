@@ -4,10 +4,11 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>SSDTLifecycleExtension.Shared</AssemblyName>
     <RootNamespace>SSDTLifecycleExtension.Shared</RootNamespace>
+	<LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations" Version="2021.3.0" />
+    <PackageReference Include="JetBrains.Annotations" Version="2022.3.1" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
   </ItemGroup>
 

@@ -1,9 +1,5 @@
-﻿namespace SSDTLifecycleExtension.Shared.Contracts.Models
-{
-    using System.ComponentModel;
+﻿namespace SSDTLifecycleExtension.Shared.Contracts.Models;
 
-    public interface IBaseModel : INotifyPropertyChanged, INotifyDataErrorInfo
-    {
-        
-    }
+public interface IBaseModel : INotifyPropertyChanged, INotifyDataErrorInfo
+{
 }

@@ -1,27 +1,17 @@
-﻿using NUnit.Framework;
+﻿namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers;
 
-namespace SSDTLifecycleExtension.UnitTests.Shared.ScriptModifiers
+[TestFixture]
+public class TrackDacpacVersionModifierTests
 {
-    using System;
-    using System.Threading.Tasks;
-    using SSDTLifecycleExtension.Shared.Contracts;
-    using SSDTLifecycleExtension.Shared.Models;
-    using SSDTLifecycleExtension.Shared.ScriptModifiers;
-
-    [TestFixture]
-    public class TrackDacpacVersionModifierTests
-    {
-        private const string MultiLineInputWithFinalGo =
-@"
+    private const string MultiLineInputWithFinalGo =
+        @"
 GO
 SET ANSI_NULLS, ANSI_PADDING, ANSI_WARNINGS, ARITHABORT, CONCAT_NULL_YIELDS_NULL, QUOTED_IDENTIFIER ON;
 
 SET NUMERIC_ROUNDABORT OFF;
 
-
 GO
 USE [$(DatabaseName)];
-
 
 GO
 PRINT 'First statement';
@@ -37,24 +27,21 @@ ALTER TABLE [dbo].[Author] DROP COLUMN Birthday;
 
 GO
 USE [$(DatabaseName)];
-
 
 GO
 PRINT 'Update complete'
 
 GO";
 
-        private const string MultiLineInputWithFinalGoAndNewLine =
-@"
+    private const string MultiLineInputWithFinalGoAndNewLine =
+        @"
 GO
 SET ANSI_NULLS, ANSI_PADDING, ANSI_WARNINGS, ARITHABORT, CONCAT_NULL_YIELDS_NULL, QUOTED_IDENTIFIER ON;
 
 SET NUMERIC_ROUNDABORT OFF;
 
-
 GO
 USE [$(DatabaseName)];
-
 
 GO
 PRINT 'First statement';
@@ -70,7 +57,6 @@ ALTER TABLE [dbo].[Author] DROP COLUMN Birthday;
 
 GO
 USE [$(DatabaseName)];
-
 
 GO
 PRINT 'Update complete'
@@ -78,17 +64,15 @@ PRINT 'Update complete'
 GO
 ";
 
-        private const string MultiLineInputWithoutFinalGo =
-@"
+    private const string MultiLineInputWithoutFinalGo =
+        @"
 GO
 SET ANSI_NULLS, ANSI_PADDING, ANSI_WARNINGS, ARITHABORT, CONCAT_NULL_YIELDS_NULL, QUOTED_IDENTIFIER ON;
 
 SET NUMERIC_ROUNDABORT OFF;
 
-
 GO
 USE [$(DatabaseName)];
-
 
 GO
 PRINT 'First statement';
@@ -104,22 +88,19 @@ ALTER TABLE [dbo].[Author] DROP COLUMN Birthday;
 
 GO
 USE [$(DatabaseName)];
-
 
 GO
 PRINT 'Update complete'";
 
-        private const string MultiLineInputWithoutFinalGoButWithNewLine =
-@"
+    private const string MultiLineInputWithoutFinalGoButWithNewLine =
+        @"
 GO
 SET ANSI_NULLS, ANSI_PADDING, ANSI_WARNINGS, ARITHABORT, CONCAT_NULL_YIELDS_NULL, QUOTED_IDENTIFIER ON;
 
 SET NUMERIC_ROUNDABORT OFF;
 
-
 GO
 USE [$(DatabaseName)];
-
 
 GO
 PRINT 'First statement';
@@ -136,22 +117,19 @@ ALTER TABLE [dbo].[Author] DROP COLUMN Birthday;
 GO
 USE [$(DatabaseName)];
 
-
 GO
 PRINT 'Update complete'
 ";
 
-        private const string FinalMultilineStatementFullVersion =
-@"
+    private const string FinalMultilineStatementFullVersion =
+        @"
 GO
 SET ANSI_NULLS, ANSI_PADDING, ANSI_WARNINGS, ARITHABORT, CONCAT_NULL_YIELDS_NULL, QUOTED_IDENTIFIER ON;
 
 SET NUMERIC_ROUNDABORT OFF;
 
-
 GO
 USE [$(DatabaseName)];
-
 
 GO
 IF OBJECT_ID(N'[dbo].[__DacpacVersion]', N'U') IS NULL
@@ -202,7 +180,6 @@ ALTER TABLE [dbo].[Author] DROP COLUMN Birthday;
 GO
 USE [$(DatabaseName)];
 
-
 GO
 PRINT 'Update complete'
 
@@ -222,17 +199,15 @@ UPDATE [dv]
 GO
 ";
 
-        private const string FinalMultilineStatementMajorMinorBuildVersion =
-@"
+    private const string FinalMultilineStatementMajorMinorBuildVersion =
+        @"
 GO
 SET ANSI_NULLS, ANSI_PADDING, ANSI_WARNINGS, ARITHABORT, CONCAT_NULL_YIELDS_NULL, QUOTED_IDENTIFIER ON;
 
 SET NUMERIC_ROUNDABORT OFF;
 
-
 GO
 USE [$(DatabaseName)];
-
 
 GO
 IF OBJECT_ID(N'[dbo].[__DacpacVersion]', N'U') IS NULL
@@ -283,7 +258,6 @@ ALTER TABLE [dbo].[Author] DROP COLUMN Birthday;
 GO
 USE [$(DatabaseName)];
 
-
 GO
 PRINT 'Update complete'
 
@@ -303,17 +277,15 @@ UPDATE [dv]
 GO
 ";
 
-        private const string FinalMultilineStatementMajorMinorVersion =
-@"
+    private const string FinalMultilineStatementMajorMinorVersion =
+        @"
 GO
 SET ANSI_NULLS, ANSI_PADDING, ANSI_WARNINGS, ARITHABORT, CONCAT_NULL_YIELDS_NULL, QUOTED_IDENTIFIER ON;
 
 SET NUMERIC_ROUNDABORT OFF;
 
-
 GO
 USE [$(DatabaseName)];
-
 
 GO
 IF OBJECT_ID(N'[dbo].[__DacpacVersion]', N'U') IS NULL
@@ -364,7 +336,6 @@ ALTER TABLE [dbo].[Author] DROP COLUMN Birthday;
 GO
 USE [$(DatabaseName)];
 
-
 GO
 PRINT 'Update complete'
 
@@ -384,137 +355,136 @@ UPDATE [dv]
 GO
 ";
 
-        [Test]
-        public void Modify_ArgumentNullException_Model()
-        {
-            // Arrange
-            IScriptModifier modifier = new TrackDacpacVersionModifier();
+    [Test]
+    public void Modify_ArgumentNullException_Model()
+    {
+        // Arrange
+        IScriptModifier modifier = new TrackDacpacVersionModifier();
 
-            // Act & Assert
-            // ReSharper disable AssignNullToNotNullAttribute
-            Assert.Throws<ArgumentNullException>(() => modifier.ModifyAsync(null));
-            // ReSharper restore AssignNullToNotNullAttribute
-        }
+        // Act & Assert
+        // ReSharper disable AssignNullToNotNullAttribute
+        Assert.Throws<ArgumentNullException>(() => modifier.ModifyAsync(null));
+        // ReSharper restore AssignNullToNotNullAttribute
+    }
 
-        [Test]
-        public void Modify_ArgumentException_ProjectPropertiesSqlTargetNameNull()
-        {
-            // Arrange
-            IScriptModifier modifier = new TrackDacpacVersionModifier();
-            var project = new SqlProject("", "", "");
-            var configuration = new ConfigurationModel();
-            var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
-            var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
-            var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
-            var paths = new PathCollection(directories, sourcePaths, targetPaths);
-            var model = new ScriptModificationModel(MultiLineInputWithFinalGo, project, configuration, paths, new Version(1, 0, 0), false);
+    [Test]
+    public void Modify_ArgumentException_ProjectPropertiesSqlTargetNameNull()
+    {
+        // Arrange
+        IScriptModifier modifier = new TrackDacpacVersionModifier();
+        var project = new SqlProject("", "", "");
+        var configuration = new ConfigurationModel();
+        var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
+        var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
+        var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
+        var paths = new PathCollection(directories, sourcePaths, targetPaths);
+        var model = new ScriptModificationModel(MultiLineInputWithFinalGo, project, configuration, paths, new Version(1, 0, 0), false);
 
-            // Act
-            var e = Assert.Throws<ArgumentException>(() => modifier.ModifyAsync(model));
+        // Act
+        var e = Assert.Throws<ArgumentException>(() => modifier.ModifyAsync(model));
 
-            // Assert
-            Assert.IsNotNull(e);
-            Assert.IsTrue(e.Message.Contains(nameof(SqlProjectProperties.SqlTargetName)));
-        }
+        // Assert
+        Assert.IsNotNull(e);
+        Assert.IsTrue(e.Message.Contains(nameof(SqlProjectProperties.SqlTargetName)));
+    }
 
-        [Test]
-        public void Modify_ArgumentException_ProjectPropertiesDacVersionNull()
-        {
-            // Arrange
-            IScriptModifier modifier = new TrackDacpacVersionModifier();
-            var project = new SqlProject("", "", "");
-            project.ProjectProperties.SqlTargetName = "Database.TestProject";
-            var configuration = new ConfigurationModel();
-            var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
-            var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
-            var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
-            var paths = new PathCollection(directories, sourcePaths, targetPaths);
-            var model = new ScriptModificationModel(MultiLineInputWithFinalGo, project, configuration, paths, new Version(1, 0, 0), false);
+    [Test]
+    public void Modify_ArgumentException_ProjectPropertiesDacVersionNull()
+    {
+        // Arrange
+        IScriptModifier modifier = new TrackDacpacVersionModifier();
+        var project = new SqlProject("", "", "");
+        project.ProjectProperties.SqlTargetName = "Database.TestProject";
+        var configuration = new ConfigurationModel();
+        var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
+        var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
+        var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
+        var paths = new PathCollection(directories, sourcePaths, targetPaths);
+        var model = new ScriptModificationModel(MultiLineInputWithFinalGo, project, configuration, paths, new Version(1, 0, 0), false);
 
-            // Act
-            var e = Assert.Throws<ArgumentException>(() => modifier.ModifyAsync(model));
+        // Act
+        var e = Assert.Throws<ArgumentException>(() => modifier.ModifyAsync(model));
 
-            // Assert
-            Assert.IsNotNull(e);
-            Assert.IsTrue(e.Message.Contains(nameof(SqlProjectProperties.DacVersion)));
-        }
+        // Assert
+        Assert.IsNotNull(e);
+        Assert.IsTrue(e.Message.Contains(nameof(SqlProjectProperties.DacVersion)));
+    }
 
-        [Test]
-        [TestCase(MultiLineInputWithFinalGo, TestName = nameof(MultiLineInputWithFinalGo))]
-        [TestCase(MultiLineInputWithFinalGoAndNewLine, TestName = nameof(MultiLineInputWithFinalGoAndNewLine))]
-        [TestCase(MultiLineInputWithoutFinalGo, TestName = nameof(MultiLineInputWithoutFinalGo))]
-        [TestCase(MultiLineInputWithoutFinalGoButWithNewLine, TestName = nameof(MultiLineInputWithoutFinalGoButWithNewLine))]
-        public async Task Modify_CorrectModification_FullVersion_Async(string input)
-        {
-            // Arrange
-            IScriptModifier modifier = new TrackDacpacVersionModifier();
-            var project = new SqlProject("", "", "");
-            project.ProjectProperties.SqlTargetName = "Database.TestProject";
-            project.ProjectProperties.DacVersion = new Version(500, 30, 44, 80);
-            var configuration = new ConfigurationModel();
-            var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
-            var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
-            var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
-            var paths = new PathCollection(directories, sourcePaths, targetPaths);
-            var model = new ScriptModificationModel(input, project, configuration, paths, new Version(1, 0, 0), false);
+    [Test]
+    [TestCase(MultiLineInputWithFinalGo, TestName = nameof(MultiLineInputWithFinalGo))]
+    [TestCase(MultiLineInputWithFinalGoAndNewLine, TestName = nameof(MultiLineInputWithFinalGoAndNewLine))]
+    [TestCase(MultiLineInputWithoutFinalGo, TestName = nameof(MultiLineInputWithoutFinalGo))]
+    [TestCase(MultiLineInputWithoutFinalGoButWithNewLine, TestName = nameof(MultiLineInputWithoutFinalGoButWithNewLine))]
+    public async Task Modify_CorrectModification_FullVersion_Async(string input)
+    {
+        // Arrange
+        IScriptModifier modifier = new TrackDacpacVersionModifier();
+        var project = new SqlProject("", "", "");
+        project.ProjectProperties.SqlTargetName = "Database.TestProject";
+        project.ProjectProperties.DacVersion = new Version(500, 30, 44, 80);
+        var configuration = new ConfigurationModel();
+        var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
+        var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
+        var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
+        var paths = new PathCollection(directories, sourcePaths, targetPaths);
+        var model = new ScriptModificationModel(input, project, configuration, paths, new Version(1, 0, 0), false);
 
-            // Act
-            await modifier.ModifyAsync(model);
+        // Act
+        await modifier.ModifyAsync(model);
 
-            // Assert
-            Assert.AreEqual(FinalMultilineStatementFullVersion, model.CurrentScript);
-        }
+        // Assert
+        Assert.AreEqual(FinalMultilineStatementFullVersion, model.CurrentScript);
+    }
 
-        [Test]
-        [TestCase(MultiLineInputWithFinalGo, TestName = nameof(MultiLineInputWithFinalGo))]
-        [TestCase(MultiLineInputWithFinalGoAndNewLine, TestName = nameof(MultiLineInputWithFinalGoAndNewLine))]
-        [TestCase(MultiLineInputWithoutFinalGo, TestName = nameof(MultiLineInputWithoutFinalGo))]
-        [TestCase(MultiLineInputWithoutFinalGoButWithNewLine, TestName = nameof(MultiLineInputWithoutFinalGoButWithNewLine))]
-        public async Task Modify_CorrectModification_MajorMinorBuildVersion_Async(string input)
-        {
-            // Arrange
-            IScriptModifier modifier = new TrackDacpacVersionModifier();
-            var project = new SqlProject("", "", "");
-            project.ProjectProperties.SqlTargetName = "Database.TestProject";
-            project.ProjectProperties.DacVersion = new Version(500, 30, 44);
-            var configuration = new ConfigurationModel();
-            var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
-            var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
-            var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
-            var paths = new PathCollection(directories, sourcePaths, targetPaths);
-            var model = new ScriptModificationModel(input, project, configuration, paths, new Version(1, 0, 0), false);
+    [Test]
+    [TestCase(MultiLineInputWithFinalGo, TestName = nameof(MultiLineInputWithFinalGo))]
+    [TestCase(MultiLineInputWithFinalGoAndNewLine, TestName = nameof(MultiLineInputWithFinalGoAndNewLine))]
+    [TestCase(MultiLineInputWithoutFinalGo, TestName = nameof(MultiLineInputWithoutFinalGo))]
+    [TestCase(MultiLineInputWithoutFinalGoButWithNewLine, TestName = nameof(MultiLineInputWithoutFinalGoButWithNewLine))]
+    public async Task Modify_CorrectModification_MajorMinorBuildVersion_Async(string input)
+    {
+        // Arrange
+        IScriptModifier modifier = new TrackDacpacVersionModifier();
+        var project = new SqlProject("", "", "");
+        project.ProjectProperties.SqlTargetName = "Database.TestProject";
+        project.ProjectProperties.DacVersion = new Version(500, 30, 44);
+        var configuration = new ConfigurationModel();
+        var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
+        var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
+        var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
+        var paths = new PathCollection(directories, sourcePaths, targetPaths);
+        var model = new ScriptModificationModel(input, project, configuration, paths, new Version(1, 0, 0), false);
 
-            // Act
-            await modifier.ModifyAsync(model);
+        // Act
+        await modifier.ModifyAsync(model);
 
-            // Assert
-            Assert.AreEqual(FinalMultilineStatementMajorMinorBuildVersion, model.CurrentScript);
-        }
+        // Assert
+        Assert.AreEqual(FinalMultilineStatementMajorMinorBuildVersion, model.CurrentScript);
+    }
 
-        [Test]
-        [TestCase(MultiLineInputWithFinalGo, TestName = nameof(MultiLineInputWithFinalGo))]
-        [TestCase(MultiLineInputWithFinalGoAndNewLine, TestName = nameof(MultiLineInputWithFinalGoAndNewLine))]
-        [TestCase(MultiLineInputWithoutFinalGo, TestName = nameof(MultiLineInputWithoutFinalGo))]
-        [TestCase(MultiLineInputWithoutFinalGoButWithNewLine, TestName = nameof(MultiLineInputWithoutFinalGoButWithNewLine))]
-        public async Task Modify_CorrectModification_MajorMinorVersion_Async(string input)
-        {
-            // Arrange
-            IScriptModifier modifier = new TrackDacpacVersionModifier();
-            var project = new SqlProject("", "", "");
-            project.ProjectProperties.SqlTargetName = "Database.TestProject";
-            project.ProjectProperties.DacVersion = new Version(500, 30);
-            var configuration = new ConfigurationModel();
-            var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
-            var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
-            var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
-            var paths = new PathCollection(directories, sourcePaths, targetPaths);
-            var model = new ScriptModificationModel(input, project, configuration, paths, new Version(1, 0, 0), false);
+    [Test]
+    [TestCase(MultiLineInputWithFinalGo, TestName = nameof(MultiLineInputWithFinalGo))]
+    [TestCase(MultiLineInputWithFinalGoAndNewLine, TestName = nameof(MultiLineInputWithFinalGoAndNewLine))]
+    [TestCase(MultiLineInputWithoutFinalGo, TestName = nameof(MultiLineInputWithoutFinalGo))]
+    [TestCase(MultiLineInputWithoutFinalGoButWithNewLine, TestName = nameof(MultiLineInputWithoutFinalGoButWithNewLine))]
+    public async Task Modify_CorrectModification_MajorMinorVersion_Async(string input)
+    {
+        // Arrange
+        IScriptModifier modifier = new TrackDacpacVersionModifier();
+        var project = new SqlProject("", "", "");
+        project.ProjectProperties.SqlTargetName = "Database.TestProject";
+        project.ProjectProperties.DacVersion = new Version(500, 30);
+        var configuration = new ConfigurationModel();
+        var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
+        var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
+        var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
+        var paths = new PathCollection(directories, sourcePaths, targetPaths);
+        var model = new ScriptModificationModel(input, project, configuration, paths, new Version(1, 0, 0), false);
 
-            // Act
-            await modifier.ModifyAsync(model);
+        // Act
+        await modifier.ModifyAsync(model);
 
-            // Assert
-            Assert.AreEqual(FinalMultilineStatementMajorMinorVersion, model.CurrentScript);
-        }
+        // Assert
+        Assert.AreEqual(FinalMultilineStatementMajorMinorVersion, model.CurrentScript);
     }
 }

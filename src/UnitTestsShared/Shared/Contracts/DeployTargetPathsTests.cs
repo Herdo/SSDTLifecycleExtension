@@ -1,25 +1,20 @@
-﻿using NUnit.Framework;
+﻿namespace SSDTLifecycleExtension.UnitTests.Shared.Contracts;
 
-namespace SSDTLifecycleExtension.UnitTests.Shared.Contracts
+[TestFixture]
+public class DeployTargetPathsTests
 {
-    using SSDTLifecycleExtension.Shared.Contracts;
-
-    [TestFixture]
-    public class DeployTargetPathsTests
+    [Test]
+    public void Constructor_CorrectSettingOfProperties()
     {
-        [Test]
-        public void Constructor_CorrectSettingOfProperties()
-        {
-            // Arrange
-            const string deployScriptPath = "deployScriptPath";
-            const string deployReportPath = "deployReportPath";
+        // Arrange
+        const string deployScriptPath = "deployScriptPath";
+        const string deployReportPath = "deployReportPath";
 
-            // Act
-            var dtp = new DeployTargetPaths(deployScriptPath, deployReportPath);
+        // Act
+        var dtp = new DeployTargetPaths(deployScriptPath, deployReportPath);
 
-            // Assert
-            Assert.AreEqual(deployScriptPath, dtp.DeployScriptPath);
-            Assert.AreEqual(deployReportPath, dtp.DeployReportPath);
-        }
+        // Assert
+        Assert.AreEqual(deployScriptPath, dtp.DeployScriptPath);
+        Assert.AreEqual(deployReportPath, dtp.DeployReportPath);
     }
 }
