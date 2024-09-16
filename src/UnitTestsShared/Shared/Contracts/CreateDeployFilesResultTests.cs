@@ -4,15 +4,6 @@
 public class CreateDeployFilesResultTests
 {
     [Test]
-    public void Constructor_Errors_ArgumentNullException()
-    {
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new CreateDeployFilesResult(null));
-    }
-
-    [Test]
     public void Constructor_Errors_CorrectInitialization()
     {
         // Arrange
@@ -22,12 +13,12 @@ public class CreateDeployFilesResultTests
         var result = new CreateDeployFilesResult(errors);
 
         // Assert
-        Assert.IsNull(result.DeployScriptContent);
-        Assert.IsNull(result.DeployReportContent);
-        Assert.IsNull(result.PreDeploymentScript);
-        Assert.IsNull(result.PostDeploymentScript);
-        Assert.IsNull(result.UsedPublishProfile);
-        Assert.AreSame(errors, result.Errors);
+        result.DeployScriptContent.Should().BeNull();
+        result.DeployReportContent.Should().BeNull();
+        result.PreDeploymentScript.Should().BeNull();
+        result.PostDeploymentScript.Should().BeNull();
+        result.UsedPublishProfile.Should().BeNull();
+        result.Errors.Should().BeSameAs(errors);
     }
 
     [Test]
@@ -44,11 +35,11 @@ public class CreateDeployFilesResultTests
         var result = new CreateDeployFilesResult(script, report, pre, post, publishProfile);
 
         // Assert
-        Assert.AreEqual(script, result.DeployScriptContent);
-        Assert.AreEqual(report, result.DeployReportContent);
-        Assert.AreEqual(pre, result.PreDeploymentScript);
-        Assert.AreEqual(post, result.PostDeploymentScript);
-        Assert.AreSame(publishProfile, result.UsedPublishProfile);
-        Assert.IsNull(result.Errors);
+        result.DeployScriptContent.Should().Be(script);
+        result.DeployReportContent.Should().Be(report);
+        result.PreDeploymentScript.Should().Be(pre);
+        result.PostDeploymentScript.Should().Be(post);
+        result.UsedPublishProfile.Should().BeSameAs(publishProfile);
+        result.Errors.Should().BeNull();
     }
 }

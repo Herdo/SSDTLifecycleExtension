@@ -10,7 +10,7 @@ public class ConfigurationModelTests
         var model = ConfigurationModel.GetDefault();
 
         // Assert
-        Assert.IsNotNull(model);
+        model.Should().NotBeNull();
     }
 
     [Test]
@@ -23,7 +23,7 @@ public class ConfigurationModelTests
         model.ValidateAll();
 
         // Assert
-        Assert.IsFalse(model.HasErrors);
+        model.HasErrors.Should().BeFalse();
     }
 
     [Test]
@@ -34,16 +34,14 @@ public class ConfigurationModelTests
         var model = new ConfigurationModel();
         object invokedPropertyChangedSender = null;
         string invokedPropertyChangedProperty = null;
-        model.PropertyChanged += (sender,
-                                  args) =>
+        model.PropertyChanged += (sender, args) =>
         {
             invokedPropertyChangedSender = sender;
             invokedPropertyChangedProperty = args?.PropertyName;
         };
         object invokedErrorsChangedSender = null;
         string invokedErrorsChangedProperty = null;
-        model.ErrorsChanged += (sender,
-                                args) =>
+        model.ErrorsChanged += (sender, args) =>
         {
             invokedErrorsChangedSender = sender;
             invokedErrorsChangedProperty = args?.PropertyName;
@@ -54,11 +52,11 @@ public class ConfigurationModelTests
         var returnedValue = model.ArtifactsPath;
 
         // Assert
-        Assert.AreEqual(testValue, returnedValue);
-        Assert.AreSame(model, invokedPropertyChangedSender);
-        Assert.AreEqual(nameof(ConfigurationModel.ArtifactsPath), invokedPropertyChangedProperty);
-        Assert.AreSame(model, invokedErrorsChangedSender);
-        Assert.AreEqual(nameof(ConfigurationModel.ArtifactsPath), invokedErrorsChangedProperty);
+        returnedValue.Should().Be(testValue);
+        invokedPropertyChangedSender.Should().BeSameAs(model);
+        invokedPropertyChangedProperty.Should().Be(nameof(ConfigurationModel.ArtifactsPath));
+        invokedErrorsChangedSender.Should().BeSameAs(model);
+        invokedErrorsChangedProperty.Should().Be(nameof(ConfigurationModel.ArtifactsPath));
     }
 
     [Test]
@@ -69,16 +67,14 @@ public class ConfigurationModelTests
         var model = new ConfigurationModel();
         object invokedPropertyChangedSender = null;
         string invokedPropertyChangedProperty = null;
-        model.PropertyChanged += (sender,
-                                  args) =>
+        model.PropertyChanged += (sender, args) =>
         {
             invokedPropertyChangedSender = sender;
             invokedPropertyChangedProperty = args?.PropertyName;
         };
         object invokedErrorsChangedSender = null;
         string invokedErrorsChangedProperty = null;
-        model.ErrorsChanged += (sender,
-                                args) =>
+        model.ErrorsChanged += (sender, args) =>
         {
             invokedErrorsChangedSender = sender;
             invokedErrorsChangedProperty = args?.PropertyName;
@@ -89,11 +85,11 @@ public class ConfigurationModelTests
         var returnedValue = model.PublishProfilePath;
 
         // Assert
-        Assert.AreEqual(testValue, returnedValue);
-        Assert.AreSame(model, invokedPropertyChangedSender);
-        Assert.AreEqual(nameof(ConfigurationModel.PublishProfilePath), invokedPropertyChangedProperty);
-        Assert.AreSame(model, invokedErrorsChangedSender);
-        Assert.AreEqual(nameof(ConfigurationModel.PublishProfilePath), invokedErrorsChangedProperty);
+        returnedValue.Should().Be(testValue);
+        invokedPropertyChangedSender.Should().BeSameAs(model);
+        invokedPropertyChangedProperty.Should().Be(nameof(ConfigurationModel.PublishProfilePath));
+        invokedErrorsChangedSender.Should().BeSameAs(model);
+        invokedErrorsChangedProperty.Should().Be(nameof(ConfigurationModel.PublishProfilePath));
     }
 
     [Test]
@@ -104,16 +100,14 @@ public class ConfigurationModelTests
         var model = new ConfigurationModel();
         object invokedPropertyChangedSender = null;
         string invokedPropertyChangedProperty = null;
-        model.PropertyChanged += (sender,
-                                  args) =>
+        model.PropertyChanged += (sender, args) =>
         {
             invokedPropertyChangedSender = sender;
             invokedPropertyChangedProperty = args?.PropertyName;
         };
         object invokedErrorsChangedSender = null;
         string invokedErrorsChangedProperty = null;
-        model.ErrorsChanged += (sender,
-                                args) =>
+        model.ErrorsChanged += (sender, args) =>
         {
             invokedErrorsChangedSender = sender;
             invokedErrorsChangedProperty = args?.PropertyName;
@@ -124,31 +118,29 @@ public class ConfigurationModelTests
         var returnedValue = model.SharedDacpacRepositoryPath;
 
         // Assert
-        Assert.AreEqual(testValue, returnedValue);
-        Assert.AreSame(model, invokedPropertyChangedSender);
-        Assert.AreEqual(nameof(ConfigurationModel.SharedDacpacRepositoryPath), invokedPropertyChangedProperty);
-        Assert.AreSame(model, invokedErrorsChangedSender);
-        Assert.AreEqual(nameof(ConfigurationModel.SharedDacpacRepositoryPath), invokedErrorsChangedProperty);
+        returnedValue.Should().Be(testValue);
+        invokedPropertyChangedSender.Should().BeSameAs(model);
+        invokedPropertyChangedProperty.Should().Be(nameof(ConfigurationModel.SharedDacpacRepositoryPath));
+        invokedErrorsChangedSender.Should().BeSameAs(model);
+        invokedErrorsChangedProperty.Should().Be(nameof(ConfigurationModel.SharedDacpacRepositoryPath));
     }
 
     [Test]
     public void BuildBeforeScriptCreation_Get_Set_PropertyChanged()
     {
         // Arrange
-        const bool testValue = true;
+        const bool testValue = false;
         var model = new ConfigurationModel();
         object invokedPropertyChangedSender = null;
         string invokedPropertyChangedProperty = null;
-        model.PropertyChanged += (sender,
-                                  args) =>
+        model.PropertyChanged += (sender, args) =>
         {
             invokedPropertyChangedSender = sender;
             invokedPropertyChangedProperty = args?.PropertyName;
         };
         object invokedErrorsChangedSender = null;
         string invokedErrorsChangedProperty = null;
-        model.ErrorsChanged += (sender,
-                                args) =>
+        model.ErrorsChanged += (sender, args) =>
         {
             invokedErrorsChangedSender = sender;
             invokedErrorsChangedProperty = args?.PropertyName;
@@ -159,31 +151,29 @@ public class ConfigurationModelTests
         var returnedValue = model.BuildBeforeScriptCreation;
 
         // Assert
-        Assert.AreEqual(testValue, returnedValue);
-        Assert.AreSame(model, invokedPropertyChangedSender);
-        Assert.AreEqual(nameof(ConfigurationModel.BuildBeforeScriptCreation), invokedPropertyChangedProperty);
-        Assert.IsNull(invokedErrorsChangedSender);
-        Assert.IsNull(invokedErrorsChangedProperty);
+        returnedValue.Should().Be(testValue);
+        invokedPropertyChangedSender.Should().BeSameAs(model);
+        invokedPropertyChangedProperty.Should().Be(nameof(ConfigurationModel.BuildBeforeScriptCreation));
+        invokedErrorsChangedSender.Should().BeNull();
+        invokedErrorsChangedProperty.Should().BeNull();
     }
 
     [Test]
     public void CreateDocumentationWithScriptCreation_Get_Set_PropertyChanged()
     {
         // Arrange
-        const bool testValue = true;
+        const bool testValue = false;
         var model = new ConfigurationModel();
         object invokedPropertyChangedSender = null;
         string invokedPropertyChangedProperty = null;
-        model.PropertyChanged += (sender,
-                                  args) =>
+        model.PropertyChanged += (sender, args) =>
         {
             invokedPropertyChangedSender = sender;
             invokedPropertyChangedProperty = args?.PropertyName;
         };
         object invokedErrorsChangedSender = null;
         string invokedErrorsChangedProperty = null;
-        model.ErrorsChanged += (sender,
-                                args) =>
+        model.ErrorsChanged += (sender, args) =>
         {
             invokedErrorsChangedSender = sender;
             invokedErrorsChangedProperty = args?.PropertyName;
@@ -194,11 +184,11 @@ public class ConfigurationModelTests
         var returnedValue = model.CreateDocumentationWithScriptCreation;
 
         // Assert
-        Assert.AreEqual(testValue, returnedValue);
-        Assert.AreSame(model, invokedPropertyChangedSender);
-        Assert.AreEqual(nameof(ConfigurationModel.CreateDocumentationWithScriptCreation), invokedPropertyChangedProperty);
-        Assert.IsNull(invokedErrorsChangedSender);
-        Assert.IsNull(invokedErrorsChangedProperty);
+        returnedValue.Should().Be(testValue);
+        invokedPropertyChangedSender.Should().BeSameAs(model);
+        invokedPropertyChangedProperty.Should().Be(nameof(ConfigurationModel.CreateDocumentationWithScriptCreation));
+        invokedErrorsChangedSender.Should().BeNull();
+        invokedErrorsChangedProperty.Should().BeNull();
     }
 
     [Test]
@@ -209,16 +199,14 @@ public class ConfigurationModelTests
         var model = new ConfigurationModel();
         object invokedPropertyChangedSender = null;
         string invokedPropertyChangedProperty = null;
-        model.PropertyChanged += (sender,
-                                  args) =>
+        model.PropertyChanged += (sender, args) =>
         {
             invokedPropertyChangedSender = sender;
             invokedPropertyChangedProperty = args?.PropertyName;
         };
         var invokedErrorsChangedSenderList = new List<object>();
         var invokedErrorsChangedPropertyList = new List<string>();
-        model.ErrorsChanged += (sender,
-                                args) =>
+        model.ErrorsChanged += (sender, args) =>
         {
             if (sender != null)
                 invokedErrorsChangedSenderList.Add(sender);
@@ -231,15 +219,15 @@ public class ConfigurationModelTests
         var returnedValue = model.CommentOutUnnamedDefaultConstraintDrops;
 
         // Assert
-        Assert.AreEqual(testValue, returnedValue);
-        Assert.AreSame(model, invokedPropertyChangedSender);
-        Assert.AreEqual(nameof(ConfigurationModel.CommentOutUnnamedDefaultConstraintDrops), invokedPropertyChangedProperty);
-        Assert.AreEqual(2, invokedErrorsChangedSenderList.Count);
-        Assert.AreSame(model, invokedErrorsChangedSenderList[0]);
-        Assert.AreSame(model, invokedErrorsChangedSenderList[1]);
-        Assert.AreEqual(2, invokedErrorsChangedPropertyList.Count);
-        Assert.AreEqual(nameof(ConfigurationModel.CommentOutUnnamedDefaultConstraintDrops), invokedErrorsChangedPropertyList[0]);
-        Assert.AreEqual(nameof(ConfigurationModel.ReplaceUnnamedDefaultConstraintDrops), invokedErrorsChangedPropertyList[1]);
+        returnedValue.Should().Be(testValue);
+        invokedPropertyChangedSender.Should().BeSameAs(model);
+        invokedPropertyChangedProperty.Should().Be(nameof(ConfigurationModel.CommentOutUnnamedDefaultConstraintDrops));
+        invokedErrorsChangedSenderList.Should().HaveCount(2);
+        invokedErrorsChangedSenderList[0].Should().BeSameAs(model);
+        invokedErrorsChangedSenderList[1].Should().BeSameAs(model);
+        invokedErrorsChangedPropertyList.Should().HaveCount(2);
+        invokedErrorsChangedPropertyList[0].Should().Be(nameof(ConfigurationModel.CommentOutUnnamedDefaultConstraintDrops));
+        invokedErrorsChangedPropertyList[1].Should().Be(nameof(ConfigurationModel.ReplaceUnnamedDefaultConstraintDrops));
     }
 
     [Test]
@@ -250,16 +238,14 @@ public class ConfigurationModelTests
         var model = new ConfigurationModel();
         object invokedPropertyChangedSender = null;
         string invokedPropertyChangedProperty = null;
-        model.PropertyChanged += (sender,
-                                  args) =>
+        model.PropertyChanged += (sender, args) =>
         {
             invokedPropertyChangedSender = sender;
             invokedPropertyChangedProperty = args?.PropertyName;
         };
         var invokedErrorsChangedSenderList = new List<object>();
         var invokedErrorsChangedPropertyList = new List<string>();
-        model.ErrorsChanged += (sender,
-                                args) =>
+        model.ErrorsChanged += (sender, args) =>
         {
             if (sender != null)
                 invokedErrorsChangedSenderList.Add(sender);
@@ -272,15 +258,15 @@ public class ConfigurationModelTests
         var returnedValue = model.ReplaceUnnamedDefaultConstraintDrops;
 
         // Assert
-        Assert.AreEqual(testValue, returnedValue);
-        Assert.AreSame(model, invokedPropertyChangedSender);
-        Assert.AreEqual(nameof(ConfigurationModel.ReplaceUnnamedDefaultConstraintDrops), invokedPropertyChangedProperty);
-        Assert.AreEqual(2, invokedErrorsChangedSenderList.Count);
-        Assert.AreSame(model, invokedErrorsChangedSenderList[0]);
-        Assert.AreSame(model, invokedErrorsChangedSenderList[1]);
-        Assert.AreEqual(2, invokedErrorsChangedPropertyList.Count);
-        Assert.AreEqual(nameof(ConfigurationModel.ReplaceUnnamedDefaultConstraintDrops), invokedErrorsChangedPropertyList[0]);
-        Assert.AreEqual(nameof(ConfigurationModel.CommentOutUnnamedDefaultConstraintDrops), invokedErrorsChangedPropertyList[1]);
+        returnedValue.Should().Be(testValue);
+        invokedPropertyChangedSender.Should().BeSameAs(model);
+        invokedPropertyChangedProperty.Should().Be(nameof(ConfigurationModel.ReplaceUnnamedDefaultConstraintDrops));
+        invokedErrorsChangedSenderList.Should().HaveCount(2);
+        invokedErrorsChangedSenderList[0].Should().BeSameAs(model);
+        invokedErrorsChangedSenderList[1].Should().BeSameAs(model);
+        invokedErrorsChangedPropertyList.Should().HaveCount(2);
+        invokedErrorsChangedPropertyList[0].Should().Be(nameof(ConfigurationModel.ReplaceUnnamedDefaultConstraintDrops));
+        invokedErrorsChangedPropertyList[1].Should().Be(nameof(ConfigurationModel.CommentOutUnnamedDefaultConstraintDrops));
     }
 
     [Test]
@@ -291,16 +277,14 @@ public class ConfigurationModelTests
         var model = new ConfigurationModel();
         object invokedPropertyChangedSender = null;
         string invokedPropertyChangedProperty = null;
-        model.PropertyChanged += (sender,
-                                  args) =>
+        model.PropertyChanged += (sender, args) =>
         {
             invokedPropertyChangedSender = sender;
             invokedPropertyChangedProperty = args?.PropertyName;
         };
         object invokedErrorsChangedSender = null;
         string invokedErrorsChangedProperty = null;
-        model.ErrorsChanged += (sender,
-                                args) =>
+        model.ErrorsChanged += (sender, args) =>
         {
             invokedErrorsChangedSender = sender;
             invokedErrorsChangedProperty = args?.PropertyName;
@@ -311,11 +295,11 @@ public class ConfigurationModelTests
         var returnedValue = model.VersionPattern;
 
         // Assert
-        Assert.AreEqual(testValue, returnedValue);
-        Assert.AreSame(model, invokedPropertyChangedSender);
-        Assert.AreEqual(nameof(ConfigurationModel.VersionPattern), invokedPropertyChangedProperty);
-        Assert.AreSame(model, invokedErrorsChangedSender);
-        Assert.AreEqual(nameof(ConfigurationModel.VersionPattern), invokedErrorsChangedProperty);
+        returnedValue.Should().Be(testValue);
+        invokedPropertyChangedSender.Should().BeSameAs(model);
+        invokedPropertyChangedProperty.Should().Be(nameof(ConfigurationModel.VersionPattern));
+        invokedErrorsChangedSender.Should().BeSameAs(model);
+        invokedErrorsChangedProperty.Should().Be(nameof(ConfigurationModel.VersionPattern));
     }
 
     [Test]
@@ -326,16 +310,14 @@ public class ConfigurationModelTests
         var model = new ConfigurationModel();
         object invokedPropertyChangedSender = null;
         string invokedPropertyChangedProperty = null;
-        model.PropertyChanged += (sender,
-                                  args) =>
+        model.PropertyChanged += (sender, args) =>
         {
             invokedPropertyChangedSender = sender;
             invokedPropertyChangedProperty = args?.PropertyName;
         };
         object invokedErrorsChangedSender = null;
         string invokedErrorsChangedProperty = null;
-        model.ErrorsChanged += (sender,
-                                args) =>
+        model.ErrorsChanged += (sender, args) =>
         {
             invokedErrorsChangedSender = sender;
             invokedErrorsChangedProperty = args?.PropertyName;
@@ -346,11 +328,11 @@ public class ConfigurationModelTests
         var returnedValue = model.TrackDacpacVersion;
 
         // Assert
-        Assert.AreEqual(testValue, returnedValue);
-        Assert.AreSame(model, invokedPropertyChangedSender);
-        Assert.AreEqual(nameof(ConfigurationModel.TrackDacpacVersion), invokedPropertyChangedProperty);
-        Assert.IsNull(invokedErrorsChangedSender);
-        Assert.IsNull(invokedErrorsChangedProperty);
+        returnedValue.Should().Be(testValue);
+        invokedPropertyChangedSender.Should().BeSameAs(model);
+        invokedPropertyChangedProperty.Should().Be(nameof(ConfigurationModel.TrackDacpacVersion));
+        invokedErrorsChangedSender.Should().BeNull();
+        invokedErrorsChangedProperty.Should().BeNull();
     }
 
     [Test]
@@ -361,16 +343,14 @@ public class ConfigurationModelTests
         var model = new ConfigurationModel();
         object invokedPropertyChangedSender = null;
         string invokedPropertyChangedProperty = null;
-        model.PropertyChanged += (sender,
-                                  args) =>
+        model.PropertyChanged += (sender, args) =>
         {
             invokedPropertyChangedSender = sender;
             invokedPropertyChangedProperty = args?.PropertyName;
         };
         object invokedErrorsChangedSender = null;
         string invokedErrorsChangedProperty = null;
-        model.ErrorsChanged += (sender,
-                                args) =>
+        model.ErrorsChanged += (sender, args) =>
         {
             invokedErrorsChangedSender = sender;
             invokedErrorsChangedProperty = args?.PropertyName;
@@ -381,11 +361,11 @@ public class ConfigurationModelTests
         var returnedValue = model.CustomHeader;
 
         // Assert
-        Assert.AreEqual(testValue, returnedValue);
-        Assert.AreSame(model, invokedPropertyChangedSender);
-        Assert.AreEqual(nameof(ConfigurationModel.CustomHeader), invokedPropertyChangedProperty);
-        Assert.IsNull(invokedErrorsChangedSender);
-        Assert.IsNull(invokedErrorsChangedProperty);
+        returnedValue.Should().Be(testValue);
+        invokedPropertyChangedSender.Should().BeSameAs(model);
+        invokedPropertyChangedProperty.Should().Be(nameof(ConfigurationModel.CustomHeader));
+        invokedErrorsChangedSender.Should().BeNull();
+        invokedErrorsChangedProperty.Should().BeNull();
     }
 
     [Test]
@@ -396,16 +376,14 @@ public class ConfigurationModelTests
         var model = new ConfigurationModel();
         object invokedPropertyChangedSender = null;
         string invokedPropertyChangedProperty = null;
-        model.PropertyChanged += (sender,
-                                  args) =>
+        model.PropertyChanged += (sender, args) =>
         {
             invokedPropertyChangedSender = sender;
             invokedPropertyChangedProperty = args?.PropertyName;
         };
         object invokedErrorsChangedSender = null;
         string invokedErrorsChangedProperty = null;
-        model.ErrorsChanged += (sender,
-                                args) =>
+        model.ErrorsChanged += (sender, args) =>
         {
             invokedErrorsChangedSender = sender;
             invokedErrorsChangedProperty = args?.PropertyName;
@@ -416,11 +394,11 @@ public class ConfigurationModelTests
         var returnedValue = model.CustomFooter;
 
         // Assert
-        Assert.AreEqual(testValue, returnedValue);
-        Assert.AreSame(model, invokedPropertyChangedSender);
-        Assert.AreEqual(nameof(ConfigurationModel.CustomFooter), invokedPropertyChangedProperty);
-        Assert.IsNull(invokedErrorsChangedSender);
-        Assert.IsNull(invokedErrorsChangedProperty);
+        returnedValue.Should().Be(testValue);
+        invokedPropertyChangedSender.Should().BeSameAs(model);
+        invokedPropertyChangedProperty.Should().Be(nameof(ConfigurationModel.CustomFooter));
+        invokedErrorsChangedSender.Should().BeNull();
+        invokedErrorsChangedProperty.Should().BeNull();
     }
 
     [Test]
@@ -431,16 +409,14 @@ public class ConfigurationModelTests
         var model = new ConfigurationModel();
         object invokedPropertyChangedSender = null;
         string invokedPropertyChangedProperty = null;
-        model.PropertyChanged += (sender,
-                                  args) =>
+        model.PropertyChanged += (sender, args) =>
         {
             invokedPropertyChangedSender = sender;
             invokedPropertyChangedProperty = args?.PropertyName;
         };
         object invokedErrorsChangedSender = null;
         string invokedErrorsChangedProperty = null;
-        model.ErrorsChanged += (sender,
-                                args) =>
+        model.ErrorsChanged += (sender, args) =>
         {
             invokedErrorsChangedSender = sender;
             invokedErrorsChangedProperty = args?.PropertyName;
@@ -451,11 +427,11 @@ public class ConfigurationModelTests
         var returnedValue = model.RemoveSqlCmdStatements;
 
         // Assert
-        Assert.AreEqual(testValue, returnedValue);
-        Assert.AreSame(model, invokedPropertyChangedSender);
-        Assert.AreEqual(nameof(ConfigurationModel.RemoveSqlCmdStatements), invokedPropertyChangedProperty);
-        Assert.IsNull(invokedErrorsChangedSender);
-        Assert.IsNull(invokedErrorsChangedProperty);
+        returnedValue.Should().Be(testValue);
+        invokedPropertyChangedSender.Should().BeSameAs(model);
+        invokedPropertyChangedProperty.Should().Be(nameof(ConfigurationModel.RemoveSqlCmdStatements));
+        invokedErrorsChangedSender.Should().BeNull();
+        invokedErrorsChangedProperty.Should().BeNull();
     }
 
     [Test]
@@ -466,16 +442,14 @@ public class ConfigurationModelTests
         var model = new ConfigurationModel();
         object invokedPropertyChangedSender = null;
         string invokedPropertyChangedProperty = null;
-        model.PropertyChanged += (sender,
-                                  args) =>
+        model.PropertyChanged += (sender, args) =>
         {
             invokedPropertyChangedSender = sender;
             invokedPropertyChangedProperty = args?.PropertyName;
         };
         object invokedErrorsChangedSender = null;
         string invokedErrorsChangedProperty = null;
-        model.ErrorsChanged += (sender,
-                                args) =>
+        model.ErrorsChanged += (sender, args) =>
         {
             invokedErrorsChangedSender = sender;
             invokedErrorsChangedProperty = args?.PropertyName;
@@ -486,31 +460,29 @@ public class ConfigurationModelTests
         var returnedValue = model.DeleteRefactorlogAfterVersionedScriptGeneration;
 
         // Assert
-        Assert.AreEqual(testValue, returnedValue);
-        Assert.AreSame(model, invokedPropertyChangedSender);
-        Assert.AreEqual(nameof(ConfigurationModel.DeleteRefactorlogAfterVersionedScriptGeneration), invokedPropertyChangedProperty);
-        Assert.IsNull(invokedErrorsChangedSender);
-        Assert.IsNull(invokedErrorsChangedProperty);
+        returnedValue.Should().Be(testValue);
+        invokedPropertyChangedSender.Should().BeSameAs(model);
+        invokedPropertyChangedProperty.Should().Be(nameof(ConfigurationModel.DeleteRefactorlogAfterVersionedScriptGeneration));
+        invokedErrorsChangedSender.Should().BeNull();
+        invokedErrorsChangedProperty.Should().BeNull();
     }
 
     [Test]
     public void DeleteLatestAfterVersionedScriptGeneration_Get_Set_PropertyChanged()
     {
         // Arrange
-        const bool testValue = true;
+        const bool testValue = false;
         var model = new ConfigurationModel();
         object invokedPropertyChangedSender = null;
         string invokedPropertyChangedProperty = null;
-        model.PropertyChanged += (sender,
-                                  args) =>
+        model.PropertyChanged += (sender, args) =>
         {
             invokedPropertyChangedSender = sender;
             invokedPropertyChangedProperty = args?.PropertyName;
         };
         object invokedErrorsChangedSender = null;
         string invokedErrorsChangedProperty = null;
-        model.ErrorsChanged += (sender,
-                                args) =>
+        model.ErrorsChanged += (sender, args) =>
         {
             invokedErrorsChangedSender = sender;
             invokedErrorsChangedProperty = args?.PropertyName;
@@ -521,11 +493,11 @@ public class ConfigurationModelTests
         var returnedValue = model.DeleteLatestAfterVersionedScriptGeneration;
 
         // Assert
-        Assert.AreEqual(testValue, returnedValue);
-        Assert.AreSame(model, invokedPropertyChangedSender);
-        Assert.AreEqual(nameof(ConfigurationModel.DeleteLatestAfterVersionedScriptGeneration), invokedPropertyChangedProperty);
-        Assert.IsNull(invokedErrorsChangedSender);
-        Assert.IsNull(invokedErrorsChangedProperty);
+        returnedValue.Should().Be(testValue);
+        invokedPropertyChangedSender.Should().BeSameAs(model);
+        invokedPropertyChangedProperty.Should().Be(nameof(ConfigurationModel.DeleteLatestAfterVersionedScriptGeneration));
+        invokedErrorsChangedSender.Should().BeNull();
+        invokedErrorsChangedProperty.Should().BeNull();
     }
 
     [Test]
@@ -554,20 +526,22 @@ public class ConfigurationModelTests
         var copy = model.Copy();
 
         // Assert
-        Assert.IsNotNull(copy);
-        Assert.AreNotSame(model, copy);
-        Assert.AreEqual(model.ArtifactsPath, copy.ArtifactsPath);
-        Assert.AreEqual(model.PublishProfilePath, copy.PublishProfilePath);
-        Assert.AreEqual(model.SharedDacpacRepositoryPath, copy.SharedDacpacRepositoryPath);
-        Assert.AreEqual(model.ReplaceUnnamedDefaultConstraintDrops, copy.ReplaceUnnamedDefaultConstraintDrops);
-        Assert.AreEqual(model.VersionPattern, copy.VersionPattern);
-        Assert.AreEqual(model.CommentOutUnnamedDefaultConstraintDrops, copy.CommentOutUnnamedDefaultConstraintDrops);
-        Assert.AreEqual(model.CreateDocumentationWithScriptCreation, copy.CreateDocumentationWithScriptCreation);
-        Assert.AreEqual(model.CustomHeader, copy.CustomHeader);
-        Assert.AreEqual(model.CustomFooter, copy.CustomFooter);
-        Assert.AreEqual(model.BuildBeforeScriptCreation, copy.BuildBeforeScriptCreation);
-        Assert.AreEqual(model.TrackDacpacVersion, copy.TrackDacpacVersion);
-        Assert.AreEqual(model.RemoveSqlCmdStatements, copy.RemoveSqlCmdStatements);
+        copy.Should().NotBeNull();
+        copy.Should().NotBeSameAs(model);
+        copy.ArtifactsPath.Should().Be(model.ArtifactsPath);
+        copy.PublishProfilePath.Should().Be(model.PublishProfilePath);
+        copy.SharedDacpacRepositoryPath.Should().Be(model.SharedDacpacRepositoryPath);
+        copy.ReplaceUnnamedDefaultConstraintDrops.Should().Be(model.ReplaceUnnamedDefaultConstraintDrops);
+        copy.VersionPattern.Should().Be(model.VersionPattern);
+        copy.CommentOutUnnamedDefaultConstraintDrops.Should().Be(model.CommentOutUnnamedDefaultConstraintDrops);
+        copy.CreateDocumentationWithScriptCreation.Should().Be(model.CreateDocumentationWithScriptCreation);
+        copy.CustomHeader.Should().Be(model.CustomHeader);
+        copy.CustomFooter.Should().Be(model.CustomFooter);
+        copy.BuildBeforeScriptCreation.Should().Be(model.BuildBeforeScriptCreation);
+        copy.TrackDacpacVersion.Should().Be(model.TrackDacpacVersion);
+        copy.RemoveSqlCmdStatements.Should().Be(model.RemoveSqlCmdStatements);
+        copy.DeleteRefactorlogAfterVersionedScriptGeneration.Should().Be(model.DeleteRefactorlogAfterVersionedScriptGeneration);
+        copy.DeleteLatestAfterVersionedScriptGeneration.Should().Be(model.DeleteLatestAfterVersionedScriptGeneration);
     }
 
     [Test]
@@ -596,7 +570,7 @@ public class ConfigurationModelTests
         var areEqual = model.Equals(null);
 
         // Assert
-        Assert.IsFalse(areEqual);
+        areEqual.Should().BeFalse();
     }
 
     [Test]
@@ -625,7 +599,7 @@ public class ConfigurationModelTests
         var areEqual = model.Equals(model);
 
         // Assert
-        Assert.IsTrue(areEqual);
+        areEqual.Should().BeTrue();
     }
 
     [Test]
@@ -671,7 +645,7 @@ public class ConfigurationModelTests
         var areEqual = model1.Equals(model2);
 
         // Assert
-        Assert.IsTrue(areEqual);
+        areEqual.Should().BeTrue();
     }
 
     [Test]
@@ -717,6 +691,6 @@ public class ConfigurationModelTests
         var areEqual = model1.Equals(model2);
 
         // Assert
-        Assert.IsFalse(areEqual);
+        areEqual.Should().BeFalse();
     }
 }

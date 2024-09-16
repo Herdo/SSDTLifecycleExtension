@@ -3,24 +3,24 @@
 [DebuggerDisplay("{" + nameof(DisplayName) + ",nq}")]
 public sealed class DefaultConstraint : IEquatable<DefaultConstraint>
 {
-    [NotNull] public string TableSchema { get; }
+    public string TableSchema { get; }
 
-    [NotNull] public string TableName { get; }
+    public string TableName { get; }
 
-    [NotNull] public string ColumnName { get; }
+    public string ColumnName { get; }
 
-    [CanBeNull] public string ConstraintName { get; }
+    public string? ConstraintName { get; }
 
-    [NotNull] public string DisplayName => $"[{TableSchema}].[{TableName}].[{ColumnName}].[{ConstraintName ?? "<UNNAMED>"}]";
+    public string DisplayName => $"[{TableSchema}].[{TableName}].[{ColumnName}].[{ConstraintName ?? "<UNNAMED>"}]";
 
-    public DefaultConstraint([NotNull] string tableSchema,
-                             [NotNull] string tableName,
-                             [NotNull] string columnName,
-                             [CanBeNull] string constraintName)
+    public DefaultConstraint(string tableSchema,
+        string tableName,
+        string columnName,
+        string? constraintName)
     {
-        TableSchema = tableSchema ?? throw new ArgumentNullException(nameof(tableSchema));
-        TableName = tableName ?? throw new ArgumentNullException(nameof(tableName));
-        ColumnName = columnName ?? throw new ArgumentNullException(nameof(columnName));
+        TableSchema = tableSchema;
+        TableName = tableName;
+        ColumnName = columnName;
         ConstraintName = constraintName;
     }
 

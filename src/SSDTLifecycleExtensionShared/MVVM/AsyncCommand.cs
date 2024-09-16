@@ -1,22 +1,15 @@
-﻿namespace SSDTLifecycleExtension.MVVM;
+﻿#nullable enable
 
-public class AsyncCommand : IAsyncCommand
+namespace SSDTLifecycleExtension.MVVM;
+
+public class AsyncCommand(Func<Task> _execute,
+        Func<bool> _canExecute,
+        IErrorHandler _errorHandler)
+    : IAsyncCommand
 {
-    public event EventHandler CanExecuteChanged;
+    public event EventHandler? CanExecuteChanged;
 
     private bool _isExecuting;
-    private readonly Func<Task> _execute;
-    private readonly Func<bool> _canExecute;
-    private readonly IErrorHandler _errorHandler;
-
-    public AsyncCommand([NotNull] Func<Task> execute,
-                        [NotNull] Func<bool> canExecute,
-                        [NotNull] IErrorHandler errorHandler)
-    {
-        _execute = execute ?? throw new ArgumentNullException(nameof(execute));
-        _canExecute = canExecute ?? throw new ArgumentNullException(nameof(canExecute));
-        _errorHandler = errorHandler ?? throw new ArgumentNullException(nameof(errorHandler));
-    }
 
     public bool CanExecute()
     {
@@ -47,8 +40,6 @@ public class AsyncCommand : IAsyncCommand
         CanExecuteChanged?.Invoke(this, EventArgs.Empty);
     }
 
-    #region Explicit ICommand implementations
-
     bool ICommand.CanExecute(object parameter)
     {
         return CanExecute();
@@ -58,6 +49,4 @@ public class AsyncCommand : IAsyncCommand
     {
         ExecuteAsync().FireAndForget(this, _errorHandler);
     }
-
-    #endregion
 }

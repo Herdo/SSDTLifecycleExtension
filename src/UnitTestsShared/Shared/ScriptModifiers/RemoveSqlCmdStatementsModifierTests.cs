@@ -21,7 +21,7 @@ GO
 GO
 /*
 Check SQLCMD mode comment
-SET NOEXEC OFF; 
+SET NOEXEC OFF;
 */
 :setvar __IsSqlCmdEnabled ""True""
 GO
@@ -71,7 +71,7 @@ GO
 GO
 /*
 Check SQLCMD mode comment
-SET NOEXEC OFF; 
+SET NOEXEC OFF;
 */
 :setvar __IsSqlCmdEnabled ""True""
 GO
@@ -128,17 +128,6 @@ PRINT 'Update complete'
 GO";
 
     [Test]
-    public void ModifyAsync_ArgumentNullException_Model()
-    {
-        // Arrange
-        IScriptModifier modifier = new RemoveSqlCmdStatementsModifier();
-
-        // Act & Assert
-        // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => modifier.ModifyAsync(null));
-    }
-
-    [Test]
     [TestCase(MultiLineInputWithSqlcmdStatementsWithCommentedOutSetVar)]
     [TestCase(MultiLineInputWithSqlcmdStatementsWithoutCommentedOutSetVar)]
     public async Task ModifyAsync_CorrectModification_Async(string input)
@@ -161,6 +150,6 @@ GO";
         await modifier.ModifyAsync(model);
 
         // Assert
-        Assert.AreEqual(MultiLineInputWithoutSqlcmdStatements, model.CurrentScript);
+        model.CurrentScript.Should().Be(MultiLineInputWithoutSqlcmdStatements);
     }
 }

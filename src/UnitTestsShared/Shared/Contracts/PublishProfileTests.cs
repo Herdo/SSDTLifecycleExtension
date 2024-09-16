@@ -16,7 +16,7 @@ public class PublishProfileTests
         instance.CreateNewDatabase = true;
 
         // Assert
-        Assert.IsTrue(instance.CreateNewDatabase);
+        instance.CreateNewDatabase.Should().BeTrue();
     }
 
     [Test]
@@ -32,7 +32,7 @@ public class PublishProfileTests
         instance.BackupDatabaseBeforeChanges = true;
 
         // Assert
-        Assert.IsTrue(instance.BackupDatabaseBeforeChanges);
+        instance.BackupDatabaseBeforeChanges.Should().BeTrue();
     }
 
     [Test]
@@ -48,7 +48,7 @@ public class PublishProfileTests
         instance.ScriptDatabaseOptions = true;
 
         // Assert
-        Assert.IsTrue(instance.ScriptDatabaseOptions);
+        instance.ScriptDatabaseOptions.Should().BeTrue();
     }
 
     [Test]
@@ -64,6 +64,6 @@ public class PublishProfileTests
         instance.ScriptDeployStateChecks = true;
 
         // Assert
-        Assert.IsTrue(instance.ScriptDeployStateChecks);
+        instance.ScriptDeployStateChecks.Should().BeTrue();
     }
 }

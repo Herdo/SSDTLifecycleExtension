@@ -17,18 +17,14 @@ public interface IScriptCreationService
     /// <param name="previousVersion">The previous version used as base version.</param>
     /// <param name="latest">Whether to generate "latest" or the configured DacVersion.</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken" /> used to cancel the script creation.</param>
-    /// <exception cref="ArgumentNullException">
-    ///     <paramref name="project" />, <paramref name="configuration" />, or
-    ///     <paramref name="previousVersion" /> are <b>null</b>.
-    /// </exception>
     /// <exception cref="InvalidOperationException">
     ///     A creation is currently running. Check <see cref="IsCreating" /> before
     ///     calling.
     /// </exception>
     /// <returns><b>True</b>, if the creation was successful, otherwise <b>false</b>.</returns>
-    Task<bool> CreateAsync([NotNull] SqlProject project,
-                           [NotNull] ConfigurationModel configuration,
-                           [NotNull] Version previousVersion,
-                           bool latest,
-                           CancellationToken cancellationToken);
+    Task<bool> CreateAsync(SqlProject project,
+        ConfigurationModel configuration,
+        Version previousVersion,
+        bool latest,
+        CancellationToken cancellationToken);
 }

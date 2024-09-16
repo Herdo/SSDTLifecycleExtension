@@ -1,4 +1,6 @@
-﻿namespace SSDTLifecycleExtension.Windows;
+﻿#nullable enable
+
+namespace SSDTLifecycleExtension.Windows;
 
 public interface IVisualStudioToolWindow
 {

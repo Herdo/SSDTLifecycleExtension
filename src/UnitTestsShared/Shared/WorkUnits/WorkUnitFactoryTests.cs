@@ -4,27 +4,6 @@
 public class WorkUnitFactoryTests
 {
     [Test]
-    public void Constructor_ArgumentNullException_DependencyResolver()
-    {
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new WorkUnitFactory(null));
-    }
-
-    [Test]
-    public void GetNextWorkUnit_ScaffoldingStateModel_ArgumentNullException_StateModel()
-    {
-        // Arrange
-        var drMock = new Mock<IDependencyResolver>();
-        IWorkUnitFactory wuf = new WorkUnitFactory(drMock.Object);
-            
-        // Act & Assert
-        // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => wuf.GetNextWorkUnit(null as ScaffoldingStateModel));
-    }
-
-    [Test]
     [TestCase(StateModelState.Undefined)]
     [TestCase(StateModelState.PathsVerified)]
     [TestCase(StateModelState.TriedToCreateDeploymentFiles)]
@@ -72,7 +51,7 @@ public class WorkUnitFactoryTests
         var workUnit = wuf.GetNextWorkUnit(model);
 
         // Assert
-        Assert.AreSame(expectedWorkUnit, workUnit);
+        workUnit.Should().BeSameAs(expectedWorkUnit);
         drMock.Verify(m => m.Get<LoadSqlProjectPropertiesUnit>(), Times.Once);
     }
 
@@ -98,7 +77,7 @@ public class WorkUnitFactoryTests
         var workUnit = wuf.GetNextWorkUnit(model);
 
         // Assert
-        Assert.AreSame(expectedWorkUnit, workUnit);
+        workUnit.Should().BeSameAs(expectedWorkUnit);
         drMock.Verify(m => m.Get<FormatTargetVersionUnit>(), Times.Once);
     }
 
@@ -125,7 +104,7 @@ public class WorkUnitFactoryTests
         var workUnit = wuf.GetNextWorkUnit(model);
 
         // Assert
-        Assert.AreSame(expectedWorkUnit, workUnit);
+        workUnit.Should().BeSameAs(expectedWorkUnit);
         drMock.Verify(m => m.Get<ValidateTargetVersionUnit>(), Times.Once);
     }
 
@@ -151,7 +130,7 @@ public class WorkUnitFactoryTests
         var workUnit = wuf.GetNextWorkUnit(model);
 
         // Assert
-        Assert.AreSame(expectedWorkUnit, workUnit);
+        workUnit.Should().BeSameAs(expectedWorkUnit);
         drMock.Verify(m => m.Get<LoadPathsUnit>(), Times.Once);
     }
 
@@ -177,7 +156,7 @@ public class WorkUnitFactoryTests
         var workUnit = wuf.GetNextWorkUnit(model);
 
         // Assert
-        Assert.AreSame(expectedWorkUnit, workUnit);
+        workUnit.Should().BeSameAs(expectedWorkUnit);
         drMock.Verify(m => m.Get<BuildProjectUnit>(), Times.Once);
     }
 
@@ -204,7 +183,7 @@ public class WorkUnitFactoryTests
         var workUnit = wuf.GetNextWorkUnit(model);
 
         // Assert
-        Assert.AreSame(expectedWorkUnit, workUnit);
+        workUnit.Should().BeSameAs(expectedWorkUnit);
         drMock.Verify(m => m.Get<CleanNewArtifactsDirectoryUnit>(), Times.Once);
     }
 
@@ -230,7 +209,7 @@ public class WorkUnitFactoryTests
         var workUnit = wuf.GetNextWorkUnit(model);
 
         // Assert
-        Assert.AreSame(expectedWorkUnit, workUnit);
+        workUnit.Should().BeSameAs(expectedWorkUnit);
         drMock.Verify(m => m.Get<CopyBuildResultUnit>(), Times.Once);
     }
 
@@ -257,7 +236,7 @@ public class WorkUnitFactoryTests
         var workUnit = wuf.GetNextWorkUnit(model);
 
         // Assert
-        Assert.AreSame(expectedWorkUnit, workUnit);
+        workUnit.Should().BeSameAs(expectedWorkUnit);
         drMock.Verify(m => m.Get<CopyDacpacToSharedDacpacRepositoryUnit>(), Times.Once);
     }
 
@@ -280,19 +259,7 @@ public class WorkUnitFactoryTests
         var workUnit = wuf.GetNextWorkUnit(model);
 
         // Assert
-        Assert.IsNull(workUnit);
-    }
-
-    [Test]
-    public void GetNextWorkUnit_ScriptCreationStateModel_ArgumentNullException_StateModel()
-    {
-        // Arrange
-        var drMock = new Mock<IDependencyResolver>();
-        IWorkUnitFactory wuf = new WorkUnitFactory(drMock.Object);
-
-        // Act & Assert
-        // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => wuf.GetNextWorkUnit(null as ScriptCreationStateModel));
+        workUnit.Should().BeNull();
     }
 
     [Test]
@@ -338,7 +305,7 @@ public class WorkUnitFactoryTests
         var workUnit = wuf.GetNextWorkUnit(model);
 
         // Assert
-        Assert.AreSame(expectedWorkUnit, workUnit);
+        workUnit.Should().BeSameAs(expectedWorkUnit);
         drMock.Verify(m => m.Get<LoadSqlProjectPropertiesUnit>(), Times.Once);
     }
 
@@ -364,7 +331,7 @@ public class WorkUnitFactoryTests
         var workUnit = wuf.GetNextWorkUnit(model);
 
         // Assert
-        Assert.AreSame(expectedWorkUnit, workUnit);
+        workUnit.Should().BeSameAs(expectedWorkUnit);
         drMock.Verify(m => m.Get<FormatTargetVersionUnit>(), Times.Once);
     }
 
@@ -391,7 +358,7 @@ public class WorkUnitFactoryTests
         var workUnit = wuf.GetNextWorkUnit(model);
 
         // Assert
-        Assert.AreSame(expectedWorkUnit, workUnit);
+        workUnit.Should().BeSameAs(expectedWorkUnit);
         drMock.Verify(m => m.Get<ValidateTargetVersionUnit>(), Times.Once);
     }
 
@@ -417,7 +384,7 @@ public class WorkUnitFactoryTests
         var workUnit = wuf.GetNextWorkUnit(model);
 
         // Assert
-        Assert.AreSame(expectedWorkUnit, workUnit);
+        workUnit.Should().BeSameAs(expectedWorkUnit);
         drMock.Verify(m => m.Get<LoadPathsUnit>(), Times.Once);
     }
 
@@ -444,7 +411,7 @@ public class WorkUnitFactoryTests
         var workUnit = wuf.GetNextWorkUnit(model);
 
         // Assert
-        Assert.AreSame(expectedWorkUnit, workUnit);
+        workUnit.Should().BeSameAs(expectedWorkUnit);
         drMock.Verify(m => m.Get<VerifyPathsUnit>(), Times.Once);
     }
 
@@ -470,7 +437,7 @@ public class WorkUnitFactoryTests
         var workUnit = wuf.GetNextWorkUnit(model);
 
         // Assert
-        Assert.AreSame(expectedWorkUnit, workUnit);
+        workUnit.Should().BeSameAs(expectedWorkUnit);
         drMock.Verify(m => m.Get<BuildProjectUnit>(), Times.Once);
     }
 
@@ -497,7 +464,7 @@ public class WorkUnitFactoryTests
         var workUnit = wuf.GetNextWorkUnit(model);
 
         // Assert
-        Assert.AreSame(expectedWorkUnit, workUnit);
+        workUnit.Should().BeSameAs(expectedWorkUnit);
         drMock.Verify(m => m.Get<CleanNewArtifactsDirectoryUnit>(), Times.Once);
     }
 
@@ -523,7 +490,7 @@ public class WorkUnitFactoryTests
         var workUnit = wuf.GetNextWorkUnit(model);
 
         // Assert
-        Assert.AreSame(expectedWorkUnit, workUnit);
+        workUnit.Should().BeSameAs(expectedWorkUnit);
         drMock.Verify(m => m.Get<CopyBuildResultUnit>(), Times.Once);
     }
 
@@ -550,7 +517,7 @@ public class WorkUnitFactoryTests
         var workUnit = wuf.GetNextWorkUnit(model);
 
         // Assert
-        Assert.AreSame(expectedWorkUnit, workUnit);
+        workUnit.Should().BeSameAs(expectedWorkUnit);
         drMock.Verify(m => m.Get<CopyDacpacToSharedDacpacRepositoryUnit>(), Times.Once);
     }
 
@@ -578,7 +545,7 @@ public class WorkUnitFactoryTests
         var workUnit = wuf.GetNextWorkUnit(model);
 
         // Assert
-        Assert.AreSame(expectedWorkUnit, workUnit);
+        workUnit.Should().BeSameAs(expectedWorkUnit);
         drMock.Verify(m => m.Get<CreateDeploymentFilesUnit>(), Times.Once);
     }
 
@@ -606,7 +573,7 @@ public class WorkUnitFactoryTests
         var workUnit = wuf.GetNextWorkUnit(model);
 
         // Assert
-        Assert.AreSame(expectedWorkUnit, workUnit);
+        workUnit.Should().BeSameAs(expectedWorkUnit);
         drMock.Verify(m => m.Get<ModifyDeploymentScriptUnit>(), Times.Once);
     }
 
@@ -638,12 +605,12 @@ public class WorkUnitFactoryTests
         // Assert
         if (createLatest)
         {
-            Assert.IsNull(workUnit);
+            workUnit.Should().BeNull();
             drMock.Verify(m => m.Get<DeleteRefactorLogUnit>(), Times.Never);
         }
         else
         {
-            Assert.AreSame(expectedWorkUnit, workUnit);
+            workUnit.Should().BeSameAs(expectedWorkUnit);
             drMock.Verify(m => m.Get<DeleteRefactorLogUnit>(), Times.Once);
         }
     }
@@ -675,12 +642,12 @@ public class WorkUnitFactoryTests
         // Assert
         if (createLatest)
         {
-            Assert.IsNull(workUnit);
+            workUnit.Should().BeNull();
             drMock.Verify(m => m.Get<CleanLatestArtifactsDirectoryUnit>(), Times.Never);
         }
         else
         {
-            Assert.AreSame(expectedWorkUnit, workUnit);
+            workUnit.Should().BeSameAs(expectedWorkUnit);
             drMock.Verify(m => m.Get<CleanLatestArtifactsDirectoryUnit>(), Times.Once);
         }
     }
@@ -704,6 +671,6 @@ public class WorkUnitFactoryTests
         var workUnit = wuf.GetNextWorkUnit(model);
 
         // Assert
-        Assert.IsNull(workUnit);
+        workUnit.Should().BeNull();
     }
 }

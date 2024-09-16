@@ -4,57 +4,6 @@
 public class CreateDeploymentFilesUnitTests
 {
     [Test]
-    public void Constructor_ArgumentNullException_DacAccess()
-    {
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new CreateDeploymentFilesUnit(null, null, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_FileSystemAccess()
-    {
-        // Arrange
-        var daMock = Mock.Of<IDacAccess>();
-
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new CreateDeploymentFilesUnit(daMock, null, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_Logger()
-    {
-        // Arrange
-        var daMock = Mock.Of<IDacAccess>();
-        var fsaMock = Mock.Of<IFileSystemAccess>();
-
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new CreateDeploymentFilesUnit(daMock, fsaMock, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void Work_ScriptCreationStateModel_ArgumentNullException_StateModel()
-    {
-        // Arrange
-        var daMock = Mock.Of<IDacAccess>();
-        var fsaMock = Mock.Of<IFileSystemAccess>();
-        var loggerMock = Mock.Of<ILogger>();
-        IWorkUnit<ScriptCreationStateModel> unit = new CreateDeploymentFilesUnit(daMock, fsaMock, loggerMock);
-
-        // Act & Assert
-        // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => unit.Work(null, CancellationToken.None));
-    }
-
-    [Test]
     public async Task Work_ScriptCreationStateModel_DacAccessError_Async()
     {
         // Arrange
@@ -82,8 +31,8 @@ public class CreateDeploymentFilesUnitTests
         await unit.Work(model, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(StateModelState.TriedToCreateDeploymentFiles, model.CurrentState);
-        Assert.IsFalse(model.Result);
+        model.CurrentState.Should().Be(StateModelState.TriedToCreateDeploymentFiles);
+        model.Result.Should().BeFalse();
         fsaMock.Verify(m => m.WriteFileAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
         loggerMock.Verify(m => m.LogErrorAsync("Script creation aborted."), Times.Once);
         loggerMock.Verify(m => m.LogErrorAsync("Failed to create script."), Times.Once);
@@ -122,8 +71,8 @@ public class CreateDeploymentFilesUnitTests
         await unit.Work(model, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(StateModelState.TriedToCreateDeploymentFiles, model.CurrentState);
-        Assert.IsFalse(model.Result);
+        model.CurrentState.Should().Be(StateModelState.TriedToCreateDeploymentFiles);
+        model.Result.Should().BeFalse();
         fsaMock.Verify(m => m.WriteFileAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         loggerMock.Verify(m => m.LogErrorAsync("Script creation aborted."), Times.Once);
         loggerMock.Verify(m => m.LogErrorAsync(testException, "Failed to write deploy script"), Times.Once);
@@ -160,8 +109,8 @@ public class CreateDeploymentFilesUnitTests
         await unit.Work(model, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(StateModelState.TriedToCreateDeploymentFiles, model.CurrentState);
-        Assert.IsFalse(model.Result);
+        model.CurrentState.Should().Be(StateModelState.TriedToCreateDeploymentFiles);
+        model.Result.Should().BeFalse();
         fsaMock.Verify(m => m.WriteFileAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Exactly(2));
         loggerMock.Verify(m => m.LogErrorAsync("Script creation aborted."), Times.Once);
         loggerMock.Verify(m => m.LogErrorAsync(testException, "Failed to write deploy report"), Times.Once);
@@ -197,8 +146,8 @@ public class CreateDeploymentFilesUnitTests
         await unit.Work(model, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(StateModelState.TriedToCreateDeploymentFiles, model.CurrentState);
-        Assert.IsFalse(model.Result);
+        model.CurrentState.Should().Be(StateModelState.TriedToCreateDeploymentFiles);
+        model.Result.Should().BeFalse();
         loggerMock.Verify(m => m.LogErrorAsync("Failed to create complete script. Generated script is missing the pre-deployment script."), Times.Once);
         fsaMock.Verify(m => m.WriteFileAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
     }
@@ -233,8 +182,8 @@ public class CreateDeploymentFilesUnitTests
         await unit.Work(model, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(StateModelState.TriedToCreateDeploymentFiles, model.CurrentState);
-        Assert.IsFalse(model.Result);
+        model.CurrentState.Should().Be(StateModelState.TriedToCreateDeploymentFiles);
+        model.Result.Should().BeFalse();
         loggerMock.Verify(m => m.LogErrorAsync("Failed to create complete script. Generated script is missing the post-deployment script."), Times.Once);
         fsaMock.Verify(m => m.WriteFileAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
     }
@@ -275,8 +224,8 @@ public class CreateDeploymentFilesUnitTests
         await unit.Work(model, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(StateModelState.TriedToCreateDeploymentFiles, model.CurrentState);
-        Assert.IsNull(model.Result);
+        model.CurrentState.Should().Be(StateModelState.TriedToCreateDeploymentFiles);
+        model.Result.Should().BeNull();
         fsaMock.Verify(m => m.WriteFileAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         fsaMock.Verify(m => m.WriteFileAsync("deployScriptPath", (includePreDeployment ? "pre " : "") + "script" + (includePostDeployment ? " post" : "")), Times.Once);
         loggerMock.Verify(m => m.LogDebugAsync("Previous DACPAC path: \"previousDacpacPath\""), Times.Once);
@@ -323,8 +272,8 @@ public class CreateDeploymentFilesUnitTests
         await unit.Work(model, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(StateModelState.TriedToCreateDeploymentFiles, model.CurrentState);
-        Assert.IsNull(model.Result);
+        model.CurrentState.Should().Be(StateModelState.TriedToCreateDeploymentFiles);
+        model.Result.Should().BeNull();
         fsaMock.Verify(m => m.WriteFileAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Exactly(2));
         fsaMock.Verify(m => m.WriteFileAsync("deployScriptPath", (includePreDeployment ? "pre " : "") + "script" + (includePostDeployment ? " post" : "")), Times.Once);
         fsaMock.Verify(m => m.WriteFileAsync("deployReportPath", "report"), Times.Once);
@@ -408,8 +357,8 @@ public class CreateDeploymentFilesUnitTests
         await unit.Work(model, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(StateModelState.TriedToCreateDeploymentFiles, model.CurrentState);
-        Assert.AreEqual(expectedResult, model.Result);
+        model.CurrentState.Should().Be(StateModelState.TriedToCreateDeploymentFiles);
+        model.Result.Should().Be(expectedResult);
         if (removeSqlCmdStatements && createNewDatabase)
         {
             loggerMock.Verify(m => m.LogErrorAsync($"{nameof(PublishProfile.CreateNewDatabase)} cannot bet set to true, when {nameof(ConfigurationModel.RemoveSqlCmdStatements)} is also true."), Times.Once);

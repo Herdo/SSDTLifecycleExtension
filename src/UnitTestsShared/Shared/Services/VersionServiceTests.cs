@@ -4,31 +4,6 @@
 public class VersionServiceTests
 {
     [Test]
-    public void FormatVersion_ArgumentNullException_Version()
-    {
-        // Arrange
-        IVersionService vs = new VersionService();
-
-        // Act & Assert
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => vs.FormatVersion(null, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void FormatVersion_ArgumentNullException_Configuration()
-    {
-        // Arrange
-        IVersionService vs = new VersionService();
-        var v = new Version(1, 0);
-
-        // Act & Assert
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => vs.FormatVersion(v, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
     [TestCase(null)]
     [TestCase("")]
     [TestCase("1")]
@@ -45,8 +20,7 @@ public class VersionServiceTests
         var e = Assert.Throws<InvalidOperationException>(() => vs.FormatVersion(v, cm));
 
         // Assert
-        Assert.IsNotNull(e);
-        Assert.IsTrue(e.Message.Contains("not long enough"));
+        e.Message.Should().Contain("not long enough");
     }
 
     [Test]
@@ -64,8 +38,7 @@ public class VersionServiceTests
         var e = Assert.Throws<InvalidOperationException>(() => vs.FormatVersion(v, cm));
 
         // Assert
-        Assert.IsNotNull(e);
-        Assert.IsTrue(e.Message.Contains("too long"));
+        e.Message.Should().Contain("too long");
     }
 
     [Test]
@@ -86,6 +59,6 @@ public class VersionServiceTests
         var formatted = vs.FormatVersion(v, cm);
 
         // Assert
-        Assert.AreEqual(expectedResult, formatted);
+        formatted.Should().Be(expectedResult);
     }
 }

@@ -1,20 +1,10 @@
 ﻿namespace SSDTLifecycleExtension.Shared.Services;
 
-public class BuildService : IBuildService
+public class BuildService(IVisualStudioAccess _visualStudioAccess,
+                          IFileSystemAccess _fileSystemAccess,
+                          ILogger _logger)
+    : IBuildService
 {
-    private readonly IVisualStudioAccess _visualStudioAccess;
-    private readonly IFileSystemAccess _fileSystemAccess;
-    private readonly ILogger _logger;
-
-    public BuildService(IVisualStudioAccess visualStudioAccess,
-                        IFileSystemAccess fileSystemAccess,
-                        ILogger logger)
-    {
-        _visualStudioAccess = visualStudioAccess ?? throw new ArgumentNullException(nameof(visualStudioAccess));
-        _fileSystemAccess = fileSystemAccess ?? throw new ArgumentNullException(nameof(fileSystemAccess));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
-
     private async Task<bool> BuildProjectInternalAsync(SqlProject project)
     {
         await _logger.LogInfoAsync("Building project ...");
@@ -41,7 +31,7 @@ public class BuildService : IBuildService
             return false;
         }
 
-        var copyFilesResult = _fileSystemAccess.CopyFiles(project.ProjectProperties.BinaryDirectory, targetDirectory, "*.dacpac");
+        var copyFilesResult = _fileSystemAccess.CopyFiles(project.ProjectProperties.BinaryDirectory!, targetDirectory, "*.dacpac");
         foreach (var (source, target) in copyFilesResult.CopiedFiles)
             await _logger.LogTraceAsync($"Copied file \"{source}\" to \"{target}\" ...");
 
@@ -59,19 +49,12 @@ public class BuildService : IBuildService
 
     Task<bool> IBuildService.BuildProjectAsync(SqlProject project)
     {
-        if (project == null)
-            throw new ArgumentNullException(nameof(project));
-
         return BuildProjectInternalAsync(project);
     }
 
     Task<bool> IBuildService.CopyBuildResultAsync(SqlProject project,
-                                                  string targetDirectory)
+        string targetDirectory)
     {
-        if (project == null)
-            throw new ArgumentNullException(nameof(project));
-        if (targetDirectory == null)
-            throw new ArgumentNullException(nameof(targetDirectory));
         if (string.IsNullOrWhiteSpace(project.ProjectProperties.BinaryDirectory))
             throw new ArgumentException($"{nameof(SqlProjectProperties.BinaryDirectory)} must be filled.", nameof(project));
 

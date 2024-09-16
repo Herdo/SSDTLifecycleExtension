@@ -1,12 +1,14 @@
-﻿namespace SSDTLifecycleExtension.OutputClassification;
+﻿#nullable enable
+
+namespace SSDTLifecycleExtension.OutputClassification;
 
 internal sealed class OutputClassifier : IClassifier
 {
     private readonly IClassificationTypeRegistryService _classificationTypeRegistryService;
 
-    internal OutputClassifier([NotNull] IClassificationTypeRegistryService classificationTypeRegistryService)
+    internal OutputClassifier(IClassificationTypeRegistryService classificationTypeRegistryService)
     {
-        _classificationTypeRegistryService = classificationTypeRegistryService ?? throw new ArgumentNullException(nameof(classificationTypeRegistryService));
+        _classificationTypeRegistryService = classificationTypeRegistryService;
     }
 
     IList<ClassificationSpan> IClassifier.GetClassificationSpans(SnapshotSpan span)
@@ -56,5 +58,5 @@ internal sealed class OutputClassifier : IClassifier
         return spans;
     }
 
-    public event EventHandler<ClassificationChangedEventArgs> ClassificationChanged;
+    public event EventHandler<ClassificationChangedEventArgs>? ClassificationChanged;
 }

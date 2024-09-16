@@ -4,63 +4,6 @@
 public class CommandAvailabilityServiceTests
 {
     [Test]
-    public void Constructor_ArgumentNullException_VisualStudioAccess()
-    {
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        Assert.Throws<ArgumentNullException>(() => new CommandAvailabilityService(null, null, null));
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_ScaffoldingService()
-    {
-        // Arrange
-        var vsaMock = Mock.Of<IVisualStudioAccess>();
-
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        Assert.Throws<ArgumentNullException>(() => new CommandAvailabilityService(vsaMock, null, null));
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_ScriptCreationService()
-    {
-        // Arrange
-        var vsaMock = Mock.Of<IVisualStudioAccess>();
-        var scaffoldingMock = Mock.Of<IScaffoldingService>();
-
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        Assert.Throws<ArgumentNullException>(() => new CommandAvailabilityService(vsaMock, scaffoldingMock, null));
-    }
-
-    [Test]
-    public void HandleCommandAvailability_ArgumentNullException_SetVisible()
-    {
-        // Arrange
-        var vsaMock = Mock.Of<IVisualStudioAccess>();
-        var scaffoldingMock = Mock.Of<IScaffoldingService>();
-        var scriptCreationMock = Mock.Of<IScriptCreationService>();
-        ICommandAvailabilityService service = new CommandAvailabilityService(vsaMock, scaffoldingMock, scriptCreationMock);
-
-        // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => service.HandleCommandAvailability(null, null));
-    }
-
-    [Test]
-    public void HandleCommandAvailability_ArgumentNullException_SetEnabled()
-    {
-        // Arrange
-        var vsaMock = Mock.Of<IVisualStudioAccess>();
-        var scaffoldingMock = Mock.Of<IScaffoldingService>();
-        var scriptCreationMock = Mock.Of<IScriptCreationService>();
-        ICommandAvailabilityService service = new CommandAvailabilityService(vsaMock, scaffoldingMock, scriptCreationMock);
-
-        // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => service.HandleCommandAvailability(b => { }, null));
-    }
-
-    [Test]
     public void HandleCommandAvailability_NoProjectSelected()
     {
         // Arrange
@@ -76,8 +19,8 @@ public class CommandAvailabilityServiceTests
         service.HandleCommandAvailability(b => visible = b, b => enabled = b);
 
         // Assert
-        Assert.IsNull(visible);
-        Assert.IsNull(enabled);
+        visible.Should().BeNull();
+        enabled.Should().BeNull();
     }
 
     [Test]
@@ -96,8 +39,8 @@ public class CommandAvailabilityServiceTests
         service.HandleCommandAvailability(b => visible = b, b => enabled = b);
 
         // Assert
-        Assert.IsFalse(visible);
-        Assert.IsFalse(enabled);
+        visible.Should().BeFalse();
+        enabled.Should().BeFalse();
     }
 
     [Test]
@@ -122,7 +65,7 @@ public class CommandAvailabilityServiceTests
         service.HandleCommandAvailability(b => visible = b, b => enabled = b);
 
         // Assert
-        Assert.IsTrue(visible);
-        Assert.AreEqual(expectedEnabled, enabled);
+        visible.Should().BeTrue();
+        enabled.Should().Be(expectedEnabled);
     }
 }

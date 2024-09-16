@@ -10,9 +10,9 @@ public class SqlProjectPropertiesTests
         var p = new SqlProjectProperties();
 
         // Assert
-        Assert.IsNull(p.SqlTargetName);
-        Assert.IsNull(p.BinaryDirectory);
-        Assert.IsNull(p.DacVersion);
+        p.SqlTargetName.Should().BeNull();
+        p.BinaryDirectory.Should().BeNull();
+        p.DacVersion.Should().BeNull();
     }
 
     [Test]
@@ -26,7 +26,7 @@ public class SqlProjectPropertiesTests
         p.SqlTargetName = sqlTargetName;
 
         // Assert
-        Assert.AreEqual(sqlTargetName, p.SqlTargetName);
+        p.SqlTargetName.Should().Be(sqlTargetName);
     }
 
     [Test]
@@ -40,7 +40,7 @@ public class SqlProjectPropertiesTests
         p.BinaryDirectory = binaryDirectoryName;
 
         // Assert
-        Assert.AreEqual(binaryDirectoryName, p.BinaryDirectory);
+        p.BinaryDirectory.Should().Be(binaryDirectoryName);
     }
 
     [Test]
@@ -54,6 +54,6 @@ public class SqlProjectPropertiesTests
         p.DacVersion = v;
 
         // Assert
-        Assert.AreSame(v, p.DacVersion);
+        p.DacVersion.Should().BeSameAs(v);
     }
 }

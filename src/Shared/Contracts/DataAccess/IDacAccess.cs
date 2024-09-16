@@ -2,11 +2,11 @@
 
 public interface IDacAccess
 {
-    Task<CreateDeployFilesResult> CreateDeployFilesAsync([NotNull] string previousVersionDacpacPath,
-                                                         [NotNull] string newVersionDacpacPath,
-                                                         [NotNull] string publishProfilePath,
-                                                         bool createDeployScript,
-                                                         bool createDeployReport);
+    Task<CreateDeployFilesResult> CreateDeployFilesAsync(string previousVersionDacpacPath,
+        string newVersionDacpacPath,
+        string publishProfilePath,
+        bool createDeployScript,
+        bool createDeployReport);
 
-    Task<(DefaultConstraint[] DefaultConstraints, string[] Errors)> GetDefaultConstraintsAsync([NotNull] string dacpacPath);
+    Task<(DefaultConstraint[]? DefaultConstraints, string[]? Errors)> GetDefaultConstraintsAsync(string dacpacPath);
 }

@@ -1,4 +1,6 @@
-﻿namespace SSDTLifecycleExtension;
+﻿#nullable enable
+
+namespace SSDTLifecycleExtension;
 
 internal sealed class DependencyResolver : IDependencyResolver
 {
@@ -6,75 +8,66 @@ internal sealed class DependencyResolver : IDependencyResolver
     private readonly Dictionary<Type, Dictionary<string, object>> _viewModels;
     private bool _disposed;
 
-    internal DependencyResolver([NotNull] IVisualStudioAccess visualStudioAccess,
-                                [NotNull] ILogger logger,
-                                [NotNull] OleMenuCommandService commandService)
+    internal DependencyResolver(IVisualStudioAccess visualStudioAccess,
+        ILogger logger,
+        OleMenuCommandService commandService)
     {
-        if (visualStudioAccess == null)
-            throw new ArgumentNullException(nameof(visualStudioAccess));
-        if (logger == null)
-            throw new ArgumentNullException(nameof(logger));
-        if (commandService == null)
-            throw new ArgumentNullException(nameof(commandService));
-
         _container = CreateContainer(visualStudioAccess,
-                                     logger,
-                                     commandService);
-        _viewModels = new Dictionary<Type, Dictionary<string, object>>();
+            logger,
+            commandService);
+        _viewModels = [];
     }
 
     private IUnityContainer CreateContainer(IVisualStudioAccess visualStudioAccess,
-                                            ILogger logger,
-                                            OleMenuCommandService commandService)
+        ILogger logger,
+        OleMenuCommandService commandService)
     {
         return new UnityContainer()
 
-               // Register self
-               .RegisterInstance(typeof(IDependencyResolver), this, new ContainerControlledLifetimeManager())
+            // Register self
+            .RegisterInstance(typeof(IDependencyResolver), this, new ContainerControlledLifetimeManager())
 
-               // Visual Studio dependencies
-               .RegisterInstance(commandService, new ContainerControlledLifetimeManager()) // The command service
+            // Visual Studio dependencies
+            .RegisterInstance(commandService, new ContainerControlledLifetimeManager()) // The command service
 
-               // Tool window initialization
-               .RegisterSingleton<ToolWindowInitializer>()
+            // Tool window initialization
+            .RegisterSingleton<ToolWindowInitializer>()
 
-               // ViewModels
-               .RegisterType<ScriptCreationViewModel>()
-               .RegisterType<VersionHistoryViewModel>()
-               .RegisterType<ConfigurationViewModel>()
+            // ViewModels
+            .RegisterType<ScriptCreationViewModel>()
+            .RegisterType<VersionHistoryViewModel>()
+            .RegisterType<ConfigurationViewModel>()
 
-               // Services with state / events
-               .RegisterSingleton<IConfigurationService, ConfigurationService>()
-               .RegisterSingleton<IScaffoldingService, ScaffoldingService>()
-               .RegisterSingleton<IScriptCreationService, ScriptCreationService>()
+            // Services with state / events
+            .RegisterSingleton<IConfigurationService, ConfigurationService>()
+            .RegisterSingleton<IScaffoldingService, ScaffoldingService>()
+            .RegisterSingleton<IScriptCreationService, ScriptCreationService>()
 
-               // Stateless services
-               .RegisterType<ICommandAvailabilityService, CommandAvailabilityService>()
-               .RegisterType<IBuildService, BuildService>()
-               .RegisterType<IVersionService, VersionService>()
-               .RegisterType<ISqlProjectService, SqlProjectService>()
-               .RegisterType<IXmlFormatService, XmlFormatService>()
-               .RegisterType<IArtifactsService, ArtifactsService>()
-               .RegisterType<IScriptModifierProviderService, ScriptModifierProviderService>()
+            // Stateless services
+            .RegisterType<ICommandAvailabilityService, CommandAvailabilityService>()
+            .RegisterType<IBuildService, BuildService>()
+            .RegisterType<IVersionService, VersionService>()
+            .RegisterType<ISqlProjectService, SqlProjectService>()
+            .RegisterType<IXmlFormatService, XmlFormatService>()
+            .RegisterType<IArtifactsService, ArtifactsService>()
+            .RegisterType<IScriptModifierProviderService, ScriptModifierProviderService>()
 
-               // Data Access
-               .RegisterSingleton<IFileSystemAccess, FileSystemAccess>()
-               .RegisterInstance(visualStudioAccess, new ContainerControlledLifetimeManager())
-               .RegisterInstance(logger, new ContainerControlledLifetimeManager())
-               .RegisterType<IDacAccess, DacAccess>()
+            // Data Access
+            .RegisterSingleton<IFileSystemAccess, FileSystemAccess>()
+            .RegisterInstance(visualStudioAccess, new ContainerControlledLifetimeManager())
+            .RegisterInstance(logger, new ContainerControlledLifetimeManager())
+            .RegisterType<IDacAccess, DacAccess>()
 
-               // Factories
-               .RegisterSingleton<IScriptModifierFactory, ScriptModifierFactory>()
-               .RegisterSingleton<IWorkUnitFactory, WorkUnitFactory>();
+            // Factories
+            .RegisterSingleton<IScriptModifierFactory, ScriptModifierFactory>()
+            .RegisterSingleton<IWorkUnitFactory, WorkUnitFactory>();
     }
 
-    internal void RegisterPackage<TImplementation>([NotNull] TImplementation package)
+    internal void RegisterPackage<TImplementation>(TImplementation package)
         where TImplementation : IAsyncPackage
     {
         if (_disposed)
             throw new ObjectDisposedException(nameof(DependencyResolver));
-        if (package == null)
-            throw new ArgumentNullException(nameof(package));
         _container.RegisterInstance(package, new ContainerControlledLifetimeManager());
     }
 
@@ -85,12 +78,11 @@ internal sealed class DependencyResolver : IDependencyResolver
         return _container.Resolve<T>();
     }
 
-    internal TViewModel GetViewModel<TViewModel>([NotNull] SqlProject project) where TViewModel : IViewModel
+    internal TViewModel GetViewModel<TViewModel>(SqlProject project)
+        where TViewModel : IViewModel
     {
         if (_disposed)
             throw new ObjectDisposedException(nameof(DependencyResolver));
-        if (project == null)
-            throw new ArgumentNullException(nameof(project));
 
         // Check for an existing view model registered with the project.
         if (_viewModels.TryGetValue(typeof(TViewModel), out var instances)

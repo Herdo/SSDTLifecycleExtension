@@ -4,10 +4,10 @@ public interface IConfigurationService
 {
     event EventHandler<ProjectConfigurationChangedEventArgs> ConfigurationChanged;
 
-    Task<ConfigurationModel> GetConfigurationOrDefaultAsync([NotNull] SqlProject project);
+    Task<ConfigurationModel> GetConfigurationOrDefaultAsync(SqlProject project);
 
-    Task<ConfigurationModel> GetConfigurationOrDefaultAsync([NotNull] string path);
+    Task<ConfigurationModel> GetConfigurationOrDefaultAsync(string path);
 
-    Task<bool> SaveConfigurationAsync([NotNull] SqlProject project,
-                                      [NotNull] ConfigurationModel model);
+    Task<bool> SaveConfigurationAsync(SqlProject project,
+        ConfigurationModel model);
 }

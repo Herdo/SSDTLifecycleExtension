@@ -1,36 +1,26 @@
 ﻿namespace SSDTLifecycleExtension.Shared.WorkUnits;
 
-[UsedImplicitly]
-public class FormatTargetVersionUnit : IWorkUnit<ScaffoldingStateModel>,
+public class FormatTargetVersionUnit(IVersionService _versionService)
+    : IWorkUnit<ScaffoldingStateModel>,
     IWorkUnit<ScriptCreationStateModel>
 {
-    [NotNull] private readonly IVersionService _versionService;
-
-    public FormatTargetVersionUnit([NotNull] IVersionService versionService)
-    {
-        _versionService = versionService ?? throw new ArgumentNullException(nameof(versionService));
-    }
-
     Task IWorkUnit<ScaffoldingStateModel>.Work(ScaffoldingStateModel stateModel,
-                                               CancellationToken cancellationToken)
+        CancellationToken cancellationToken)
     {
-        if (stateModel == null)
-            throw new ArgumentNullException(nameof(stateModel));
-
         stateModel.FormattedTargetVersion = Version.Parse(_versionService.FormatVersion(stateModel.TargetVersion, stateModel.Configuration));
         stateModel.CurrentState = StateModelState.FormattedTargetVersionLoaded;
         return Task.CompletedTask;
     }
 
     Task IWorkUnit<ScriptCreationStateModel>.Work(ScriptCreationStateModel stateModel,
-                                                  CancellationToken cancellationToken)
+        CancellationToken cancellationToken)
     {
-        if (stateModel == null)
-            throw new ArgumentNullException(nameof(stateModel));
-
         if (!stateModel.CreateLatest)
+        {
+            Guard.IsNotNull(stateModel.Project.ProjectProperties.DacVersion);
             stateModel.FormattedTargetVersion =
                 Version.Parse(_versionService.FormatVersion(stateModel.Project.ProjectProperties.DacVersion, stateModel.Configuration));
+        }
         stateModel.CurrentState = StateModelState.FormattedTargetVersionLoaded;
         return Task.CompletedTask;
     }

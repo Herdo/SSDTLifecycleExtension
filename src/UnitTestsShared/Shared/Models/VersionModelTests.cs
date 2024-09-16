@@ -10,9 +10,9 @@ public class VersionModelTests
         var vm = new VersionModel();
 
         // Assert
-        Assert.IsNull(vm.UnderlyingVersion);
-        Assert.IsFalse(vm.IsNewestVersion);
-        Assert.AreEqual("<null>", vm.DisplayName);
+        vm.UnderlyingVersion.Should().Be(new Version(0, 0));
+        vm.IsNewestVersion.Should().BeFalse();
+        vm.DisplayName.Should().Be("0.0");
     }
 
     [Test]
@@ -24,12 +24,12 @@ public class VersionModelTests
         vm.PropertyChanged += (sender, args) => changedProperties.Add(args.PropertyName);
 
         // Act
-        vm.UnderlyingVersion = null;
+        vm.UnderlyingVersion = new Version(0, 0);
 
         // Assert
-        Assert.IsNull(vm.UnderlyingVersion);
-        Assert.AreEqual(0, changedProperties.Count);
-        Assert.AreEqual("<null>", vm.DisplayName);
+        vm.UnderlyingVersion.Should().Be(new Version(0, 0));
+        changedProperties.Should().BeEmpty();
+        vm.DisplayName.Should().Be("0.0");
     }
 
     [Test]
@@ -45,11 +45,11 @@ public class VersionModelTests
         vm.UnderlyingVersion = newVersion;
 
         // Assert
-        Assert.AreSame(newVersion, vm.UnderlyingVersion);
-        Assert.AreEqual(2, changedProperties.Count);
-        Assert.AreEqual(nameof(VersionModel.UnderlyingVersion), changedProperties[0]);
-        Assert.AreEqual(nameof(VersionModel.DisplayName), changedProperties[1]);
-        Assert.AreEqual("1.2.3.4", vm.DisplayName);
+        vm.UnderlyingVersion.Should().BeSameAs(newVersion);
+        changedProperties.Should().HaveCount(2);
+        changedProperties[0].Should().Be(nameof(VersionModel.UnderlyingVersion));
+        changedProperties[1].Should().Be(nameof(VersionModel.DisplayName));
+        vm.DisplayName.Should().Be("1.2.3.4");
     }
 
     [Test]
@@ -64,9 +64,9 @@ public class VersionModelTests
         vm.IsNewestVersion = false;
 
         // Assert
-        Assert.IsFalse(vm.IsNewestVersion);
-        Assert.AreEqual(0, changedProperties.Count);
-        Assert.AreEqual("<null>", vm.DisplayName);
+        vm.IsNewestVersion.Should().BeFalse();
+        changedProperties.Should().BeEmpty();
+        vm.DisplayName.Should().Be("0.0");
     }
 
     [Test]
@@ -81,11 +81,11 @@ public class VersionModelTests
         vm.IsNewestVersion = true;
 
         // Assert
-        Assert.IsTrue(vm.IsNewestVersion);
-        Assert.AreEqual(2, changedProperties.Count);
-        Assert.AreEqual(nameof(VersionModel.IsNewestVersion), changedProperties[0]);
-        Assert.AreEqual(nameof(VersionModel.DisplayName), changedProperties[1]);
-        Assert.AreEqual("<null>", vm.DisplayName);
+        vm.IsNewestVersion.Should().BeTrue();
+        changedProperties.Should().HaveCount(2);
+        changedProperties[0].Should().Be(nameof(VersionModel.IsNewestVersion));
+        changedProperties[1].Should().Be(nameof(VersionModel.DisplayName));
+        vm.DisplayName.Should().Be("0.0 (newest)");
     }
 
     [Test]
@@ -102,13 +102,13 @@ public class VersionModelTests
         vm.IsNewestVersion = true;
 
         // Assert
-        Assert.AreSame(newVersion, vm.UnderlyingVersion);
-        Assert.IsTrue(vm.IsNewestVersion);
-        Assert.AreEqual(4, changedProperties.Count);
-        Assert.AreEqual(nameof(VersionModel.UnderlyingVersion), changedProperties[0]);
-        Assert.AreEqual(nameof(VersionModel.DisplayName), changedProperties[1]);
-        Assert.AreEqual(nameof(VersionModel.IsNewestVersion), changedProperties[2]);
-        Assert.AreEqual(nameof(VersionModel.DisplayName), changedProperties[3]);
-        Assert.AreEqual("3.2.3 (newest)", vm.DisplayName);
+        vm.UnderlyingVersion.Should().BeSameAs(newVersion);
+        vm.IsNewestVersion.Should().BeTrue();
+        changedProperties.Should().HaveCount(4);
+        changedProperties[0].Should().Be(nameof(VersionModel.UnderlyingVersion));
+        changedProperties[1].Should().Be(nameof(VersionModel.DisplayName));
+        changedProperties[2].Should().Be(nameof(VersionModel.IsNewestVersion));
+        changedProperties[3].Should().Be(nameof(VersionModel.DisplayName));
+        vm.DisplayName.Should().Be("3.2.3 (newest)");
     }
 }

@@ -16,17 +16,13 @@ public interface IScaffoldingService
     /// <param name="configuration">The configuration to use.</param>
     /// <param name="targetVersion">The version that will be created.</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken" /> used to cancel the script creation.</param>
-    /// <exception cref="ArgumentNullException">
-    ///     <paramref name="project" />, <paramref name="configuration" />, or
-    ///     <paramref name="targetVersion" /> are <b>null</b>.
-    /// </exception>
     /// <exception cref="InvalidOperationException">
     ///     A scaffolding is currently running. Check <see cref="IsScaffolding" />
     ///     before calling.
     /// </exception>
     /// <returns><b>True</b>, if scaffolding was successful, otherwise <b>false</b>.</returns>
-    Task<bool> ScaffoldAsync([NotNull] SqlProject project,
-                             [NotNull] ConfigurationModel configuration,
-                             [NotNull] Version targetVersion,
-                             CancellationToken cancellationToken);
+    Task<bool> ScaffoldAsync(SqlProject project,
+        ConfigurationModel configuration,
+        Version targetVersion,
+        CancellationToken cancellationToken);
 }

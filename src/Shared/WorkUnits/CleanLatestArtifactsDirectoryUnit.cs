@@ -1,21 +1,12 @@
 ﻿namespace SSDTLifecycleExtension.Shared.WorkUnits;
 
-[UsedImplicitly]
-public class CleanLatestArtifactsDirectoryUnit : IWorkUnit<ScriptCreationStateModel>
+public class CleanLatestArtifactsDirectoryUnit(IFileSystemAccess _fileSystemAccess,
+                                               ILogger _logger)
+    : IWorkUnit<ScriptCreationStateModel>
 {
-    [NotNull] private readonly IFileSystemAccess _fileSystemAccess;
-    [NotNull] private readonly ILogger _logger;
-
-    public CleanLatestArtifactsDirectoryUnit([NotNull] IFileSystemAccess fileSystemAccess,
-                                             [NotNull] ILogger logger)
-    {
-        _fileSystemAccess = fileSystemAccess ?? throw new ArgumentNullException(nameof(fileSystemAccess));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
-
     private async Task CleanArtifactsDirectoryInternal(IStateModel stateModel,
-                                                       ConfigurationModel configuration,
-                                                       PathCollection paths)
+        ConfigurationModel configuration,
+        PathCollection paths)
     {
         if (!configuration.DeleteLatestAfterVersionedScriptGeneration)
         {
@@ -32,13 +23,12 @@ public class CleanLatestArtifactsDirectoryUnit : IWorkUnit<ScriptCreationStateMo
     }
 
     Task IWorkUnit<ScriptCreationStateModel>.Work(ScriptCreationStateModel stateModel,
-                                                  CancellationToken cancellationToken)
+        CancellationToken cancellationToken)
     {
-        if (stateModel == null)
-            throw new ArgumentNullException(nameof(stateModel));
+        Guard.IsNotNullOrWhiteSpace(stateModel.Paths?.Directories.LatestArtifactsDirectory);
 
         return CleanArtifactsDirectoryInternal(stateModel,
-                                               stateModel.Configuration,
-                                               stateModel.Paths);
+            stateModel.Configuration,
+            stateModel.Paths);
     }
 }

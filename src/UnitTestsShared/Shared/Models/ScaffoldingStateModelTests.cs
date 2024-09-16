@@ -4,58 +4,6 @@
 public class ScaffoldingStateModelTests
 {
     [Test]
-    public void Constructor_ArgumentNullException_Project()
-    {
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new ScaffoldingStateModel(null, null, null, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_Configuration()
-    {
-        // Arrange
-        var project = new SqlProject("a", "b", "c");
-
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new ScaffoldingStateModel(project, null, null, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_TargetVersion()
-    {
-        // Arrange
-        var project = new SqlProject("a", "b", "c");
-        var configuration = ConfigurationModel.GetDefault();
-
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new ScaffoldingStateModel(project, configuration, null, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_HandleWorkInProgressChanged()
-    {
-        // Arrange
-        var project = new SqlProject("a", "b", "c");
-        var configuration = ConfigurationModel.GetDefault();
-        var targetVersion = new Version(1, 0);
-
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new ScaffoldingStateModel(project, configuration, targetVersion, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
     public void Constructor_CorrectInitialization()
     {
         // Arrange
@@ -69,10 +17,10 @@ public class ScaffoldingStateModelTests
         var model = new ScaffoldingStateModel(project, configuration, targetVersion, changeHandler);
 
         // Assert
-        Assert.AreSame(project, model.Project);
-        Assert.AreSame(configuration, model.Configuration);
-        Assert.AreSame(targetVersion, model.TargetVersion);
-        Assert.AreSame(changeHandler, model.HandleWorkInProgressChanged);
+        model.Project.Should().BeSameAs(project);
+        model.Configuration.Should().BeSameAs(configuration);
+        model.TargetVersion.Should().BeSameAs(targetVersion);
+        model.HandleWorkInProgressChanged.Should().BeSameAs(changeHandler);
     }
 
     [Test]
@@ -91,7 +39,7 @@ public class ScaffoldingStateModelTests
         model.FormattedTargetVersion = formattedVersion;
 
         // Assert
-        Assert.AreSame(formattedVersion, model.FormattedTargetVersion);
+        model.FormattedTargetVersion.Should().BeSameAs(formattedVersion);
     }
 
     [Test]
@@ -113,6 +61,6 @@ public class ScaffoldingStateModelTests
         model.Paths = paths;
 
         // Assert
-        Assert.AreSame(paths, model.Paths);
+        model.Paths.Should().BeSameAs(paths);
     }
 }

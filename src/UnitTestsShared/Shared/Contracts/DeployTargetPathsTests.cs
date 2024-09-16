@@ -14,7 +14,7 @@ public class DeployTargetPathsTests
         var dtp = new DeployTargetPaths(deployScriptPath, deployReportPath);
 
         // Assert
-        Assert.AreEqual(deployScriptPath, dtp.DeployScriptPath);
-        Assert.AreEqual(deployReportPath, dtp.DeployReportPath);
+        dtp.DeployScriptPath.Should().Be(deployScriptPath);
+        dtp.DeployReportPath.Should().Be(deployReportPath);
     }
 }

@@ -4,104 +4,6 @@
 public class ScaffoldingServiceTests
 {
     [Test]
-    public void Constructor_ArgumentNullException_WorkUnitFactory()
-    {
-        // Arrange
-        var loggerMock = Mock.Of<ILogger>();
-
-        // Act
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        var e = Assert.Throws<ArgumentNullException>(() => new ScaffoldingService(null, null, loggerMock));
-        // ReSharper restore AssignNullToNotNullAttribute
-
-        // Assert
-        Assert.AreEqual("workUnitFactory", e.ParamName);
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_VisualStudioAccess()
-    {
-        // Arrange
-        var loggerMock = Mock.Of<ILogger>();
-        var wufMock = Mock.Of<IWorkUnitFactory>();
-
-        // Act
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        var e = Assert.Throws<ArgumentNullException>(() => new ScaffoldingService(wufMock, null, loggerMock));
-        // ReSharper restore AssignNullToNotNullAttribute
-
-        // Assert
-        Assert.AreEqual("visualStudioAccess", e.ParamName);
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_Logger()
-    {
-        // Arrange
-        var wufMock = Mock.Of<IWorkUnitFactory>();
-        var vsaMock = Mock.Of<IVisualStudioAccess>();
-
-        // Act
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        var e = Assert.Throws<ArgumentNullException>(() => new ScaffoldingService(wufMock, vsaMock, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-
-        // Assert
-        Assert.AreEqual("logger", e.ParamName);
-    }
-
-    [Test]
-    public void ScaffoldAsync_ArgumentNullException_Project()
-    {
-        // Arrange
-        var wufMock = Mock.Of<IWorkUnitFactory>();
-        var vsaMock = Mock.Of<IVisualStudioAccess>();
-        var loggerMock = Mock.Of<ILogger>();
-        IScaffoldingService service = new ScaffoldingService(wufMock, vsaMock, loggerMock);
-
-        // Act & Assert
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => service.ScaffoldAsync(null, null, null, CancellationToken.None));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void ScaffoldAsync_ArgumentNullException_Configuration()
-    {
-        // Arrange
-        var wufMock = Mock.Of<IWorkUnitFactory>();
-        var vsaMock = Mock.Of<IVisualStudioAccess>();
-        var loggerMock = Mock.Of<ILogger>();
-        IScaffoldingService service = new ScaffoldingService(wufMock, vsaMock, loggerMock);
-        var project = new SqlProject("a", "b", "c");
-
-        // Act & Assert
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => service.ScaffoldAsync(project, null, null, CancellationToken.None));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void ScaffoldAsync_ArgumentNullException_PreviousVersion()
-    {
-        // Arrange
-        var wufMock = Mock.Of<IWorkUnitFactory>();
-        var vsaMock = Mock.Of<IVisualStudioAccess>();
-        var loggerMock = Mock.Of<ILogger>();
-        IScaffoldingService service = new ScaffoldingService(wufMock, vsaMock, loggerMock);
-        var project = new SqlProject("a", "b", "c");
-        var configuration = ConfigurationModel.GetDefault();
-
-        // Act & Assert
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => service.ScaffoldAsync(project, configuration, null, CancellationToken.None));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
     public async Task ScaffoldAsync_InvalidOperationException_CallCreateWhileRunning_Async()
     {
         // Arrange
@@ -127,9 +29,9 @@ public class ScaffoldingServiceTests
         await service.ScaffoldAsync(project, configuration, targetVersion, CancellationToken.None);
 
         // Assert
-        Assert.IsTrue(invokedSecondTime);
-        Assert.IsNotNull(thrownException);
-        Assert.IsInstanceOf<InvalidOperationException>(thrownException);
+        invokedSecondTime.Should().BeTrue();
+        thrownException.Should().NotBeNull();
+        thrownException.Should().BeOfType<InvalidOperationException>();
     }
 
     [Test]
@@ -154,10 +56,10 @@ public class ScaffoldingServiceTests
         var result = await service.ScaffoldAsync(project, configuration, targetVersion, CancellationToken.None);
 
         // Assert
-        Assert.IsTrue(result);
-        Assert.AreEqual(2, isCreatingList.Count);
-        Assert.IsTrue(isCreatingList[0]);
-        Assert.IsFalse(isCreatingList[1]);
+        result.Should().BeTrue();
+        isCreatingList.Should().HaveCount(2);
+        isCreatingList[0].Should().BeTrue();
+        isCreatingList[1].Should().BeFalse();
         vsaMock.Verify(m => m.StartLongRunningTaskIndicatorAsync(), Times.Once);
         vsaMock.Verify(m => m.ClearSSDTLifecycleOutputAsync(), Times.Once);
         vsaMock.Verify(m => m.StopLongRunningTaskIndicatorAsync(), Times.Once);
@@ -187,10 +89,10 @@ public class ScaffoldingServiceTests
         var result = await service.ScaffoldAsync(project, configuration, targetVersion, CancellationToken.None);
 
         // Assert
-        Assert.IsTrue(result);
-        Assert.AreEqual(2, isCreatingList.Count);
-        Assert.IsTrue(isCreatingList[0]);
-        Assert.IsFalse(isCreatingList[1]);
+        result.Should().BeTrue();
+        isCreatingList.Should().HaveCount(2);
+        isCreatingList[0].Should().BeTrue();
+        isCreatingList[1].Should().BeFalse();
         vsaMock.Verify(m => m.StartLongRunningTaskIndicatorAsync(), Times.Once);
         vsaMock.Verify(m => m.ClearSSDTLifecycleOutputAsync(), Times.Once);
         vsaMock.Verify(m => m.StopLongRunningTaskIndicatorAsync(), Times.Once);
@@ -228,10 +130,10 @@ public class ScaffoldingServiceTests
         var result = await service.ScaffoldAsync(project, configuration, targetVersion, CancellationToken.None);
 
         // Assert
-        Assert.IsTrue(result);
-        Assert.AreEqual(2, isCreatingList.Count);
-        Assert.IsTrue(isCreatingList[0]);
-        Assert.IsFalse(isCreatingList[1]);
+        result.Should().BeTrue();
+        isCreatingList.Should().HaveCount(2);
+        isCreatingList[0].Should().BeTrue();
+        isCreatingList[1].Should().BeFalse();
         vsaMock.Verify(m => m.StartLongRunningTaskIndicatorAsync(), Times.Once);
         vsaMock.Verify(m => m.ClearSSDTLifecycleOutputAsync(), Times.Once);
         vsaMock.Verify(m => m.StopLongRunningTaskIndicatorAsync(), Times.Once);
@@ -270,10 +172,10 @@ public class ScaffoldingServiceTests
         var result = await service.ScaffoldAsync(project, configuration, targetVersion, CancellationToken.None);
 
         // Assert
-        Assert.IsFalse(result);
-        Assert.AreEqual(2, isCreatingList.Count);
-        Assert.IsTrue(isCreatingList[0]);
-        Assert.IsFalse(isCreatingList[1]);
+        result.Should().BeFalse();
+        isCreatingList.Should().HaveCount(2);
+        isCreatingList[0].Should().BeTrue();
+        isCreatingList[1].Should().BeFalse();
         vsaMock.Verify(m => m.StartLongRunningTaskIndicatorAsync(), Times.Once);
         vsaMock.Verify(m => m.ClearSSDTLifecycleOutputAsync(), Times.Once);
         vsaMock.Verify(m => m.StopLongRunningTaskIndicatorAsync(), Times.Once);
@@ -314,10 +216,10 @@ public class ScaffoldingServiceTests
         var result = await service.ScaffoldAsync(project, configuration, targetVersion, CancellationToken.None);
 
         // Assert
-        Assert.IsFalse(result);
-        Assert.AreEqual(2, isCreatingList.Count);
-        Assert.IsTrue(isCreatingList[0]);
-        Assert.IsFalse(isCreatingList[1]);
+        result.Should().BeFalse();
+        isCreatingList.Should().HaveCount(2);
+        isCreatingList[0].Should().BeTrue();
+        isCreatingList[1].Should().BeFalse();
         vsaMock.Verify(m => m.StartLongRunningTaskIndicatorAsync(), Times.Once);
         vsaMock.Verify(m => m.ClearSSDTLifecycleOutputAsync(), Times.Once);
         vsaMock.Verify(m => m.StopLongRunningTaskIndicatorAsync(), Times.Once);
@@ -336,6 +238,6 @@ public class ScaffoldingServiceTests
         var isCreating = service.IsScaffolding;
 
         // Assert
-        Assert.IsFalse(isCreating);
+        isCreating.Should().BeFalse();
     }
 }

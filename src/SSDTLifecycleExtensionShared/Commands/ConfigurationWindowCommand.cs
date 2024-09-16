@@ -1,6 +1,7 @@
-﻿namespace SSDTLifecycleExtension.Commands;
+﻿#nullable enable
 
-[UsedImplicitly]
+namespace SSDTLifecycleExtension.Commands;
+
 [ExcludeFromCodeCoverage] // Test would require a Visual Studio shell.
 internal sealed class ConfigurationWindowCommand : WindowBaseCommand<ConfigurationWindow, ConfigurationViewModel>
 {
@@ -23,7 +24,7 @@ internal sealed class ConfigurationWindowCommand : WindowBaseCommand<Configurati
     {
     }
 
-    public static ConfigurationWindowCommand Instance
+    public static ConfigurationWindowCommand? Instance
     {
         get;
         private set;

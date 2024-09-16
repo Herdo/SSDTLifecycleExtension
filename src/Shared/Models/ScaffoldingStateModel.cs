@@ -1,25 +1,18 @@
 ﻿namespace SSDTLifecycleExtension.Shared.Models;
 
-public class ScaffoldingStateModel : BaseStateModel
+public class ScaffoldingStateModel(SqlProject project,
+                                   ConfigurationModel configuration,
+                                   Version targetVersion,
+                                   Func<bool, Task> handleWorkInProgressChanged)
+    : BaseStateModel(handleWorkInProgressChanged)
 {
-    [NotNull] public SqlProject Project { get; }
+    public SqlProject Project { get; } = project;
 
-    [NotNull] public ConfigurationModel Configuration { get; }
+    public ConfigurationModel Configuration { get; } = configuration;
 
-    [NotNull] public Version TargetVersion { get; }
+    public Version TargetVersion { get; } = targetVersion;
 
-    [CanBeNull] public Version FormattedTargetVersion { get; set; }
+    public Version? FormattedTargetVersion { get; set; }
 
-    [CanBeNull] public PathCollection Paths { get; set; }
-
-    public ScaffoldingStateModel([NotNull] SqlProject project,
-                                 [NotNull] ConfigurationModel configuration,
-                                 [NotNull] Version targetVersion,
-                                 [NotNull] Func<bool, Task> handleWorkInProgressChanged)
-        : base(handleWorkInProgressChanged)
-    {
-        Project = project ?? throw new ArgumentNullException(nameof(project));
-        Configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-        TargetVersion = targetVersion ?? throw new ArgumentNullException(nameof(targetVersion));
-    }
+    public PathCollection? Paths { get; set; }
 }

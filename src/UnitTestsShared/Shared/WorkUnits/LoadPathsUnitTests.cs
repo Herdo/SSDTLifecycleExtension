@@ -4,27 +4,6 @@
 public class LoadPathsUnitTests
 {
     [Test]
-    public void Constructor_ArgumentNullException_SqlProjectService()
-    {
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new LoadPathsUnit(null));
-    }
-
-    [Test]
-    public void Work_ScaffoldingStateModel_ArgumentNullException_StateModel()
-    {
-        // Arrange
-        var spsMock = new Mock<ISqlProjectService>();
-        IWorkUnit<ScaffoldingStateModel> unit = new LoadPathsUnit(spsMock.Object);
-
-        // Act & Assert
-        // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => unit.Work(null, CancellationToken.None));
-    }
-
-    [Test]
     public async Task Work_ScaffoldingStateModel_LoadedSuccessful_Async()
     {
         // Arrange
@@ -45,8 +24,8 @@ public class LoadPathsUnitTests
         await unit.Work(model, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(StateModelState.PathsLoaded, model.CurrentState);
-        Assert.IsNull(model.Result);
+        model.CurrentState.Should().Be(StateModelState.PathsLoaded);
+        model.Result.Should().BeNull();
     }
 
     [Test]
@@ -66,20 +45,8 @@ public class LoadPathsUnitTests
         await unit.Work(model, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(StateModelState.PathsLoaded, model.CurrentState);
-        Assert.IsFalse(model.Result);
-    }
-
-    [Test]
-    public void Work_ScriptCreationStateModel_ArgumentNullException_StateModel()
-    {
-        // Arrange
-        var spsMock = new Mock<ISqlProjectService>();
-        IWorkUnit<ScriptCreationStateModel> unit = new LoadPathsUnit(spsMock.Object);
-
-        // Act & Assert
-        // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => unit.Work(null, CancellationToken.None));
+        model.CurrentState.Should().Be(StateModelState.PathsLoaded);
+        model.Result.Should().BeFalse();
     }
 
     [Test]
@@ -103,8 +70,8 @@ public class LoadPathsUnitTests
         await unit.Work(model, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(StateModelState.PathsLoaded, model.CurrentState);
-        Assert.IsNull(model.Result);
+        model.CurrentState.Should().Be(StateModelState.PathsLoaded);
+        model.Result.Should().BeNull();
     }
 
     [Test]
@@ -124,7 +91,7 @@ public class LoadPathsUnitTests
         await unit.Work(model, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(StateModelState.PathsLoaded, model.CurrentState);
-        Assert.IsFalse(model.Result);
+        model.CurrentState.Should().Be(StateModelState.PathsLoaded);
+        model.Result.Should().BeFalse();
     }
 }

@@ -4,43 +4,6 @@
 public class PathCollectionTests
 {
     [Test]
-    public void Constructor_ArgumentNullException_Directories()
-    {
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new PathCollection(null, null, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_DeploySources()
-    {
-        // Arrange
-        var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
-
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new PathCollection(directories, null, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_DeployTargets()
-    {
-        // Arrange
-        var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
-        var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
-
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new PathCollection(directories, sourcePaths, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
     public void Constructor_InvalidOperationException_NeitherScriptPathNorDeployPathSet_WhenPreviousDacpacPathIsSet()
     {
         // Arrange
@@ -84,8 +47,8 @@ public class PathCollectionTests
                                     targetPaths);
 
         // Assert
-        Assert.AreSame(directories, pc.Directories);
-        Assert.AreSame(sourcePaths, pc.DeploySources);
-        Assert.AreSame(targetPaths, pc.DeployTargets);
+        pc.Directories.Should().BeSameAs(directories);
+        pc.DeploySources.Should().BeSameAs(sourcePaths);
+        pc.DeployTargets.Should().BeSameAs(targetPaths);
     }
 }

@@ -1,18 +1,11 @@
 ﻿namespace SSDTLifecycleExtension.Shared.WorkUnits;
 
-[UsedImplicitly]
-public class LoadSqlProjectPropertiesUnit : IWorkUnit<ScaffoldingStateModel>,
+public class LoadSqlProjectPropertiesUnit(ISqlProjectService _sqlProjectService)
+    : IWorkUnit<ScaffoldingStateModel>,
     IWorkUnit<ScriptCreationStateModel>
 {
-    [NotNull] private readonly ISqlProjectService _sqlProjectService;
-
-    public LoadSqlProjectPropertiesUnit([NotNull] ISqlProjectService sqlProjectService)
-    {
-        _sqlProjectService = sqlProjectService ?? throw new ArgumentNullException(nameof(sqlProjectService));
-    }
-
     private async Task TryLoadSqlProjectPropertiesInternal(IStateModel stateModel,
-                                                           SqlProject project)
+        SqlProject project)
     {
         var loaded = await _sqlProjectService.TryLoadSqlProjectPropertiesAsync(project);
         if (!loaded)
@@ -21,20 +14,14 @@ public class LoadSqlProjectPropertiesUnit : IWorkUnit<ScaffoldingStateModel>,
     }
 
     Task IWorkUnit<ScaffoldingStateModel>.Work(ScaffoldingStateModel stateModel,
-                                               CancellationToken cancellationToken)
+        CancellationToken cancellationToken)
     {
-        if (stateModel == null)
-            throw new ArgumentNullException(nameof(stateModel));
-
         return TryLoadSqlProjectPropertiesInternal(stateModel, stateModel.Project);
     }
 
     Task IWorkUnit<ScriptCreationStateModel>.Work(ScriptCreationStateModel stateModel,
-                                                  CancellationToken cancellationToken)
+        CancellationToken cancellationToken)
     {
-        if (stateModel == null)
-            throw new ArgumentNullException(nameof(stateModel));
-
         return TryLoadSqlProjectPropertiesInternal(stateModel, stateModel.Project);
     }
 }

@@ -1,6 +1,7 @@
-﻿namespace SSDTLifecycleExtension.Commands;
+﻿#nullable enable
 
-[UsedImplicitly]
+namespace SSDTLifecycleExtension.Commands;
+
 [ExcludeFromCodeCoverage] // Test would require a Visual Studio shell.
 internal sealed class VersionHistoryWindowCommand : WindowBaseCommand<VersionHistoryWindow, VersionHistoryViewModel>
 {
@@ -23,7 +24,7 @@ internal sealed class VersionHistoryWindowCommand : WindowBaseCommand<VersionHis
     {
     }
 
-    public static VersionHistoryWindowCommand Instance
+    public static VersionHistoryWindowCommand? Instance
     {
         get;
         private set;

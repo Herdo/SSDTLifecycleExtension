@@ -4,42 +4,6 @@
 public class ValidateTargetVersionUnitTests
 {
     [Test]
-    public void Constructor_ArgumentNullException_VisualStudioAccess()
-    {
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new ValidateTargetVersionUnit(null, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_Logger()
-    {
-        // Arrange
-        var vsaMock = new Mock<IVisualStudioAccess>();
-
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new ValidateTargetVersionUnit(vsaMock.Object, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void Work_ScaffoldingStateModel_ArgumentNullException_StateModel()
-    {
-        // Arrange
-        var vsaMock = new Mock<IVisualStudioAccess>();
-        var loggerMock = new Mock<ILogger>();
-        IWorkUnit<ScaffoldingStateModel> unit = new ValidateTargetVersionUnit(vsaMock.Object, loggerMock.Object);
-
-        // Act & Assert
-        // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => unit.Work(null, CancellationToken.None));
-    }
-
-    [Test]
     public async Task Work_ScaffoldingStateModel_ValidVersion_Async()
     {
         // Arrange
@@ -62,8 +26,8 @@ public class ValidateTargetVersionUnitTests
         await unit.Work(model, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(StateModelState.FormattedTargetVersionValidated, model.CurrentState);
-        Assert.IsNull(model.Result);
+        model.CurrentState.Should().Be(StateModelState.FormattedTargetVersionValidated);
+        model.Result.Should().BeNull();
         vsaMock.Verify(m => m.ShowModalError(It.IsAny<string>()), Times.Never);
         loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);
     }
@@ -93,23 +57,10 @@ public class ValidateTargetVersionUnitTests
         await unit.Work(model, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(StateModelState.FormattedTargetVersionValidated, model.CurrentState);
-        Assert.IsFalse(model.Result);
+        model.CurrentState.Should().Be(StateModelState.FormattedTargetVersionValidated);
+        model.Result.Should().BeFalse();
         vsaMock.Verify(m => m.ShowModalError("Please change the DAC version in the SQL project settings (see output window)."), Times.Once);
         loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Once);
-    }
-
-    [Test]
-    public void Work_ScriptCreationStateModel_ArgumentNullException_StateModel()
-    {
-        // Arrange
-        var vsaMock = new Mock<IVisualStudioAccess>();
-        var loggerMock = new Mock<ILogger>();
-        IWorkUnit<ScriptCreationStateModel> unit = new ValidateTargetVersionUnit(vsaMock.Object, loggerMock.Object);
-
-        // Act & Assert
-        // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => unit.Work(null, CancellationToken.None));
     }
 
     [Test]
@@ -133,8 +84,8 @@ public class ValidateTargetVersionUnitTests
         await unit.Work(model, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(StateModelState.FormattedTargetVersionValidated, model.CurrentState);
-        Assert.IsNull(model.Result);
+        model.CurrentState.Should().Be(StateModelState.FormattedTargetVersionValidated);
+        model.Result.Should().BeNull();
         vsaMock.Verify(m => m.ShowModalError(It.IsAny<string>()), Times.Never);
         loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);
     }
@@ -159,8 +110,8 @@ public class ValidateTargetVersionUnitTests
         await unit.Work(model, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(StateModelState.FormattedTargetVersionValidated, model.CurrentState);
-        Assert.IsNull(model.Result);
+        model.CurrentState.Should().Be(StateModelState.FormattedTargetVersionValidated);
+        model.Result.Should().BeNull();
         vsaMock.Verify(m => m.ShowModalError(It.IsAny<string>()), Times.Never);
         loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);
     }
@@ -188,8 +139,8 @@ public class ValidateTargetVersionUnitTests
         await unit.Work(model, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(StateModelState.FormattedTargetVersionValidated, model.CurrentState);
-        Assert.IsFalse(model.Result);
+        model.CurrentState.Should().Be(StateModelState.FormattedTargetVersionValidated);
+        model.Result.Should().BeFalse();
         vsaMock.Verify(m => m.ShowModalError("Please change the DAC version in the SQL project settings (see output window)."), Times.Once);
         loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Once);
     }

@@ -47,7 +47,7 @@ public class BoolToVisibilityConverterTests
         var converted = converter.Convert(input, typeof(Visibility), parameter, CultureInfo.InvariantCulture);
 
         // Assert
-        Assert.AreEqual(expected, converted);
+        converted.Should().Be(expected);
     }
 
     [Test]

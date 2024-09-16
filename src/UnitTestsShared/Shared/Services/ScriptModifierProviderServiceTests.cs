@@ -4,27 +4,6 @@
 public class ScriptModifierProviderServiceTests
 {
     [Test]
-    public void Constructor_ArgumentNullException_ScriptModifierFactory()
-    {
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new ScriptModifierProviderService(null));
-    }
-
-    [Test]
-    public void GetScriptModifiers_ArgumentNullException_Configuration()
-    {
-        // Arrange
-        var smfMock = new Mock<IScriptModifierFactory>();
-        IScriptModifierProviderService service = new ScriptModifierProviderService(smfMock.Object);
-
-        // Act & Assert
-        // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => service.GetScriptModifiers(null));
-    }
-
-    [Test]
     public void GetScriptModifiers_NoModifiers()
     {
         // Arrange
@@ -43,8 +22,8 @@ public class ScriptModifierProviderServiceTests
         var modifiers = service.GetScriptModifiers(config);
 
         // Assert
-        Assert.IsNotNull(modifiers);
-        Assert.AreEqual(0, modifiers.Count);
+        modifiers.Should().NotBeNull();
+        modifiers.Should().BeEmpty();
         smfMock.Verify(m => m.CreateScriptModifier(It.IsAny<ScriptModifier>()), Times.Never);
     }
 
@@ -80,14 +59,14 @@ public class ScriptModifierProviderServiceTests
         var modifiers = service.GetScriptModifiers(config);
 
         // Assert
-        Assert.IsNotNull(modifiers);
-        Assert.AreEqual(6, modifiers.Count);
+        modifiers.Should().NotBeNull();
+        modifiers.Should().HaveCount(6);
         smfMock.Verify(m => m.CreateScriptModifier(It.IsAny<ScriptModifier>()), Times.Exactly(6));
-        Assert.AreSame(modifiers[ScriptModifier.CommentOutUnnamedDefaultConstraintDrops], sm1);
-        Assert.AreSame(modifiers[ScriptModifier.ReplaceUnnamedDefaultConstraintDrops], sm2);
-        Assert.AreSame(modifiers[ScriptModifier.AddCustomHeader], sm3);
-        Assert.AreSame(modifiers[ScriptModifier.AddCustomFooter], sm4);
-        Assert.AreSame(modifiers[ScriptModifier.TrackDacpacVersion], sm5);
-        Assert.AreSame(modifiers[ScriptModifier.RemoveSqlCmdStatements], sm6);
+        modifiers[ScriptModifier.CommentOutUnnamedDefaultConstraintDrops].Should().BeSameAs(sm1);
+        modifiers[ScriptModifier.ReplaceUnnamedDefaultConstraintDrops].Should().BeSameAs(sm2);
+        modifiers[ScriptModifier.AddCustomHeader].Should().BeSameAs(sm3);
+        modifiers[ScriptModifier.AddCustomFooter].Should().BeSameAs(sm4);
+        modifiers[ScriptModifier.TrackDacpacVersion].Should().BeSameAs(sm5);
+        modifiers[ScriptModifier.RemoveSqlCmdStatements].Should().BeSameAs(sm6);
     }
 }

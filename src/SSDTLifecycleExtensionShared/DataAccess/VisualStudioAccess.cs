@@ -1,6 +1,7 @@
-﻿namespace SSDTLifecycleExtension.DataAccess;
+﻿#nullable enable
 
-[UsedImplicitly]
+namespace SSDTLifecycleExtension.DataAccess;
+
 [ExcludeFromCodeCoverage] // Test would require a Visual Studio shell.
 public class VisualStudioAccess : IVisualStudioAccess
 {
@@ -9,7 +10,7 @@ public class VisualStudioAccess : IVisualStudioAccess
     private Guid _paneGuid;
 
     public VisualStudioAccess(DTE2 dte2,
-                              AsyncPackage package)
+        AsyncPackage package)
     {
         ThreadHelper.ThrowIfNotOnUIThread();
         _dte2 = dte2;
@@ -50,11 +51,11 @@ public class VisualStudioAccess : IVisualStudioAccess
         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
         var outputPane = await GetOrCreateSSDTOutputPaneAsync();
-        outputPane.OutputString(message);
-        outputPane.OutputString(Environment.NewLine);
+        outputPane.OutputStringThreadSafe(message);
+        outputPane.OutputStringThreadSafe(Environment.NewLine);
     }
 
-    public event EventHandler SolutionClosed;
+    public event EventHandler? SolutionClosed;
 
     Guid IVisualStudioAccess.GetSelectedProjectKind()
     {
@@ -65,7 +66,7 @@ public class VisualStudioAccess : IVisualStudioAccess
             : Guid.Empty;
     }
 
-    SqlProject IVisualStudioAccess.GetSelectedSqlProject()
+    SqlProject? IVisualStudioAccess.GetSelectedSqlProject()
     {
         ThreadHelper.ThrowIfNotOnUIThread();
 

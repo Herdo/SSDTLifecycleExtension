@@ -87,27 +87,6 @@ PRINT 'Update complete'
 ";
 
     [Test]
-    public void SearchStatementRange_ArgumentNullException_Input()
-    {
-        // Arrange
-        var s = new StringSearchModifierBaseTestImplementation();
-
-        // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => s.SearchStatementRangeBase(null, null, 0, 0));
-    }
-
-    [Test]
-    public void SearchStatementRange_ArgumentNullException_Statement()
-    {
-        // Arrange
-        var s = new StringSearchModifierBaseTestImplementation();
-        const string input = @"";
-
-        // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => s.SearchStatementRangeBase(input, null, 0, 0));
-    }
-
-    [Test]
     public void SearchStatementRange_ArgumentException_Statement()
     {
         // Arrange
@@ -143,8 +122,8 @@ PRINT 'Update complete'
         var (startIndex, endIndex) = s.SearchStatementRangeBase(input, statement, 0, 0);
 
         // Assert
-        Assert.AreEqual(-1, startIndex, "Wrong start index");
-        Assert.AreEqual(-1, endIndex, "Wrong end index");
+        startIndex.Should().Be(-1);
+        endIndex.Should().Be(-1);
     }
 
     [Test]
@@ -165,8 +144,8 @@ PRINT 'Update complete'
         var (startIndex, endIndex) = s.SearchStatementRangeBase(MultiLineInputWithFinalGo, statement, startAfterIndex, numberOfLeadingStatementsToInclude);
 
         // Assert
-        Assert.AreEqual(expectedStartIndex, startIndex, "Wrong start index");
-        Assert.AreEqual(expectedEndIndex, endIndex, "Wrong end index");
+        startIndex.Should().Be(expectedStartIndex);
+        endIndex.Should().Be(expectedEndIndex);
     }
 
     [Test]
@@ -192,8 +171,8 @@ PRINT 'Update complete'
         var (startIndex, endIndex) = s.SearchStatementRangeBase(MultiLineInputWithFinalGo, statement, startAfterIndex, numberOfLeadingStatementsToInclude);
 
         // Assert
-        Assert.AreEqual(expectedStartIndex, startIndex, "Wrong start index");
-        Assert.AreEqual(expectedEndIndex, endIndex, "Wrong end index");
+        startIndex.Should().Be(expectedStartIndex);
+        endIndex.Should().Be(expectedEndIndex);
     }
 
     [Test]
@@ -219,8 +198,8 @@ PRINT 'Update complete'
         var (startIndex, endIndex) = s.SearchStatementRangeBase(MultiLineInputWithFinalGo, statement, startAfterIndex, numberOfLeadingStatementsToInclude);
 
         // Assert
-        Assert.AreEqual(expectedStartIndex, startIndex, "Wrong start index");
-        Assert.AreEqual(expectedEndIndex, endIndex, "Wrong end index");
+        startIndex.Should().Be(expectedStartIndex);
+        endIndex.Should().Be(expectedEndIndex);
     }
 
     [Test]
@@ -246,41 +225,8 @@ PRINT 'Update complete'
         var (startIndex, endIndex) = s.SearchStatementRangeBase(MultiLineInputWithoutFinalGo, statement, startAfterIndex, numberOfLeadingStatementsToInclude);
 
         // Assert
-        Assert.AreEqual(expectedStartIndex, startIndex, "Wrong start index");
-        Assert.AreEqual(expectedEndIndex, endIndex, "Wrong end index");
-    }
-
-    [Test]
-    public void ForEachMatch_ArgumentNullException_Input()
-    {
-        // Arrange
-        var s = new StringSearchModifierBaseTestImplementation();
-
-        // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => s.ForEachMatchBase(null, null, 0, null));
-    }
-
-    [Test]
-    public void ForEachMatch_ArgumentNullException_Statement()
-    {
-        // Arrange
-        var s = new StringSearchModifierBaseTestImplementation();
-        const string input = "input";
-
-        // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => s.ForEachMatchBase(input, null, 0, null));
-    }
-
-    [Test]
-    public void ForEachMatch_ArgumentNullException_Modifier()
-    {
-        // Arrange
-        var s = new StringSearchModifierBaseTestImplementation();
-        const string input = "input";
-        const string statement = "statement";
-
-        // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => s.ForEachMatchBase(input, statement, 0, null));
+        startIndex.Should().Be(expectedStartIndex);
+        endIndex.Should().Be(expectedEndIndex);
     }
 
     [Test]
@@ -326,8 +272,8 @@ PRINT 'Update complete'
         var modified = s.ForEachMatchBase(input, statement, 0, modifier);
 
         // Assert
-        Assert.IsFalse(modifierCalled);
-        Assert.AreEqual("foobar", modified);
+        modifierCalled.Should().BeFalse();
+        modified.Should().Be("foobar");
     }
 
     [Test]
@@ -347,8 +293,8 @@ PRINT 'Update complete'
         var modified = s.ForEachMatchBase(MultiLineInputWithFinalGo, statement, 0, modifier);
 
         // Assert
-        Assert.IsTrue(modifierCalled);
-        Assert.AreEqual(MultiLineInputWithFinalGoWithDifferentSchema, modified);
+        modifierCalled.Should().BeTrue();
+        modified.Should().Be(MultiLineInputWithFinalGoWithDifferentSchema);
     }
 
     [Test]
@@ -368,8 +314,8 @@ PRINT 'Update complete'
         var modified = s.ForEachMatchBase(MultiLineInputWithFinalGo, statement, 5, modifier);
 
         // Assert
-        Assert.IsTrue(modifierCalled);
-        Assert.AreEqual(MultiLineInputWithFinalGoWithoutOverlappingComments, modified);
+        modifierCalled.Should().BeTrue();
+        modified.Should().Be(MultiLineInputWithFinalGoWithoutOverlappingComments);
     }
 
     [Test]
@@ -389,8 +335,8 @@ PRINT 'Update complete'
         var modified = s.ForEachMatchBase(MultiLineInputWithFinalGo, statement, 1, modifier);
 
         // Assert
-        Assert.IsTrue(modifierCalled);
-        Assert.AreEqual(MultiLineInputWithFinalGoWithDifferentSchemaAndPrints, modified);
+        modifierCalled.Should().BeTrue();
+        modified.Should().Be(MultiLineInputWithFinalGoWithDifferentSchemaAndPrints);
     }
 
     private class StringSearchModifierBaseTestImplementation : StringSearchModifierBase

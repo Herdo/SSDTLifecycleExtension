@@ -1,4 +1,6 @@
-﻿namespace SSDTLifecycleExtension.Windows;
+﻿#nullable enable
+
+namespace SSDTLifecycleExtension.Windows;
 
 [Guid("6e00e764-f71a-438f-84fe-5fe986514012")]
 [ExcludeFromCodeCoverage] // Test would require a UI thread.
@@ -10,16 +12,9 @@ public class ScriptCreationWindow : ToolWindowPane, IVisualStudioToolWindow
         Content = new ScriptCreationWindowControl();
     }
 
-    public ScriptCreationWindow(string message)
-        : this()
+    public void SetCaption(string? projectName)
     {
-        if (message == null)
-            throw new ArgumentNullException(nameof(message));
-    }
-
-    public void SetCaption(string projectName)
-    {
-        Caption = projectName == null
+        Caption = projectName is null
             ? "Script Creation"
             : $"Script Creation: {projectName}";
     }

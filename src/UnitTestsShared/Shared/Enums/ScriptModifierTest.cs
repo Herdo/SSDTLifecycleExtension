@@ -10,6 +10,6 @@ public class ScriptModifierTest
         var intValue = (int)ScriptModifier.RemoveSqlCmdStatements;
 
         // Assert
-        Assert.AreEqual(int.MaxValue, intValue);
+        intValue.Should().Be(int.MaxValue);
     }
 }

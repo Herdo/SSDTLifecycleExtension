@@ -4,28 +4,6 @@
 public class FormatTargetVersionUnitTests
 {
     [Test]
-    public void Constructor_ArgumentNullException_VersionService()
-    {
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new FormatTargetVersionUnit(null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void Work_ScaffoldingStateModel_ArgumentNullException_StateModel()
-    {
-        // Arrange
-        var vsMock = new Mock<IVersionService>();
-        IWorkUnit<ScaffoldingStateModel> unit = new FormatTargetVersionUnit(vsMock.Object);
-
-        // Act & Assert
-        // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => unit.Work(null, CancellationToken.None));
-    }
-
-    [Test]
     public async Task Work_ScaffoldingStateModel_FormattedSuccessful_Async()
     {
         // Arrange
@@ -43,21 +21,9 @@ public class FormatTargetVersionUnitTests
         await unit.Work(model, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(StateModelState.FormattedTargetVersionLoaded, model.CurrentState);
-        Assert.IsNull(model.Result);
-        Assert.AreEqual(expectedFormattedTargetVersion, model.FormattedTargetVersion);
-    }
-
-    [Test]
-    public void Work_ScriptCreationStateModel_ArgumentNullException_StateModel()
-    {
-        // Arrange
-        var vsMock = new Mock<IVersionService>();
-        IWorkUnit<ScriptCreationStateModel> unit = new FormatTargetVersionUnit(vsMock.Object);
-
-        // Act & Assert
-        // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => unit.Work(null, CancellationToken.None));
+        model.CurrentState.Should().Be(StateModelState.FormattedTargetVersionLoaded);
+        model.Result.Should().BeNull();
+        model.FormattedTargetVersion.Should().Be(expectedFormattedTargetVersion);
     }
 
     [Test]
@@ -82,15 +48,15 @@ public class FormatTargetVersionUnitTests
         await unit.Work(model, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(StateModelState.FormattedTargetVersionLoaded, model.CurrentState);
-        Assert.IsNull(model.Result);
+        model.CurrentState.Should().Be(StateModelState.FormattedTargetVersionLoaded);
+        model.Result.Should().BeNull();
         if (latest)
         {
-            Assert.IsNull(model.FormattedTargetVersion);
+            model.FormattedTargetVersion.Should().BeNull();
         }
         else
         {
-            Assert.AreEqual(expectedFormattedTargetVersion, model.FormattedTargetVersion);
+            model.FormattedTargetVersion.Should().Be(expectedFormattedTargetVersion);
         }
     }
 }

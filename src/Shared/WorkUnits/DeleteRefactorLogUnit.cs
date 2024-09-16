@@ -1,25 +1,14 @@
 ﻿namespace SSDTLifecycleExtension.Shared.WorkUnits;
 
-[UsedImplicitly]
-public class DeleteRefactorLogUnit : IWorkUnit<ScriptCreationStateModel>
+public class DeleteRefactorLogUnit(IFileSystemAccess _fileSystemAccess,
+                                   IVisualStudioAccess _visualStudioAccess,
+                                   ILogger _logger)
+    : IWorkUnit<ScriptCreationStateModel>
 {
-    [NotNull] private readonly IFileSystemAccess _fileSystemAccess;
-    [NotNull] private readonly IVisualStudioAccess _visualStudioAccess;
-    [NotNull] private readonly ILogger _logger;
-
-    public DeleteRefactorLogUnit([NotNull] IFileSystemAccess fileSystemAccess,
-                                 [NotNull] IVisualStudioAccess visualStudioAccess,
-                                 [NotNull] ILogger logger)
-    {
-        _fileSystemAccess = fileSystemAccess ?? throw new ArgumentNullException(nameof(fileSystemAccess));
-        _visualStudioAccess = visualStudioAccess ?? throw new ArgumentNullException(nameof(visualStudioAccess));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
-
     private async Task TryToDeleteRefactorLogInternal(IStateModel stateModel,
-                                                      SqlProject project,
-                                                      ConfigurationModel configuration,
-                                                      PathCollection paths)
+        SqlProject project,
+        ConfigurationModel configuration,
+        PathCollection paths)
     {
         if (!configuration.DeleteRefactorlogAfterVersionedScriptGeneration)
         {
@@ -42,14 +31,13 @@ public class DeleteRefactorLogUnit : IWorkUnit<ScriptCreationStateModel>
     }
 
     Task IWorkUnit<ScriptCreationStateModel>.Work(ScriptCreationStateModel stateModel,
-                                                  CancellationToken cancellationToken)
+        CancellationToken cancellationToken)
     {
-        if (stateModel == null)
-            throw new ArgumentNullException(nameof(stateModel));
+        Guard.IsNotNullOrWhiteSpace(stateModel.Paths?.Directories.ProjectDirectory);
 
         return TryToDeleteRefactorLogInternal(stateModel,
-                                              stateModel.Project,
-                                              stateModel.Configuration,
-                                              stateModel.Paths);
+            stateModel.Project,
+            stateModel.Configuration,
+            stateModel.Paths);
     }
 }

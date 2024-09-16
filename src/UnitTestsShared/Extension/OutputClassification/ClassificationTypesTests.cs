@@ -16,7 +16,7 @@ public class ClassificationTypesTests
 
         // Assert
         var equalAmount = constants.Length == staticProperties.Length && staticProperties.Length == nestedTypes.Length;
-        Assert.IsTrue(equalAmount, $"There has to be an equal amount of constants ({constants.Length}), static properties ({staticProperties.Length}), and nested types ({nestedTypes.Length}) in the {nameof(ClassificationTypes)} class.");
+        equalAmount.Should().BeTrue();
     }
 
     [Test]
@@ -33,40 +33,40 @@ public class ClassificationTypesTests
         {
             // Constant
             var key = constant.Name;
-            var classificationName = constant.GetValue(null);
+            var classificationName = (string)constant.GetValue(null);
 
             // Type definition property
             var typeDefinition = staticProperties.SingleOrDefault(m => m.Name == $"{key}TypeDefinition");
-            Assert.IsNotNull(typeDefinition, $"Missing type definition for the key '{key}'.");
+            typeDefinition.Should().NotBeNull();
             var typeDefinitionAttributes = typeDefinition.GetCustomAttributes(false);
-            Assert.AreEqual(2, typeDefinitionAttributes.Length, $"Type definition for the key '{key}' has an unexpected amount of attributes.");
+            typeDefinitionAttributes.Should().HaveCount(2);
             var typeDefinitionExportAttributes = typeDefinitionAttributes.OfType<ExportAttribute>().ToArray();
             var typeDefinitionNameAttributes = typeDefinitionAttributes.OfType<NameAttribute>().ToArray();
-            Assert.AreEqual(1, typeDefinitionExportAttributes.Length, $"Type definition for the key '{key}' has an unexpected amount of {typeof(ExportAttribute).FullName} attributes.");
-            Assert.AreEqual(1, typeDefinitionNameAttributes.Length, $"Type definition for the key '{key}' has an unexpected amount of {typeof(NameAttribute).FullName} attributes.");
+            typeDefinitionExportAttributes.Should().ContainSingle();
+            typeDefinitionNameAttributes.Should().ContainSingle();
             var typeDefinitionExportType = typeDefinitionExportAttributes[0].ContractType;
-            Assert.AreSame(typeof(ClassificationTypeDefinition), typeDefinitionExportType, $"Wrong export type on the type definition property for the key '{key}'.");
+            typeDefinitionExportType.Should().Be(typeof(ClassificationTypeDefinition));
             var typeDefinitionName = typeDefinitionNameAttributes[0].Name;
-            Assert.AreEqual(classificationName, typeDefinitionName, $"Wrong name attribute on the type definition property for the key '{key}'.");
+            typeDefinitionName.Should().Be(classificationName);
 
             // Nested classification class
             var nestedType = nestedTypes.SingleOrDefault(m => m.Name == $"{key}Classification");
-            Assert.IsNotNull(nestedType, $"Missing nested type for the key '{key}'.");
-            Assert.AreSame(typeof(ClassificationFormatDefinition), nestedType.BaseType);
+            nestedType.Should().NotBeNull();
+            nestedType.BaseType.Should().Be(typeof(ClassificationFormatDefinition));
             var nestedTypeAttributes = nestedType.GetCustomAttributes(false);
-            Assert.AreEqual(3, nestedTypeAttributes.Length, $"Nested type for the key '{key}' has an unexpected amount of attributes.");
+            nestedTypeAttributes.Should().HaveCountGreaterThanOrEqualTo(3);
             var nestedTypeExportAttributes = nestedTypeAttributes.OfType<ExportAttribute>().ToArray();
             var nestedTypeClassificationTypeAttributes = nestedTypeAttributes.OfType<ClassificationTypeAttribute>().ToArray();
             var nestedTypeNameAttributes = nestedTypeAttributes.OfType<NameAttribute>().ToArray();
-            Assert.AreEqual(1, nestedTypeExportAttributes.Length, $"Nested type for the key '{key}' has an unexpected amount of {typeof(ExportAttribute).FullName} attributes.");
-            Assert.AreEqual(1, nestedTypeClassificationTypeAttributes.Length, $"Nested type for the key '{key}' has an unexpected amount of {typeof(ClassificationTypeAttribute).FullName} attributes.");
-            Assert.AreEqual(1, nestedTypeNameAttributes.Length, $"Nested type for the key '{key}' has an unexpected amount of {typeof(NameAttribute).FullName} attributes.");
+            nestedTypeExportAttributes.Should().ContainSingle();
+            nestedTypeClassificationTypeAttributes.Should().ContainSingle();
+            nestedTypeNameAttributes.Should().ContainSingle();
             var nestedTypeExportType = nestedTypeExportAttributes[0].ContractType;
-            Assert.AreSame(typeof(EditorFormatDefinition), nestedTypeExportType, $"Wrong export type on the nested type for the key '{key}'.");
+            nestedTypeExportType.Should().Be(typeof(EditorFormatDefinition));
             var nestedTypeClassificationType = nestedTypeClassificationTypeAttributes[0].ClassificationTypeNames;
-            Assert.AreEqual(classificationName, nestedTypeClassificationType, $"Wrong classification type on the nested type for the key '{key}'.");
+            nestedTypeClassificationType.Should().Be(classificationName);
             var nestedTypeName = nestedTypeNameAttributes[0].Name;
-            Assert.AreEqual(classificationName, nestedTypeName, $"Wrong name attribute on the nested type for the key '{key}'.");
+            nestedTypeName.Should().Be(classificationName);
         }
     }
 
@@ -77,8 +77,8 @@ public class ClassificationTypesTests
         ClassificationFormatDefinition classification = new ClassificationTypes.CriticalClassification();
 
         // Assert
-        Assert.AreEqual(Colors.Firebrick, classification.ForegroundColor);
-        Assert.IsTrue(classification.IsBold);
+        classification.ForegroundColor.Should().Be(Colors.Firebrick);
+        classification.IsBold.Should().BeTrue();
     }
 
     [Test]
@@ -88,8 +88,8 @@ public class ClassificationTypesTests
         ClassificationFormatDefinition classification = new ClassificationTypes.ErrorClassification();
 
         // Assert
-        Assert.AreEqual(Colors.Red, classification.ForegroundColor);
-        Assert.IsTrue(classification.IsBold);
+        classification.ForegroundColor.Should().Be(Colors.Red);
+        classification.IsBold.Should().BeTrue();
     }
 
     [Test]
@@ -99,8 +99,8 @@ public class ClassificationTypesTests
         ClassificationFormatDefinition classification = new ClassificationTypes.WarningClassification();
 
         // Assert
-        Assert.AreEqual(Colors.DarkOrange, classification.ForegroundColor);
-        Assert.IsTrue(classification.IsBold);
+        classification.ForegroundColor.Should().Be(Colors.DarkOrange);
+        classification.IsBold.Should().BeTrue();
     }
 
     [Test]
@@ -110,7 +110,7 @@ public class ClassificationTypesTests
         ClassificationFormatDefinition classification = new ClassificationTypes.DebugClassification();
 
         // Assert
-        Assert.AreEqual(Colors.Gray, classification.ForegroundColor);
+        classification.ForegroundColor.Should().Be(Colors.Gray);
     }
 
     [Test]
@@ -120,7 +120,7 @@ public class ClassificationTypesTests
         ClassificationFormatDefinition classification = new ClassificationTypes.TraceClassification();
 
         // Assert
-        Assert.AreEqual(Colors.Gray, classification.ForegroundColor);
+        classification.ForegroundColor.Should().Be(Colors.Gray);
     }
 
     [Test]
@@ -130,7 +130,7 @@ public class ClassificationTypesTests
         ClassificationFormatDefinition classification = new ClassificationTypes.DoneClassification();
 
         // Assert
-        Assert.AreEqual(Colors.Green, classification.ForegroundColor);
+        classification.ForegroundColor.Should().Be(Colors.Green);
     }
 
     [Test]
@@ -148,12 +148,12 @@ public class ClassificationTypesTests
         ClassificationTypes.DoneTypeDefinition = ctd;
 
         // Assert
-        Assert.AreSame(ctd, ClassificationTypes.CriticalTypeDefinition);
-        Assert.AreSame(ctd, ClassificationTypes.ErrorTypeDefinition);
-        Assert.AreSame(ctd, ClassificationTypes.WarningTypeDefinition);
-        Assert.AreSame(ctd, ClassificationTypes.DebugTypeDefinition);
-        Assert.AreSame(ctd, ClassificationTypes.TraceTypeDefinition);
-        Assert.AreSame(ctd, ClassificationTypes.DoneTypeDefinition);
+        ClassificationTypes.CriticalTypeDefinition.Should().BeSameAs(ctd);
+        ClassificationTypes.ErrorTypeDefinition.Should().BeSameAs(ctd);
+        ClassificationTypes.WarningTypeDefinition.Should().BeSameAs(ctd);
+        ClassificationTypes.DebugTypeDefinition.Should().BeSameAs(ctd);
+        ClassificationTypes.TraceTypeDefinition.Should().BeSameAs(ctd);
+        ClassificationTypes.DoneTypeDefinition.Should().BeSameAs(ctd);
     }
 
     private static FieldInfo[] GetConstants(IReflect type)

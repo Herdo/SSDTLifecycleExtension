@@ -50,18 +50,6 @@ PRINT 'Update complete'
 GO";
 
     [Test]
-    public void Modify_ArgumentNullException_Model()
-    {
-        // Arrange
-        IScriptModifier modifier = new CommentOutUnnamedDefaultConstraintDropsModifier();
-
-        // Act & Assert
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => modifier.ModifyAsync(null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
     public async Task Modify_CorrectModification_Async()
     {
         // Arrange
@@ -78,6 +66,6 @@ GO";
         await modifier.ModifyAsync(model);
 
         // Assert
-        Assert.AreEqual(MultipleDropDefaultConstraintStatementsCommented, model.CurrentScript);
+        model.CurrentScript.Should().Be(MultipleDropDefaultConstraintStatementsCommented);
     }
 }

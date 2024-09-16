@@ -45,7 +45,7 @@ public class BoolInvertConverterTests
         var converted = converter.Convert(input, typeof(bool), null, CultureInfo.InvariantCulture);
 
         // Assert
-        Assert.AreEqual(expected, converted);
+        converted.Should().Be(expected);
     }
 
     [Test]
