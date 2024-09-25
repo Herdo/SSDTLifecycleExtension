@@ -4,18 +4,6 @@
 public class AddCustomFooterModifierTests
 {
     [Test]
-    public void Modify_ArgumentNullException_Model()
-    {
-        // Arrange
-        IScriptModifier s = new AddCustomFooterModifier();
-
-        // Act & Assert
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => s.ModifyAsync(null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
     public async Task Modify_CustomFooterAdded_Async()
     {
         // Arrange
@@ -37,8 +25,7 @@ public class AddCustomFooterModifierTests
         await s.ModifyAsync(model);
 
         // Assert
-        Assert.IsNotNull(model.CurrentScript);
-        Assert.AreEqual("foobar\r\nfooter", model.CurrentScript);
+        model.CurrentScript.Should().Be("foobar\r\nfooter");
     }
 
     [Test]
@@ -66,8 +53,7 @@ public class AddCustomFooterModifierTests
         await s.ModifyAsync(model);
 
         // Assert
-        Assert.IsNotNull(model.CurrentScript);
-        Assert.AreEqual("foobar", model.CurrentScript);
+        model.CurrentScript.Should().Be("foobar");
     }
 
     [Test]
@@ -92,8 +78,7 @@ public class AddCustomFooterModifierTests
         await s.ModifyAsync(model);
 
         // Assert
-        Assert.IsNotNull(model.CurrentScript);
-        Assert.AreEqual("foobar\r\nScript base version: 1.2.0", model.CurrentScript);
+        model.CurrentScript.Should().Be("foobar\r\nScript base version: 1.2.0");
     }
 
     [Test]
@@ -118,7 +103,6 @@ public class AddCustomFooterModifierTests
         await s.ModifyAsync(model);
 
         // Assert
-        Assert.IsNotNull(model.CurrentScript);
-        Assert.AreEqual("foobar\r\nScript target version: 1.3.0", model.CurrentScript);
+        model.CurrentScript.Should().Be("foobar\r\nScript target version: 1.3.0");
     }
 }

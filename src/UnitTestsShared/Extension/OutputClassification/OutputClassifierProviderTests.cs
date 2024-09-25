@@ -15,10 +15,10 @@ public class OutputClassifierProviderTests
         var exportAttributes = attributes.OfType<System.ComponentModel.Composition.ExportAttribute>().ToArray();
 
         // Assert
-        Assert.AreEqual(1, contentTypeAttributes.Length);
-        Assert.AreEqual("output", contentTypeAttributes[0].ContentTypes);
-        Assert.AreEqual(1, exportAttributes.Length);
-        Assert.AreEqual(typeof(IClassifierProvider), exportAttributes[0].ContractType);
+        contentTypeAttributes.Should().ContainSingle()
+            .Which.ContentTypes.Should().Be("output");
+        exportAttributes.Should().ContainSingle()
+            .Which.ContractType.Should().Be(typeof(IClassifierProvider));
     }
 
     [Test]
@@ -32,7 +32,7 @@ public class OutputClassifierProviderTests
         };
 
         // Act & Assert
-        Assert.DoesNotThrow(() => provider.GetClassifier(null));
+        provider.Invoking(p => p.GetClassifier(null)).Should().NotThrow();
     }
 
     [Test]
@@ -50,8 +50,8 @@ public class OutputClassifierProviderTests
         var instance2 = provider.GetClassifier(null);
 
         // Assert
-        Assert.IsNotNull(instance1);
-        Assert.IsNotNull(instance2);
-        Assert.AreSame(instance1, instance2);
+        instance1.Should().NotBeNull();
+        instance2.Should().NotBeNull();
+        instance1.Should().BeSameAs(instance2);
     }
 }

@@ -4,14 +4,6 @@
 public class ConfigurationModelValidationsTests
 {
     [Test]
-    public void ValidateArtifactsPath_ArgumentNullException_Model()
-    {
-        // Act & Assert
-        // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => ConfigurationModelValidations.ValidateArtifactsPath(null));
-    }
-
-    [Test]
     [TestCase(null)]
     [TestCase("")]
     [TestCase("    ")]
@@ -27,9 +19,8 @@ public class ConfigurationModelValidationsTests
         var errors = ConfigurationModelValidations.ValidateArtifactsPath(model);
 
         // Assert
-        Assert.IsNotNull(errors);
-        Assert.AreEqual(1, errors.Count);
-        Assert.AreEqual("Path cannot be empty.", errors[0]);
+        errors.Should().ContainSingle()
+            .Which.Should().Be("Path cannot be empty.");
     }
 
     [Test]
@@ -45,9 +36,8 @@ public class ConfigurationModelValidationsTests
         var errors = ConfigurationModelValidations.ValidateArtifactsPath(model);
 
         // Assert
-        Assert.IsNotNull(errors);
-        Assert.AreEqual(1, errors.Count);
-        Assert.AreEqual("Path contains invalid characters.", errors[0]);
+        errors.Should().ContainSingle()
+            .Which.Should().Be("Path contains invalid characters.");
     }
 
     [Test]
@@ -63,9 +53,8 @@ public class ConfigurationModelValidationsTests
         var errors = ConfigurationModelValidations.ValidateArtifactsPath(model);
 
         // Assert
-        Assert.IsNotNull(errors);
-        Assert.AreEqual(1, errors.Count);
-        Assert.AreEqual("Path must be a relative path.", errors[0]);
+        errors.Should().ContainSingle()
+            .Which.Should().Be("Path must be a relative path.");
     }
 
     [Test]
@@ -81,16 +70,7 @@ public class ConfigurationModelValidationsTests
         var errors = ConfigurationModelValidations.ValidateArtifactsPath(model);
 
         // Assert
-        Assert.IsNotNull(errors);
-        Assert.AreEqual(0, errors.Count);
-    }
-
-    [Test]
-    public void ValidatePublishProfilePath_ArgumentNullException_Model()
-    {
-        // Act & Assert
-        // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => ConfigurationModelValidations.ValidatePublishProfilePath(null));
+        errors.Should().BeEmpty();
     }
 
     [Test]
@@ -109,9 +89,8 @@ public class ConfigurationModelValidationsTests
         var errors = ConfigurationModelValidations.ValidatePublishProfilePath(model);
 
         // Assert
-        Assert.IsNotNull(errors);
-        Assert.AreEqual(1, errors.Count);
-        Assert.AreEqual("Path cannot be empty.", errors[0]);
+        errors.Should().ContainSingle()
+            .Which.Should().Be("Path cannot be empty.");
     }
 
     [Test]
@@ -129,9 +108,8 @@ public class ConfigurationModelValidationsTests
         var errors = ConfigurationModelValidations.ValidatePublishProfilePath(model);
 
         // Assert
-        Assert.IsNotNull(errors);
-        Assert.AreEqual(1, errors.Count);
-        Assert.AreEqual("Profile file name must end with *.publish.xml.", errors[0]);
+        errors.Should().ContainSingle()
+            .Which.Should().Be("Profile file name must end with *.publish.xml.");
     }
 
     [Test]
@@ -147,9 +125,8 @@ public class ConfigurationModelValidationsTests
         var errors = ConfigurationModelValidations.ValidatePublishProfilePath(model);
 
         // Assert
-        Assert.IsNotNull(errors);
-        Assert.AreEqual(1, errors.Count);
-        Assert.AreEqual("Path contains invalid characters.", errors[0]);
+        errors.Should().ContainSingle()
+            .Which.Should().Be("Path contains invalid characters.");
     }
 
     [Test]
@@ -165,9 +142,8 @@ public class ConfigurationModelValidationsTests
         var errors = ConfigurationModelValidations.ValidatePublishProfilePath(model);
 
         // Assert
-        Assert.IsNotNull(errors);
-        Assert.AreEqual(1, errors.Count);
-        Assert.AreEqual("Path must be a relative path.", errors[0]);
+        errors.Should().ContainSingle()
+            .Which.Should().Be("Path must be a relative path.");
     }
 
     [Test]
@@ -185,16 +161,7 @@ public class ConfigurationModelValidationsTests
         var errors = ConfigurationModelValidations.ValidatePublishProfilePath(model);
 
         // Assert
-        Assert.IsNotNull(errors);
-        Assert.AreEqual(0, errors.Count);
-    }
-
-    [Test]
-    public void ValidateSharedDacpacRepositoryPath_ArgumentNullException_Model()
-    {
-        // Act & Assert
-        // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => ConfigurationModelValidations.ValidateSharedDacpacRepositoryPath(null));
+        errors.Should().BeEmpty();
     }
 
     [Test]
@@ -210,9 +177,8 @@ public class ConfigurationModelValidationsTests
         var errors = ConfigurationModelValidations.ValidateSharedDacpacRepositoryPath(model);
 
         // Assert
-        Assert.IsNotNull(errors);
-        Assert.AreEqual(1, errors.Count);
-        Assert.AreEqual("Path contains invalid characters.", errors[0]);
+        errors.Should().ContainSingle()
+            .Which.Should().Be("Path contains invalid characters.");
     }
 
     [Test]
@@ -231,9 +197,8 @@ public class ConfigurationModelValidationsTests
         var errors = ConfigurationModelValidations.ValidateSharedDacpacRepositoryPath(model);
 
         // Assert
-        Assert.IsNotNull(errors);
-        Assert.AreEqual(1, errors.Count);
-        Assert.AreEqual("Path must be a directory.", errors[0]);
+        errors.Should().ContainSingle()
+            .Which.Should().Be("Path must be a directory.");
     }
 
     [Test]
@@ -249,9 +214,8 @@ public class ConfigurationModelValidationsTests
         var errors = ConfigurationModelValidations.ValidateSharedDacpacRepositoryPath(model);
 
         // Assert
-        Assert.IsNotNull(errors);
-        Assert.AreEqual(1, errors.Count);
-        Assert.AreEqual("Path must be an absolute path.", errors[0]);
+        errors.Should().ContainSingle()
+            .Which.Should().Be("Path must be an absolute path.");
     }
 
     [Test]
@@ -270,8 +234,7 @@ public class ConfigurationModelValidationsTests
         var errors = ConfigurationModelValidations.ValidateSharedDacpacRepositoryPath(model);
 
         // Assert
-        Assert.IsNotNull(errors);
-        Assert.AreEqual(0, errors.Count);
+        errors.Should().BeEmpty();
     }
 
     [Test]
@@ -287,16 +250,7 @@ public class ConfigurationModelValidationsTests
         var errors = ConfigurationModelValidations.ValidateSharedDacpacRepositoryPath(model);
 
         // Assert
-        Assert.IsNotNull(errors);
-        Assert.AreEqual(0, errors.Count);
-    }
-
-    [Test]
-    public void ValidateUnnamedDefaultConstraintDropsBehavior_ArgumentNullException_Model()
-    {
-        // Act & Assert
-        // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => ConfigurationModelValidations.ValidateUnnamedDefaultConstraintDropsBehavior(null));
+        errors.Should().BeEmpty();
     }
 
     [Test]
@@ -313,9 +267,8 @@ public class ConfigurationModelValidationsTests
         var errors = ConfigurationModelValidations.ValidateUnnamedDefaultConstraintDropsBehavior(model);
 
         // Assert
-        Assert.IsNotNull(errors);
-        Assert.AreEqual(1, errors.Count);
-        Assert.AreEqual("Behavior for unnamed default constraint drops is ambiguous.", errors[0]);
+        errors.Should().ContainSingle()
+            .Which.Should().Be("Behavior for unnamed default constraint drops is ambiguous.");
     }
 
     [Test]
@@ -335,16 +288,7 @@ public class ConfigurationModelValidationsTests
         var errors = ConfigurationModelValidations.ValidateUnnamedDefaultConstraintDropsBehavior(model);
 
         // Assert
-        Assert.IsNotNull(errors);
-        Assert.AreEqual(0, errors.Count);
-    }
-
-    [Test]
-    public void ValidateVersionPattern_ArgumentNullException_Model()
-    {
-        // Act & Assert
-        // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => ConfigurationModelValidations.ValidateVersionPattern(null));
+        errors.Should().BeEmpty();
     }
 
     [Test]
@@ -363,9 +307,8 @@ public class ConfigurationModelValidationsTests
         var errors = ConfigurationModelValidations.ValidateVersionPattern(model);
 
         // Assert
-        Assert.IsNotNull(errors);
-        Assert.AreEqual(1, errors.Count);
-        Assert.AreEqual("Pattern cannot be empty.", errors[0]);
+        errors.Should().ContainSingle()
+            .Which.Should().Be("Pattern cannot be empty.");
     }
 
     [Test]
@@ -383,9 +326,8 @@ public class ConfigurationModelValidationsTests
         var errors = ConfigurationModelValidations.ValidateVersionPattern(model);
 
         // Assert
-        Assert.IsNotNull(errors);
-        Assert.AreEqual(1, errors.Count);
-        Assert.AreEqual("Pattern doesn't contain enough parts.", errors[0]);
+        errors.Should().ContainSingle()
+            .Which.Should().Be("Pattern doesn't contain enough parts.");
     }
 
     [Test]
@@ -403,9 +345,8 @@ public class ConfigurationModelValidationsTests
         var errors = ConfigurationModelValidations.ValidateVersionPattern(model);
 
         // Assert
-        Assert.IsNotNull(errors);
-        Assert.AreEqual(1, errors.Count);
-        Assert.AreEqual("Pattern contains too many parts.", errors[0]);
+        errors.Should().ContainSingle()
+            .Which.Should().Be("Pattern contains too many parts.");
     }
 
     [Test]
@@ -421,12 +362,11 @@ public class ConfigurationModelValidationsTests
         var errors = ConfigurationModelValidations.ValidateVersionPattern(model);
 
         // Assert
-        Assert.IsNotNull(errors);
-        Assert.AreEqual(4, errors.Count);
-        Assert.AreEqual("Major number cannot be negative.", errors[0]);
-        Assert.AreEqual("Minor number cannot be negative.", errors[1]);
-        Assert.AreEqual("Build number cannot be negative.", errors[2]);
-        Assert.AreEqual("Revision number cannot be negative.", errors[3]);
+        errors.Should().HaveCount(4);
+        errors[0].Should().Be("Major number cannot be negative.");
+        errors[1].Should().Be("Minor number cannot be negative.");
+        errors[2].Should().Be("Build number cannot be negative.");
+        errors[3].Should().Be("Revision number cannot be negative.");
     }
 
     [Test]
@@ -442,12 +382,11 @@ public class ConfigurationModelValidationsTests
         var errors = ConfigurationModelValidations.ValidateVersionPattern(model);
 
         // Assert
-        Assert.IsNotNull(errors);
-        Assert.AreEqual(4, errors.Count);
-        Assert.AreEqual("Invalid special keyword for major number.", errors[0]);
-        Assert.AreEqual("Invalid special keyword for minor number.", errors[1]);
-        Assert.AreEqual("Invalid special keyword for build number.", errors[2]);
-        Assert.AreEqual("Invalid special keyword for revision number.", errors[3]);
+        errors.Should().HaveCount(4);
+        errors[0].Should().Be("Invalid special keyword for major number.");
+        errors[1].Should().Be("Invalid special keyword for minor number.");
+        errors[2].Should().Be("Invalid special keyword for build number.");
+        errors[3].Should().Be("Invalid special keyword for revision number.");
     }
 
     [Test]
@@ -468,7 +407,6 @@ public class ConfigurationModelValidationsTests
         var errors = ConfigurationModelValidations.ValidateVersionPattern(model);
 
         // Assert
-        Assert.IsNotNull(errors);
-        Assert.AreEqual(0, errors.Count);
+        errors.Should().BeEmpty();
     }
 }

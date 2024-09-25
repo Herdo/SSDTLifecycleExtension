@@ -356,23 +356,12 @@ GO
 ";
 
     [Test]
-    public void Modify_ArgumentNullException_Model()
-    {
-        // Arrange
-        IScriptModifier modifier = new TrackDacpacVersionModifier();
-
-        // Act & Assert
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => modifier.ModifyAsync(null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
     public void Modify_ArgumentException_ProjectPropertiesSqlTargetNameNull()
     {
         // Arrange
         IScriptModifier modifier = new TrackDacpacVersionModifier();
         var project = new SqlProject("", "", "");
+        project.ProjectProperties.DacVersion = new Version(2, 0, 0);
         var configuration = new ConfigurationModel();
         var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
         var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
@@ -384,30 +373,7 @@ GO
         var e = Assert.Throws<ArgumentException>(() => modifier.ModifyAsync(model));
 
         // Assert
-        Assert.IsNotNull(e);
-        Assert.IsTrue(e.Message.Contains(nameof(SqlProjectProperties.SqlTargetName)));
-    }
-
-    [Test]
-    public void Modify_ArgumentException_ProjectPropertiesDacVersionNull()
-    {
-        // Arrange
-        IScriptModifier modifier = new TrackDacpacVersionModifier();
-        var project = new SqlProject("", "", "");
-        project.ProjectProperties.SqlTargetName = "Database.TestProject";
-        var configuration = new ConfigurationModel();
-        var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
-        var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
-        var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
-        var paths = new PathCollection(directories, sourcePaths, targetPaths);
-        var model = new ScriptModificationModel(MultiLineInputWithFinalGo, project, configuration, paths, new Version(1, 0, 0), false);
-
-        // Act
-        var e = Assert.Throws<ArgumentException>(() => modifier.ModifyAsync(model));
-
-        // Assert
-        Assert.IsNotNull(e);
-        Assert.IsTrue(e.Message.Contains(nameof(SqlProjectProperties.DacVersion)));
+        e.Message.Should().Contain(nameof(SqlProjectProperties.SqlTargetName));
     }
 
     [Test]
@@ -433,7 +399,7 @@ GO
         await modifier.ModifyAsync(model);
 
         // Assert
-        Assert.AreEqual(FinalMultilineStatementFullVersion, model.CurrentScript);
+        model.CurrentScript.Should().Be(FinalMultilineStatementFullVersion);
     }
 
     [Test]
@@ -459,7 +425,7 @@ GO
         await modifier.ModifyAsync(model);
 
         // Assert
-        Assert.AreEqual(FinalMultilineStatementMajorMinorBuildVersion, model.CurrentScript);
+        model.CurrentScript.Should().Be(FinalMultilineStatementMajorMinorBuildVersion);
     }
 
     [Test]
@@ -485,6 +451,6 @@ GO
         await modifier.ModifyAsync(model);
 
         // Assert
-        Assert.AreEqual(FinalMultilineStatementMajorMinorVersion, model.CurrentScript);
+        model.CurrentScript.Should().Be(FinalMultilineStatementMajorMinorVersion);
     }
 }

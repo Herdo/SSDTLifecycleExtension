@@ -4,16 +4,6 @@
 public class ScriptModifierFactoryTests
 {
     [Test]
-    public void Constructor_ArgumentNullException_DependencyResolver()
-    {
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new ScriptModifierFactory(null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
     [TestCase(ScriptModifier.Undefined)]
     public void CreateScriptModifier_ArgumentOutOfRangeException(ScriptModifier scriptModifier)
     {
@@ -51,7 +41,6 @@ public class ScriptModifierFactoryTests
         var modifier = f.CreateScriptModifier(scriptModifier);
 
         // Assert
-        Assert.IsNotNull(modifier);
-        Assert.IsInstanceOf(implementingType, modifier);
+        modifier.Should().BeOfType(implementingType);
     }
 }

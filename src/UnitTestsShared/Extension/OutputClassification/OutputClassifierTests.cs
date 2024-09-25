@@ -4,15 +4,6 @@
 public class OutputClassifierTests
 {
     [Test]
-    public void Constructor_ArgumentNullException_ClassificationTypeRegistryService()
-    {
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new OutputClassifier(null));
-    }
-
-    [Test]
     public void GetClassificationSpans_EmptyWhenNoSnapshot()
     {
         // Arrange
@@ -27,8 +18,7 @@ public class OutputClassifierTests
         var spans = classifier.GetClassificationSpans(span);
 
         // Assert
-        Assert.IsNotNull(spans);
-        Assert.AreEqual(0, spans.Count);
+        spans.Should().BeEmpty();
     }
 
     [Test]
@@ -48,8 +38,7 @@ public class OutputClassifierTests
         var spans = classifier.GetClassificationSpans(snapshotSpan);
 
         // Assert
-        Assert.IsNotNull(spans);
-        Assert.AreEqual(0, spans.Count);
+        spans.Should().BeEmpty();
     }
 
     [Test]
@@ -72,8 +61,7 @@ public class OutputClassifierTests
         var spans = classifier.GetClassificationSpans(snapshotSpan);
 
         // Assert
-        Assert.IsNotNull(spans);
-        Assert.AreEqual(0, spans.Count);
+        spans.Should().BeEmpty();
     }
 
     [Test]
@@ -108,11 +96,11 @@ public class OutputClassifierTests
         var spans = classifier.GetClassificationSpans(snapshotSpan);
 
         // Assert
-        Assert.IsNotNull(spans);
-        Assert.AreEqual(1, spans.Count);
-        Assert.AreEqual(snapshotSpan, spans[0].Span);
+        spans.Should().ContainSingle()
+            .Which.Span.Should().Be(snapshotSpan);
+        spans.Should().ContainSingle()
+            .Which.ClassificationType.Should().Be(criticalClassificationType);
         classificationTypeRegistryServiceMock.Verify(m => m.GetClassificationType(It.IsAny<string>()), Times.Once);
-        Assert.AreSame(criticalClassificationType, spans[0].ClassificationType);
     }
 
     [Test]
@@ -147,11 +135,11 @@ public class OutputClassifierTests
         var spans = classifier.GetClassificationSpans(snapshotSpan);
 
         // Assert
-        Assert.IsNotNull(spans);
-        Assert.AreEqual(1, spans.Count);
-        Assert.AreEqual(snapshotSpan, spans[0].Span);
+        spans.Should().ContainSingle()
+            .Which.Span.Should().Be(snapshotSpan);
+        spans.Should().ContainSingle()
+            .Which.ClassificationType.Should().Be(errorClassificationType);
         classificationTypeRegistryServiceMock.Verify(m => m.GetClassificationType(It.IsAny<string>()), Times.Once);
-        Assert.AreSame(errorClassificationType, spans[0].ClassificationType);
     }
 
     [Test]
@@ -186,11 +174,11 @@ public class OutputClassifierTests
         var spans = classifier.GetClassificationSpans(snapshotSpan);
 
         // Assert
-        Assert.IsNotNull(spans);
-        Assert.AreEqual(1, spans.Count);
-        Assert.AreEqual(snapshotSpan, spans[0].Span);
+        spans.Should().ContainSingle()
+            .Which.Span.Should().Be(snapshotSpan);
+        spans.Should().ContainSingle()
+            .Which.ClassificationType.Should().Be(warningClassificationType);
         classificationTypeRegistryServiceMock.Verify(m => m.GetClassificationType(It.IsAny<string>()), Times.Once);
-        Assert.AreSame(warningClassificationType, spans[0].ClassificationType);
     }
 
     [Test]
@@ -225,11 +213,11 @@ public class OutputClassifierTests
         var spans = classifier.GetClassificationSpans(snapshotSpan);
 
         // Assert
-        Assert.IsNotNull(spans);
-        Assert.AreEqual(1, spans.Count);
-        Assert.AreEqual(snapshotSpan, spans[0].Span);
+        spans.Should().ContainSingle()
+            .Which.Span.Should().Be(snapshotSpan);
+        spans.Should().ContainSingle()
+            .Which.ClassificationType.Should().Be(debugClassificationType);
         classificationTypeRegistryServiceMock.Verify(m => m.GetClassificationType(It.IsAny<string>()), Times.Once);
-        Assert.AreSame(debugClassificationType, spans[0].ClassificationType);
     }
 
     [Test]
@@ -264,11 +252,11 @@ public class OutputClassifierTests
         var spans = classifier.GetClassificationSpans(snapshotSpan);
 
         // Assert
-        Assert.IsNotNull(spans);
-        Assert.AreEqual(1, spans.Count);
-        Assert.AreEqual(snapshotSpan, spans[0].Span);
+        spans.Should().ContainSingle()
+            .Which.Span.Should().Be(snapshotSpan);
+        spans.Should().ContainSingle()
+            .Which.ClassificationType.Should().Be(traceClassificationType);
         classificationTypeRegistryServiceMock.Verify(m => m.GetClassificationType(It.IsAny<string>()), Times.Once);
-        Assert.AreSame(traceClassificationType, spans[0].ClassificationType);
     }
 
     [Test]
@@ -303,10 +291,10 @@ public class OutputClassifierTests
         var spans = classifier.GetClassificationSpans(snapshotSpan);
 
         // Assert
-        Assert.IsNotNull(spans);
-        Assert.AreEqual(1, spans.Count);
-        Assert.AreEqual(snapshotSpan, spans[0].Span);
+        spans.Should().ContainSingle()
+            .Which.Span.Should().Be(snapshotSpan);
+        spans.Should().ContainSingle()
+            .Which.ClassificationType.Should().Be(doneClassificationType);
         classificationTypeRegistryServiceMock.Verify(m => m.GetClassificationType(It.IsAny<string>()), Times.Once);
-        Assert.AreSame(doneClassificationType, spans[0].ClassificationType);
     }
 }

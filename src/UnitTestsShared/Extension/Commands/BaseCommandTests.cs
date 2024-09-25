@@ -41,9 +41,9 @@ public class BaseCommandTests
                                                     commandSet);
 
         // Assert
-        Assert.IsNotNull(cmd);
+        cmd.Should().NotBeNull();
         var registeredCommand = cs.FindCommand(commandId);
-        Assert.IsNotNull(registeredCommand);
+        registeredCommand.Should().NotBeNull();
     }
 
     [Test]
@@ -68,21 +68,20 @@ public class BaseCommandTests
 
         // Act
         var cmd = new BaseCommandTestImplementation(cs,
-                                                    casMock.Object,
-                                                    commandIdInt,
-                                                    commandSet);
-        Assert.IsNotNull(cmd);
+            casMock.Object,
+            commandIdInt,
+            commandSet);
         var registeredCommand = cs.FindCommand(commandId);
-        Assert.IsNotNull(registeredCommand);
-        Assert.IsTrue(registeredCommand.Visible);
-        Assert.IsTrue(registeredCommand.Enabled);
+        registeredCommand.Visible.Should().BeTrue();
+        registeredCommand.Enabled.Should().BeTrue();
         var status = registeredCommand.OleStatus;
 
         // Assert
-        Assert.AreNotEqual(0, status);
-        Assert.IsTrue(handleCommandAvailabilityCalled);
-        Assert.IsFalse(registeredCommand.Visible);
-        Assert.IsFalse(registeredCommand.Enabled);
+        cmd.Should().NotBeNull();
+        status.Should().NotBe(0);
+        handleCommandAvailabilityCalled.Should().BeTrue();
+        registeredCommand.Visible.Should().BeFalse();
+        registeredCommand.Enabled.Should().BeFalse();
     }
 
     [Test]
@@ -113,11 +112,11 @@ public class BaseCommandTests
         };
 
         // Assert
-        Assert.IsNotNull(cmd);
+        cmd.Should().NotBeNull();
         var invoked = cs.GlobalInvoke(commandId);
-        Assert.IsTrue(invoked);
-        Assert.IsNotNull(executeSender);
-        Assert.IsNotNull(executeArgs);
+        invoked.Should().BeTrue();
+        executeSender.Should().NotBeNull();
+        executeArgs.Should().NotBeNull();
     }
 
     private sealed class BaseCommandTestImplementation : BaseCommand

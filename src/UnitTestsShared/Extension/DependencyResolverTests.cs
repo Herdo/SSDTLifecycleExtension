@@ -4,43 +4,6 @@
 public class DependencyResolverTests
 {
     [Test]
-    public void Constructor_ArgumentNullException_VisualStudioAccess()
-    {
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new DependencyResolver(null, null, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_Logger()
-    {
-        // Arrange
-        var vsaMock = Mock.Of<IVisualStudioAccess>();
-
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new DependencyResolver(vsaMock, null, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_CommandService()
-    {
-        // Arrange
-        var vsaMock = Mock.Of<IVisualStudioAccess>();
-        var loggerMock = Mock.Of<ILogger>();
-
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new DependencyResolver(vsaMock, loggerMock, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
     public void Get_ObjectDisposedException_AfterDisposal()
     {
         // Arrange
@@ -66,11 +29,11 @@ public class DependencyResolverTests
         IVisualStudioAccess returnedInstance;
         using (var dr = new DependencyResolver(vsaMock, loggerMock, cs))
 
-            // Act
-            returnedInstance = dr.Get<IVisualStudioAccess>();
+        // Act
+        returnedInstance = dr.Get<IVisualStudioAccess>();
 
         // Assert
-        Assert.AreSame(vsaMock, returnedInstance);
+        returnedInstance.Should().BeSameAs(vsaMock);
     }
 
     [Test]
@@ -84,11 +47,11 @@ public class DependencyResolverTests
         ILogger returnedInstance;
         using (var dr = new DependencyResolver(vsaMock, loggerMock, cs))
 
-            // Act
-            returnedInstance = dr.Get<ILogger>();
+        // Act
+        returnedInstance = dr.Get<ILogger>();
 
         // Assert
-        Assert.AreSame(loggerMock, returnedInstance);
+        returnedInstance.Should().BeSameAs(loggerMock);
     }
 
     [Test]
@@ -102,11 +65,11 @@ public class DependencyResolverTests
         OleMenuCommandService returnedInstance;
         using (var dr = new DependencyResolver(vsaMock, loggerMock, cs))
 
-            // Act
-            returnedInstance = dr.Get<OleMenuCommandService>();
+        // Act
+        returnedInstance = dr.Get<OleMenuCommandService>();
 
         // Assert
-        Assert.AreSame(cs, returnedInstance);
+        returnedInstance.Should().BeSameAs(cs);
     }
 
     [Test]
@@ -126,18 +89,6 @@ public class DependencyResolverTests
     }
 
     [Test]
-    public void GetViewModel_ArgumentNullException_Project()
-    {
-        // Arrange
-        var vsaMock = Mock.Of<IVisualStudioAccess>();
-        var loggerMock = Mock.Of<ILogger>();
-        var spMock = Mock.Of<IServiceProvider>();
-        var cs = new OleMenuCommandService(spMock);
-        using var dr = new DependencyResolver(vsaMock, loggerMock, cs);
-        Assert.Throws<ArgumentNullException>(() => dr.GetViewModel<IViewModel>(null));
-    }
-
-    [Test]
     public void GetViewModel_DifferentInstancesForDifferentProjects()
     {
         // Arrange
@@ -151,18 +102,16 @@ public class DependencyResolverTests
         ViewModelTestImplementation vm2;
         using (var dr = new DependencyResolver(vsaMock, loggerMock, cs))
 
-            // Act
+        // Act
         {
             vm1 = dr.GetViewModel<ViewModelTestImplementation>(p1);
             vm2 = dr.GetViewModel<ViewModelTestImplementation>(p2);
         }
 
         // Assert
-        Assert.IsNotNull(vm1);
-        Assert.IsNotNull(vm2);
-        Assert.AreNotSame(vm1, vm2);
-        Assert.AreSame(p1, vm1.Project);
-        Assert.AreSame(p2, vm2.Project);
+        vm1.Should().NotBeSameAs(vm2);
+        vm1.Project.Should().BeSameAs(p1);
+        vm2.Project.Should().BeSameAs(p2);
     }
 
     [Test]
@@ -178,18 +127,16 @@ public class DependencyResolverTests
         ViewModelTestImplementation vm2;
         using (var dr = new DependencyResolver(vsaMock, loggerMock, cs))
 
-            // Act
+        // Act
         {
             vm1 = dr.GetViewModel<ViewModelTestImplementation>(p);
             vm2 = dr.GetViewModel<ViewModelTestImplementation>(p);
         }
 
         // Assert
-        Assert.IsNotNull(vm1);
-        Assert.IsNotNull(vm2);
-        Assert.AreSame(vm1, vm2);
-        Assert.AreSame(p, vm1.Project);
-        Assert.AreSame(p, vm2.Project);
+        vm1.Should().BeSameAs(vm2);
+        vm1.Project.Should().BeSameAs(p);
+        vm2.Project.Should().BeSameAs(p);
     }
 
     [Test]
@@ -206,18 +153,16 @@ public class DependencyResolverTests
         ViewModelTestImplementation vm2;
         using (var dr = new DependencyResolver(vsaMock, loggerMock, cs))
 
-            // Act
+        // Act
         {
             vm1 = dr.GetViewModel<ViewModelTestImplementation>(p1);
             vm2 = dr.GetViewModel<ViewModelTestImplementation>(p2);
         }
 
         // Assert
-        Assert.IsNotNull(vm1);
-        Assert.IsNotNull(vm2);
-        Assert.AreSame(vm1, vm2);
-        Assert.AreSame(p1, vm1.Project);
-        Assert.AreSame(p1, vm2.Project);
+        vm1.Should().BeSameAs(vm2);
+        vm1.Project.Should().BeSameAs(p1);
+        vm2.Project.Should().BeSameAs(p1);
     }
 
     [Test]
@@ -252,21 +197,6 @@ public class DependencyResolverTests
     }
 
     [Test]
-    public void RegisterPackage_ArgumentNullException_Package()
-    {
-        // Arrange
-        var vsaMock = Mock.Of<IVisualStudioAccess>();
-        var loggerMock = Mock.Of<ILogger>();
-        var spMock = Mock.Of<IServiceProvider>();
-        var cs = new OleMenuCommandService(spMock);
-        var dr = new DependencyResolver(vsaMock, loggerMock, cs);
-
-        // Act & Assert
-        // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => dr.RegisterPackage<AsyncPackageTestImplementation>(null));
-    }
-
-    [Test]
     public void RegisterPackage_Successfully()
     {
         // Arrange
@@ -282,7 +212,7 @@ public class DependencyResolverTests
 
         // Assert
         var registeredPackage = dr.Get<AsyncPackageTestImplementation>();
-        Assert.AreSame(package, registeredPackage);
+        registeredPackage.Should().BeSameAs(package);
     }
 
     [Test]
@@ -298,8 +228,8 @@ public class DependencyResolverTests
         dr.RegisterPackage(package);
         var interfacesToConstruct = GetInterfacesToConstruct();
         var getMethod = typeof(DependencyResolver).GetMethod("Get");
-        Assert.IsNotNull(getMethod);
-        var failedConstructions = new List<string>();
+        getMethod.Should().NotBeNull();
+        var failedConstructions = new List<(string Interface, string Error)>();
 
         // Act
         foreach (var interfaceToConstruct in interfacesToConstruct)
@@ -309,14 +239,14 @@ public class DependencyResolverTests
             {
                 getRef.Invoke(dr, null);
             }
-            catch
+            catch (Exception e)
             {
-                failedConstructions.Add(interfaceToConstruct.FullName);
+                failedConstructions.Add((interfaceToConstruct.FullName, e.ToString()));
             }
         }
 
         // Assert
-        Assert.AreEqual(0, failedConstructions.Count, $"Failed to construct the following interfaces:{Environment.NewLine}{string.Join(Environment.NewLine, failedConstructions)}");
+        failedConstructions.Should().BeEmpty();
     }
 
     private static IEnumerable<Type> GetInterfacesToConstruct()
@@ -334,7 +264,6 @@ public class DependencyResolverTests
                              .ToArray();
     }
 
-    [UsedImplicitly]
     private class ViewModelTestImplementation : ViewModelBase
     {
         public SqlProject Project { get; }

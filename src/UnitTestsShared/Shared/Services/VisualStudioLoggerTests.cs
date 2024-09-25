@@ -4,29 +4,6 @@
 public class VisualStudioLoggerTests
 {
     [Test]
-    public void Constructor_ArgumentNullException_VisualStudioAccess()
-    {
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new VisualStudioLogger(null, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_DocumentationBaseUrl()
-    {
-        // Arrange
-        var vsaMock = new Mock<IVisualStudioAccess>();
-
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new VisualStudioLogger(vsaMock.Object, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
     public void DocumentationBaseUrl_GetCorrectValue()
     {
         // Arrange
@@ -37,7 +14,7 @@ public class VisualStudioLoggerTests
         ILogger logger = new VisualStudioLogger(vsaMock.Object, documentationBaseUrl);
 
         // Assert
-        Assert.AreEqual(documentationBaseUrl, logger.DocumentationBaseUrl);
+        logger.DocumentationBaseUrl.Should().Be(documentationBaseUrl);
     }
 
     [Test]

@@ -295,6 +295,11 @@ public sealed class ConfigurationModel : BaseModel,
         return copy;
     }
 
+    public override bool Equals(object other)
+    {
+        return Equals(other as ConfigurationModel);
+    }
+
     public bool Equals(ConfigurationModel other)
     {
         if (ReferenceEquals(null, other))

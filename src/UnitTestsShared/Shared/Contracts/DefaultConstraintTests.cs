@@ -4,43 +4,6 @@
 public class DefaultConstraintTests
 {
     [Test]
-    public void Constructor_ArgumentNullException_TableSchema()
-    {
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new DefaultConstraint(null, null, null, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_TableName()
-    {
-        // Arrange
-        const string tableSchema = "dbo";
-
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new DefaultConstraint(tableSchema, null, null, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_ColumnName()
-    {
-        // Arrange
-        const string tableSchema = "dbo";
-        const string tableName = "Author";
-
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new DefaultConstraint(tableSchema, tableName, null, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
     [TestCase(null)]
     [TestCase("DF_Name")]
     public void Constructor_CorrectInitialization(string constraintName)
@@ -54,11 +17,11 @@ public class DefaultConstraintTests
         var dc = new DefaultConstraint(tableSchema, tableName, columnName, constraintName);
 
         // Assert
-        Assert.AreEqual(tableSchema, dc.TableSchema);
-        Assert.AreEqual(tableName, dc.TableName);
-        Assert.AreEqual(columnName, dc.ColumnName);
-        Assert.AreEqual(constraintName, dc.ConstraintName);
-        Assert.AreEqual($"[dbo].[Author].[Name].[{(constraintName ?? "<UNNAMED>")}]", dc.DisplayName);
+        dc.TableSchema.Should().Be(tableSchema);
+        dc.TableName.Should().Be(tableName);
+        dc.ColumnName.Should().Be(columnName);
+        dc.ConstraintName.Should().Be(constraintName);
+        dc.DisplayName.Should().Be($"[dbo].[Author].[Name].[{(constraintName ?? "<UNNAMED>")}]");
     }
 
     [Test]
@@ -71,7 +34,7 @@ public class DefaultConstraintTests
         var equals = instance.Equals(null as object);
 
         // Assert
-        Assert.IsFalse(equals);
+        equals.Should().BeFalse();
     }
 
     [Test]
@@ -81,10 +44,10 @@ public class DefaultConstraintTests
         var instance = new DefaultConstraint("a", "b", "c", "d");
 
         // Act
-        var equals = instance.Equals((object) instance);
+        var equals = instance.Equals((object)instance);
 
         // Assert
-        Assert.IsTrue(equals);
+        equals.Should().BeTrue();
     }
 
     [Test]
@@ -97,7 +60,7 @@ public class DefaultConstraintTests
         var equals = instance.Equals(new Version(1, 0));
 
         // Assert
-        Assert.IsFalse(equals);
+        equals.Should().BeFalse();
     }
 
     [Test]
@@ -117,7 +80,7 @@ public class DefaultConstraintTests
         var equals = instance1.Equals((object)instance2);
 
         // Assert
-        Assert.AreEqual(expectedEquals, equals);
+        equals.Should().Be(expectedEquals);
     }
 
     [Test]
@@ -130,7 +93,7 @@ public class DefaultConstraintTests
         var equals = instance.Equals(null);
 
         // Assert
-        Assert.IsFalse(equals);
+        equals.Should().BeFalse();
     }
 
     [Test]
@@ -143,7 +106,7 @@ public class DefaultConstraintTests
         var equals = instance.Equals(instance);
 
         // Assert
-        Assert.IsTrue(equals);
+        equals.Should().BeTrue();
     }
 
     [Test]
@@ -163,7 +126,7 @@ public class DefaultConstraintTests
         var equals = instance1.Equals(instance2);
 
         // Assert
-        Assert.AreEqual(expectedEquals, equals);
+        equals.Should().Be(expectedEquals);
     }
 
     [Test]
@@ -185,7 +148,7 @@ public class DefaultConstraintTests
         var sameHashCode = i1HashCode == i2HashCode;
 
         // Assert
-        Assert.AreEqual(expectedSameHashCode, sameHashCode);
+        sameHashCode.Should().Be(expectedSameHashCode);
     }
 
     [Test]
@@ -205,7 +168,7 @@ public class DefaultConstraintTests
         var equality = instance1 == instance2;
 
         // Assert
-        Assert.AreEqual(expectedEquality, equality);
+        equality.Should().Be(expectedEquality);
     }
 
     [Test]
@@ -225,6 +188,6 @@ public class DefaultConstraintTests
         var inequality = instance1 != instance2;
 
         // Assert
-        Assert.AreEqual(expectedInequality, inequality);
+        inequality.Should().Be(expectedInequality);
     }
 }

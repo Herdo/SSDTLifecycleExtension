@@ -12,9 +12,9 @@ public class ViewModelBaseTests
         vm.PropertyChanged += (sender,
                                args) =>
         {
-            Assert.IsNotNull(sender);
-            Assert.AreSame(vm, sender);
-            Assert.IsNotNull(args);
+            sender.Should().NotBeNull();
+            sender.Should().BeSameAs(vm);
+            args.Should().NotBeNull();
             changedProperties.Add(args.PropertyName);
         };
 
@@ -22,10 +22,10 @@ public class ViewModelBaseTests
         vm.ImplicitName = "test";
 
         // Assert
-        Assert.AreEqual("test", vm.ImplicitName);
-        Assert.IsNull(vm.ExplicitName);
-        Assert.AreEqual(1, changedProperties.Count);
-        Assert.AreEqual("ImplicitName", changedProperties[0]);
+        vm.ImplicitName.Should().Be("test");
+        vm.ExplicitName.Should().BeNull();
+        changedProperties.Should().ContainSingle()
+            .Which.Should().Be("ImplicitName");
     }
 
     [Test]
@@ -37,9 +37,9 @@ public class ViewModelBaseTests
         vm.PropertyChanged += (sender,
                                args) =>
         {
-            Assert.IsNotNull(sender);
-            Assert.AreSame(vm, sender);
-            Assert.IsNotNull(args);
+            sender.Should().NotBeNull();
+            sender.Should().BeSameAs(vm);
+            args.Should().NotBeNull();
             changedProperties.Add(args.PropertyName);
         };
 
@@ -47,10 +47,10 @@ public class ViewModelBaseTests
         vm.ExplicitName = "test";
 
         // Assert
-        Assert.IsNull(vm.ImplicitName);
-        Assert.AreEqual("test", vm.ExplicitName);
-        Assert.AreEqual(1, changedProperties.Count);
-        Assert.AreEqual("ExplicitNameExtra", changedProperties[0]);
+        vm.ImplicitName.Should().BeNull();
+        vm.ExplicitName.Should().Be("test");
+        changedProperties.Should().ContainSingle()
+            .Which.Should().Be("ExplicitNameExtra");
     }
 
     private sealed class ViewModelBaseTestImplementation : ViewModelBase

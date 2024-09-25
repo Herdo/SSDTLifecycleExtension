@@ -41,4 +41,9 @@ public sealed class VersionModel : BaseModel
                 : UnderlyingVersion.ToString();
         }
     }
+
+    public VersionModel()
+    {
+        UnderlyingVersion = new Version();
+    }
 }

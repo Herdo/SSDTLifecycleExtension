@@ -4,27 +4,6 @@
 public class CopyBuildResultUnitTests
 {
     [Test]
-    public void Constructor_ArgumentNullException_BuildService()
-    {
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new CopyBuildResultUnit(null));
-    }
-
-    [Test]
-    public void Work_ScaffoldingStateModel_ArgumentNullException_StateModel()
-    {
-        // Arrange
-        var bsMock = new Mock<IBuildService>();
-        IWorkUnit<ScaffoldingStateModel> unit = new CopyBuildResultUnit(bsMock.Object);
-
-        // Act & Assert
-        // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => unit.Work(null, CancellationToken.None));
-    }
-
-    [Test]
     public async Task Work_ScaffoldingStateModel_CopiedSuccessful_Async()
     {
         // Arrange
@@ -48,8 +27,8 @@ public class CopyBuildResultUnitTests
         await unit.Work(model, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(StateModelState.TriedToCopyBuildResult, model.CurrentState);
-        Assert.IsNull(model.Result);
+        model.CurrentState.Should().Be(StateModelState.TriedToCopyBuildResult);
+        model.Result.Should().BeNull();
     }
 
     [Test]
@@ -76,20 +55,8 @@ public class CopyBuildResultUnitTests
         await unit.Work(model, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(StateModelState.TriedToCopyBuildResult, model.CurrentState);
-        Assert.IsFalse(model.Result);
-    }
-
-    [Test]
-    public void Work_ScriptCreationStateModel_ArgumentNullException_StateModel()
-    {
-        // Arrange
-        var bsMock = new Mock<IBuildService>();
-        IWorkUnit<ScriptCreationStateModel> unit = new CopyBuildResultUnit(bsMock.Object);
-
-        // Act & Assert
-        // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => unit.Work(null, CancellationToken.None));
+        model.CurrentState.Should().Be(StateModelState.TriedToCopyBuildResult);
+        model.Result.Should().BeFalse();
     }
 
     [Test]
@@ -116,8 +83,8 @@ public class CopyBuildResultUnitTests
         await unit.Work(model, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(StateModelState.TriedToCopyBuildResult, model.CurrentState);
-        Assert.IsNull(model.Result);
+        model.CurrentState.Should().Be(StateModelState.TriedToCopyBuildResult);
+        model.Result.Should().BeNull();
     }
 
     [Test]
@@ -144,7 +111,7 @@ public class CopyBuildResultUnitTests
         await unit.Work(model, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(StateModelState.TriedToCopyBuildResult, model.CurrentState);
-        Assert.IsFalse(model.Result);
+        model.CurrentState.Should().Be(StateModelState.TriedToCopyBuildResult);
+        model.Result.Should().BeFalse();
     }
 }

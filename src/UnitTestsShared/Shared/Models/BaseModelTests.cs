@@ -13,7 +13,7 @@ public class BaseModelTests
         var hasErrors = model.HasErrors;
 
         // Assert
-        Assert.IsFalse(hasErrors);
+        hasErrors.Should().BeFalse();
     }
 
     [Test]
@@ -34,10 +34,10 @@ public class BaseModelTests
         model.FakeError = true;
 
         // Assert
-        Assert.IsNotNull(invokedSender);
-        Assert.AreSame(model, invokedSender);
-        Assert.IsNotNull(invokedProperty);
-        Assert.AreEqual(nameof(BaseModelTestImplementation.FakeError), invokedProperty);
+        invokedSender.Should().NotBeNull();
+        invokedSender.Should().BeSameAs(model);
+        invokedProperty.Should().NotBeNull();
+        invokedProperty.Should().Be(nameof(BaseModelTestImplementation.FakeError));
     }
 
     [Test]
@@ -61,12 +61,12 @@ public class BaseModelTests
         model.FakeError = false;
 
         // Assert
-        Assert.AreEqual(2, senderList.Count);
-        Assert.AreSame(model, senderList[0]);
-        Assert.AreSame(model, senderList[1]);
-        Assert.AreEqual(2, propertyList.Count);
-        Assert.AreEqual(nameof(BaseModelTestImplementation.FakeError), propertyList[0]);
-        Assert.AreEqual(nameof(BaseModelTestImplementation.FakeError), propertyList[1]);
+        senderList.Should().HaveCount(2);
+        senderList[0].Should().BeSameAs(model);
+        senderList[1].Should().BeSameAs(model);
+        propertyList.Should().HaveCount(2);
+        propertyList[0].Should().Be(nameof(BaseModelTestImplementation.FakeError));
+        propertyList[1].Should().Be(nameof(BaseModelTestImplementation.FakeError));
     }
 
     [Test]
@@ -76,14 +76,14 @@ public class BaseModelTests
     public void GetErrors_EmptyListIfNoPropertyNameIsProvided(string propertyName)
     {
         // Arrange
-        var model = new BaseModelTestImplementation {FakeError = true};
+        var model = new BaseModelTestImplementation { FakeError = true };
 
         // Act
         var errors = model.GetErrors(propertyName);
 
         // Assert
-        Assert.IsNotNull(errors);
-        Assert.AreEqual(0, errors.OfType<string>().Count());
+        errors.Should().NotBeNull();
+        errors.OfType<string>().Should().BeEmpty();
     }
 
     [Test]
@@ -99,8 +99,8 @@ public class BaseModelTests
         var errors = model.GetErrors(propertyName);
 
         // Assert
-        Assert.IsNotNull(errors);
-        Assert.AreEqual(0, errors.OfType<string>().Count());
+        errors.Should().NotBeNull();
+        errors.OfType<string>().Should().BeEmpty();
     }
 
     [Test]
@@ -113,11 +113,11 @@ public class BaseModelTests
         var errors = model.GetErrors(nameof(BaseModelTestImplementation.FakeError));
 
         // Assert
-        Assert.IsNotNull(errors);
+        errors.Should().NotBeNull();
         var errorArray = errors.OfType<string>().ToArray();
-        Assert.AreEqual(2, errorArray.Length);
-        Assert.AreEqual("Error1", errorArray[0]);
-        Assert.AreEqual("Error2", errorArray[1]);
+        errorArray.Should().HaveCount(2);
+        errorArray[0].Should().Be("Error1");
+        errorArray[1].Should().Be("Error2");
     }
 
     [Test]
@@ -132,7 +132,7 @@ public class BaseModelTests
         var hasErrors = model.HasErrors;
 
         // Assert
-        Assert.AreEqual(expectedHasErrorsState, hasErrors);
+        hasErrors.Should().Be(expectedHasErrorsState);
     }
 
     [Test]
@@ -142,7 +142,8 @@ public class BaseModelTests
         var model = new BaseModelTestImplementation();
 
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => model.InvokeSetValidationErrorsWithPropertyNameNull());
+        Action act = () => model.InvokeSetValidationErrorsWithPropertyNameNull();
+        act.Should().Throw<ArgumentNullException>();
     }
 
     private class BaseModelTestImplementation : BaseModel
@@ -170,10 +171,10 @@ public class BaseModelTests
             if (shouldFakeErrors)
             {
                 return new List<string>
-                {
-                    "Error1",
-                    "Error2"
-                };
+                        {
+                            "Error1",
+                            "Error2"
+                        };
             }
             return Array.Empty<string>();
         }

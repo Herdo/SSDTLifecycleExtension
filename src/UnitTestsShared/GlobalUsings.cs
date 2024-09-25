@@ -17,7 +17,6 @@ global using System.Windows.Input;
 global using System.Windows.Media;
 global using System.Xml;
 global using FluentAssertions;
-global using JetBrains.Annotations;
 global using Microsoft.VisualStudio.Shell;
 global using Microsoft.VisualStudio.Text;
 global using Microsoft.VisualStudio.Text.Classification;

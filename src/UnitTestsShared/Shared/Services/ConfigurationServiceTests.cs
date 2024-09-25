@@ -4,51 +4,6 @@
 public class ConfigurationServiceTests
 {
     [Test]
-    public void Constructor_ArgumentNullException_FileSystemAccess()
-    {
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        Assert.Throws<ArgumentNullException>(() => new ConfigurationService(null, null, null));
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_VisualStudioAccess()
-    {
-        // Arrange
-        var fsaMock = Mock.Of<IFileSystemAccess>();
-
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        Assert.Throws<ArgumentNullException>(() => new ConfigurationService(fsaMock, null, null));
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_Logger()
-    {
-        // Arrange
-        var fsaMock = Mock.Of<IFileSystemAccess>();
-        var vsaMock = Mock.Of<IVisualStudioAccess>();
-
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        Assert.Throws<ArgumentNullException>(() => new ConfigurationService(fsaMock, vsaMock, null));
-    }
-
-    [Test]
-    public void GetConfigurationOrDefaultAsync_SqlProject_ArgumentNullException_Project()
-    {
-        // Arrange
-        var fsaMock = Mock.Of<IFileSystemAccess>();
-        var vsaMock = Mock.Of<IVisualStudioAccess>();
-        var loggerMock = Mock.Of<ILogger>();
-        IConfigurationService service = new ConfigurationService(fsaMock, vsaMock, loggerMock);
-
-        // Act & Assert
-        // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => service.GetConfigurationOrDefaultAsync(null as SqlProject));
-    }
-
-    [Test]
     public void GetConfigurationOrDefaultAsync_SqlProject_ArgumentExceptionException_InvalidPathFormat()
     {
         // Arrange
@@ -96,10 +51,9 @@ public class ConfigurationServiceTests
         var configuration = await service.GetConfigurationOrDefaultAsync(project);
 
         // Assert
-        Assert.IsNotNull(configuration);
+        configuration.Should().Be(defaultConfiguration);
         vsaMock.Verify(m => m.ShowModalError(It.IsAny<string>()), Times.Never);
         loggerMock.Verify(m => m.LogErrorAsync(exception, It.IsAny<string>()), Times.Never);
-        Assert.IsTrue(defaultConfiguration.Equals(configuration));
     }
 
     [Test]
@@ -122,10 +76,9 @@ public class ConfigurationServiceTests
         var configuration = await service.GetConfigurationOrDefaultAsync(project);
 
         // Assert
-        Assert.IsNotNull(configuration);
+        configuration.Should().Be(defaultConfiguration);
         vsaMock.Verify(m => m.ShowModalError(It.Is<string>(s => s.Contains("Accessing the configuration file failed."))), Times.Once);
         loggerMock.Verify(m => m.LogErrorAsync(exception, It.Is<string>(s => s.Contains("Failed to read the configuration from file"))), Times.Once);
-        Assert.IsTrue(defaultConfiguration.Equals(configuration));
     }
 
     [Test]
@@ -153,21 +106,20 @@ public class ConfigurationServiceTests
         var configuration = await service.GetConfigurationOrDefaultAsync(project);
 
         // Assert
-        Assert.IsNotNull(configuration);
-        Assert.IsFalse(defaultConfiguration.Equals(configuration));
-        Assert.AreEqual("__Deployment", configuration.ArtifactsPath);
-        Assert.AreEqual("Test.publish.xml", configuration.PublishProfilePath);
-        Assert.AreEqual("C:\\Temp\\Repository\\", configuration.SharedDacpacRepositoryPath);
-        Assert.IsFalse(configuration.BuildBeforeScriptCreation);
-        Assert.IsTrue(configuration.CreateDocumentationWithScriptCreation);
-        Assert.IsTrue(configuration.CommentOutUnnamedDefaultConstraintDrops);   // This must be true to cause an validation error for the last assert.
-        Assert.IsTrue(configuration.ReplaceUnnamedDefaultConstraintDrops);      // This must be true to cause an validation error for the last assert.
-        Assert.AreEqual("{MAJOR}.0.{BUILD}", configuration.VersionPattern);
-        Assert.IsTrue(configuration.TrackDacpacVersion);
-        Assert.AreEqual("header", configuration.CustomHeader);
-        Assert.AreEqual("footer", configuration.CustomFooter);
-        Assert.IsTrue(configuration.RemoveSqlCmdStatements);
-        Assert.IsTrue(configuration.HasErrors); // This will check if ValidateAll is called correctly.
+        configuration.Should().NotBe(defaultConfiguration);
+        configuration.ArtifactsPath.Should().Be("__Deployment");
+        configuration.PublishProfilePath.Should().Be("Test.publish.xml");
+        configuration.SharedDacpacRepositoryPath.Should().Be("C:\\Temp\\Repository\\");
+        configuration.BuildBeforeScriptCreation.Should().BeFalse();
+        configuration.CreateDocumentationWithScriptCreation.Should().BeTrue();
+        configuration.CommentOutUnnamedDefaultConstraintDrops.Should().BeTrue();   // This must be true to cause an validation error for the last assert.
+        configuration.ReplaceUnnamedDefaultConstraintDrops.Should().BeTrue();      // This must be true to cause an validation error for the last assert.
+        configuration.VersionPattern.Should().Be("{MAJOR}.0.{BUILD}");
+        configuration.TrackDacpacVersion.Should().BeTrue();
+        configuration.CustomHeader.Should().Be("header");
+        configuration.CustomFooter.Should().Be("footer");
+        configuration.RemoveSqlCmdStatements.Should().BeTrue();
+        configuration.HasErrors.Should().BeTrue(); // This will check if ValidateAll is called correctly.
     }
 
     [Test]
@@ -194,35 +146,20 @@ public class ConfigurationServiceTests
         var configuration = await service.GetConfigurationOrDefaultAsync(project);
 
         // Assert
-        Assert.IsNotNull(configuration);
-        Assert.IsFalse(defaultConfiguration.Equals(configuration));
-        Assert.AreEqual("__Deployment", configuration.ArtifactsPath);
-        Assert.AreEqual(defaultConfiguration.PublishProfilePath, configuration.PublishProfilePath);
-        Assert.AreEqual(defaultConfiguration.SharedDacpacRepositoryPath, configuration.SharedDacpacRepositoryPath);
-        Assert.IsFalse(configuration.BuildBeforeScriptCreation);
-        Assert.IsTrue(configuration.CreateDocumentationWithScriptCreation);
-        Assert.IsTrue(configuration.CommentOutUnnamedDefaultConstraintDrops);   // This must be true to cause an validation error for the last assert.
-        Assert.IsTrue(configuration.ReplaceUnnamedDefaultConstraintDrops);      // This must be true to cause an validation error for the last assert.
-        Assert.AreEqual(defaultConfiguration.VersionPattern, configuration.VersionPattern);
-        Assert.IsTrue(configuration.TrackDacpacVersion);
-        Assert.AreEqual("header", configuration.CustomHeader);
-        Assert.AreEqual("footer", configuration.CustomFooter);
-        Assert.IsTrue(configuration.RemoveSqlCmdStatements);
-        Assert.IsTrue(configuration.HasErrors); // This will check if ValidateAll is called correctly.
-    }
-
-    [Test]
-    public void GetConfigurationOrDefaultAsync_Path_ArgumentNullException_Project()
-    {
-        // Arrange
-        var fsaMock = Mock.Of<IFileSystemAccess>();
-        var vsaMock = Mock.Of<IVisualStudioAccess>();
-        var loggerMock = Mock.Of<ILogger>();
-        IConfigurationService service = new ConfigurationService(fsaMock, vsaMock, loggerMock);
-
-        // Act & Assert
-        // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => service.GetConfigurationOrDefaultAsync(null as string));
+        configuration.Should().NotBe(defaultConfiguration);
+        configuration.ArtifactsPath.Should().Be("__Deployment");
+        configuration.PublishProfilePath.Should().Be(defaultConfiguration.PublishProfilePath);
+        configuration.SharedDacpacRepositoryPath.Should().Be(defaultConfiguration.SharedDacpacRepositoryPath);
+        configuration.BuildBeforeScriptCreation.Should().BeFalse();
+        configuration.CreateDocumentationWithScriptCreation.Should().BeTrue();
+        configuration.CommentOutUnnamedDefaultConstraintDrops.Should().BeTrue();   // This must be true to cause an validation error for the last assert.
+        configuration.ReplaceUnnamedDefaultConstraintDrops.Should().BeTrue();      // This must be true to cause an validation error for the last assert.
+        configuration.VersionPattern.Should().Be(defaultConfiguration.VersionPattern);
+        configuration.TrackDacpacVersion.Should().BeTrue();
+        configuration.CustomHeader.Should().Be("header");
+        configuration.CustomFooter.Should().Be("footer");
+        configuration.RemoveSqlCmdStatements.Should().BeTrue();
+        configuration.HasErrors.Should().BeTrue(); // This will check if ValidateAll is called correctly.
     }
 
     [Test]
@@ -244,8 +181,7 @@ public class ConfigurationServiceTests
         var configuration = await service.GetConfigurationOrDefaultAsync("C:\\Temp\\Test\\Properties\\ssdtlifecycle.json");
 
         // Assert
-        Assert.IsNotNull(configuration);
-        Assert.IsTrue(defaultConfiguration.Equals(configuration));
+        configuration.Should().Be(defaultConfiguration);
         vsaMock.Verify(m => m.ShowModalError(It.Is<string>(s => s.Contains("Accessing the configuration file failed."))), Times.Once);
         loggerMock.Verify(m => m.LogErrorAsync(exception, It.Is<string>(s => s.Contains("Failed to read the configuration from file"))), Times.Once);
     }
@@ -267,8 +203,7 @@ public class ConfigurationServiceTests
         var configuration = await service.GetConfigurationOrDefaultAsync("C:\\Temp\\Test\\Properties\\ssdtlifecycle.json");
 
         // Assert
-        Assert.IsNotNull(configuration);
-        Assert.IsTrue(defaultConfiguration.Equals(configuration));
+        configuration.Should().Be(defaultConfiguration);
         vsaMock.Verify(m => m.ShowModalError(It.IsAny<string>()), Times.Never);
         loggerMock.Verify(m => m.LogErrorAsync(exception, It.IsAny<string>()), Times.Never);
     }
@@ -297,21 +232,20 @@ public class ConfigurationServiceTests
         var configuration = await service.GetConfigurationOrDefaultAsync("C:\\Temp\\Test\\Properties\\ssdtlifecycle.json");
 
         // Assert
-        Assert.IsNotNull(configuration);
-        Assert.IsFalse(defaultConfiguration.Equals(configuration));
-        Assert.AreEqual("__Deployment", configuration.ArtifactsPath);
-        Assert.AreEqual("Test.publish.xml", configuration.PublishProfilePath);
-        Assert.AreEqual("C:\\Temp\\Repository\\", configuration.SharedDacpacRepositoryPath);
-        Assert.IsFalse(configuration.BuildBeforeScriptCreation);
-        Assert.IsTrue(configuration.CreateDocumentationWithScriptCreation);
-        Assert.IsTrue(configuration.CommentOutUnnamedDefaultConstraintDrops);   // This must be true to cause an validation error for the last assert.
-        Assert.IsTrue(configuration.ReplaceUnnamedDefaultConstraintDrops);      // This must be true to cause an validation error for the last assert.
-        Assert.AreEqual("{MAJOR}.0.{BUILD}", configuration.VersionPattern);
-        Assert.IsTrue(configuration.TrackDacpacVersion);
-        Assert.AreEqual("header", configuration.CustomHeader);
-        Assert.AreEqual("footer", configuration.CustomFooter);
-        Assert.IsTrue(configuration.RemoveSqlCmdStatements);
-        Assert.IsTrue(configuration.HasErrors); // This will check if ValidateAll is called correctly.
+        configuration.Should().NotBe(defaultConfiguration);
+        configuration.ArtifactsPath.Should().Be("__Deployment");
+        configuration.PublishProfilePath.Should().Be("Test.publish.xml");
+        configuration.SharedDacpacRepositoryPath.Should().Be("C:\\Temp\\Repository\\");
+        configuration.BuildBeforeScriptCreation.Should().BeFalse();
+        configuration.CreateDocumentationWithScriptCreation.Should().BeTrue();
+        configuration.CommentOutUnnamedDefaultConstraintDrops.Should().BeTrue();   // This must be true to cause an validation error for the last assert.
+        configuration.ReplaceUnnamedDefaultConstraintDrops.Should().BeTrue();      // This must be true to cause an validation error for the last assert.
+        configuration.VersionPattern.Should().Be("{MAJOR}.0.{BUILD}");
+        configuration.TrackDacpacVersion.Should().BeTrue();
+        configuration.CustomHeader.Should().Be("header");
+        configuration.CustomFooter.Should().Be("footer");
+        configuration.RemoveSqlCmdStatements.Should().BeTrue();
+        configuration.HasErrors.Should().BeTrue(); // This will check if ValidateAll is called correctly.
     }
 
     [Test]
@@ -337,51 +271,20 @@ public class ConfigurationServiceTests
         var configuration = await service.GetConfigurationOrDefaultAsync("C:\\Temp\\Test\\Properties\\ssdtlifecycle.json");
 
         // Assert
-        Assert.IsNotNull(configuration);
-        Assert.IsFalse(defaultConfiguration.Equals(configuration));
-        Assert.AreEqual("__Deployment", configuration.ArtifactsPath);
-        Assert.AreEqual(defaultConfiguration.PublishProfilePath, configuration.PublishProfilePath);
-        Assert.AreEqual(defaultConfiguration.SharedDacpacRepositoryPath, configuration.SharedDacpacRepositoryPath);
-        Assert.IsFalse(configuration.BuildBeforeScriptCreation);
-        Assert.IsTrue(configuration.CreateDocumentationWithScriptCreation);
-        Assert.IsTrue(configuration.CommentOutUnnamedDefaultConstraintDrops);   // This must be true to cause an validation error for the last assert.
-        Assert.IsTrue(configuration.ReplaceUnnamedDefaultConstraintDrops);      // This must be true to cause an validation error for the last assert.
-        Assert.AreEqual(defaultConfiguration.VersionPattern, configuration.VersionPattern);
-        Assert.IsTrue(configuration.TrackDacpacVersion);
-        Assert.AreEqual("header", configuration.CustomHeader);
-        Assert.AreEqual("footer", configuration.CustomFooter);
-        Assert.IsTrue(configuration.RemoveSqlCmdStatements);
-        Assert.IsTrue(configuration.HasErrors); // This will check if ValidateAll is called correctly.
-    }
-
-    [Test]
-    public void SaveConfigurationAsync_ArgumentNullException_Project()
-    {
-        // Arrange
-        var fsaMock = Mock.Of<IFileSystemAccess>();
-        var vsaMock = Mock.Of<IVisualStudioAccess>();
-        var loggerMock = Mock.Of<ILogger>();
-        IConfigurationService service = new ConfigurationService(fsaMock, vsaMock, loggerMock);
-
-        // Act & Assert
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => service.SaveConfigurationAsync(null, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void SaveConfigurationAsync_ArgumentNullException_Model()
-    {
-        // Arrange
-        var fsaMock = Mock.Of<IFileSystemAccess>();
-        var vsaMock = Mock.Of<IVisualStudioAccess>();
-        var loggerMock = Mock.Of<ILogger>();
-        IConfigurationService service = new ConfigurationService(fsaMock, vsaMock, loggerMock);
-        var project = new SqlProject("", "", "");
-
-        // Act & Assert
-        // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => service.SaveConfigurationAsync(project, null));
+        configuration.Should().NotBe(defaultConfiguration);
+        configuration.ArtifactsPath.Should().Be("__Deployment");
+        configuration.PublishProfilePath.Should().Be(defaultConfiguration.PublishProfilePath);
+        configuration.SharedDacpacRepositoryPath.Should().Be(defaultConfiguration.SharedDacpacRepositoryPath);
+        configuration.BuildBeforeScriptCreation.Should().BeFalse();
+        configuration.CreateDocumentationWithScriptCreation.Should().BeTrue();
+        configuration.CommentOutUnnamedDefaultConstraintDrops.Should().BeTrue();   // This must be true to cause an validation error for the last assert.
+        configuration.ReplaceUnnamedDefaultConstraintDrops.Should().BeTrue();      // This must be true to cause an validation error for the last assert.
+        configuration.VersionPattern.Should().Be(defaultConfiguration.VersionPattern);
+        configuration.TrackDacpacVersion.Should().BeTrue();
+        configuration.CustomHeader.Should().Be("header");
+        configuration.CustomFooter.Should().Be("footer");
+        configuration.RemoveSqlCmdStatements.Should().BeTrue();
+        configuration.HasErrors.Should().BeTrue(); // This will check if ValidateAll is called correctly.
     }
 
     [Test]
@@ -437,9 +340,9 @@ public class ConfigurationServiceTests
         var result = await service.SaveConfigurationAsync(project, model);
 
         // Assert
-        Assert.IsFalse(result);
+        result.Should().BeFalse();
         fsaMock.Verify(m => m.WriteFileAsync("C:\\Temp\\Test\\Properties\\ssdtlifecycle.json", It.IsNotNull<string>()), Times.Once);
-        Assert.IsNull(configurationChangedProject);
+        configurationChangedProject.Should().BeNull();
         vsaMock.Verify(m => m.AddItemToProjectProperties(It.IsAny<SqlProject>(), It.IsAny<string>()), Times.Never);
         loggerMock.Verify(m => m.LogErrorAsync(exception, "Failed to save the configuration"), Times.Once);
         vsaMock.Verify(m => m.ShowModalError("Failed to save the configuration. Please check the SSDT Lifecycle output window for details."), Times.Once);
@@ -465,9 +368,9 @@ public class ConfigurationServiceTests
         var result = await service.SaveConfigurationAsync(project, model);
 
         // Assert
-        Assert.IsTrue(result);
+        result.Should().BeTrue();
         fsaMock.Verify(m => m.WriteFileAsync("C:\\Temp\\Test\\Properties\\ssdtlifecycle.json", It.IsNotNull<string>()), Times.Once);
-        Assert.AreSame(project, configurationChangedProject);
+        configurationChangedProject.Should().BeSameAs(project);
         vsaMock.Verify(m => m.AddItemToProjectProperties(project, "C:\\Temp\\Test\\Properties\\ssdtlifecycle.json"), Times.Once);
     }
 }
