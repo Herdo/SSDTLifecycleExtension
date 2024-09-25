@@ -4,27 +4,6 @@
 public class BuildProjectUnitTests
 {
     [Test]
-    public void Constructor_ArgumentNullException_BuildService()
-    {
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new BuildProjectUnit(null));
-    }
-
-    [Test]
-    public void Work_ScaffoldingStateModel_ArgumentNullException_StateModel()
-    {
-        // Arrange
-        var bsMock = new Mock<IBuildService>();
-        IWorkUnit<ScaffoldingStateModel> unit = new BuildProjectUnit(bsMock.Object);
-
-        // Act & Assert
-        // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => unit.Work(null, CancellationToken.None));
-    }
-
-    [Test]
     public async Task Work_ScaffoldingStateModel_BuiltSuccessful_Async()
     {
         // Arrange
@@ -41,8 +20,8 @@ public class BuildProjectUnitTests
         await unit.Work(model, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(StateModelState.TriedToBuildProject, model.CurrentState);
-        Assert.IsNull(model.Result);
+        model.CurrentState.Should().Be(StateModelState.TriedToBuildProject);
+        model.Result.Should().BeNull();
     }
 
     [Test]
@@ -62,20 +41,8 @@ public class BuildProjectUnitTests
         await unit.Work(model, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(StateModelState.TriedToBuildProject, model.CurrentState);
-        Assert.IsFalse(model.Result);
-    }
-
-    [Test]
-    public void Work_ScriptCreationStateModel_ArgumentNullException_StateModel()
-    {
-        // Arrange
-        var bsMock = new Mock<IBuildService>();
-        IWorkUnit<ScriptCreationStateModel> unit = new BuildProjectUnit(bsMock.Object);
-
-        // Act & Assert
-        // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => unit.Work(null, CancellationToken.None));
+        model.CurrentState.Should().Be(StateModelState.TriedToBuildProject);
+        model.Result.Should().BeFalse();
     }
 
     [Test]
@@ -96,8 +63,8 @@ public class BuildProjectUnitTests
         await unit.Work(model, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(StateModelState.TriedToBuildProject, model.CurrentState);
-        Assert.IsNull(model.Result);
+        model.CurrentState.Should().Be(StateModelState.TriedToBuildProject);
+        model.Result.Should().BeNull();
         bsMock.Verify(m => m.BuildProjectAsync(project), Times.Never);
     }
 
@@ -119,8 +86,8 @@ public class BuildProjectUnitTests
         await unit.Work(model, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(StateModelState.TriedToBuildProject, model.CurrentState);
-        Assert.IsNull(model.Result);
+        model.CurrentState.Should().Be(StateModelState.TriedToBuildProject);
+        model.Result.Should().BeNull();
         bsMock.Verify(m => m.BuildProjectAsync(project), Times.Once);
     }
 
@@ -141,7 +108,7 @@ public class BuildProjectUnitTests
         await unit.Work(model, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(StateModelState.TriedToBuildProject, model.CurrentState);
-        Assert.IsFalse(model.Result);
+        model.CurrentState.Should().Be(StateModelState.TriedToBuildProject);
+        model.Result.Should().BeFalse();
     }
 }

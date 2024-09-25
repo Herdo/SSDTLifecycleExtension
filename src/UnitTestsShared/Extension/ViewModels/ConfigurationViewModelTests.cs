@@ -4,121 +4,6 @@
 public class ConfigurationViewModelTests
 {
     [Test]
-    public void Constructor_ArgumentNullException_Project()
-    {
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new ConfigurationViewModel(null,
-                                                                              null,
-                                                                              null,
-                                                                              null,
-                                                                              null,
-                                                                              null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_ConfigurationService()
-    {
-        // Arrange
-        var project = new SqlProject("", "", "");
-
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new ConfigurationViewModel(project,
-                                                                              null,
-                                                                              null,
-                                                                              null,
-                                                                              null,
-                                                                              null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_FileSystemAccess()
-    {
-        // Arrange
-        var project = new SqlProject("", "", "");
-        var csMock = Mock.Of<IConfigurationService>();
-
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new ConfigurationViewModel(project,
-                                                                              csMock,
-                                                                              null,
-                                                                              null,
-                                                                              null,
-                                                                              null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_ScaffoldingService()
-    {
-        // Arrange
-        var project = new SqlProject("", "", "");
-        var csMock = Mock.Of<IConfigurationService>();
-        var fsaMock = Mock.Of<IFileSystemAccess>();
-
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new ConfigurationViewModel(project,
-                                                                              csMock,
-                                                                              fsaMock,
-                                                                              null,
-                                                                              null,
-                                                                              null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_ScriptCreationService()
-    {
-        // Arrange
-        var project = new SqlProject("", "", "");
-        var csMock = Mock.Of<IConfigurationService>();
-        var fsaMock = Mock.Of<IFileSystemAccess>();
-        var ssMock = Mock.Of<IScaffoldingService>();
-
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new ConfigurationViewModel(project,
-                                                                              csMock,
-                                                                              fsaMock,
-                                                                              ssMock,
-                                                                              null,
-                                                                              null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_Logger()
-    {
-        // Arrange
-        var project = new SqlProject("", "", "");
-        var csMock = Mock.Of<IConfigurationService>();
-        var fsaMock = Mock.Of<IFileSystemAccess>();
-        var ssMock = Mock.Of<IScaffoldingService>();
-        var scsMock = Mock.Of<IScriptCreationService>();
-
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new ConfigurationViewModel(project,
-                                                                              csMock,
-                                                                              fsaMock,
-                                                                              ssMock,
-                                                                              scsMock,
-                                                                              null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
     public void Constructor_CorrectInitialization()
     {
         // Arrange
@@ -138,11 +23,11 @@ public class ConfigurationViewModelTests
                                             loggerMock);
 
         // Assert
-        Assert.IsNull(vm.Model);
-        Assert.IsNotNull(vm.BrowsePublishProfileCommand);
-        Assert.IsNotNull(vm.ResetConfigurationToDefaultCommand);
-        Assert.IsNotNull(vm.SaveConfigurationCommand);
-        Assert.IsNotNull(vm.OpenDocumentationCommand);
+        vm.Model.Should().BeNull();
+        vm.BrowsePublishProfileCommand.Should().NotBeNull();
+        vm.ResetConfigurationToDefaultCommand.Should().NotBeNull();
+        vm.SaveConfigurationCommand.Should().NotBeNull();
+        vm.OpenDocumentationCommand.Should().NotBeNull();
     }
 
     [Test]
@@ -168,10 +53,10 @@ public class ConfigurationViewModelTests
         var result = await vm.InitializeAsync();
 
         // Assert
-        Assert.IsTrue(result);
-        Assert.IsNotNull(vm.Model);
-        Assert.AreNotSame(model, vm.Model);
-        Assert.AreEqual(model, vm.Model);
+        result.Should().BeTrue();
+        vm.Model.Should().NotBeNull();
+        vm.Model.Should().NotBeSameAs(model);
+        vm.Model.Should().Be(model);
     }
 
     [Test]
@@ -207,8 +92,8 @@ public class ConfigurationViewModelTests
         vm.Model = model;
 
         // Assert
-        Assert.IsNull(invokedSender);
-        Assert.IsNull(invokedProperty);
+        invokedSender.Should().BeNull();
+        invokedProperty.Should().BeNull();
     }
 
     [Test]
@@ -217,6 +102,7 @@ public class ConfigurationViewModelTests
         // Arrange
         var model1 = ConfigurationModel.GetDefault();
         var model2 = ConfigurationModel.GetDefault();
+        model2.ArtifactsPath = "foobar"; // At least one property must be different, otherwise the model is considered the same and no property changed event is raised.
         var project = new SqlProject("", "", "");
         var csMock = Mock.Of<IConfigurationService>();
         var fsaMock = Mock.Of<IFileSystemAccess>();
@@ -245,8 +131,8 @@ public class ConfigurationViewModelTests
         vm.Model = model2;
 
         // Assert
-        Assert.AreSame(vm, invokedSender);
-        Assert.AreEqual(nameof(ConfigurationViewModel.Model), invokedProperty);
+        invokedSender.Should().BeSameAs(vm);
+        invokedProperty.Should().Be(nameof(ConfigurationViewModel.Model));
     }
 
     [Test]
@@ -274,7 +160,7 @@ public class ConfigurationViewModelTests
         var canExecute = vm.BrowsePublishProfileCommand.CanExecute(null);
 
         // Assert
-        Assert.AreEqual(expectedCanExecute, canExecute);
+        canExecute.Should().Be(expectedCanExecute);
     }
 
     [Test]
@@ -306,7 +192,7 @@ public class ConfigurationViewModelTests
         vm.BrowsePublishProfileCommand.Execute(null);
 
         // Assert
-        Assert.AreEqual(expectedPublishProfilePath, vm.Model.PublishProfilePath);
+        vm.Model.PublishProfilePath.Should().Be(expectedPublishProfilePath);
     }
 
     [Test]
@@ -339,7 +225,7 @@ public class ConfigurationViewModelTests
         vm.BrowsePublishProfileCommand.Execute(null);
 
         // Assert
-        Assert.AreEqual(expectedPublishProfilePath, vm.Model.PublishProfilePath);
+        vm.Model.PublishProfilePath.Should().Be(expectedPublishProfilePath);
     }
 
     [Test]
@@ -363,7 +249,7 @@ public class ConfigurationViewModelTests
         var canExecute = vm.ResetConfigurationToDefaultCommand.CanExecute(null);
 
         // Assert
-        Assert.IsTrue(canExecute);
+        canExecute.Should().BeTrue();
     }
 
     [Test]
@@ -389,8 +275,7 @@ public class ConfigurationViewModelTests
         var errorChangedSenderList = new List<object>();
         var errorChangedPropertyList = new List<string>();
         ConfigurationModel propertyChangedModel = null;
-        vm.PropertyChanged += (sender,
-                               args) =>
+        vm.PropertyChanged += (sender, args) =>
         {
             if (sender != null)
                 changedSenders.Add(sender);
@@ -400,8 +285,7 @@ public class ConfigurationViewModelTests
                 return;
 
             propertyChangedModel = vm.Model;
-            propertyChangedModel.ErrorsChanged += (errorSender,
-                                                   errorPropertyArgs) =>
+            propertyChangedModel.ErrorsChanged += (errorSender, errorPropertyArgs) =>
             {
                 if (errorSender != null)
                     errorChangedSenderList.Add(errorSender);
@@ -414,17 +298,17 @@ public class ConfigurationViewModelTests
         vm.ResetConfigurationToDefaultCommand.Execute(null);
 
         // Assert
-        Assert.AreEqual(2, changedSenders.Count);
-        Assert.AreSame(vm, changedSenders[0]);
-        Assert.AreSame(vm, changedSenders[1]);
-        Assert.AreEqual(2, changedProperties.Count);
-        Assert.AreEqual(nameof(ConfigurationViewModel.Model), changedProperties[0]);
-        Assert.AreEqual(nameof(ConfigurationViewModel.IsModelDirty), changedProperties[1]);
-        Assert.AreSame(vm.Model, propertyChangedModel);
-        Assert.AreEqual(defaultModel, vm.Model);
-        Assert.IsTrue(errorChangedSenderList.Count > 0);
-        Assert.IsTrue(errorChangedPropertyList.Count > 0);
-        Assert.AreEqual(errorChangedSenderList.Count, errorChangedPropertyList.Count);
+        changedSenders.Should().HaveCount(2);
+        changedSenders[0].Should().BeSameAs(vm);
+        changedSenders[1].Should().BeSameAs(vm);
+        changedProperties.Should().HaveCount(2);
+        changedProperties[0].Should().Be(nameof(ConfigurationViewModel.Model));
+        changedProperties[1].Should().Be(nameof(ConfigurationViewModel.IsModelDirty));
+        vm.Model.Should().BeSameAs(propertyChangedModel);
+        vm.Model.Should().Be(defaultModel);
+        errorChangedSenderList.Should().NotBeEmpty();
+        errorChangedPropertyList.Should().NotBeEmpty();
+        errorChangedSenderList.Should().HaveSameCount(errorChangedPropertyList);
     }
 
     [Test]
@@ -452,7 +336,7 @@ public class ConfigurationViewModelTests
         var canExecute = vm.SaveConfigurationCommand.CanExecute();
 
         // Assert
-        Assert.IsFalse(canExecute);
+        canExecute.Should().BeFalse();
     }
 
     [Test]
@@ -482,7 +366,7 @@ public class ConfigurationViewModelTests
         var canExecute = vm.SaveConfigurationCommand.CanExecute();
 
         // Assert
-        Assert.IsFalse(canExecute);
+        canExecute.Should().BeFalse();
     }
 
     [Test]
@@ -523,7 +407,7 @@ public class ConfigurationViewModelTests
         var canExecute = vm.SaveConfigurationCommand.CanExecute();
 
         // Assert
-        Assert.IsFalse(canExecute);
+        canExecute.Should().BeFalse();
     }
 
     [Test]
@@ -567,8 +451,8 @@ public class ConfigurationViewModelTests
         var canExecuteAfterScaffolding = vm.SaveConfigurationCommand.CanExecute();
 
         // Assert
-        Assert.IsFalse(canExecuteDuringScaffolding);
-        Assert.IsTrue(canExecuteAfterScaffolding);
+        canExecuteDuringScaffolding.Should().BeFalse();
+        canExecuteAfterScaffolding.Should().BeTrue();
     }
 
     [Test]
@@ -609,7 +493,7 @@ public class ConfigurationViewModelTests
         var canExecute = vm.SaveConfigurationCommand.CanExecute();
 
         // Assert
-        Assert.IsFalse(canExecute);
+        canExecute.Should().BeFalse();
     }
 
     [Test]
@@ -653,8 +537,8 @@ public class ConfigurationViewModelTests
         var canExecuteAfterScriptCreation = vm.SaveConfigurationCommand.CanExecute();
 
         // Assert
-        Assert.IsFalse(canExecuteDuringScriptCreation);
-        Assert.IsTrue(canExecuteAfterScriptCreation);
+        canExecuteDuringScriptCreation.Should().BeFalse();
+        canExecuteAfterScriptCreation.Should().BeTrue();
     }
 
     [Test]
@@ -700,13 +584,13 @@ public class ConfigurationViewModelTests
         var canSaveAfterSaving = vm.SaveConfigurationCommand.CanExecute();
 
         // Assert
-        Assert.IsTrue(canSaveBeforeSaving);
-        Assert.IsTrue(canSaveAfterSaving);
+        canSaveBeforeSaving.Should().BeTrue();
+        canSaveAfterSaving.Should().BeTrue();
         csMock.Verify(m => m.SaveConfigurationAsync(project, It.IsNotNull<ConfigurationModel>()), Times.Once());
-        Assert.IsNotNull(savedModel);
-        Assert.AreNotSame(model, savedModel);
-        Assert.AreEqual(model, savedModel);
-        Assert.AreSame(model, vm.Model);
+        savedModel.Should().NotBeNull();
+        savedModel.Should().NotBeSameAs(model);
+        savedModel.Should().Be(model);
+        vm.Model.Should().BeSameAs(model);
     }
 
     [Test]
@@ -752,13 +636,13 @@ public class ConfigurationViewModelTests
         var canSaveAfterSaving = vm.SaveConfigurationCommand.CanExecute();
 
         // Assert
-        Assert.IsTrue(canSaveBeforeSaving);
-        Assert.IsFalse(canSaveAfterSaving);
+        canSaveBeforeSaving.Should().BeTrue();
+        canSaveAfterSaving.Should().BeFalse();
         csMock.Verify(m => m.SaveConfigurationAsync(project, It.IsNotNull<ConfigurationModel>()), Times.Once());
-        Assert.IsNotNull(savedModel);
-        Assert.AreNotSame(model, savedModel);
-        Assert.AreEqual(model, savedModel);
-        Assert.AreSame(model, vm.Model);
+        savedModel.Should().NotBeNull();
+        savedModel.Should().NotBeSameAs(model);
+        savedModel.Should().Be(model);
+        vm.Model.Should().BeSameAs(model);
     }
 
     [Test]
@@ -783,8 +667,7 @@ public class ConfigurationViewModelTests
         ConfigurationModel savedModel = null;
         var csMock = new Mock<IConfigurationService>();
         csMock.Setup(m => m.SaveConfigurationAsync(project, It.IsNotNull<ConfigurationModel>()))
-              .Callback((SqlProject p,
-                         ConfigurationModel m) => savedModel = m)
+              .Callback((SqlProject p, ConfigurationModel m) => savedModel = m)
               .ThrowsAsync(testException);
         var fsaMock = Mock.Of<IFileSystemAccess>();
         var ssMock = Mock.Of<IScaffoldingService>();
@@ -815,17 +698,17 @@ public class ConfigurationViewModelTests
         var canSaveAfterSaving = vm.SaveConfigurationCommand.CanExecute();
 
         // Assert
-        Assert.IsTrue(canSaveBeforeSaving);
-        Assert.IsTrue(canSaveAfterSaving);
+        canSaveBeforeSaving.Should().BeTrue();
+        canSaveAfterSaving.Should().BeTrue();
         csMock.Verify(m => m.SaveConfigurationAsync(project, It.IsNotNull<ConfigurationModel>()), Times.Once());
-        Assert.IsNotNull(savedModel);
-        Assert.AreNotSame(model, savedModel);
-        Assert.AreEqual(model, savedModel);
-        Assert.AreSame(model, vm.Model);
+        savedModel.Should().NotBeNull();
+        savedModel.Should().NotBeSameAs(model);
+        savedModel.Should().Be(model);
+        vm.Model.Should().BeSameAs(model);
         loggerMock.Verify(m => m.LogErrorAsync(It.IsNotNull<Exception>(), It.IsNotNull<string>()), Times.Once);
-        Assert.AreSame(testException, loggedException);
-        Assert.IsNotNull(loggedMessage);
-        Assert.IsTrue(loggedMessage.Contains(nameof(ConfigurationViewModel.SaveConfigurationCommand)));
+        loggedException.Should().BeSameAs(testException);
+        loggedMessage.Should().NotBeNull();
+        loggedMessage.Should().Contain(nameof(ConfigurationViewModel.SaveConfigurationCommand));
     }
 
     [Test]
@@ -894,7 +777,7 @@ public class ConfigurationViewModelTests
         var canExecute = vm.OpenDocumentationCommand.CanExecute(null);
 
         // Assert
-        Assert.IsTrue(canExecute);
+        canExecute.Should().BeTrue();
     }
 
     [Test]
@@ -987,7 +870,7 @@ public class ConfigurationViewModelTests
         var canExecute = vm.ImportConfigurationCommand.CanExecute();
 
         // Assert
-        Assert.IsFalse(canExecute);
+        canExecute.Should().BeFalse();
     }
 
     [Test]
@@ -1031,8 +914,8 @@ public class ConfigurationViewModelTests
         var canExecuteAfterScaffolding = vm.ImportConfigurationCommand.CanExecute();
 
         // Assert
-        Assert.IsFalse(canExecuteDuringScaffolding);
-        Assert.IsTrue(canExecuteAfterScaffolding);
+        canExecuteDuringScaffolding.Should().BeFalse();
+        canExecuteAfterScaffolding.Should().BeTrue();
     }
 
     [Test]
@@ -1073,7 +956,7 @@ public class ConfigurationViewModelTests
         var canExecute = vm.ImportConfigurationCommand.CanExecute();
 
         // Assert
-        Assert.IsFalse(canExecute);
+        canExecute.Should().BeFalse();
     }
 
     [Test]
@@ -1117,8 +1000,8 @@ public class ConfigurationViewModelTests
         var canExecuteAfterScriptCreation = vm.ImportConfigurationCommand.CanExecute();
 
         // Assert
-        Assert.IsFalse(canExecuteDuringScriptCreation);
-        Assert.IsTrue(canExecuteAfterScriptCreation);
+        canExecuteDuringScriptCreation.Should().BeFalse();
+        canExecuteAfterScriptCreation.Should().BeTrue();
     }
 
     [Test]
@@ -1166,10 +1049,10 @@ public class ConfigurationViewModelTests
         var canImportAfterSaving = vm.ImportConfigurationCommand.CanExecute();
 
         // Assert
-        Assert.IsTrue(canImportBeforeSaving);
-        Assert.IsTrue(canImportAfterSaving);
+        canImportBeforeSaving.Should().BeTrue();
+        canImportAfterSaving.Should().BeTrue();
         csMock.Verify(m => m.GetConfigurationOrDefaultAsync(testPath), Times.Once);
-        Assert.AreSame(newModel, vm.Model);
+        vm.Model.Should().BeSameAs(newModel);
     }
 
     [Test]
@@ -1201,10 +1084,10 @@ public class ConfigurationViewModelTests
         var canImportAfterSaving = vm.ImportConfigurationCommand.CanExecute();
 
         // Assert
-        Assert.IsTrue(canImportBeforeSaving);
-        Assert.IsTrue(canImportAfterSaving);
+        canImportBeforeSaving.Should().BeTrue();
+        canImportAfterSaving.Should().BeTrue();
         csMock.Verify(m => m.GetConfigurationOrDefaultAsync(It.IsAny<string>()), Times.Never);
-        Assert.AreSame(oldModel, vm.Model);
+        vm.Model.Should().BeSameAs(oldModel);
     }
 
     [Test]
@@ -1261,14 +1144,14 @@ public class ConfigurationViewModelTests
         var canImportAfterSaving = vm.ImportConfigurationCommand.CanExecute();
 
         // Assert
-        Assert.IsTrue(canImportBeforeSaving);
-        Assert.IsTrue(canImportAfterSaving);
+        canImportBeforeSaving.Should().BeTrue();
+        canImportAfterSaving.Should().BeTrue();
         csMock.Verify(m => m.GetConfigurationOrDefaultAsync(testPath), Times.Once);
-        Assert.AreSame(oldModel, vm.Model);
+        vm.Model.Should().BeSameAs(oldModel);
         loggerMock.Verify(m => m.LogErrorAsync(It.IsNotNull<Exception>(), It.IsNotNull<string>()), Times.Once);
-        Assert.AreSame(testException, loggedException);
-        Assert.IsNotNull(loggedMessage);
-        Assert.IsTrue(loggedMessage.Contains(nameof(ConfigurationViewModel.ImportConfigurationCommand)));
+        loggedException.Should().BeSameAs(testException);
+        loggedMessage.Should().NotBeNull();
+        loggedMessage.Should().Contain(nameof(ConfigurationViewModel.ImportConfigurationCommand));
     }
 
     [Test]

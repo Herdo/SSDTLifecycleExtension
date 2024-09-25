@@ -1,6 +1,7 @@
 ﻿namespace SSDTLifecycleExtension.UnitTests.Extension.DataAccess;
 
 [TestFixture]
+[SetUICulture("en-US")]
 public class DacAccessTests
 {
     private static readonly List<string> CreatedFiles;
@@ -57,58 +58,6 @@ public class DacAccessTests
             }
         }
         CreatedFiles.Clear();
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_XmlFormatService()
-    {
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new DacAccess(null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void CreateDeployFilesAsync_ArgumentNullException_PreviousVersionDacpacPath()
-    {
-        // Arrange
-        var xfsMock = Mock.Of<IXmlFormatService>();
-        IDacAccess da = new DacAccess(xfsMock);
-
-        // Act & Assert
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => da.CreateDeployFilesAsync(null, null, null, false, false));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void CreateDeployFilesAsync_ArgumentNullException_NewVersionDacpacPath()
-    {
-        // Arrange
-        var xfsMock = Mock.Of<IXmlFormatService>();
-        IDacAccess da = new DacAccess(xfsMock);
-        var previousVersionDacpacPath = "path1";
-
-        // Act & Assert
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => da.CreateDeployFilesAsync(previousVersionDacpacPath, null, null, false, false));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void CreateDeployFilesAsync_ArgumentNullException_PublishProfilePath()
-    {
-        // Arrange
-        var xfsMock = Mock.Of<IXmlFormatService>();
-        IDacAccess da = new DacAccess(xfsMock);
-        var previousVersionDacpacPath = "path1";
-        var newVersionDacpacPath = "path2";
-
-        // Act & Assert
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => da.CreateDeployFilesAsync(previousVersionDacpacPath, newVersionDacpacPath, null, false, false));
-        // ReSharper restore AssignNullToNotNullAttribute
     }
 
     [Test]
@@ -176,45 +125,31 @@ public class DacAccessTests
         var result = await da.CreateDeployFilesAsync(tempPreviousVersionDacpacPath, tempNewVersionDacpacPath, tempPublishProfilePath, true, true);
 
         // Assert
-        Assert.IsNotNull(result.DeployScriptContent);
-        Assert.IsNotNull(result.DeployReportContent);
-        Assert.AreEqual("-- Pre-deployment script content goes here\r\nGO\r\n", result.PreDeploymentScript);
-        Assert.AreEqual("-- Post-deployment script content goes here\r\nGO\r\n", result.PostDeploymentScript);
-        Assert.IsNull(result.Errors);
+        result.DeployScriptContent.Should().NotBeNull();
+        result.DeployReportContent.Should().NotBeNull();
+        result.PreDeploymentScript.Should().Be("-- Pre-deployment script content goes here\r\nGO\r\n");
+        result.PostDeploymentScript.Should().Be("-- Post-deployment script content goes here\r\nGO\r\n");
+        result.Errors.Should().BeNull();
         xfsMock.Verify(m => m.FormatDeployReport(It.IsNotNull<string>()), Times.Once);
         // Verify script
         var productionIndex = result.DeployScriptContent.IndexOf("PRODUCTION", StringComparison.InvariantCulture);
-        Assert.IsTrue(productionIndex > 0);
+        productionIndex.Should().BeGreaterThan(0);
         var onErrorIndex = result.DeployScriptContent.IndexOf(":on error exit", StringComparison.InvariantCulture);
-        Assert.IsTrue(onErrorIndex > productionIndex);
+        onErrorIndex.Should().BeGreaterThan(productionIndex);
         var changeDatabaseIndex = result.DeployScriptContent.IndexOf("USE [$(DatabaseName)]", StringComparison.InvariantCulture);
-        Assert.IsTrue(changeDatabaseIndex > onErrorIndex);
+        changeDatabaseIndex.Should().BeGreaterThan(onErrorIndex);
         var preDeploymentIndex = result.DeployScriptContent.IndexOf(result.PreDeploymentScript, StringComparison.InvariantCulture);
-        Assert.IsTrue(preDeploymentIndex > changeDatabaseIndex);
+        preDeploymentIndex.Should().BeGreaterThan(changeDatabaseIndex);
         var createAuthorPrintIndex = result.DeployScriptContent.IndexOf("[dbo].[Author]...';", StringComparison.InvariantCulture);
-        Assert.IsTrue(createAuthorPrintIndex > preDeploymentIndex);
+        createAuthorPrintIndex.Should().BeGreaterThan(preDeploymentIndex);
         var createAuthorTableIndex = result.DeployScriptContent.IndexOf("CREATE TABLE [dbo].[Author]", StringComparison.InvariantCulture);
-        Assert.IsTrue(createAuthorTableIndex > createAuthorPrintIndex);
+        createAuthorTableIndex.Should().BeGreaterThan(createAuthorPrintIndex);
         var postDeploymentIndex = result.DeployScriptContent.IndexOf(result.PostDeploymentScript, StringComparison.InvariantCulture);
-        Assert.IsTrue(postDeploymentIndex > createAuthorTableIndex);
+        postDeploymentIndex.Should().BeGreaterThan(createAuthorTableIndex);
         // Verify report
-        Assert.AreEqual(@"<?xml version=""1.0"" encoding=""utf-8""?><DeploymentReport xmlns=""http://schemas.microsoft.com/sqlserver/dac/DeployReport/2012/02""><Alerts />" +
-                        @"<Operations><Operation Name=""Create""><Item Value=""[dbo].[Author]"" Type=""SqlTable"" /><Item Value=""[dbo].[DF_Birthday_Today]"" Type=""SqlDefaultConstraint"" /></Operation>" +
-                        @"</Operations></DeploymentReport>",
-                        result.DeployReportContent);
-    }
-
-    [Test]
-    public void GetDefaultConstraintsAsync_ArgumentNullException_DacpacPath()
-    {
-        // Arrange
-        var xfsMock = Mock.Of<IXmlFormatService>();
-        IDacAccess da = new DacAccess(xfsMock);
-
-        // Act & Assert
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => da.GetDefaultConstraintsAsync(null));
-        // ReSharper restore AssignNullToNotNullAttribute
+        result.DeployReportContent.Should().Be(@"<?xml version=""1.0"" encoding=""utf-8""?><DeploymentReport xmlns=""http://schemas.microsoft.com/sqlserver/dac/DeployReport/2012/02""><Alerts />" +
+            @"<Operations><Operation Name=""Create""><Item Value=""[dbo].[Author]"" Type=""SqlTable"" /><Item Value=""[dbo].[DF_Birthday_Today]"" Type=""SqlDefaultConstraint"" /></Operation>" +
+            @"</Operations></DeploymentReport>");
     }
 
     [Test]
@@ -229,26 +164,26 @@ public class DacAccessTests
         var (defaultConstraints, errors) = await da.GetDefaultConstraintsAsync(tempDacpacPath);
 
         // Assert
-        Assert.IsNotNull(defaultConstraints);
-        Assert.IsNull(errors);
-        Assert.AreEqual(3, defaultConstraints.Length);
+        defaultConstraints.Should().NotBeNull();
+        errors.Should().BeNull();
+        defaultConstraints.Should().HaveCount(3);
         var orderedConstraints = defaultConstraints.OrderBy(m => m.ColumnName)
                                                    .ToArray();
         // First constraint
-        Assert.AreEqual("dbo", orderedConstraints[0].TableSchema);
-        Assert.AreEqual("Author", orderedConstraints[0].TableName);
-        Assert.AreEqual("Birthday", orderedConstraints[0].ColumnName);
-        Assert.AreEqual("DF_Birthday_Today", orderedConstraints[0].ConstraintName);
+        orderedConstraints[0].TableSchema.Should().Be("dbo");
+        orderedConstraints[0].TableName.Should().Be("Author");
+        orderedConstraints[0].ColumnName.Should().Be("Birthday");
+        orderedConstraints[0].ConstraintName.Should().Be("DF_Birthday_Today");
         // Second constraint
-        Assert.AreEqual("dbo", orderedConstraints[1].TableSchema);
-        Assert.AreEqual("Author", orderedConstraints[1].TableName);
-        Assert.AreEqual("FirstName", orderedConstraints[1].ColumnName);
-        Assert.AreEqual("DF_FirstName_Empty", orderedConstraints[1].ConstraintName);
+        orderedConstraints[1].TableSchema.Should().Be("dbo");
+        orderedConstraints[1].TableName.Should().Be("Author");
+        orderedConstraints[1].ColumnName.Should().Be("FirstName");
+        orderedConstraints[1].ConstraintName.Should().Be("DF_FirstName_Empty");
         // Third constraint
-        Assert.AreEqual("dbo", orderedConstraints[2].TableSchema);
-        Assert.AreEqual("Author", orderedConstraints[2].TableName);
-        Assert.AreEqual("LastName", orderedConstraints[2].ColumnName);
-        Assert.AreEqual(null, orderedConstraints[2].ConstraintName);
+        orderedConstraints[2].TableSchema.Should().Be("dbo");
+        orderedConstraints[2].TableName.Should().Be("Author");
+        orderedConstraints[2].ColumnName.Should().Be("LastName");
+        orderedConstraints[2].ConstraintName.Should().BeNull();
     }
 
     [Test]
@@ -263,12 +198,12 @@ public class DacAccessTests
         var (defaultConstraints, errors) = await da.GetDefaultConstraintsAsync(tempDacpacPath);
 
         // Assert
-        Assert.IsNotNull(defaultConstraints);
-        Assert.IsNull(errors);
-        Assert.AreEqual(1, defaultConstraints.Length);
-        Assert.AreEqual("dbo", defaultConstraints[0].TableSchema);
-        Assert.AreEqual("Author", defaultConstraints[0].TableName);
-        Assert.AreEqual("Birthday", defaultConstraints[0].ColumnName);
-        Assert.AreEqual("DF_Birthday_Today", defaultConstraints[0].ConstraintName);
+        defaultConstraints.Should().NotBeNull();
+        errors.Should().BeNull();
+        var defaultConstraint = defaultConstraints.Should().ContainSingle().Subject;
+        defaultConstraint.TableSchema.Should().Be("dbo");
+        defaultConstraint.TableName.Should().Be("Author");
+        defaultConstraint.ColumnName.Should().Be("Birthday");
+        defaultConstraint.ConstraintName.Should().Be("DF_Birthday_Today");
     }
 }

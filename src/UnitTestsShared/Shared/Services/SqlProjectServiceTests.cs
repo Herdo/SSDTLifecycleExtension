@@ -4,51 +4,6 @@
 public class SqlProjectServiceTests
 {
     [Test]
-    public void Constructor_ArgumentNullException_VersionService()
-    {
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        Assert.Throws<ArgumentNullException>(() => new SqlProjectService(null, null, null));
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_FileSystemAccess()
-    {
-        // Arrange
-        var vsMock = Mock.Of<IVersionService>();
-
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        Assert.Throws<ArgumentNullException>(() => new SqlProjectService(vsMock, null, null));
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_Logger()
-    {
-        // Arrange
-        var vsMock = Mock.Of<IVersionService>();
-        var fsaMock = Mock.Of<IFileSystemAccess>();
-
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        Assert.Throws<ArgumentNullException>(() => new SqlProjectService(vsMock, fsaMock, null));
-    }
-
-    [Test]
-    public void TryLoadSqlProjectPropertiesAsync_ArgumentNullException_Project()
-    {
-        // Arrange
-        var vsMock = Mock.Of<IVersionService>();
-        var fsaMock = Mock.Of<IFileSystemAccess>();
-        var loggerMock = Mock.Of<ILogger>();
-        ISqlProjectService service = new SqlProjectService(vsMock, fsaMock, loggerMock);
-
-        // Act & Assert
-        // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => service.TryLoadSqlProjectPropertiesAsync(null));
-    }
-
-    [Test]
     public async Task TryLoadSqlProjectPropertiesAsync_Error_NoProjectDirectory_Async()
     {
         // Arrange
@@ -66,9 +21,9 @@ public class SqlProjectServiceTests
         var loadedSuccessfully = await service.TryLoadSqlProjectPropertiesAsync(project);
 
         // Assert
-        Assert.IsFalse(loadedSuccessfully);
-        Assert.AreEqual(1, loggedMessages.Count);
-        Assert.AreEqual(@"Cannot get project directory for C:\", loggedMessages[0]);
+        loadedSuccessfully.Should().BeFalse();
+        loggedMessages.Should().ContainSingle()
+            .Which.Should().Be(@"Cannot get project directory for C:\");
     }
 
     [Test]
@@ -92,11 +47,11 @@ public class SqlProjectServiceTests
         var loadedSuccessfully = await service.TryLoadSqlProjectPropertiesAsync(project);
 
         // Assert
-        Assert.IsFalse(loadedSuccessfully);
-        Assert.AreEqual(1, loggedErrorMessages.Count);
-        Assert.IsNotNull(loggedErrorMessages[0]);
-        Assert.IsNotNull(loggedErrorMessages[0].Exception);
-        Assert.IsTrue(loggedErrorMessages[0].Message.StartsWith(@"Cannot read contents of ""C:\TestProject.sqlproj"""));
+        loadedSuccessfully.Should().BeFalse();
+        loggedErrorMessages.Should().ContainSingle()
+            .Which.Exception.Should().NotBeNull();
+        loggedErrorMessages.Should().ContainSingle()
+            .Which.Message.Should().StartWith(@"Cannot read contents of ""C:\TestProject.sqlproj""");
     }
 
     [Test]
@@ -125,12 +80,11 @@ public class SqlProjectServiceTests
         var loadedSuccessfully = await service.TryLoadSqlProjectPropertiesAsync(project);
 
         // Assert
-        Assert.IsFalse(loadedSuccessfully);
-        Assert.AreEqual(1, loggedErrorMessages.Count);
-        Assert.AreEqual(@"Cannot read name of ""C:\TestProject.sqlproj"". " +
-                        "Please make sure that the \"Name\" is set correctly, e.g. \"MyDatabaseProject\". " +
-                        "This value has to be set manually in XML.",
-                        loggedErrorMessages[0]);
+        loadedSuccessfully.Should().BeFalse();
+        loggedErrorMessages.Should().ContainSingle()
+            .Which.Should().Be(@"Cannot read name of ""C:\TestProject.sqlproj"". " +
+                "Please make sure that the \"Name\" is set correctly, e.g. \"MyDatabaseProject\". " +
+                "This value has to be set manually in XML.");
     }
 
     [Test]
@@ -160,12 +114,11 @@ public class SqlProjectServiceTests
         var loadedSuccessfully = await service.TryLoadSqlProjectPropertiesAsync(project);
 
         // Assert
-        Assert.IsFalse(loadedSuccessfully);
-        Assert.AreEqual(1, loggedErrorMessages.Count);
-        Assert.AreEqual(@"Cannot read output path of ""C:\TestProject.sqlproj"". " +
-                        "Please make sure that the \"OutputPath\" for the current configuration is set correctly, e.g. \"bin\\Output\\\". " +
-                        "This value can be set from your database project => \"Properties\" => \"Build\" => \"Output path\".",
-                        loggedErrorMessages[0]);
+        loadedSuccessfully.Should().BeFalse();
+        loggedErrorMessages.Should().ContainSingle()
+            .Which.Should().Be(@"Cannot read output path of ""C:\TestProject.sqlproj"". " +
+                "Please make sure that the \"OutputPath\" for the current configuration is set correctly, e.g. \"bin\\Output\\\". " +
+                "This value can be set from your database project => \"Properties\" => \"Build\" => \"Output path\".");
     }
 
     [Test]
@@ -196,12 +149,11 @@ public class SqlProjectServiceTests
         var loadedSuccessfully = await service.TryLoadSqlProjectPropertiesAsync(project);
 
         // Assert
-        Assert.IsFalse(loadedSuccessfully);
-        Assert.AreEqual(1, loggedErrorMessages.Count);
-        Assert.AreEqual(@"Cannot read DacVersion of ""C:\TestProject.sqlproj"". " +
-                        "Please make sure that the \"DacVersion\" is set correctly, e.g. \"1.0.0\". " +
-                        "This value can bet set from your database project => \"Properties\" => \"Project Settings\" => \"Output types\" => \"Data-tier Application\" => \"Properties...\" => \"Version\".",
-                        loggedErrorMessages[0]);
+        loadedSuccessfully.Should().BeFalse();
+        loggedErrorMessages.Should().ContainSingle()
+            .Which.Should().Be(@"Cannot read DacVersion of ""C:\TestProject.sqlproj"". " +
+                "Please make sure that the \"DacVersion\" is set correctly, e.g. \"1.0.0\". " +
+                "This value can bet set from your database project => \"Properties\" => \"Project Settings\" => \"Output types\" => \"Data-tier Application\" => \"Properties...\" => \"Version\".");
     }
 
     [Test]
@@ -229,12 +181,12 @@ public class SqlProjectServiceTests
         var loadedSuccessfully = await service.TryLoadSqlProjectPropertiesAsync(project);
 
         // Assert
-        Assert.IsTrue(loadedSuccessfully);
+        loadedSuccessfully.Should().BeTrue();
         loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);
         loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<Exception>(), It.IsAny<string>()), Times.Never);
-        Assert.AreEqual("TestProject", project.ProjectProperties.SqlTargetName);
-        Assert.AreEqual(@"C:\TestProject\bin\Output", project.ProjectProperties.BinaryDirectory);
-        Assert.AreEqual(new Version(2, 2, 3), project.ProjectProperties.DacVersion);
+        project.ProjectProperties.SqlTargetName.Should().Be("TestProject");
+        project.ProjectProperties.BinaryDirectory.Should().Be(@"C:\TestProject\bin\Output");
+        project.ProjectProperties.DacVersion.Should().Be(new Version(2, 2, 3));
     }
 
     [Test]
@@ -263,12 +215,12 @@ public class SqlProjectServiceTests
         var loadedSuccessfully = await service.TryLoadSqlProjectPropertiesAsync(project);
 
         // Assert
-        Assert.IsTrue(loadedSuccessfully);
+        loadedSuccessfully.Should().BeTrue();
         loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);
         loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<Exception>(), It.IsAny<string>()), Times.Never);
-        Assert.AreEqual("TestProjectName", project.ProjectProperties.SqlTargetName);
-        Assert.AreEqual(@"C:\TestProject\bin\Output", project.ProjectProperties.BinaryDirectory);
-        Assert.AreEqual(new Version(2, 2, 3), project.ProjectProperties.DacVersion);
+        project.ProjectProperties.SqlTargetName.Should().Be("TestProjectName");
+        project.ProjectProperties.BinaryDirectory.Should().Be(@"C:\TestProject\bin\Output");
+        project.ProjectProperties.DacVersion.Should().Be(new Version(2, 2, 3));
     }
 
     [Test]
@@ -297,12 +249,12 @@ public class SqlProjectServiceTests
         var loadedSuccessfully = await service.TryLoadSqlProjectPropertiesAsync(project);
 
         // Assert
-        Assert.IsTrue(loadedSuccessfully);
+        loadedSuccessfully.Should().BeTrue();
         loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);
         loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<Exception>(), It.IsAny<string>()), Times.Never);
-        Assert.AreEqual("TestProject", project.ProjectProperties.SqlTargetName);
-        Assert.AreEqual(@"C:\TestProject\bin\Output", project.ProjectProperties.BinaryDirectory);
-        Assert.AreEqual(new Version(2, 2, 3), project.ProjectProperties.DacVersion);
+        project.ProjectProperties.SqlTargetName.Should().Be("TestProject");
+        project.ProjectProperties.BinaryDirectory.Should().Be(@"C:\TestProject\bin\Output");
+        project.ProjectProperties.DacVersion.Should().Be(new Version(2, 2, 3));
     }
 
     [Test]
@@ -330,46 +282,15 @@ public class SqlProjectServiceTests
         var loadedSuccessfully = await service.TryLoadSqlProjectPropertiesAsync(project);
 
         // Assert
-        Assert.IsTrue(loadedSuccessfully);
+        loadedSuccessfully.Should().BeTrue();
         loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);
         loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<Exception>(), It.IsAny<string>()), Times.Never);
-        Assert.AreEqual("TestProject", project.ProjectProperties.SqlTargetName);
-        Assert.AreEqual(@"C:\TestProject\bin\Output", project.ProjectProperties.BinaryDirectory);
-        Assert.AreEqual(new Version(2, 2, 3), project.ProjectProperties.DacVersion);
+        project.ProjectProperties.SqlTargetName.Should().Be("TestProject");
+        project.ProjectProperties.BinaryDirectory.Should().Be(@"C:\TestProject\bin\Output");
+        project.ProjectProperties.DacVersion.Should().Be(new Version(2, 2, 3));
         loggerMock.Verify(m => m.LogWarningAsync("XML node 'Name' doesn't match the actual project name. This could cause an unexpected behavior."), Times.Once);
         loggerMock.Verify(m => m.LogDebugAsync("Value of 'Name' node: TestProject"), Times.Once);
         loggerMock.Verify(m => m.LogDebugAsync("Actual project name: awesomeproject"), Times.Once);
-    }
-
-    [Test]
-    public void TryLoadPathsForScaffoldingAsync_ArgumentNullException_Project()
-    {
-        // Arrange
-        var vsMock = Mock.Of<IVersionService>();
-        var fsaMock = Mock.Of<IFileSystemAccess>();
-        var loggerMock = Mock.Of<ILogger>();
-        ISqlProjectService service = new SqlProjectService(vsMock, fsaMock, loggerMock);
-
-        // Act & Assert
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => service.TryLoadPathsForScaffoldingAsync(null, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void TryLoadPathsForScaffoldingAsync_ArgumentNullException_Configuration()
-    {
-        // Arrange
-        var project = new SqlProject("a", "b", "c");
-        var vsMock = Mock.Of<IVersionService>();
-        var fsaMock = Mock.Of<IFileSystemAccess>();
-        var loggerMock = Mock.Of<ILogger>();
-        ISqlProjectService service = new SqlProjectService(vsMock, fsaMock, loggerMock);
-
-        // Act & Assert
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => service.TryLoadPathsForScaffoldingAsync(project, null));
-        // ReSharper restore AssignNullToNotNullAttribute
     }
 
     [Test]
@@ -377,6 +298,7 @@ public class SqlProjectServiceTests
     {
         // Arrange
         var project = new SqlProject("a", @"C:\", "c");
+        project.ProjectProperties.DacVersion = new Version(2, 0, 0);
         var configuration = new ConfigurationModel();
         var vsMock = Mock.Of<IVersionService>();
         var fsaMock = Mock.Of<IFileSystemAccess>();
@@ -391,9 +313,9 @@ public class SqlProjectServiceTests
         var paths = await service.TryLoadPathsForScaffoldingAsync(project, configuration);
 
         // Assert
-        Assert.IsNull(paths);
-        Assert.AreEqual(1, loggedErrorMessages.Count);
-        Assert.AreEqual(@"Cannot get project directory for C:\", loggedErrorMessages[0]);
+        paths.Should().BeNull();
+        loggedErrorMessages.Should().ContainSingle()
+            .Which.Should().Be(@"Cannot get project directory for C:\");
     }
 
     [Test]
@@ -424,17 +346,17 @@ public class SqlProjectServiceTests
         var paths = await service.TryLoadPathsForScaffoldingAsync(project, configuration);
 
         // Assert
-        Assert.IsNotNull(paths);
+        paths.Should().NotBeNull();
         loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);
         loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<Exception>(), It.IsAny<string>()), Times.Never);
-        Assert.AreEqual(@"C:\TestProject", paths.Directories.ProjectDirectory);
-        Assert.AreEqual(@"C:\TestProject\TestProfile.publish.xml", paths.DeploySources.PublishProfilePath);
-        Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest", paths.Directories.LatestArtifactsDirectory);
-        Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948", paths.Directories.NewArtifactsDirectory);
-        Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948\TestSqlTarget.dacpac", paths.DeploySources.NewDacpacPath);
-        Assert.IsNull(paths.DeploySources.PreviousDacpacPath);
-        Assert.IsNull(paths.DeployTargets.DeployScriptPath);
-        Assert.IsNull(paths.DeployTargets.DeployReportPath);
+        paths.Directories.ProjectDirectory.Should().Be(@"C:\TestProject");
+        paths.DeploySources.PublishProfilePath.Should().Be(@"C:\TestProject\TestProfile.publish.xml");
+        paths.Directories.LatestArtifactsDirectory.Should().Be(@"C:\TestProject\_TestDeployment\latest");
+        paths.Directories.NewArtifactsDirectory.Should().Be(@"C:\TestProject\_TestDeployment\40.23.4.4948");
+        paths.DeploySources.NewDacpacPath.Should().Be(@"C:\TestProject\_TestDeployment\40.23.4.4948\TestSqlTarget.dacpac");
+        paths.DeploySources.PreviousDacpacPath.Should().BeNull();
+        paths.DeployTargets.DeployScriptPath.Should().BeNull();
+        paths.DeployTargets.DeployReportPath.Should().BeNull();
     }
 
     [Test]
@@ -463,65 +385,17 @@ public class SqlProjectServiceTests
         var paths = await service.TryLoadPathsForScaffoldingAsync(project, configuration);
 
         // Assert
-        Assert.IsNotNull(paths);
+        paths.Should().NotBeNull();
         loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);
         loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<Exception>(), It.IsAny<string>()), Times.Never);
-        Assert.AreEqual(@"C:\TestProject", paths.Directories.ProjectDirectory);
-        Assert.AreEqual(string.Empty, paths.DeploySources.PublishProfilePath);
-        Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest", paths.Directories.LatestArtifactsDirectory);
-        Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948", paths.Directories.NewArtifactsDirectory);
-        Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948\TestSqlTarget.dacpac", paths.DeploySources.NewDacpacPath);
-        Assert.IsNull(paths.DeploySources.PreviousDacpacPath);
-        Assert.IsNull(paths.DeployTargets.DeployScriptPath);
-        Assert.IsNull(paths.DeployTargets.DeployReportPath);
-    }
-
-    [Test]
-    public void TryLoadPathsForScriptCreationAsync_ArgumentNullException_Project()
-    {
-        // Arrange
-        var vsMock = Mock.Of<IVersionService>();
-        var fsaMock = Mock.Of<IFileSystemAccess>();
-        var loggerMock = Mock.Of<ILogger>();
-        ISqlProjectService service = new SqlProjectService(vsMock, fsaMock, loggerMock);
-
-        // Act & Assert
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => service.TryLoadPathsForScriptCreationAsync(null, null, null, false));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void TryLoadPathsForScriptCreationAsync_ArgumentNullException_Configuration()
-    {
-        // Arrange
-        var project = new SqlProject("a", "b", "c");
-        var vsMock = Mock.Of<IVersionService>();
-        var fsaMock = Mock.Of<IFileSystemAccess>();
-        var loggerMock = Mock.Of<ILogger>();
-        ISqlProjectService service = new SqlProjectService(vsMock, fsaMock, loggerMock);
-
-        // Act & Assert
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => service.TryLoadPathsForScriptCreationAsync(project, null, null, false));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void TryLoadPathsForScriptCreationAsync_ArgumentNullException_PreviousVersion()
-    {
-        // Arrange
-        var project = new SqlProject("a", "b", "c");
-        var configuration = new ConfigurationModel();
-        var vsMock = Mock.Of<IVersionService>();
-        var fsaMock = Mock.Of<IFileSystemAccess>();
-        var loggerMock = Mock.Of<ILogger>();
-        ISqlProjectService service = new SqlProjectService(vsMock, fsaMock, loggerMock);
-
-        // Act & Assert
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => service.TryLoadPathsForScriptCreationAsync(project, configuration, null, false));
-        // ReSharper restore AssignNullToNotNullAttribute
+        paths.Directories.ProjectDirectory.Should().Be(@"C:\TestProject");
+        paths.DeploySources.PublishProfilePath.Should().BeNullOrWhiteSpace();
+        paths.Directories.LatestArtifactsDirectory.Should().Be(@"C:\TestProject\_TestDeployment\latest");
+        paths.Directories.NewArtifactsDirectory.Should().Be(@"C:\TestProject\_TestDeployment\40.23.4.4948");
+        paths.DeploySources.NewDacpacPath.Should().Be(@"C:\TestProject\_TestDeployment\40.23.4.4948\TestSqlTarget.dacpac");
+        paths.DeploySources.PreviousDacpacPath.Should().BeNull();
+        paths.DeployTargets.DeployScriptPath.Should().BeNull();
+        paths.DeployTargets.DeployReportPath.Should().BeNull();
     }
 
     [Test]
@@ -529,6 +403,7 @@ public class SqlProjectServiceTests
     {
         // Arrange
         var project = new SqlProject("a", @"C:\", "c");
+        project.ProjectProperties.DacVersion = new Version(2, 0, 0);
         var configuration = new ConfigurationModel();
         var vsMock = Mock.Of<IVersionService>();
         var fsaMock = Mock.Of<IFileSystemAccess>();
@@ -543,9 +418,9 @@ public class SqlProjectServiceTests
         var paths = await service.TryLoadPathsForScriptCreationAsync(project, configuration, new Version(1, 0), false);
 
         // Assert
-        Assert.IsNull(paths);
-        Assert.AreEqual(1, loggedErrorMessages.Count);
-        Assert.AreEqual(@"Cannot get project directory for C:\", loggedErrorMessages[0]);
+        paths.Should().BeNull();
+        loggedErrorMessages.Should().ContainSingle()
+            .Which.Should().Be(@"Cannot get project directory for C:\");
     }
 
     [Test]
@@ -577,17 +452,17 @@ public class SqlProjectServiceTests
         var paths = await service.TryLoadPathsForScriptCreationAsync(project, configuration, new Version(40, 23, 3, 4932), true);
 
         // Assert
-        Assert.IsNotNull(paths);
+        paths.Should().NotBeNull();
         loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);
         loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<Exception>(), It.IsAny<string>()), Times.Never);
-        Assert.AreEqual(@"C:\TestProject", paths.Directories.ProjectDirectory);
-        Assert.AreEqual(@"C:\TestProject\TestProfile.publish.xml", paths.DeploySources.PublishProfilePath);
-        Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest", paths.Directories.LatestArtifactsDirectory);
-        Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest", paths.Directories.NewArtifactsDirectory);
-        Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest\TestSqlTarget.dacpac", paths.DeploySources.NewDacpacPath);
-        Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.3.4932\TestSqlTarget.dacpac", paths.DeploySources.PreviousDacpacPath);
-        Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest\TestSqlTarget_40.23.3.4932_latest.sql", paths.DeployTargets.DeployScriptPath);
-        Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest\TestSqlTarget_40.23.3.4932_latest.xml", paths.DeployTargets.DeployReportPath);
+        paths.Directories.ProjectDirectory.Should().Be(@"C:\TestProject");
+        paths.DeploySources.PublishProfilePath.Should().Be(@"C:\TestProject\TestProfile.publish.xml");
+        paths.Directories.LatestArtifactsDirectory.Should().Be(@"C:\TestProject\_TestDeployment\latest");
+        paths.Directories.NewArtifactsDirectory.Should().Be(@"C:\TestProject\_TestDeployment\latest");
+        paths.DeploySources.NewDacpacPath.Should().Be(@"C:\TestProject\_TestDeployment\latest\TestSqlTarget.dacpac");
+        paths.DeploySources.PreviousDacpacPath.Should().Be(@"C:\TestProject\_TestDeployment\40.23.3.4932\TestSqlTarget.dacpac");
+        paths.DeployTargets.DeployScriptPath.Should().Be(@"C:\TestProject\_TestDeployment\latest\TestSqlTarget_40.23.3.4932_latest.sql");
+        paths.DeployTargets.DeployReportPath.Should().Be(@"C:\TestProject\_TestDeployment\latest\TestSqlTarget_40.23.3.4932_latest.xml");
     }
 
     [Test]
@@ -617,17 +492,17 @@ public class SqlProjectServiceTests
         var paths = await service.TryLoadPathsForScriptCreationAsync(project, configuration, new Version(40, 23, 3, 4932), true);
 
         // Assert
-        Assert.IsNotNull(paths);
+        paths.Should().NotBeNull();
         loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);
         loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<Exception>(), It.IsAny<string>()), Times.Never);
-        Assert.AreEqual(@"C:\TestProject", paths.Directories.ProjectDirectory);
-        Assert.AreEqual(string.Empty, paths.DeploySources.PublishProfilePath);
-        Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest", paths.Directories.LatestArtifactsDirectory);
-        Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest", paths.Directories.NewArtifactsDirectory);
-        Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest\TestSqlTarget.dacpac", paths.DeploySources.NewDacpacPath);
-        Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.3.4932\TestSqlTarget.dacpac", paths.DeploySources.PreviousDacpacPath);
-        Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest\TestSqlTarget_40.23.3.4932_latest.sql", paths.DeployTargets.DeployScriptPath);
-        Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest\TestSqlTarget_40.23.3.4932_latest.xml", paths.DeployTargets.DeployReportPath);
+        paths.Directories.ProjectDirectory.Should().Be(@"C:\TestProject");
+        paths.DeploySources.PublishProfilePath.Should().BeNullOrWhiteSpace();
+        paths.Directories.LatestArtifactsDirectory.Should().Be(@"C:\TestProject\_TestDeployment\latest");
+        paths.Directories.NewArtifactsDirectory.Should().Be(@"C:\TestProject\_TestDeployment\latest");
+        paths.DeploySources.NewDacpacPath.Should().Be(@"C:\TestProject\_TestDeployment\latest\TestSqlTarget.dacpac");
+        paths.DeploySources.PreviousDacpacPath.Should().Be(@"C:\TestProject\_TestDeployment\40.23.3.4932\TestSqlTarget.dacpac");
+        paths.DeployTargets.DeployScriptPath.Should().Be(@"C:\TestProject\_TestDeployment\latest\TestSqlTarget_40.23.3.4932_latest.sql");
+        paths.DeployTargets.DeployReportPath.Should().Be(@"C:\TestProject\_TestDeployment\latest\TestSqlTarget_40.23.3.4932_latest.xml");
     }
 
     [Test]
@@ -659,17 +534,17 @@ public class SqlProjectServiceTests
         var paths = await service.TryLoadPathsForScriptCreationAsync(project, configuration, new Version(40, 23, 3, 4932), false);
 
         // Assert
-        Assert.IsNotNull(paths);
+        paths.Should().NotBeNull();
         loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);
         loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<Exception>(), It.IsAny<string>()), Times.Never);
-        Assert.AreEqual(@"C:\TestProject", paths.Directories.ProjectDirectory);
-        Assert.AreEqual(@"C:\TestProject\TestProfile.publish.xml", paths.DeploySources.PublishProfilePath);
-        Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest", paths.Directories.LatestArtifactsDirectory);
-        Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948", paths.Directories.NewArtifactsDirectory);
-        Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948\TestSqlTarget.dacpac", paths.DeploySources.NewDacpacPath);
-        Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.3.4932\TestSqlTarget.dacpac", paths.DeploySources.PreviousDacpacPath);
-        Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948\TestSqlTarget_40.23.3.4932_40.23.4.4948.sql", paths.DeployTargets.DeployScriptPath);
-        Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948\TestSqlTarget_40.23.3.4932_40.23.4.4948.xml", paths.DeployTargets.DeployReportPath);
+        paths.Directories.ProjectDirectory.Should().Be(@"C:\TestProject");
+        paths.DeploySources.PublishProfilePath.Should().Be(@"C:\TestProject\TestProfile.publish.xml");
+        paths.Directories.LatestArtifactsDirectory.Should().Be(@"C:\TestProject\_TestDeployment\latest");
+        paths.Directories.NewArtifactsDirectory.Should().Be(@"C:\TestProject\_TestDeployment\40.23.4.4948");
+        paths.DeploySources.NewDacpacPath.Should().Be(@"C:\TestProject\_TestDeployment\40.23.4.4948\TestSqlTarget.dacpac");
+        paths.DeploySources.PreviousDacpacPath.Should().Be(@"C:\TestProject\_TestDeployment\40.23.3.4932\TestSqlTarget.dacpac");
+        paths.DeployTargets.DeployScriptPath.Should().Be(@"C:\TestProject\_TestDeployment\40.23.4.4948\TestSqlTarget_40.23.3.4932_40.23.4.4948.sql");
+        paths.DeployTargets.DeployReportPath.Should().Be(@"C:\TestProject\_TestDeployment\40.23.4.4948\TestSqlTarget_40.23.3.4932_40.23.4.4948.xml");
     }
 
     [Test]
@@ -699,16 +574,16 @@ public class SqlProjectServiceTests
         var paths = await service.TryLoadPathsForScriptCreationAsync(project, configuration, new Version(40, 23, 3, 4932), false);
 
         // Assert
-        Assert.IsNotNull(paths);
+        paths.Should().NotBeNull();
         loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);
         loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<Exception>(), It.IsAny<string>()), Times.Never);
-        Assert.AreEqual(@"C:\TestProject", paths.Directories.ProjectDirectory);
-        Assert.AreEqual(string.Empty, paths.DeploySources.PublishProfilePath);
-        Assert.AreEqual(@"C:\TestProject\_TestDeployment\latest", paths.Directories.LatestArtifactsDirectory);
-        Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948", paths.Directories.NewArtifactsDirectory);
-        Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948\TestSqlTarget.dacpac", paths.DeploySources.NewDacpacPath);
-        Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.3.4932\TestSqlTarget.dacpac", paths.DeploySources.PreviousDacpacPath);
-        Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948\TestSqlTarget_40.23.3.4932_40.23.4.4948.sql", paths.DeployTargets.DeployScriptPath);
-        Assert.AreEqual(@"C:\TestProject\_TestDeployment\40.23.4.4948\TestSqlTarget_40.23.3.4932_40.23.4.4948.xml", paths.DeployTargets.DeployReportPath);
+        paths.Directories.ProjectDirectory.Should().Be(@"C:\TestProject");
+        paths.DeploySources.PublishProfilePath.Should().BeNullOrWhiteSpace();
+        paths.Directories.LatestArtifactsDirectory.Should().Be(@"C:\TestProject\_TestDeployment\latest");
+        paths.Directories.NewArtifactsDirectory.Should().Be(@"C:\TestProject\_TestDeployment\40.23.4.4948");
+        paths.DeploySources.NewDacpacPath.Should().Be(@"C:\TestProject\_TestDeployment\40.23.4.4948\TestSqlTarget.dacpac");
+        paths.DeploySources.PreviousDacpacPath.Should().Be(@"C:\TestProject\_TestDeployment\40.23.3.4932\TestSqlTarget.dacpac");
+        paths.DeployTargets.DeployScriptPath.Should().Be(@"C:\TestProject\_TestDeployment\40.23.4.4948\TestSqlTarget_40.23.3.4932_40.23.4.4948.sql");
+        paths.DeployTargets.DeployReportPath.Should().Be(@"C:\TestProject\_TestDeployment\40.23.4.4948\TestSqlTarget_40.23.3.4932_40.23.4.4948.xml");
     }
 }

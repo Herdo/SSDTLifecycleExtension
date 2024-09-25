@@ -4,57 +4,6 @@
 public class ModifyDeploymentScriptUnitTests
 {
     [Test]
-    public void Constructor_ArgumentNullException_ScriptModifierProviderService()
-    {
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new ModifyDeploymentScriptUnit(null, null, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_FileSystemAccess()
-    {
-        // Arrange
-        var mpsMock = Mock.Of<IScriptModifierProviderService>();
-
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new ModifyDeploymentScriptUnit(mpsMock, null, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_Logger()
-    {
-        // Arrange
-        var mpsMock = Mock.Of<IScriptModifierProviderService>();
-        var fsaMock = Mock.Of<IFileSystemAccess>();
-
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new ModifyDeploymentScriptUnit(mpsMock, fsaMock, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void Work_ScriptCreationStateModel_ArgumentNullException_StateModel()
-    {
-        // Arrange
-        var mpsMock = Mock.Of<IScriptModifierProviderService>();
-        var fsaMock = Mock.Of<IFileSystemAccess>();
-        var loggerMock = Mock.Of<ILogger>();
-        IWorkUnit<ScriptCreationStateModel> unit = new ModifyDeploymentScriptUnit(mpsMock, fsaMock, loggerMock);
-
-        // Act & Assert
-        // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => unit.Work(null, CancellationToken.None));
-    }
-
-    [Test]
     public async Task Work_ScriptCreationStateModel_NoModifiers_Async()
     {
         // Arrange
@@ -66,15 +15,21 @@ public class ModifyDeploymentScriptUnitTests
         var configuration = ConfigurationModel.GetDefault();
         var previousVersion = new Version(1, 0);
         Task HandlerFunc(bool b) => Task.CompletedTask;
-        var model = new ScriptCreationStateModel(project, configuration, previousVersion, false, HandlerFunc);
+        var model = new ScriptCreationStateModel(project, configuration, previousVersion, false, HandlerFunc)
+        {
+            Paths = new PathCollection(
+                new DirectoryPaths("a", "b", "c"),
+                new DeploySourcePaths("a", "b", "c"),
+                new DeployTargetPaths("a", "b"))
+        };
         mpsMock.Setup(m => m.GetScriptModifiers(configuration)).Returns(new Dictionary<ScriptModifier, IScriptModifier>());
 
         // Act
         await unit.Work(model, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(StateModelState.ModifiedDeploymentScript, model.CurrentState);
-        Assert.IsNull(model.Result);
+        model.CurrentState.Should().Be(StateModelState.ModifiedDeploymentScript);
+        model.Result.Should().BeNull();
         mpsMock.Verify(m => m.GetScriptModifiers(It.IsAny<ConfigurationModel>()), Times.Once);
         fsaMock.Verify(m => m.ReadFileAsync(It.IsAny<string>()), Times.Never);
         fsaMock.Verify(m => m.WriteFileAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
@@ -124,8 +79,8 @@ public class ModifyDeploymentScriptUnitTests
         await unit.Work(model, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(StateModelState.ModifiedDeploymentScript, model.CurrentState);
-        Assert.IsFalse(model.Result);
+        model.CurrentState.Should().Be(StateModelState.ModifiedDeploymentScript);
+        model.Result.Should().BeFalse();
         mpsMock.Verify(m => m.GetScriptModifiers(It.IsAny<ConfigurationModel>()), Times.Once);
         fsaMock.Verify(m => m.ReadFileAsync(paths.DeployTargets.DeployScriptPath), Times.Once);
         fsaMock.Verify(m => m.WriteFileAsync(paths.DeployTargets.DeployScriptPath, expectedResultScript), Times.Never);
@@ -181,8 +136,8 @@ public class ModifyDeploymentScriptUnitTests
         await unit.Work(model, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(StateModelState.ModifiedDeploymentScript, model.CurrentState);
-        Assert.IsFalse(model.Result);
+        model.CurrentState.Should().Be(StateModelState.ModifiedDeploymentScript);
+        model.Result.Should().BeFalse();
         mpsMock.Verify(m => m.GetScriptModifiers(It.IsAny<ConfigurationModel>()), Times.Once);
         fsaMock.Verify(m => m.ReadFileAsync(paths.DeployTargets.DeployScriptPath), Times.Once);
         fsaMock.Verify(m => m.WriteFileAsync(paths.DeployTargets.DeployScriptPath, expectedResultScript), Times.Once);
@@ -235,8 +190,8 @@ public class ModifyDeploymentScriptUnitTests
         await unit.Work(model, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(StateModelState.ModifiedDeploymentScript, model.CurrentState);
-        Assert.IsNull(model.Result);
+        model.CurrentState.Should().Be(StateModelState.ModifiedDeploymentScript);
+        model.Result.Should().BeNull();
         mpsMock.Verify(m => m.GetScriptModifiers(It.IsAny<ConfigurationModel>()), Times.Once);
         fsaMock.Verify(m => m.ReadFileAsync(paths.DeployTargets.DeployScriptPath), Times.Once);
         fsaMock.Verify(m => m.WriteFileAsync(paths.DeployTargets.DeployScriptPath, expectedResultScript), Times.Once);

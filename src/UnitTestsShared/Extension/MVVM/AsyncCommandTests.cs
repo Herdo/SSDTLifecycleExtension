@@ -4,43 +4,6 @@
 public class AsyncCommandTests
 {
     [Test]
-    public void Constructor_ArgumentNullException_Execute()
-    {
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new AsyncCommand(null, null, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_CanExecute()
-    {
-        // Arrange
-        Task Execute() => Task.CompletedTask;
-
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new AsyncCommand(Execute, null, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_ErrorHandler()
-    {
-        // Arrange
-        Task Execute() => Task.CompletedTask;
-        bool CanExecute() => true;
-
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new AsyncCommand(Execute, CanExecute, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
     public void RaiseCanExecuteChanged_InvokeEvent()
     {
         // Arrange
@@ -64,10 +27,8 @@ public class AsyncCommandTests
         command.RaiseCanExecuteChanged();
 
         // Assert
-        Assert.IsNotNull(invokedSender);
-        Assert.AreSame(command, invokedSender);
-        Assert.IsNotNull(invokedArgs);
-        Assert.AreSame(EventArgs.Empty, invokedArgs);
+        invokedSender.Should().BeSameAs(command);
+        invokedArgs.Should().BeSameAs(EventArgs.Empty);
     }
 
     [Test]
@@ -91,8 +52,8 @@ public class AsyncCommandTests
         var canExecute = command.CanExecute(null);
 
         // Assert
-        Assert.IsTrue(canExecute);
-        Assert.IsTrue(canExecuteCalled);
+        canExecute.Should().BeTrue();
+        canExecuteCalled.Should().BeTrue();
     }
 
     [Test]
@@ -116,8 +77,8 @@ public class AsyncCommandTests
         var canExecute = command.CanExecute();
 
         // Assert
-        Assert.IsTrue(canExecute);
-        Assert.IsTrue(canExecuteCalled);
+        canExecute.Should().BeTrue();
+        canExecuteCalled.Should().BeTrue();
     }
 
     [Test]
@@ -141,7 +102,7 @@ public class AsyncCommandTests
         command.Execute(null);
 
         // Assert
-        Assert.IsFalse(executed);
+        executed.Should().BeFalse();
     }
 
     [Test]
@@ -165,7 +126,7 @@ public class AsyncCommandTests
         await command.ExecuteAsync();
 
         // Assert
-        Assert.IsFalse(executed);
+        executed.Should().BeFalse();
     }
 
     [Test]
@@ -201,16 +162,16 @@ public class AsyncCommandTests
         command.Execute(null);
 
         // Assert
-        Assert.IsTrue(executed);
-        Assert.AreEqual(2, invokedSenderList.Count);
-        Assert.AreSame(command, invokedSenderList[0]);
-        Assert.AreSame(command, invokedSenderList[1]);
-        Assert.AreEqual(2, invokedArgsList.Count);
-        Assert.AreSame(EventArgs.Empty, invokedArgsList[0]);
-        Assert.AreSame(EventArgs.Empty, invokedArgsList[1]);
-        Assert.AreEqual(2, invokedCanExecuteStateList.Count);
-        Assert.IsFalse(invokedCanExecuteStateList[0]); // Cannot execute during first execution, even when the CanExecute delegate returns true.
-        Assert.IsTrue(invokedCanExecuteStateList[1]); // Can execute after the execution has finished.
+        executed.Should().BeTrue();
+        invokedSenderList.Should().HaveCount(2);
+        invokedSenderList[0].Should().BeSameAs(command);
+        invokedSenderList[1].Should().BeSameAs(command);
+        invokedArgsList.Should().HaveCount(2);
+        invokedArgsList[0].Should().BeSameAs(EventArgs.Empty);
+        invokedArgsList[1].Should().BeSameAs(EventArgs.Empty);
+        invokedCanExecuteStateList.Should().HaveCount(2);
+        invokedCanExecuteStateList[0].Should().BeFalse(); // Cannot execute during first execution, even when the CanExecute delegate returns true.
+        invokedCanExecuteStateList[1].Should().BeTrue(); // Can execute after the execution has finished.
     }
 
     [Test]
@@ -246,25 +207,25 @@ public class AsyncCommandTests
         await command.ExecuteAsync();
 
         // Assert
-        Assert.IsTrue(executed);
-        Assert.AreEqual(2, invokedSenderList.Count);
-        Assert.AreSame(command, invokedSenderList[0]);
-        Assert.AreSame(command, invokedSenderList[1]);
-        Assert.AreEqual(2, invokedArgsList.Count);
-        Assert.AreSame(EventArgs.Empty, invokedArgsList[0]);
-        Assert.AreSame(EventArgs.Empty, invokedArgsList[1]);
-        Assert.AreEqual(2, invokedCanExecuteStateList.Count);
-        Assert.IsFalse(invokedCanExecuteStateList[0]); // Cannot execute during first execution, even when the CanExecute delegate returns true.
-        Assert.IsTrue(invokedCanExecuteStateList[1]); // Can execute after the execution has finished.
+        executed.Should().BeTrue();
+        invokedSenderList.Should().HaveCount(2);
+        invokedSenderList[0].Should().BeSameAs(command);
+        invokedSenderList[1].Should().BeSameAs(command);
+        invokedArgsList.Should().HaveCount(2);
+        invokedArgsList[0].Should().BeSameAs(EventArgs.Empty);
+        invokedArgsList[1].Should().BeSameAs(EventArgs.Empty);
+        invokedCanExecuteStateList.Should().HaveCount(2);
+        invokedCanExecuteStateList[0].Should().BeFalse(); // Cannot execute during first execution, even when the CanExecute delegate returns true.
+        invokedCanExecuteStateList[1].Should().BeTrue(); // Can execute after the execution has finished.
     }
 
     private class ErrorHandlerTestImplementation : IErrorHandler
     {
         private readonly Action<IAsyncCommand, Exception> _callback;
 
-        public ErrorHandlerTestImplementation([NotNull] Action<IAsyncCommand, Exception> callback)
+        public ErrorHandlerTestImplementation(Action<IAsyncCommand, Exception> callback)
         {
-            _callback = callback ?? throw new ArgumentNullException(nameof(callback));
+            _callback = callback;
         }
 
         Task IErrorHandler.HandleErrorAsync(IAsyncCommand command,

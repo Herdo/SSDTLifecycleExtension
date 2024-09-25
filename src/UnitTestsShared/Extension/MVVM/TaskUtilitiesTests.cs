@@ -4,40 +4,6 @@
 public class TaskUtilitiesTests
 {
     [Test]
-    public void FireAndForget_ArgumentNullException_Task()
-    {
-        // Act & Assert
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => (null as Task).FireAndForget(null, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void FireAndForget_ArgumentNullException_Command()
-    {
-        // Arrange
-        var task = Task.CompletedTask;
-
-        // Act & Assert
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => task.FireAndForget(null, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void FireAndForget_ArgumentNullException_Handler()
-    {
-        // Arrange
-        var task = Task.CompletedTask;
-        var commandMock = Mock.Of<IAsyncCommand>();
-
-        // Act & Assert
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => task.FireAndForget(commandMock, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
     public void FireAndForget_RunCompletely()
     {
         // Arrange

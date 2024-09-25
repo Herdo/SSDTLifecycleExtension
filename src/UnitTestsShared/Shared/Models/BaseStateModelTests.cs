@@ -4,15 +4,6 @@
 public class BaseStateModelTests
 {
     [Test]
-    public void Constructor_ArgumentNullException_HandleWorkInProgressChanged()
-    {
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new BaseStateModelTestImplementation(null));
-    }
-
-    [Test]
     public void Constructor_CorrectInitialization()
     {
         // Arrange
@@ -23,9 +14,9 @@ public class BaseStateModelTests
         var model = new BaseStateModelTestImplementation(handlerFunc);
 
         // Assert
-        Assert.AreSame(handlerFunc, model.HandleWorkInProgressChanged);
-        Assert.AreEqual(StateModelState.Initialized, model.CurrentState);
-        Assert.IsNull(model.Result);
+        model.HandleWorkInProgressChanged.Should().BeSameAs(handlerFunc);
+        model.CurrentState.Should().Be(StateModelState.Initialized);
+        model.Result.Should().BeNull();
     }
 
     [Test]
@@ -40,7 +31,7 @@ public class BaseStateModelTests
         model.CurrentState = StateModelState.PathsVerified;
 
         // Assert
-        Assert.AreEqual(StateModelState.PathsVerified, model.CurrentState);
+        model.CurrentState.Should().Be(StateModelState.PathsVerified);
     }
 
     [Test]
@@ -55,12 +46,12 @@ public class BaseStateModelTests
         model.Result = true;
 
         // Assert
-        Assert.AreEqual(true, model.Result);
+        model.Result.Should().BeTrue();
     }
 
     private class BaseStateModelTestImplementation : BaseStateModel
     {
-        internal BaseStateModelTestImplementation([NotNull] Func<bool, Task> handleWorkInProgressChanged)
+        internal BaseStateModelTestImplementation(Func<bool, Task> handleWorkInProgressChanged)
             : base(handleWorkInProgressChanged)
         {
         }

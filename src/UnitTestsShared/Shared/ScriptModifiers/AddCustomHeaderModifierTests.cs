@@ -4,18 +4,6 @@
 public class AddCustomHeaderModifierTests
 {
     [Test]
-    public void Modify_ArgumentNullException_Model()
-    {
-        // Arrange
-        IScriptModifier s = new AddCustomHeaderModifier();
-
-        // Act & Assert
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => s.ModifyAsync(null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
     public async Task Modify_CustomHeaderAdded_Async()
     {
         // Arrange
@@ -37,8 +25,7 @@ public class AddCustomHeaderModifierTests
         await s.ModifyAsync(model);
 
         // Assert
-        Assert.IsNotNull(model.CurrentScript);
-        Assert.AreEqual("Header\r\nfoobar", model.CurrentScript);
+        model.CurrentScript.Should().Be("Header\r\nfoobar");
     }
 
     [Test]
@@ -66,8 +53,7 @@ public class AddCustomHeaderModifierTests
         await s.ModifyAsync(model);
 
         // Assert
-        Assert.IsNotNull(model.CurrentScript);
-        Assert.AreEqual("foobar", model.CurrentScript);
+        model.CurrentScript.Should().Be("foobar");
     }
 
     [Test]
@@ -92,8 +78,7 @@ public class AddCustomHeaderModifierTests
         await s.ModifyAsync(model);
 
         // Assert
-        Assert.IsNotNull(model.CurrentScript);
-        Assert.AreEqual("Script base version: 1.2.0\r\nfoobar", model.CurrentScript);
+        model.CurrentScript.Should().Be("Script base version: 1.2.0\r\nfoobar");
     }
 
     [Test]
@@ -118,7 +103,6 @@ public class AddCustomHeaderModifierTests
         await s.ModifyAsync(model);
 
         // Assert
-        Assert.IsNotNull(model.CurrentScript);
-        Assert.AreEqual("Script target version: 1.3.0\r\nfoobar", model.CurrentScript);
+        model.CurrentScript.Should().Be("Script target version: 1.3.0\r\nfoobar");
     }
 }

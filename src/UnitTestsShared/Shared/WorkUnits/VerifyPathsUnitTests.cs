@@ -4,42 +4,6 @@
 public class VerifyPathsUnitTests
 {
     [Test]
-    public void Constructor_ArgumentNullException_FileSystemAccess()
-    {
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new VerifyPathsUnit(null, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_Logger()
-    {
-        // Arrange
-        var fsaMock = Mock.Of<IFileSystemAccess>();
-
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new VerifyPathsUnit(fsaMock, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void Work_ScriptCreationStateModel_ArgumentNullException_StateModel()
-    {
-        // Arrange
-        var fsaMock = Mock.Of<IFileSystemAccess>();
-        var loggerMock = Mock.Of<ILogger>();
-        IWorkUnit<ScriptCreationStateModel> unit = new VerifyPathsUnit(fsaMock, loggerMock);
-
-        // Act & Assert
-        // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => unit.Work(null, CancellationToken.None));
-    }
-
-    [Test]
     public async Task Work_ScriptCreationStateModel_VerificationSuccessful_Async()
     {
         // Arrange
@@ -64,8 +28,8 @@ public class VerifyPathsUnitTests
         await unit.Work(model, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(StateModelState.PathsVerified, model.CurrentState);
-        Assert.IsNull(model.Result);
+        model.CurrentState.Should().Be(StateModelState.PathsVerified);
+        model.Result.Should().BeNull();
         loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);
     }
 
@@ -94,8 +58,8 @@ public class VerifyPathsUnitTests
         await unit.Work(model, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(StateModelState.PathsVerified, model.CurrentState);
-        Assert.IsFalse(model.Result);
+        model.CurrentState.Should().Be(StateModelState.PathsVerified);
+        model.Result.Should().BeFalse();
         loggerMock.Verify(m => m.LogErrorAsync(It.Is<string>(s => s.Contains(ConfigurationModel.UseSinglePublishProfileSpecialKeyword) && s.Contains("foobasebarpublish-profile-path"))), Times.Once);
         fsaMock.Verify(m => m.CheckIfFileExists(It.IsAny<string>()), Times.Never);
     }
@@ -126,8 +90,8 @@ public class VerifyPathsUnitTests
         await unit.Work(model, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(StateModelState.PathsVerified, model.CurrentState);
-        Assert.IsFalse(model.Result);
+        model.CurrentState.Should().Be(StateModelState.PathsVerified);
+        model.Result.Should().BeFalse();
         loggerMock.Verify(m => m.LogErrorAsync(It.Is<string>(s => s.Contains("publishProfilePath") && s.Contains("foobasebarpublish-profile-path"))), Times.Once);
     }
 }

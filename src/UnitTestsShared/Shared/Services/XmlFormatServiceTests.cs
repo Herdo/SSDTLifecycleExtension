@@ -13,7 +13,7 @@ public class XmlFormatServiceTests
         var result = service.FormatDeployReport(null);
 
         // Assert
-        Assert.IsNull(result);
+        result.Should().BeNull();
     }
 
     [Test]
@@ -48,6 +48,6 @@ public class XmlFormatServiceTests
         var result = service.FormatDeployReport(singleLine);
 
         // Assert
-        Assert.AreEqual(multiLine, result);
+        result.Should().Be(multiLine);
     }
 }

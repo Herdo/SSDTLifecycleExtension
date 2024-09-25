@@ -4,15 +4,6 @@
 public class AsyncExecutorBaseTests
 {
     [Test]
-    public void Constructor_ArgumentNullException_Logger()
-    {
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new AsyncExecutorBaseTestImplementation(null, null));
-    }
-
-    [Test]
     public async Task DoWorkAsync_CancellationRequested_Async()
     {
         // Arrange
@@ -39,10 +30,10 @@ public class AsyncExecutorBaseTests
         await instance.CallDoWorkAsync(model, cts.Token);
 
         // Assert
-        Assert.IsNull(model.Result);
-        Assert.AreEqual(2, stateList.Count);
-        Assert.IsTrue(stateList[0]);
-        Assert.IsFalse(stateList[1]);
+        model.Result.Should().BeNull();
+        stateList.Should().HaveCount(2);
+        stateList[0].Should().BeTrue();
+        stateList[1].Should().BeFalse();
         loggerMock.Verify(m => m.LogInfoAsync("started"), Times.Once);
         loggerMock.Verify(m => m.LogInfoAsync("Creation was canceled by the user."), Times.Once);
         loggerMock.Verify(m => m.LogInfoAsync(It.Is<string>(s => s.StartsWith("completed stateModel in"))), Times.Once);
@@ -76,10 +67,10 @@ public class AsyncExecutorBaseTests
         await instance.CallDoWorkAsync(model, CancellationToken.None);
 
         // Assert
-        Assert.IsFalse(model.Result);
-        Assert.AreEqual(2, stateList.Count);
-        Assert.IsTrue(stateList[0]);
-        Assert.IsFalse(stateList[1]);
+        model.Result.Should().BeFalse();
+        stateList.Should().HaveCount(2);
+        stateList[0].Should().BeTrue();
+        stateList[1].Should().BeFalse();
         loggerMock.Verify(m => m.LogInfoAsync("started"), Times.Once);
         loggerMock.Verify(m => m.LogInfoAsync("Creation was canceled by the user."), Times.Never);
         loggerMock.Verify(m => m.LogInfoAsync(It.Is<string>(s => s.StartsWith("completed stateModel in"))), Times.Once);
@@ -116,10 +107,10 @@ public class AsyncExecutorBaseTests
         await instance.CallDoWorkAsync(model, cts.Token);
 
         // Assert
-        Assert.IsTrue(model.Result);
-        Assert.AreEqual(2, stateList.Count);
-        Assert.IsTrue(stateList[0]);
-        Assert.IsFalse(stateList[1]);
+        model.Result.Should().BeTrue();
+        stateList.Should().HaveCount(2);
+        stateList[0].Should().BeTrue();
+        stateList[1].Should().BeFalse();
         wuMock.Verify(m => m.Work(model, cts.Token), Times.Once);
         loggerMock.Verify(m => m.LogInfoAsync("started"), Times.Once);
         loggerMock.Verify(m => m.LogInfoAsync("Creation was canceled by the user."), Times.Never);
@@ -153,10 +144,10 @@ public class AsyncExecutorBaseTests
         await instance.CallDoWorkAsync(model, cts.Token);
 
         // Assert
-        Assert.IsNull(model.Result);
-        Assert.AreEqual(2, stateList.Count);
-        Assert.IsTrue(stateList[0]);
-        Assert.IsFalse(stateList[1]);
+        model.Result.Should().BeNull();
+        stateList.Should().HaveCount(2);
+        stateList[0].Should().BeTrue();
+        stateList[1].Should().BeFalse();
         wuMock.Verify(m => m.Work(model, cts.Token), Times.Once);
         loggerMock.Verify(m => m.LogInfoAsync("started"), Times.Once);
         loggerMock.Verify(m => m.LogInfoAsync("Creation was canceled by the user."), Times.Never);
@@ -193,10 +184,10 @@ public class AsyncExecutorBaseTests
         await instance.CallDoWorkAsync(model, cts.Token);
 
         // Assert
-        Assert.IsNull(model.Result);
-        Assert.AreEqual(2, stateList.Count);
-        Assert.IsTrue(stateList[0]);
-        Assert.IsFalse(stateList[1]);
+        model.Result.Should().BeNull();
+        stateList.Should().HaveCount(2);
+        stateList[0].Should().BeTrue();
+        stateList[1].Should().BeFalse();
         wuMock.Verify(m => m.Work(model, cts.Token), Times.Once);
         loggerMock.Verify(m => m.LogInfoAsync("started"), Times.Once);
         loggerMock.Verify(m => m.LogInfoAsync("Creation was canceled by the user."), Times.Never);
@@ -237,10 +228,10 @@ public class AsyncExecutorBaseTests
         await instance.CallDoWorkAsync(model, cts.Token);
 
         // Assert
-        Assert.IsTrue(model.Result);
-        Assert.AreEqual(2, stateList.Count);
-        Assert.IsTrue(stateList[0]);
-        Assert.IsFalse(stateList[1]);
+        model.Result.Should().BeTrue();
+        stateList.Should().HaveCount(2);
+        stateList[0].Should().BeTrue();
+        stateList[1].Should().BeFalse();
         wuMock.Verify(m => m.Work(model, cts.Token), Times.Once);
         loggerMock.Verify(m => m.LogInfoAsync("started"), Times.Once);
         loggerMock.Verify(m => m.LogInfoAsync("Creation was canceled by the user."), Times.Never);
@@ -251,8 +242,8 @@ public class AsyncExecutorBaseTests
     {
         private readonly Func<IWorkUnit<ScaffoldingStateModel>> _workUnitGetter;
 
-        public AsyncExecutorBaseTestImplementation([NotNull] ILogger logger,
-                                                   Func<IWorkUnit<ScaffoldingStateModel>> workUnitGetter)
+        public AsyncExecutorBaseTestImplementation(ILogger logger,
+                Func<IWorkUnit<ScaffoldingStateModel>> workUnitGetter)
             : base(logger)
         {
             _workUnitGetter = workUnitGetter;

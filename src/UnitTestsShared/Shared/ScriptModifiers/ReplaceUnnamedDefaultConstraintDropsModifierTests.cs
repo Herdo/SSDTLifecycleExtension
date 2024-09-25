@@ -187,41 +187,6 @@ PRINT 'Update complete'
 GO";
 
     [Test]
-    public void Constructor_ArgumentNullException_DacAccess()
-    {
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new ReplaceUnnamedDefaultConstraintDropsModifier(null, null));
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_Logger()
-    {
-        // Arrange
-        var daMock = Mock.Of<IDacAccess>();
-
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new ReplaceUnnamedDefaultConstraintDropsModifier(daMock, null));
-    }
-
-    [Test]
-    public void ModifyAsync_ArgumentNullException_Model()
-    {
-        // Arrange
-        var daMock = Mock.Of<IDacAccess>();
-        var loggerMock = Mock.Of<ILogger>();
-        IScriptModifier modifier = new ReplaceUnnamedDefaultConstraintDropsModifier(daMock, loggerMock);
-            
-        // Act & Assert
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => modifier.ModifyAsync(null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
     public async Task ModifyAsync_ErrorsGettingDacpacConstraints_Async()
     {
         // Arrange
@@ -264,7 +229,7 @@ GO";
         await modifier.ModifyAsync(model);
 
         // Assert
-        Assert.AreEqual(MultipleDropDefaultConstraintStatements, model.CurrentScript);
+        model.CurrentScript.Should().Be(MultipleDropDefaultConstraintStatements);
         loggerMock.Verify(m => m.LogErrorAsync("Failed to load the default constraints of the previous DACPAC:"), Times.Once);
         loggerMock.Verify(m => m.LogErrorAsync("oldError1"), Times.Once);
         loggerMock.Verify(m => m.LogErrorAsync("oldError2"), Times.Once);
@@ -312,7 +277,7 @@ GO";
         await modifier.ModifyAsync(model);
 
         // Assert
-        Assert.AreEqual(MultipleDropDefaultConstraintStatementsReplacedPartially, model.CurrentScript);
+        model.CurrentScript.Should().Be(MultipleDropDefaultConstraintStatementsReplacedPartially);
         loggerMock.Verify(m => m.LogWarningAsync($"{nameof(ReplaceUnnamedDefaultConstraintDropsModifier)}: Script defines 1 unnamed default constraint(s) more to drop than the DACPAC models provide."), Times.Once);
     }
 
@@ -359,7 +324,7 @@ GO";
         await modifier.ModifyAsync(model);
 
         // Assert
-        Assert.AreEqual(expectedOutput, model.CurrentScript);
+        model.CurrentScript.Should().Be(expectedOutput);
         loggerMock.Verify(m => m.LogWarningAsync($"{nameof(ReplaceUnnamedDefaultConstraintDropsModifier)}: Regular expression matching timed out 1 time(s)."), Times.Once);
     }
 
@@ -403,6 +368,6 @@ GO";
         await modifier.ModifyAsync(model);
 
         // Assert
-        Assert.AreEqual(MultipleDropDefaultConstraintStatementsReplaced, model.CurrentScript);
+        model.CurrentScript.Should().Be(MultipleDropDefaultConstraintStatementsReplaced);
     }
 }

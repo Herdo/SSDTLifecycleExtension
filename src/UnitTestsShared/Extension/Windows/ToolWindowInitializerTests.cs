@@ -4,45 +4,6 @@
 public class ToolWindowInitializerTests
 {
     [Test]
-    public void Constructor_ArgumentNullException_VisualStudioAccess()
-    {
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new ToolWindowInitializer(null, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_DependencyResolver()
-    {
-        // Arrange
-        var vsaMock = Mock.Of<IVisualStudioAccess>();
-
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new ToolWindowInitializer(vsaMock, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void TryInitializeToolWindowAsync_ArgumentNullException_Window()
-    {
-        // Arrange
-        var vsaMock = Mock.Of<IVisualStudioAccess>();
-        var loggerMock = Mock.Of<ILogger>();
-        var spMock = Mock.Of<IServiceProvider>();
-        var cs = new OleMenuCommandService(spMock);
-        var dr = new DependencyResolver(vsaMock, loggerMock, cs);
-        var twi = new ToolWindowInitializer(vsaMock, dr);
-
-        // Act & Assert
-        // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => twi.TryInitializeToolWindowAsync<ViewModelBaseTestImplementationWithSuccessfulInitialization>(null));
-    }
-
-    [Test]
     public async Task TryInitializeToolWindowAsync_NoProjectSelected_Async()
     {
         // Arrange
@@ -59,8 +20,8 @@ public class ToolWindowInitializerTests
         var (success, fullProjectPath) = await twi.TryInitializeToolWindowAsync<ViewModelBaseTestImplementationWithSuccessfulInitialization>(windowMock);
 
         // Assert
-        Assert.IsFalse(success);
-        Assert.IsNull(fullProjectPath);
+        success.Should().BeFalse();
+        fullProjectPath.Should().BeNull();
     }
 
     [Test]
@@ -82,8 +43,8 @@ public class ToolWindowInitializerTests
         var (success, fullProjectPath) = await twi.TryInitializeToolWindowAsync<ViewModelBaseTestImplementationWithExceptionInitialization>(windowMock.Object);
 
         // Assert
-        Assert.IsTrue(success);
-        Assert.AreEqual("b", fullProjectPath);
+        success.Should().BeTrue();
+        fullProjectPath.Should().Be("b");
     }
 
     [Test]
@@ -106,8 +67,8 @@ public class ToolWindowInitializerTests
         var (success, fullProjectPath) = await twi.TryInitializeToolWindowAsync<ViewModelBaseTestImplementationWithFailingInitialization>(windowMock.Object);
 
         // Assert
-        Assert.IsFalse(success);
-        Assert.AreEqual("b", fullProjectPath);
+        success.Should().BeFalse();
+        fullProjectPath.Should().Be("b");
     }
 
     [Test]
@@ -130,12 +91,11 @@ public class ToolWindowInitializerTests
         var (success, fullProjectPath) = await twi.TryInitializeToolWindowAsync<ViewModelBaseTestImplementationWithSuccessfulInitialization>(windowMock.Object);
 
         // Assert
-        Assert.IsTrue(success);
-        Assert.AreEqual("b", fullProjectPath);
+        success.Should().BeTrue();
+        fullProjectPath.Should().Be("b");
         viewMock.Verify(m => m.SetDataContext(It.Is<IViewModel>(model => model != null && model.GetType() == typeof(ViewModelBaseTestImplementationWithSuccessfulInitialization))));
     }
 
-    [UsedImplicitly]
     private class ViewModelBaseTestImplementationWithSuccessfulInitialization : ViewModelBase
     {
         public override Task<bool> InitializeAsync()
@@ -144,7 +104,6 @@ public class ToolWindowInitializerTests
         }
     }
 
-    [UsedImplicitly]
     private class ViewModelBaseTestImplementationWithFailingInitialization : ViewModelBase
     {
         public override Task<bool> InitializeAsync()
@@ -153,7 +112,6 @@ public class ToolWindowInitializerTests
         }
     }
 
-    [UsedImplicitly]
     private class ViewModelBaseTestImplementationWithExceptionInitialization : ViewModelBase
     {
         public override Task<bool> InitializeAsync()

@@ -4,77 +4,6 @@
 public class ScriptModificationModelTests
 {
     [Test]
-    public void Constructor_ArgumentNullException_InitialScript()
-    {
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new ScriptModificationModel(null, null, null, null, null, false));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_Project()
-    {
-        // Arrange
-        var initialScript = "script";
-
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new ScriptModificationModel(initialScript, null, null, null, null, false));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_Configuration()
-    {
-        // Arrange
-        var initialScript = "script";
-        var project = new SqlProject("a", "b", "c");
-
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new ScriptModificationModel(initialScript, project, null, null, null, false));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_Paths()
-    {
-        // Arrange
-        var initialScript = "script";
-        var project = new SqlProject("a", "b", "c");
-        var configuration = new ConfigurationModel();
-
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new ScriptModificationModel(initialScript, project, configuration, null, null, false));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_PreviousVersion()
-    {
-        // Arrange
-        var initialScript = "script";
-        var project = new SqlProject("a", "b", "c");
-        var configuration = new ConfigurationModel();
-        var directories = new DirectoryPaths("projectDirectory", "latestArtifactsDirectory", "newArtifactsDirectory");
-        var sourcePaths = new DeploySourcePaths("newDacpacPath", "publishProfilePath", "previousDacpacPath");
-        var targetPaths = new DeployTargetPaths("deployScriptPath", "deployReportPath");
-        var paths = new PathCollection(directories, sourcePaths, targetPaths);
-
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new ScriptModificationModel(initialScript, project, configuration, paths, null, false));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
     public void Constructor_CorrectInitialization()
     {
         // Arrange
@@ -91,12 +20,12 @@ public class ScriptModificationModelTests
         var model = new ScriptModificationModel(initialScript, project, configuration, paths, previousVersion, true);
 
         // Assert
-        Assert.AreEqual(initialScript, model.CurrentScript);
-        Assert.AreSame(project, model.Project);
-        Assert.AreSame(configuration, model.Configuration);
-        Assert.AreSame(paths, model.Paths);
-        Assert.AreSame(previousVersion, model.PreviousVersion);
-        Assert.IsTrue(model.CreateLatest);
+        model.CurrentScript.Should().Be(initialScript);
+        model.Project.Should().BeSameAs(project);
+        model.Configuration.Should().BeSameAs(configuration);
+        model.Paths.Should().BeSameAs(paths);
+        model.PreviousVersion.Should().BeSameAs(previousVersion);
+        model.CreateLatest.Should().BeTrue();
     }
 
     [Test]
@@ -115,6 +44,7 @@ public class ScriptModificationModelTests
 
         // Act & Assert
         // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => model.CurrentScript = null);
+        Action act = () => model.CurrentScript = null;
+        act.Should().Throw<ArgumentNullException>();
     }
 }

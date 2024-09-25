@@ -1,53 +1,8 @@
-﻿using System;namespace SSDTLifecycleExtension.UnitTests.Shared.Services;
+﻿namespace SSDTLifecycleExtension.UnitTests.Shared.Services;
 
 [TestFixture]
 public class BuildServiceTests
 {
-    [Test]
-    public void Constructor_ArgumentNullException_VisualStudioAccess()
-    {
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        Assert.Throws<ArgumentNullException>(() => new BuildService(null, null, null));
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_FileSystemAccess()
-    {
-        // Arrange
-        var vsaMock = Mock.Of<IVisualStudioAccess>();
-
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        Assert.Throws<ArgumentNullException>(() => new BuildService(vsaMock, null, null));
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_Logger()
-    {
-        // Arrange
-        var vsaMock = Mock.Of<IVisualStudioAccess>();
-        var fsaMock = Mock.Of<IFileSystemAccess>();
-
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        Assert.Throws<ArgumentNullException>(() => new BuildService(vsaMock, fsaMock, null));
-    }
-
-    [Test]
-    public void BuildProjectAsync_ArgumentNullException_Project()
-    {
-        // Arrange
-        var vsaMock = Mock.Of<IVisualStudioAccess>();
-        var fsaMock = Mock.Of<IFileSystemAccess>();
-        var loggerMock = Mock.Of<ILogger>();
-        IBuildService service = new BuildService(vsaMock, fsaMock, loggerMock);
-
-        // Act & Assert
-        // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => service.BuildProjectAsync(null));
-    }
-
     [Test]
     public async Task BuildProjectAsync_LogException_Async()
     {
@@ -65,7 +20,7 @@ public class BuildServiceTests
         var result = await service.BuildProjectAsync(project);
 
         // Assert
-        Assert.IsFalse(result);
+        result.Should().BeFalse();
         vsaMock.Verify(m => m.BuildProject(project), Times.Once);
         loggerMock.Verify(m => m.LogErrorAsync(testException, @"Failed to build C:\TestProject\TestProject.sqlproj"), Times.Once);
     }
@@ -84,39 +39,8 @@ public class BuildServiceTests
         var result = await service.BuildProjectAsync(project);
 
         // Assert
-        Assert.IsTrue(result);
+        result.Should().BeTrue();
         vsaMock.Verify(m => m.BuildProject(project), Times.Once);
-    }
-
-    [Test]
-    public void CopyBuildResultAsync_ArgumentNullException_Project()
-    {
-        // Arrange
-        var vsaMock = Mock.Of<IVisualStudioAccess>();
-        var fsaMock = Mock.Of<IFileSystemAccess>();
-        var loggerMock = Mock.Of<ILogger>();
-        IBuildService service = new BuildService(vsaMock, fsaMock, loggerMock);
-
-        // Act & Assert
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => service.CopyBuildResultAsync(null, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void CopyBuildResultAsync_ArgumentNullException_TargetDirectory()
-    {
-        // Arrange
-        var project = new SqlProject("a", @"C:\TestProject\TestProject.sqlproj", "c");
-        var vsaMock = Mock.Of<IVisualStudioAccess>();
-        var fsaMock = Mock.Of<IFileSystemAccess>();
-        var loggerMock = Mock.Of<ILogger>();
-        IBuildService service = new BuildService(vsaMock, fsaMock, loggerMock);
-
-        // Act & Assert
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => service.CopyBuildResultAsync(project, null));
-        // ReSharper restore AssignNullToNotNullAttribute
     }
 
     [Test]
@@ -152,7 +76,7 @@ public class BuildServiceTests
         var result = await service.CopyBuildResultAsync(project, targetDirectory);
 
         // Assert
-        Assert.IsFalse(result);
+        result.Should().BeFalse();
         loggerMock.Verify(m => m.LogErrorAsync("Failed to ensure the target directory exists: failed to access parent directory"), Times.Once);
     }
 
@@ -186,7 +110,7 @@ public class BuildServiceTests
         var result = await service.CopyBuildResultAsync(project, targetDirectory);
 
         // Assert
-        Assert.IsFalse(result);
+        result.Should().BeFalse();
         loggerMock.Verify(m => m.LogTraceAsync(@"Copied file ""C:\Source\test.dacpac"" to ""C:\Target\test.dacpac"" ..."), Times.Once);
         loggerMock.Verify(m => m.LogErrorAsync("Failed to copy files to the target directory."), Times.Once);
         loggerMock.Verify(m => m.LogErrorAsync(directoryException, "Failed to access the directory"), Times.Once);
@@ -217,7 +141,7 @@ public class BuildServiceTests
         var result = await service.CopyBuildResultAsync(project, targetDirectory);
 
         // Assert
-        Assert.IsTrue(result);
+        result.Should().BeTrue();
         loggerMock.Verify(m => m.LogTraceAsync(@"Copied file ""C:\Source\test.dacpac"" to ""C:\Target\test.dacpac"" ..."), Times.Once);
         loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<Exception>(), It.IsAny<string>()), Times.Never);
         loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);

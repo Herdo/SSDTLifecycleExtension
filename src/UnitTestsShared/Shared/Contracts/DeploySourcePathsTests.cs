@@ -4,29 +4,6 @@
 public class DeploySourcePathsTests
 {
     [Test]
-    public void Constructor_ArgumentNullException_NewDacpacPath()
-    {
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new DeploySourcePaths(null, null, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_PublishProfilePath()
-    {
-        // Arrange
-        const string newDacpacPath = "newDacpacPath";
-
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new DeploySourcePaths(newDacpacPath, null, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
     public void Constructor_CorrectSettingOfProperties()
     {
         // Arrange
@@ -38,8 +15,8 @@ public class DeploySourcePathsTests
         var dsp = new DeploySourcePaths(newDacpacPath, publishProfilePath, previousDacpacPath);
 
         // Assert
-        Assert.AreEqual(newDacpacPath, dsp.NewDacpacPath);
-        Assert.AreEqual(publishProfilePath, dsp.PublishProfilePath);
-        Assert.AreEqual(previousDacpacPath, dsp.PreviousDacpacPath);
+        dsp.NewDacpacPath.Should().Be(newDacpacPath);
+        dsp.PublishProfilePath.Should().Be(publishProfilePath);
+        dsp.PreviousDacpacPath.Should().Be(previousDacpacPath);
     }
 }

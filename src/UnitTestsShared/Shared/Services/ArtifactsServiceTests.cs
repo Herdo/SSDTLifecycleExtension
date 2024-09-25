@@ -4,58 +4,6 @@
 public class ArtifactsServiceTests
 {
     [Test]
-    public void Constructor_ArgumentNullException_VisualStudioAccess()
-    {
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new ArtifactsService(null, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_FileSystemAccess()
-    {
-        // Arrange
-        var vsaMock = Mock.Of<IVisualStudioAccess>();
-
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new ArtifactsService(vsaMock, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void GetExistingArtifactVersions_ArgumentNullException_Project()
-    {
-        // Arrange
-        var vsaMock = Mock.Of<IVisualStudioAccess>();
-        var fsaMock = Mock.Of<IFileSystemAccess>();
-        IArtifactsService service = new ArtifactsService(vsaMock, fsaMock);
-
-        // Act & Assert
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => service.GetExistingArtifactVersions(null, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
-    public void GetExistingArtifactVersions_ArgumentNullException_Configuration()
-    {
-        // Arrange
-        var vsaMock = Mock.Of<IVisualStudioAccess>();
-        var fsaMock = Mock.Of<IFileSystemAccess>();
-        IArtifactsService service = new ArtifactsService(vsaMock, fsaMock);
-        var project = new SqlProject("a", "b", "c");
-
-        // Act & Assert
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => service.GetExistingArtifactVersions(project, null));
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
-
-    [Test]
     public void GetExistingArtifactVersions_ShowError_CannotDetermineProjectDirectory()
     {
         // Arrange
@@ -81,8 +29,7 @@ public class ArtifactsServiceTests
         var result = service.GetExistingArtifactVersions(project, config);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.AreEqual(0, result.Length);
+        result.Should().BeEmpty();
         vsaMock.Verify(m => m.ShowModalError("ERROR: Cannot determine project directory."), Times.Once);
     }
 
@@ -112,8 +59,7 @@ public class ArtifactsServiceTests
         var result = service.GetExistingArtifactVersions(project, config);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.AreEqual(0, result.Length);
+        result.Should().BeEmpty();
         vsaMock.Verify(m => m.ShowModalError("ERROR: The configured artifacts path is not valid. Please ensure that the configuration is correct."), Times.Once);
     }
 
@@ -145,8 +91,7 @@ public class ArtifactsServiceTests
         var result = service.GetExistingArtifactVersions(project, config);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.AreEqual(0, result.Length);
+        result.Should().BeEmpty();
         vsaMock.Verify(m => m.ShowModalError("ERROR: Failed to open script creation window: test exception"), Times.Once);
     }
 
@@ -178,8 +123,7 @@ public class ArtifactsServiceTests
         var result = service.GetExistingArtifactVersions(project, config);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.AreEqual(0, result.Length);
+        result.Should().BeEmpty();
         vsaMock.Verify(m => m.ShowModalError(It.IsAny<string>()), Times.Never);
     }
 
@@ -214,8 +158,7 @@ public class ArtifactsServiceTests
         var result = service.GetExistingArtifactVersions(project, config);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.AreEqual(0, result.Length);
+        result.Should().BeEmpty();
         vsaMock.Verify(m => m.ShowModalError(It.IsAny<string>()), Times.Never);
     }
 
@@ -251,12 +194,11 @@ public class ArtifactsServiceTests
         var result = service.GetExistingArtifactVersions(project, config);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.AreEqual(2, result.Length);
-        Assert.IsTrue(result[0].IsNewestVersion);
-        Assert.AreEqual(new Version(5, 0), result[0].UnderlyingVersion);
-        Assert.IsFalse(result[1].IsNewestVersion);
-        Assert.AreEqual(new Version(4, 0, 0), result[1].UnderlyingVersion);
+        result.Should().HaveCount(2);
+        result[0].IsNewestVersion.Should().BeTrue();
+        result[0].UnderlyingVersion.Should().Be(new Version(5, 0));
+        result[1].IsNewestVersion.Should().BeFalse();
+        result[1].UnderlyingVersion.Should().Be(new Version(4, 0, 0));
         vsaMock.Verify(m => m.ShowModalError(It.IsAny<string>()), Times.Never);
     }
 }
