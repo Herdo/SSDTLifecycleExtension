@@ -4,13 +4,12 @@ internal class AddCustomFooterModifier : IScriptModifier
 {
     Task IScriptModifier.ModifyAsync(ScriptModificationModel model)
     {
-        if (model == null)
-            throw new ArgumentNullException(nameof(model));
-
         if (string.IsNullOrWhiteSpace(model.Configuration.CustomFooter))
             return Task.CompletedTask;
 
-        var footer = model.Configuration.CustomFooter;
+        Guard.IsNotNull(model.Project.ProjectProperties.DacVersion);
+
+        var footer = model.Configuration.CustomFooter!;
         footer = footer.Replace(Constants.ScriptModificationSpecialKeywordPreviousVersion, model.PreviousVersion.ToString());
         footer = footer.Replace(Constants.ScriptModificationSpecialKeywordNextVersion,
                                 model.CreateLatest ? "latest" : model.Project.ProjectProperties.DacVersion.ToString());

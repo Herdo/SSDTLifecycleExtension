@@ -1,4 +1,6 @@
-﻿namespace SSDTLifecycleExtension.OutputClassification;
+﻿#nullable enable
+
+namespace SSDTLifecycleExtension.OutputClassification;
 
 public static class ClassificationTypes
 {
@@ -13,7 +15,7 @@ public static class ClassificationTypes
 
     [Export(typeof(ClassificationTypeDefinition))]
     [Name(Critical)]
-    public static ClassificationTypeDefinition CriticalTypeDefinition { get; [UsedImplicitly] set; }
+    public static ClassificationTypeDefinition? CriticalTypeDefinition { get; set; }
 
     [Export(typeof(EditorFormatDefinition))]
     [ClassificationType(ClassificationTypeNames = Critical)]
@@ -33,7 +35,7 @@ public static class ClassificationTypes
 
     [Export(typeof(ClassificationTypeDefinition))]
     [Name(Error)]
-    public static ClassificationTypeDefinition ErrorTypeDefinition { get; [UsedImplicitly] set; }
+    public static ClassificationTypeDefinition? ErrorTypeDefinition { get; set; }
 
     [Export(typeof(EditorFormatDefinition))]
     [ClassificationType(ClassificationTypeNames = Error)]
@@ -53,7 +55,7 @@ public static class ClassificationTypes
 
     [Export(typeof(ClassificationTypeDefinition))]
     [Name(Warning)]
-    public static ClassificationTypeDefinition WarningTypeDefinition { get; [UsedImplicitly] set; }
+    public static ClassificationTypeDefinition? WarningTypeDefinition { get; set; }
 
     [Export(typeof(EditorFormatDefinition))]
     [ClassificationType(ClassificationTypeNames = Warning)]
@@ -73,7 +75,7 @@ public static class ClassificationTypes
 
     [Export(typeof(ClassificationTypeDefinition))]
     [Name(Debug)]
-    public static ClassificationTypeDefinition DebugTypeDefinition { get; [UsedImplicitly] set; }
+    public static ClassificationTypeDefinition? DebugTypeDefinition { get; set; }
 
     [Export(typeof(EditorFormatDefinition))]
     [ClassificationType(ClassificationTypeNames = Debug)]
@@ -92,7 +94,7 @@ public static class ClassificationTypes
 
     [Export(typeof(ClassificationTypeDefinition))]
     [Name(Trace)]
-    public static ClassificationTypeDefinition TraceTypeDefinition { get; [UsedImplicitly] set; }
+    public static ClassificationTypeDefinition? TraceTypeDefinition { get; set; }
 
     [Export(typeof(EditorFormatDefinition))]
     [ClassificationType(ClassificationTypeNames = Trace)]
@@ -111,7 +113,7 @@ public static class ClassificationTypes
 
     [Export(typeof(ClassificationTypeDefinition))]
     [Name(Done)]
-    public static ClassificationTypeDefinition DoneTypeDefinition { get; [UsedImplicitly] set; }
+    public static ClassificationTypeDefinition? DoneTypeDefinition { get; set; }
 
     [Export(typeof(EditorFormatDefinition))]
     [ClassificationType(ClassificationTypeNames = Done)]

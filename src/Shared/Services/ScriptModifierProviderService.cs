@@ -1,20 +1,10 @@
 ﻿namespace SSDTLifecycleExtension.Shared.Services;
 
-[UsedImplicitly]
-public class ScriptModifierProviderService : IScriptModifierProviderService
+public class ScriptModifierProviderService(IScriptModifierFactory _scriptModifierFactory)
+    : IScriptModifierProviderService
 {
-    [NotNull] private readonly IScriptModifierFactory _scriptModifierFactory;
-
-    public ScriptModifierProviderService([NotNull] IScriptModifierFactory scriptModifierFactory)
-    {
-        _scriptModifierFactory = scriptModifierFactory ?? throw new ArgumentNullException(nameof(scriptModifierFactory));
-    }
-
     IReadOnlyDictionary<ScriptModifier, IScriptModifier> IScriptModifierProviderService.GetScriptModifiers(ConfigurationModel configuration)
     {
-        if (configuration == null)
-            throw new ArgumentNullException(nameof(configuration));
-
         var result = new Dictionary<ScriptModifier, IScriptModifier>();
 
         if (configuration.CommentOutUnnamedDefaultConstraintDrops)

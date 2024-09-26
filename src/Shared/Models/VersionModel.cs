@@ -2,7 +2,7 @@
 
 public sealed class VersionModel : BaseModel
 {
-    private Version _underlyingVersion;
+    private Version _underlyingVersion = new (0, 0);
     private bool _isNewestVersion;
 
     public Version UnderlyingVersion
@@ -10,7 +10,8 @@ public sealed class VersionModel : BaseModel
         get => _underlyingVersion;
         set
         {
-            if (Equals(value, _underlyingVersion)) return;
+            if (Equals(value, _underlyingVersion))
+                return;
             _underlyingVersion = value;
             OnPropertyChanged();
             OnPropertyChanged(nameof(DisplayName));
@@ -22,28 +23,24 @@ public sealed class VersionModel : BaseModel
         get => _isNewestVersion;
         set
         {
-            if (value == _isNewestVersion) return;
+            if (value == _isNewestVersion)
+                return;
             _isNewestVersion = value;
             OnPropertyChanged();
             OnPropertyChanged(nameof(DisplayName));
         }
     }
 
-    [UsedImplicitly] // Used from XAML as display name for the model.
+    /// <summary>
+    /// Used from XAML as display name for the model.
+    /// </summary>
     public string DisplayName
     {
         get
         {
-            if (UnderlyingVersion == null)
-                return "<null>";
             return IsNewestVersion
                 ? $"{UnderlyingVersion} (newest)"
                 : UnderlyingVersion.ToString();
         }
-    }
-
-    public VersionModel()
-    {
-        UnderlyingVersion = new Version();
     }
 }

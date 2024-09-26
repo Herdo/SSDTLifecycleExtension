@@ -60,7 +60,7 @@ GO
     private static (string CreateAndInsertStatement, string UpdateStatement) GetFinalStatementsFromTemplate(string input,
         SqlProject project)
     {
-        var newVersion = project.ProjectProperties.DacVersion;
+        var newVersion = project.ProjectProperties.DacVersion!;
         var majorVersion = newVersion.Major.ToString();
         var minorVersion = newVersion.Minor.ToString();
         var buildVersion = newVersion.Build.ToString();
@@ -94,8 +94,8 @@ GO
 
     Task IScriptModifier.ModifyAsync(ScriptModificationModel model)
     {
-        if (model == null)
-            throw new ArgumentNullException(nameof(model));
+        Guard.IsNotNull(model.Project.ProjectProperties.DacVersion);
+
         if (model.Project.ProjectProperties.SqlTargetName == null)
             throw new ArgumentException(
                 $"{nameof(ScriptModificationModel.Project)}.{nameof(SqlProject.ProjectProperties)}.{nameof(SqlProjectProperties.SqlTargetName)} must be set.",

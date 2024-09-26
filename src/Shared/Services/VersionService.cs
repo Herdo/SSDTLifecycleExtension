@@ -1,16 +1,10 @@
 ﻿namespace SSDTLifecycleExtension.Shared.Services;
 
-[UsedImplicitly]
 public class VersionService : IVersionService
 {
     string IVersionService.FormatVersion(Version version,
-                                         ConfigurationModel configuration)
+        ConfigurationModel configuration)
     {
-        if (version == null)
-            throw new ArgumentNullException(nameof(version));
-        if (configuration == null)
-            throw new ArgumentNullException(nameof(configuration));
-
         var configurationVersionPattern = configuration.VersionPattern ?? string.Empty;
         var pattern = configurationVersionPattern.Split(new[] {'.'}, StringSplitOptions.RemoveEmptyEntries);
         if (pattern.Length < 2)

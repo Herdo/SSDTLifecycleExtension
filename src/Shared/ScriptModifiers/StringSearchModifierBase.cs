@@ -10,8 +10,8 @@ public abstract class StringSearchModifierBase
     }
 
     private static int SearchStartIndex(string input,
-                                        int statementIndex,
-                                        byte numberOfLeadingStatementsToInclude)
+        int statementIndex,
+        byte numberOfLeadingStatementsToInclude)
     {
         var startIndex = -1;
         var searchBefore = statementIndex;
@@ -46,7 +46,7 @@ public abstract class StringSearchModifierBase
     }
 
     private static int SearchEndIndex(string input,
-                                      int statementIndex)
+        int statementIndex)
     {
         var endIndex = input.IndexOf("GO\r\n", statementIndex, StringComparison.Ordinal);
         if (endIndex >= 0)
@@ -75,7 +75,6 @@ public abstract class StringSearchModifierBase
     /// <param name="statement">The text to search for.</param>
     /// <param name="startAfterIndex">Start searching after this index.</param>
     /// <param name="numberOfLeadingStatementsToInclude">The number of leading statements to include in the range. See example.</param>
-    /// <exception cref="ArgumentNullException"><paramref name="input" /> or <paramref name="statement" /> are <b>null</b>.</exception>
     /// <exception cref="ArgumentException"><paramref name="statement" /> contains only white spaces.</exception>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="startAfterIndex" /> is negative.</exception>
     /// <returns>(-1, -1), if no match is found, otherwise the start index and end index of the range.</returns>
@@ -98,14 +97,10 @@ public abstract class StringSearchModifierBase
     ///     the beginning of line 7.
     /// </example>
     protected static (int StartIndex, int EndIndex) SearchStatementRange(string input,
-                                                                         string statement,
-                                                                         int startAfterIndex,
-                                                                         byte numberOfLeadingStatementsToInclude)
+        string statement,
+        int startAfterIndex,
+        byte numberOfLeadingStatementsToInclude)
     {
-        if (input == null)
-            throw new ArgumentNullException(nameof(input));
-        if (statement == null)
-            throw new ArgumentNullException(nameof(statement));
         if (string.IsNullOrWhiteSpace(statement))
             throw new ArgumentException("Parameter may not be only white spaces.", nameof(statement));
         if (startAfterIndex < 0)
@@ -134,10 +129,6 @@ public abstract class StringSearchModifierBase
     /// <param name="statement">The text to search for.</param>
     /// <param name="numberOfLeadingStatementsToInclude">The number of leading statements to include in the range.</param>
     /// <param name="modifier">The <see cref="Func{TResult}" /> to apply for each match.</param>
-    /// <exception cref="ArgumentNullException">
-    ///     <paramref name="input" />, <paramref name="statement" /> or
-    ///     <paramref name="modifier" /> are <b>null</b>.
-    /// </exception>
     /// <exception cref="ArgumentException"><paramref name="statement" /> contains only white spaces.</exception>
     /// <exception cref="InvalidOperationException">The result returned from the <paramref name="modifier" /> is <b>null</b>.</exception>
     /// <returns>
@@ -145,16 +136,10 @@ public abstract class StringSearchModifierBase
     ///     modifications.
     /// </returns>
     protected static string ForEachMatch(string input,
-                                         string statement,
-                                         byte numberOfLeadingStatementsToInclude,
-                                         Func<string, string> modifier)
+        string statement,
+        byte numberOfLeadingStatementsToInclude,
+        Func<string, string> modifier)
     {
-        if (input == null)
-            throw new ArgumentNullException(nameof(input));
-        if (statement == null)
-            throw new ArgumentNullException(nameof(statement));
-        if (modifier == null)
-            throw new ArgumentNullException(nameof(modifier));
         if (string.IsNullOrWhiteSpace(statement))
             throw new ArgumentException("Parameter may not be only white spaces.", nameof(statement));
 

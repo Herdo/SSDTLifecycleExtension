@@ -2,9 +2,9 @@
 
 public abstract class BaseStateModel : BaseModel, IStateModel
 {
-    protected BaseStateModel([NotNull] Func<bool, Task> handleWorkInProgressChanged)
+    protected BaseStateModel(Func<bool, Task> handleWorkInProgressChanged)
     {
-        HandleWorkInProgressChanged = handleWorkInProgressChanged ?? throw new ArgumentNullException(nameof(handleWorkInProgressChanged));
+        HandleWorkInProgressChanged = handleWorkInProgressChanged;
         CurrentState = StateModelState.Initialized;
     }
 

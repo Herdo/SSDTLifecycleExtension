@@ -1,4 +1,6 @@
-﻿namespace SSDTLifecycleExtension.MVVM;
+﻿#nullable enable
+
+namespace SSDTLifecycleExtension.MVVM;
 
 public interface IErrorHandler
 {

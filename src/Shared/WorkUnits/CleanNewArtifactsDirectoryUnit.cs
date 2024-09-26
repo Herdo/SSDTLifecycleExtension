@@ -1,19 +1,10 @@
 ﻿namespace SSDTLifecycleExtension.Shared.WorkUnits;
 
-[UsedImplicitly]
-public class CleanNewArtifactsDirectoryUnit : IWorkUnit<ScaffoldingStateModel>,
+public class CleanNewArtifactsDirectoryUnit(IFileSystemAccess _fileSystemAccess,
+                                            ILogger _logger)
+    : IWorkUnit<ScaffoldingStateModel>,
     IWorkUnit<ScriptCreationStateModel>
 {
-    [NotNull] private readonly IFileSystemAccess _fileSystemAccess;
-    [NotNull] private readonly ILogger _logger;
-
-    public CleanNewArtifactsDirectoryUnit([NotNull] IFileSystemAccess fileSystemAccess,
-                                          [NotNull] ILogger logger)
-    {
-        _fileSystemAccess = fileSystemAccess ?? throw new ArgumentNullException(nameof(fileSystemAccess));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
-
     private async Task CleanArtifactsDirectoryInternal(IStateModel stateModel,
                                                        PathCollection paths)
     {
@@ -26,20 +17,20 @@ public class CleanNewArtifactsDirectoryUnit : IWorkUnit<ScaffoldingStateModel>,
     }
 
     Task IWorkUnit<ScaffoldingStateModel>.Work(ScaffoldingStateModel stateModel,
-                                               CancellationToken cancellationToken)
+        CancellationToken cancellationToken)
     {
-        if (stateModel == null)
-            throw new ArgumentNullException(nameof(stateModel));
+        Guard.IsNotNullOrWhiteSpace(stateModel.Paths?.Directories.NewArtifactsDirectory);
 
-        return CleanArtifactsDirectoryInternal(stateModel, stateModel.Paths);
+        return CleanArtifactsDirectoryInternal(stateModel,
+            stateModel.Paths);
     }
 
     Task IWorkUnit<ScriptCreationStateModel>.Work(ScriptCreationStateModel stateModel,
-                                                  CancellationToken cancellationToken)
+        CancellationToken cancellationToken)
     {
-        if (stateModel == null)
-            throw new ArgumentNullException(nameof(stateModel));
+        Guard.IsNotNullOrWhiteSpace(stateModel.Paths?.Directories.NewArtifactsDirectory);
 
-        return CleanArtifactsDirectoryInternal(stateModel, stateModel.Paths);
+        return CleanArtifactsDirectoryInternal(stateModel,
+            stateModel.Paths);
     }
 }

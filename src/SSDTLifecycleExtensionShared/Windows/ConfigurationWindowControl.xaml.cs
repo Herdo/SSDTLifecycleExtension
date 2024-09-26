@@ -1,4 +1,6 @@
-﻿namespace SSDTLifecycleExtension.Windows;
+﻿#nullable enable
+
+namespace SSDTLifecycleExtension.Windows;
 
 [ExcludeFromCodeCoverage] // Test would require a UI thread.
 public partial class ConfigurationWindowControl : IView

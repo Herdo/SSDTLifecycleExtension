@@ -1,4 +1,6 @@
-﻿namespace SSDTLifecycleExtension;
+﻿#nullable enable
+
+namespace SSDTLifecycleExtension;
 
 public static class Constants
 {

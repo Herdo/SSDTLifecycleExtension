@@ -1,26 +1,15 @@
 ﻿namespace SSDTLifecycleExtension.Shared.Services;
 
-[UsedImplicitly]
-public class SqlProjectService : ISqlProjectService
+public class SqlProjectService(IVersionService _versionService,
+                               IFileSystemAccess _fileSystemAccess,
+                               ILogger _logger)
+    : ISqlProjectService
 {
-    private readonly IVersionService _versionService;
-    private readonly IFileSystemAccess _fileSystemAccess;
-    private readonly ILogger _logger;
-
-    public SqlProjectService(IVersionService versionService,
-                             IFileSystemAccess fileSystemAccess,
-                             ILogger logger)
-    {
-        _versionService = versionService ?? throw new ArgumentNullException(nameof(versionService));
-        _fileSystemAccess = fileSystemAccess ?? throw new ArgumentNullException(nameof(fileSystemAccess));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
-
     private static void ReadProperties(XContainer root,
-                                       out string name,
-                                       out string outputPath,
-                                       out string sqlTargetName,
-                                       out string dacVersion)
+        out string? name,
+        out string? outputPath,
+        out string? sqlTargetName,
+        out string? dacVersion)
     {
         name = null;
         outputPath = null;
@@ -54,10 +43,10 @@ public class SqlProjectService : ISqlProjectService
     }
 
 
-    private async Task<PathCollection> DeterminePathsAsync([NotNull] SqlProject project,
-                                                           [NotNull] ConfigurationModel configuration,
-                                                           [CanBeNull] Version previousVersion,
-                                                           bool createLatest)
+    private async Task<PathCollection?> DeterminePathsAsync(SqlProject project,
+        ConfigurationModel configuration,
+        Version? previousVersion,
+        bool createLatest)
     {
         var projectPath = project.FullName;
         var projectDirectory = Path.GetDirectoryName(projectPath);
@@ -70,7 +59,7 @@ public class SqlProjectService : ISqlProjectService
         // Versions
         const string latestKeyword = "latest";
         var previousVersionString = previousVersion == null ? null : _versionService.FormatVersion(previousVersion, configuration);
-        var newVersionString = createLatest ? latestKeyword : _versionService.FormatVersion(project.ProjectProperties.DacVersion, configuration);
+        var newVersionString = createLatest ? latestKeyword : _versionService.FormatVersion(project.ProjectProperties.DacVersion!, configuration);
 
         // Directories
         var artifactsPath = Path.Combine(projectDirectory, configuration.ArtifactsPath);
@@ -107,7 +96,7 @@ public class SqlProjectService : ISqlProjectService
                                   targets);
     }
 
-    private string DeterminePublishProfilePath(ConfigurationModel configuration,
+    private string? DeterminePublishProfilePath(ConfigurationModel configuration,
                                                string projectDirectory)
     {
         if (configuration.PublishProfilePath != ConfigurationModel.UseSinglePublishProfileSpecialKeyword)
@@ -116,7 +105,7 @@ public class SqlProjectService : ISqlProjectService
         var publishProfiles = _fileSystemAccess.GetFilesIn(projectDirectory, "*.publish.xml");
         return publishProfiles.Length == 1
             ? Path.Combine(projectDirectory, publishProfiles[0])
-            : string.Empty;
+            : null;
     }
 
     private async Task<bool> TryLoadSqlProjectPropertiesInternalAsync(SqlProject project)
@@ -154,12 +143,12 @@ public class SqlProjectService : ISqlProjectService
         }
 
         ReadProperties(root,
-                       out var name,
-                       out var outputPath,
-                       out var sqlTargetName,
-                       out var dacVersion);
+            out var name,
+            out var outputPath,
+            out var sqlTargetName,
+            out var dacVersion);
 
-        if (name == null)
+        if (name is null)
         {
             await _logger.LogErrorAsync($"Cannot read name of \"{project.FullName}\". "
                                       + "Please make sure that the \"Name\" is set correctly, e.g. \"MyDatabaseProject\". "
@@ -167,7 +156,7 @@ public class SqlProjectService : ISqlProjectService
             return false;
         }
 
-        if (outputPath == null)
+        if (outputPath is null)
         {
             await _logger.LogErrorAsync($"Cannot read output path of \"{project.FullName}\". "
                                       + "Please make sure that the \"OutputPath\" for the current configuration is set correctly, e.g. \"bin\\Output\\\". "
@@ -175,7 +164,7 @@ public class SqlProjectService : ISqlProjectService
             return false;
         }
 
-        if (dacVersion == null)
+        if (dacVersion is null)
         {
             await _logger.LogErrorAsync($"Cannot read DacVersion of \"{project.FullName}\". "
                                       + "Please make sure that the \"DacVersion\" is set correctly, e.g. \"1.0.0\". "
@@ -192,7 +181,7 @@ public class SqlProjectService : ISqlProjectService
         }
 
         // Set properties on the project object
-        project.ProjectProperties.SqlTargetName = string.IsNullOrWhiteSpace(sqlTargetName) ? name : sqlTargetName;
+        project.ProjectProperties.SqlTargetName = string.IsNullOrWhiteSpace(sqlTargetName) ? name : sqlTargetName!;
         project.ProjectProperties.BinaryDirectory = Path.Combine(projectDirectory, outputPath);
         project.ProjectProperties.DacVersion = Version.Parse(dacVersion);
 
@@ -201,34 +190,23 @@ public class SqlProjectService : ISqlProjectService
 
     Task<bool> ISqlProjectService.TryLoadSqlProjectPropertiesAsync(SqlProject project)
     {
-        if (project == null)
-            throw new ArgumentNullException(nameof(project));
-
         return TryLoadSqlProjectPropertiesInternalAsync(project);
     }
 
-    Task<PathCollection> ISqlProjectService.TryLoadPathsForScaffoldingAsync(SqlProject project,
-                                                                            ConfigurationModel configuration)
+    Task<PathCollection?> ISqlProjectService.TryLoadPathsForScaffoldingAsync(SqlProject project,
+        ConfigurationModel configuration)
     {
-        if (project == null)
-            throw new ArgumentNullException(nameof(project));
-        if (configuration == null)
-            throw new ArgumentNullException(nameof(configuration));
+        Guard.IsNotNull(project.ProjectProperties.DacVersion);
 
         return DeterminePathsAsync(project, configuration, null, false);
     }
 
-    Task<PathCollection> ISqlProjectService.TryLoadPathsForScriptCreationAsync(SqlProject project,
-                                                                               ConfigurationModel configuration,
-                                                                               Version previousVersion,
-                                                                               bool createLatest)
+    Task<PathCollection?> ISqlProjectService.TryLoadPathsForScriptCreationAsync(SqlProject project,
+        ConfigurationModel configuration,
+        Version previousVersion,
+        bool createLatest)
     {
-        if (project == null)
-            throw new ArgumentNullException(nameof(project));
-        if (configuration == null)
-            throw new ArgumentNullException(nameof(configuration));
-        if (previousVersion == null)
-            throw new ArgumentNullException(nameof(previousVersion));
+        Guard.IsNotNull(project.ProjectProperties.DacVersion);
 
         return DeterminePathsAsync(project, configuration, previousVersion, createLatest);
     }

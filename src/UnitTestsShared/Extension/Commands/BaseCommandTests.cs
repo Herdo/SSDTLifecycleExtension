@@ -4,26 +4,6 @@
 public class BaseCommandTests
 {
     [Test]
-    public void Constructor_ArgumentNullException_CommandService()
-    {
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        Assert.Throws<ArgumentNullException>(() => new BaseCommandTestImplementation(null, null, 0, Guid.Empty));
-    }
-
-    [Test]
-    public void Constructor_ArgumentNullException_CommandAvailabilityService()
-    {
-        // Arrange
-        var spMock = Mock.Of<IServiceProvider>();
-        var cs = new OleMenuCommandService(spMock);
-
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        Assert.Throws<ArgumentNullException>(() => new BaseCommandTestImplementation(cs, null, 0, Guid.Empty));
-    }
-
-    [Test]
     public void Constructor_CommandAddedSuccessfully()
     {
         // Arrange

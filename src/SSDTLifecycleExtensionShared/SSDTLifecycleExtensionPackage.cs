@@ -1,4 +1,6 @@
-﻿namespace SSDTLifecycleExtension;
+﻿#nullable enable
+
+namespace SSDTLifecycleExtension;
 
 [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
 [Guid(PackageGuidString)]
@@ -37,8 +39,8 @@ public sealed class SSDTLifecycleExtensionPackage : AsyncPackage, IAsyncPackage
 
     private readonly Dictionary<string, List<IVsWindowFrame>> _openedWindowFrames;
 
-    private DependencyResolver _dependencyResolver;
-    private DTE2 _dte2;
+    private DependencyResolver? _dependencyResolver;
+    private DTE2? _dte2;
 
     public SSDTLifecycleExtensionPackage()
     {
@@ -49,6 +51,8 @@ public sealed class SSDTLifecycleExtensionPackage : AsyncPackage, IAsyncPackage
     {
         if (!(await GetServiceAsync(typeof(IMenuCommandService)) is OleMenuCommandService commandService))
             throw new InvalidOperationException($"Cannot initialize {nameof(SSDTLifecycleExtensionPackage)} without the {nameof(OleMenuCommandService)}.");
+        if (_dte2 is null)
+            throw new InvalidOperationException("Missing DTE2 to initialize dependency resolver.");
 
         var visualStudioAccess = new VisualStudioAccess(_dte2, this);
         var visualStudioLogger = new VisualStudioLogger(visualStudioAccess, Constants.DocumentationBaseUrl);
@@ -58,6 +62,8 @@ public sealed class SSDTLifecycleExtensionPackage : AsyncPackage, IAsyncPackage
     private void AttachToDte2Events()
     {
         ThreadHelper.ThrowIfNotOnUIThread();
+        if (_dte2 is null)
+            return;
         _dte2.Events.SolutionEvents.AfterClosing += SolutionEvents_AfterClosing;
         _dte2.Events.SolutionEvents.ProjectRemoved += SolutionEvents_ProjectRemoved;
         _dte2.Events.SolutionEvents.ProjectRenamed += SolutionEvents_ProjectRenamed;
@@ -81,10 +87,10 @@ public sealed class SSDTLifecycleExtensionPackage : AsyncPackage, IAsyncPackage
         CloseOpenFrames(oldName);
     }
 
-    private void CloseOpenFrames(string filter)
+    private void CloseOpenFrames(string? filter)
     {
         var keyToRemove = new List<string>();
-        foreach (var windowFrames in _openedWindowFrames.Where(m => filter == null || m.Key == filter))
+        foreach (var windowFrames in _openedWindowFrames.Where(m => filter is null || m.Key == filter))
         {
             keyToRemove.Add(windowFrames.Key);
             foreach (var windowFrame in windowFrames.Value)
@@ -178,17 +184,12 @@ public sealed class SSDTLifecycleExtensionPackage : AsyncPackage, IAsyncPackage
     /// </summary>
     /// <param name="fullProjectPath">The full path of the project the <paramref name="windowFrame"/> was opened for.</param>
     /// <param name="windowFrame">The opened <see cref="IVsWindowFrame"/>.</param>
-    internal void RegisterWindowFrame([NotNull] string fullProjectPath,
-                                      [NotNull] IVsWindowFrame windowFrame)
+    internal void RegisterWindowFrame(string fullProjectPath,
+        IVsWindowFrame windowFrame)
     {
-        if (fullProjectPath == null)
-            throw new ArgumentNullException(nameof(fullProjectPath));
-        if (windowFrame == null)
-            throw new ArgumentNullException(nameof(windowFrame));
-
         if (!_openedWindowFrames.TryGetValue(fullProjectPath, out var windowFrames))
         {
-            windowFrames = new List<IVsWindowFrame>();
+            windowFrames = [];
             _openedWindowFrames[fullProjectPath] = windowFrames;
         }
 

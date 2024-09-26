@@ -1,86 +1,48 @@
 ﻿namespace SSDTLifecycleExtension.Shared.WorkUnits;
 
-[UsedImplicitly]
-public class WorkUnitFactory : IWorkUnitFactory
+public class WorkUnitFactory(IDependencyResolver _dependencyResolver)
+    : IWorkUnitFactory
 {
-    [NotNull] private readonly IDependencyResolver _dependencyResolver;
-
-    public WorkUnitFactory([NotNull] IDependencyResolver dependencyResolver)
+    IWorkUnit<ScaffoldingStateModel>? IWorkUnitFactory.GetNextWorkUnit(ScaffoldingStateModel stateModel)
     {
-        _dependencyResolver = dependencyResolver ?? throw new ArgumentNullException(nameof(dependencyResolver));
+        return stateModel.CurrentState switch
+        {
+            StateModelState.Initialized => _dependencyResolver.Get<LoadSqlProjectPropertiesUnit>(),
+            StateModelState.SqlProjectPropertiesLoaded => _dependencyResolver.Get<FormatTargetVersionUnit>(),
+            StateModelState.FormattedTargetVersionLoaded => _dependencyResolver.Get<ValidateTargetVersionUnit>(),
+            StateModelState.FormattedTargetVersionValidated => _dependencyResolver.Get<LoadPathsUnit>(),
+            StateModelState.PathsLoaded => _dependencyResolver.Get<BuildProjectUnit>(),
+            StateModelState.TriedToBuildProject => _dependencyResolver.Get<CleanNewArtifactsDirectoryUnit>(),
+            StateModelState.TriedToCleanArtifactsDirectory => _dependencyResolver.Get<CopyBuildResultUnit>(),
+            StateModelState.TriedToCopyBuildResult => _dependencyResolver.Get<CopyDacpacToSharedDacpacRepositoryUnit>(),
+            StateModelState.TriedToCopyDacpacToSharedDacpacRepository => null,
+            _ => throw new ArgumentOutOfRangeException(nameof(stateModel) + '.' + nameof(IStateModel.CurrentState)),
+        };
     }
 
-    IWorkUnit<ScaffoldingStateModel> IWorkUnitFactory.GetNextWorkUnit(ScaffoldingStateModel stateModel)
+    IWorkUnit<ScriptCreationStateModel>? IWorkUnitFactory.GetNextWorkUnit(ScriptCreationStateModel stateModel)
     {
-        if (stateModel == null)
-            throw new ArgumentNullException(nameof(stateModel));
-
-        switch (stateModel.CurrentState)
+        return stateModel.CurrentState switch
         {
-            case StateModelState.Initialized:
-                return _dependencyResolver.Get<LoadSqlProjectPropertiesUnit>();
-            case StateModelState.SqlProjectPropertiesLoaded:
-                return _dependencyResolver.Get<FormatTargetVersionUnit>();
-            case StateModelState.FormattedTargetVersionLoaded:
-                return _dependencyResolver.Get<ValidateTargetVersionUnit>();
-            case StateModelState.FormattedTargetVersionValidated:
-                return _dependencyResolver.Get<LoadPathsUnit>();
-            case StateModelState.PathsLoaded:
-                return _dependencyResolver.Get<BuildProjectUnit>();
-            case StateModelState.TriedToBuildProject:
-                return _dependencyResolver.Get<CleanNewArtifactsDirectoryUnit>();
-            case StateModelState.TriedToCleanArtifactsDirectory:
-                return _dependencyResolver.Get<CopyBuildResultUnit>();
-            case StateModelState.TriedToCopyBuildResult:
-                return _dependencyResolver.Get<CopyDacpacToSharedDacpacRepositoryUnit>();
-            case StateModelState.TriedToCopyDacpacToSharedDacpacRepository:
-                return null;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(stateModel) + '.' + nameof(IStateModel.CurrentState));
-        }
-    }
-
-    IWorkUnit<ScriptCreationStateModel> IWorkUnitFactory.GetNextWorkUnit(ScriptCreationStateModel stateModel)
-    {
-        if (stateModel == null)
-            throw new ArgumentNullException(nameof(stateModel));
-
-        switch (stateModel.CurrentState)
-        {
-            case StateModelState.Initialized:
-                return _dependencyResolver.Get<LoadSqlProjectPropertiesUnit>();
-            case StateModelState.SqlProjectPropertiesLoaded:
-                return _dependencyResolver.Get<FormatTargetVersionUnit>();
-            case StateModelState.FormattedTargetVersionLoaded:
-                return _dependencyResolver.Get<ValidateTargetVersionUnit>();
-            case StateModelState.FormattedTargetVersionValidated:
-                return _dependencyResolver.Get<LoadPathsUnit>();
-            case StateModelState.PathsLoaded:
-                return _dependencyResolver.Get<VerifyPathsUnit>();
-            case StateModelState.PathsVerified:
-                return _dependencyResolver.Get<BuildProjectUnit>();
-            case StateModelState.TriedToBuildProject:
-                return _dependencyResolver.Get<CleanNewArtifactsDirectoryUnit>();
-            case StateModelState.TriedToCleanArtifactsDirectory:
-                return _dependencyResolver.Get<CopyBuildResultUnit>();
-            case StateModelState.TriedToCopyBuildResult:
-                return _dependencyResolver.Get<CopyDacpacToSharedDacpacRepositoryUnit>();
-            case StateModelState.TriedToCopyDacpacToSharedDacpacRepository:
-                return _dependencyResolver.Get<CreateDeploymentFilesUnit>();
-            case StateModelState.TriedToCreateDeploymentFiles:
-                return _dependencyResolver.Get<ModifyDeploymentScriptUnit>();
-            case StateModelState.ModifiedDeploymentScript:
-                return stateModel.CreateLatest
-                    ? null
-                    : _dependencyResolver.Get<DeleteRefactorLogUnit>();
-            case StateModelState.DeletedRefactorLog:
-                return stateModel.CreateLatest
-                    ? null
-                    : _dependencyResolver.Get<CleanLatestArtifactsDirectoryUnit>();
-            case StateModelState.DeletedLatestArtifacts:
-                return null;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(stateModel) + '.' + nameof(IStateModel.CurrentState));
-        }
+            StateModelState.Initialized => _dependencyResolver.Get<LoadSqlProjectPropertiesUnit>(),
+            StateModelState.SqlProjectPropertiesLoaded => _dependencyResolver.Get<FormatTargetVersionUnit>(),
+            StateModelState.FormattedTargetVersionLoaded => _dependencyResolver.Get<ValidateTargetVersionUnit>(),
+            StateModelState.FormattedTargetVersionValidated => _dependencyResolver.Get<LoadPathsUnit>(),
+            StateModelState.PathsLoaded => _dependencyResolver.Get<VerifyPathsUnit>(),
+            StateModelState.PathsVerified => _dependencyResolver.Get<BuildProjectUnit>(),
+            StateModelState.TriedToBuildProject => _dependencyResolver.Get<CleanNewArtifactsDirectoryUnit>(),
+            StateModelState.TriedToCleanArtifactsDirectory => _dependencyResolver.Get<CopyBuildResultUnit>(),
+            StateModelState.TriedToCopyBuildResult => _dependencyResolver.Get<CopyDacpacToSharedDacpacRepositoryUnit>(),
+            StateModelState.TriedToCopyDacpacToSharedDacpacRepository => _dependencyResolver.Get<CreateDeploymentFilesUnit>(),
+            StateModelState.TriedToCreateDeploymentFiles => _dependencyResolver.Get<ModifyDeploymentScriptUnit>(),
+            StateModelState.ModifiedDeploymentScript => stateModel.CreateLatest
+                ? null
+                : _dependencyResolver.Get<DeleteRefactorLogUnit>(),
+            StateModelState.DeletedRefactorLog => stateModel.CreateLatest
+                ? null
+                : _dependencyResolver.Get<CleanLatestArtifactsDirectoryUnit>(),
+            StateModelState.DeletedLatestArtifacts => null,
+            _ => throw new ArgumentOutOfRangeException(nameof(stateModel) + '.' + nameof(IStateModel.CurrentState)),
+        };
     }
 }

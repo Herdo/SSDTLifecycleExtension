@@ -1,15 +1,8 @@
 ﻿namespace SSDTLifecycleExtension.Shared.Services;
 
-public abstract class AsyncExecutorBase<TStateModel>
+public abstract class AsyncExecutorBase<TStateModel>(ILogger _logger)
     where TStateModel : IStateModel
 {
-    private readonly ILogger _logger;
-
-    protected AsyncExecutorBase([NotNull] ILogger logger)
-    {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
-
     private async Task<bool> ShouldCancelAsync(CancellationToken cancellationToken)
     {
         if (!cancellationToken.IsCancellationRequested)
@@ -19,13 +12,13 @@ public abstract class AsyncExecutorBase<TStateModel>
         return true;
     }
 
-    private IWorkUnit<TStateModel> GetNextWorkUnit(TStateModel stateModel)
+    private IWorkUnit<TStateModel>? GetNextWorkUnit(TStateModel stateModel)
     {
         if (stateModel.Result == false)
             return null; // If the previous work unit set the total result to false, don't provide any further steps.
 
         var workUnit = GetNextWorkUnitForStateModel(stateModel);
-        if (workUnit != null)
+        if (workUnit is not null)
             return workUnit;
 
         // No more work units to complete.
@@ -43,16 +36,16 @@ public abstract class AsyncExecutorBase<TStateModel>
             await stateModel.HandleWorkInProgressChanged.Invoke(true);
             await _logger.LogInfoAsync(GetOperationStartedMessage());
 
-            IWorkUnit<TStateModel> workUnit;
+            IWorkUnit<TStateModel>? workUnit;
             do
             {
                 if (await ShouldCancelAsync(cancellationToken))
                     break;
 
                 workUnit = GetNextWorkUnit(stateModel);
-                if (workUnit != null)
+                if (workUnit is not null)
                     await workUnit.Work(stateModel, cancellationToken);
-            } while (workUnit != null);
+            } while (workUnit is not null);
 
             sw.Stop();
             await _logger.LogInfoAsync(GetOperationCompletedMessage(stateModel, sw.ElapsedMilliseconds));
@@ -88,5 +81,5 @@ public abstract class AsyncExecutorBase<TStateModel>
 
     protected abstract string GetOperationFailedMessage();
 
-    protected abstract IWorkUnit<TStateModel> GetNextWorkUnitForStateModel(TStateModel stateModel);
+    protected abstract IWorkUnit<TStateModel>? GetNextWorkUnitForStateModel(TStateModel stateModel);
 }

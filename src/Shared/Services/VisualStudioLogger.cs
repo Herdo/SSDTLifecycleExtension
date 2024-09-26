@@ -1,17 +1,9 @@
 ﻿namespace SSDTLifecycleExtension.Shared.Services;
 
-public class VisualStudioLogger : ILogger
+public class VisualStudioLogger(IVisualStudioAccess _visualStudioAccess,
+                                string _documentationBaseUrl)
+    : ILogger
 {
-    private readonly IVisualStudioAccess _visualStudioAccess;
-    private readonly string _documentationBaseUrl;
-
-    public VisualStudioLogger([NotNull] IVisualStudioAccess visualStudioAccess,
-                              [NotNull] string documentationBaseUrl)
-    {
-        _visualStudioAccess = visualStudioAccess ?? throw new ArgumentNullException(nameof(visualStudioAccess));
-        _documentationBaseUrl = documentationBaseUrl ?? throw new ArgumentNullException(nameof(documentationBaseUrl));
-    }
-
     private async Task LogInternal(string level, string formattedMessage)
     {
         await _visualStudioAccess.LogToOutputPanelAsync($"{level}: {formattedMessage}");

@@ -2,7 +2,7 @@
 
 public interface IWorkUnitFactory
 {
-    IWorkUnit<ScaffoldingStateModel> GetNextWorkUnit([NotNull] ScaffoldingStateModel stateModel);
+    IWorkUnit<ScaffoldingStateModel>? GetNextWorkUnit(ScaffoldingStateModel stateModel);
 
-    IWorkUnit<ScriptCreationStateModel> GetNextWorkUnit([NotNull] ScriptCreationStateModel stateModel);
+    IWorkUnit<ScriptCreationStateModel>? GetNextWorkUnit(ScriptCreationStateModel stateModel);
 }

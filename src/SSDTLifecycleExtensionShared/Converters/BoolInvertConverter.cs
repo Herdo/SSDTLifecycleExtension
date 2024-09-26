@@ -1,4 +1,6 @@
-﻿namespace SSDTLifecycleExtension.Converters;
+﻿#nullable enable
+
+namespace SSDTLifecycleExtension.Converters;
 
 public class BoolInvertConverter : IValueConverter
 {

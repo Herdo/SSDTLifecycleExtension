@@ -1,4 +1,6 @@
-﻿namespace SSDTLifecycleExtension.ViewModels;
+﻿#nullable enable
+
+namespace SSDTLifecycleExtension.ViewModels;
 
 public interface IViewModel : INotifyPropertyChanged
 {

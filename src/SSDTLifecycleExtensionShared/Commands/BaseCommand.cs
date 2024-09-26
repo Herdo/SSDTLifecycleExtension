@@ -1,4 +1,6 @@
-﻿namespace SSDTLifecycleExtension.Commands;
+﻿#nullable enable
+
+namespace SSDTLifecycleExtension.Commands;
 
 internal abstract class BaseCommand
 {
@@ -7,9 +9,6 @@ internal abstract class BaseCommand
                           int commandId,
                           Guid commandSet)
     {
-        if (commandService == null) throw new ArgumentNullException(nameof(commandService));
-        if (commandAvailabilityService == null) throw new ArgumentNullException(nameof(commandAvailabilityService));
-
         var menuCommandId = new CommandID(commandSet, commandId);
         var menuItem = new OleMenuCommand(Execute, menuCommandId);
         menuItem.BeforeQueryStatus += (sender,
