@@ -1,4 +1,5 @@
-﻿namespace SSDTLifecycleExtension.Shared.Models;
+﻿
+namespace SSDTLifecycleExtension.Shared.Models;
 
 public sealed class ConfigurationModel : BaseModel,
     IEquatable<ConfigurationModel>
@@ -9,31 +10,32 @@ public sealed class ConfigurationModel : BaseModel,
     public const string BuildVersionSpecialKeyword = "{BUILD}";
     public const string RevisionVersionSpecialKeyword = "{REVISION}";
 
-    private string _artifactsPath;
-    private string _publishProfilePath;
-    private string _sharedDacpacRepositoryPath;
-    private bool _buildBeforeScriptCreation;
-    private bool _createDocumentationWithScriptCreation;
-    private bool _commentOutUnnamedDefaultConstraintDrops;
-    private bool _replaceUnnamedDefaultConstraintDrops;
-    private bool _removeSqlCmdStatements;
-    private bool _deleteRefactorlogAfterVersionedScriptGeneration;
-    private bool _deleteLatestAfterVersionedScriptGeneration;
-    private string _versionPattern;
-    private bool _trackDacpacVersion;
-    private string _customHeader;
-    private string _customFooter;
+    private string? _artifactsPath = "_Deployment";
+    private string? _publishProfilePath = UseSinglePublishProfileSpecialKeyword;
+    private string? _sharedDacpacRepositoryPath = null;
+    private bool _buildBeforeScriptCreation = true;
+    private bool _createDocumentationWithScriptCreation = true;
+    private bool _commentOutUnnamedDefaultConstraintDrops = false;
+    private bool _replaceUnnamedDefaultConstraintDrops = false;
+    private bool _removeSqlCmdStatements = false;
+    private bool _deleteRefactorlogAfterVersionedScriptGeneration = false;
+    private bool _deleteLatestAfterVersionedScriptGeneration = true;
+    private string? _versionPattern = $"{MajorVersionSpecialKeyword}.{MinorVersionSpecialKeyword}.{BuildVersionSpecialKeyword}";
+    private bool _trackDacpacVersion = false;
+    private string? _customHeader = null;
+    private string? _customFooter = null;
 
     /// <summary>
     ///     Gets or sets the relative artifacts path.
     /// </summary>
     /// <remarks>Path is relative to the *.sqlproj file.</remarks>
-    public string ArtifactsPath
+    public string? ArtifactsPath
     {
         get => _artifactsPath;
         set
         {
-            if (value == _artifactsPath) return;
+            if (value == _artifactsPath)
+                return;
             _artifactsPath = value;
             OnPropertyChanged();
             SetValidationErrors(ConfigurationModelValidations.ValidateArtifactsPath(this));
@@ -44,12 +46,13 @@ public sealed class ConfigurationModel : BaseModel,
     ///     Gets or sets the relative publish profile path.
     /// </summary>
     /// <remarks>Path is relative to the *.sqlproj file.</remarks>
-    public string PublishProfilePath
+    public string? PublishProfilePath
     {
         get => _publishProfilePath;
         set
         {
-            if (value == _publishProfilePath) return;
+            if (value == _publishProfilePath)
+                return;
             _publishProfilePath = value;
             OnPropertyChanged();
             SetValidationErrors(ConfigurationModelValidations.ValidatePublishProfilePath(this));
@@ -59,7 +62,7 @@ public sealed class ConfigurationModel : BaseModel,
     /// <summary>
     ///     Gets or sets the absolute path for the shared DACPAC repository.
     /// </summary>
-    public string SharedDacpacRepositoryPath
+    public string? SharedDacpacRepositoryPath
     {
         get => _sharedDacpacRepositoryPath;
         set
@@ -80,7 +83,8 @@ public sealed class ConfigurationModel : BaseModel,
         get => _buildBeforeScriptCreation;
         set
         {
-            if (value == _buildBeforeScriptCreation) return;
+            if (value == _buildBeforeScriptCreation)
+                return;
             _buildBeforeScriptCreation = value;
             OnPropertyChanged();
         }
@@ -94,7 +98,8 @@ public sealed class ConfigurationModel : BaseModel,
         get => _createDocumentationWithScriptCreation;
         set
         {
-            if (value == _createDocumentationWithScriptCreation) return;
+            if (value == _createDocumentationWithScriptCreation)
+                return;
             _createDocumentationWithScriptCreation = value;
             OnPropertyChanged();
         }
@@ -108,7 +113,8 @@ public sealed class ConfigurationModel : BaseModel,
         get => _commentOutUnnamedDefaultConstraintDrops;
         set
         {
-            if (value == _commentOutUnnamedDefaultConstraintDrops) return;
+            if (value == _commentOutUnnamedDefaultConstraintDrops)
+                return;
             _commentOutUnnamedDefaultConstraintDrops = value;
             OnPropertyChanged();
             var errors = ConfigurationModelValidations.ValidateUnnamedDefaultConstraintDropsBehavior(this);
@@ -125,7 +131,8 @@ public sealed class ConfigurationModel : BaseModel,
         get => _replaceUnnamedDefaultConstraintDrops;
         set
         {
-            if (value == _replaceUnnamedDefaultConstraintDrops) return;
+            if (value == _replaceUnnamedDefaultConstraintDrops)
+                return;
             _replaceUnnamedDefaultConstraintDrops = value;
             OnPropertyChanged();
             var errors = ConfigurationModelValidations.ValidateUnnamedDefaultConstraintDropsBehavior(this);
@@ -142,7 +149,8 @@ public sealed class ConfigurationModel : BaseModel,
         get => _removeSqlCmdStatements;
         set
         {
-            if (value == _removeSqlCmdStatements) return;
+            if (value == _removeSqlCmdStatements)
+                return;
             _removeSqlCmdStatements = value;
             OnPropertyChanged();
         }
@@ -156,7 +164,8 @@ public sealed class ConfigurationModel : BaseModel,
         get => _deleteRefactorlogAfterVersionedScriptGeneration;
         set
         {
-            if (value == _deleteRefactorlogAfterVersionedScriptGeneration) return;
+            if (value == _deleteRefactorlogAfterVersionedScriptGeneration)
+                return;
             _deleteRefactorlogAfterVersionedScriptGeneration = value;
             OnPropertyChanged();
         }
@@ -180,12 +189,13 @@ public sealed class ConfigurationModel : BaseModel,
     /// <summary>
     ///     Gets or sets the version pattern.
     /// </summary>
-    public string VersionPattern
+    public string? VersionPattern
     {
         get => _versionPattern;
         set
         {
-            if (value == _versionPattern) return;
+            if (value == _versionPattern)
+                return;
             _versionPattern = value;
             OnPropertyChanged();
             SetValidationErrors(ConfigurationModelValidations.ValidateVersionPattern(this));
@@ -200,7 +210,8 @@ public sealed class ConfigurationModel : BaseModel,
         get => _trackDacpacVersion;
         set
         {
-            if (value == _trackDacpacVersion) return;
+            if (value == _trackDacpacVersion)
+                return;
             _trackDacpacVersion = value;
             OnPropertyChanged();
         }
@@ -209,12 +220,13 @@ public sealed class ConfigurationModel : BaseModel,
     /// <summary>
     ///     Gets or sets a custom header, that will be added at the beginning of the created script.
     /// </summary>
-    public string CustomHeader
+    public string? CustomHeader
     {
         get => _customHeader;
         set
         {
-            if (value == _customHeader) return;
+            if (value == _customHeader)
+                return;
             _customHeader = value;
             OnPropertyChanged();
         }
@@ -223,12 +235,13 @@ public sealed class ConfigurationModel : BaseModel,
     /// <summary>
     ///     Gets or sets a custom footer, that will be added at the end of the created script.
     /// </summary>
-    public string CustomFooter
+    public string? CustomFooter
     {
         get => _customFooter;
         set
         {
-            if (value == _customFooter) return;
+            if (value == _customFooter)
+                return;
             _customFooter = value;
             OnPropertyChanged();
         }
@@ -238,26 +251,7 @@ public sealed class ConfigurationModel : BaseModel,
     ///     Gets the default configuration.
     /// </summary>
     /// <returns>A new <see cref="ConfigurationModel" /> instance.</returns>
-    public static ConfigurationModel GetDefault()
-    {
-        return new ConfigurationModel()
-        {
-            ArtifactsPath = "_Deployment",
-            PublishProfilePath = UseSinglePublishProfileSpecialKeyword,
-            SharedDacpacRepositoryPath = null,
-            BuildBeforeScriptCreation = true,
-            CreateDocumentationWithScriptCreation = true,
-            CommentOutUnnamedDefaultConstraintDrops = false,
-            ReplaceUnnamedDefaultConstraintDrops = false,
-            RemoveSqlCmdStatements = false,
-            DeleteRefactorlogAfterVersionedScriptGeneration = false,
-            DeleteLatestAfterVersionedScriptGeneration = true,
-            VersionPattern = $"{MajorVersionSpecialKeyword}.{MinorVersionSpecialKeyword}.{BuildVersionSpecialKeyword}",
-            TrackDacpacVersion = false,
-            CustomHeader = null,
-            CustomFooter = null
-        };
-    }
+    public static ConfigurationModel GetDefault() => new();
 
     public void ValidateAll()
     {
@@ -295,12 +289,13 @@ public sealed class ConfigurationModel : BaseModel,
         return copy;
     }
 
-    public override bool Equals(object other)
+    public override bool Equals(object? other)
     {
-        return Equals(other as ConfigurationModel);
+        return other is ConfigurationModel otherConfigurationModel
+            && Equals(otherConfigurationModel);
     }
 
-    public bool Equals(ConfigurationModel other)
+    public bool Equals(ConfigurationModel? other)
     {
         if (ReferenceEquals(null, other))
             return false;
@@ -320,5 +315,25 @@ public sealed class ConfigurationModel : BaseModel,
             && _trackDacpacVersion == other._trackDacpacVersion
             && string.Equals(_customHeader, other._customHeader)
             && string.Equals(_customFooter, other._customFooter);
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 1762349303;
+        hashCode = hashCode * -1521134295 + EqualityComparer<string?>.Default.GetHashCode(_artifactsPath);
+        hashCode = hashCode * -1521134295 + EqualityComparer<string?>.Default.GetHashCode(_publishProfilePath);
+        hashCode = hashCode * -1521134295 + EqualityComparer<string?>.Default.GetHashCode(_sharedDacpacRepositoryPath);
+        hashCode = hashCode * -1521134295 + _buildBeforeScriptCreation.GetHashCode();
+        hashCode = hashCode * -1521134295 + _createDocumentationWithScriptCreation.GetHashCode();
+        hashCode = hashCode * -1521134295 + _commentOutUnnamedDefaultConstraintDrops.GetHashCode();
+        hashCode = hashCode * -1521134295 + _replaceUnnamedDefaultConstraintDrops.GetHashCode();
+        hashCode = hashCode * -1521134295 + _removeSqlCmdStatements.GetHashCode();
+        hashCode = hashCode * -1521134295 + _deleteRefactorlogAfterVersionedScriptGeneration.GetHashCode();
+        hashCode = hashCode * -1521134295 + _deleteLatestAfterVersionedScriptGeneration.GetHashCode();
+        hashCode = hashCode * -1521134295 + EqualityComparer<string?>.Default.GetHashCode(_versionPattern);
+        hashCode = hashCode * -1521134295 + _trackDacpacVersion.GetHashCode();
+        hashCode = hashCode * -1521134295 + EqualityComparer<string?>.Default.GetHashCode(_customHeader);
+        hashCode = hashCode * -1521134295 + EqualityComparer<string?>.Default.GetHashCode(_customFooter);
+        return hashCode;
     }
 }

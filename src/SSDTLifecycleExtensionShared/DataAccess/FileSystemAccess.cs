@@ -1,6 +1,7 @@
-﻿namespace SSDTLifecycleExtension.DataAccess;
+﻿#nullable enable
 
-[UsedImplicitly]
+namespace SSDTLifecycleExtension.DataAccess;
+
 [ExcludeFromCodeCoverage] // Test would require IO access.
 public class FileSystemAccess : IFileSystemAccess
 {
@@ -14,7 +15,7 @@ public class FileSystemAccess : IFileSystemAccess
     private static async Task WriteFileInternalAsync(string targetPath,
                                                      string content)
     {
-        Stream stream = null;
+        Stream? stream = null;
         try
         {
             stream = new FileStream(targetPath, FileMode.Create, FileAccess.Write, FileShare.None);
@@ -34,10 +35,10 @@ public class FileSystemAccess : IFileSystemAccess
         {
             var di = new DirectoryInfo(directoryPath);
             if (!di.Exists)
-                return Array.Empty<string>();
+                return [];
             var children = di.EnumerateFileSystemInfos(filter).ToArray();
             if (children.Length == 0)
-                return Array.Empty<string>();
+                return [];
 
             var deletedFiles = new List<string>();
             foreach (var child in children)
@@ -50,53 +51,41 @@ public class FileSystemAccess : IFileSystemAccess
                 }
                 catch
                 {
-                    return Array.Empty<string>();
+                    return [];
                 }
             }
 
-            return deletedFiles.ToArray();
+            return [.. deletedFiles];
         }
         catch
         {
-            return Array.Empty<string>();
+            return [];
         }
     }
 
     Task<string> IFileSystemAccess.ReadFileAsync(string sourcePath)
     {
-        if (sourcePath == null)
-            throw new ArgumentNullException(nameof(sourcePath));
-
         return ReadFileInternalAsync(sourcePath);
     }
 
     Task IFileSystemAccess.WriteFileAsync(string targetPath,
                                           string content)
     {
-        if (targetPath == null)
-            throw new ArgumentNullException(nameof(targetPath));
-        if (content == null)
-            throw new ArgumentNullException(nameof(content));
-
         // Ensure the directory exists.
         var directory = Path.GetDirectoryName(targetPath);
-        if (directory == null)
+        if (directory is null)
             throw new InvalidOperationException($"Cannot determine directory of '{nameof(targetPath)}'.");
         var di = new DirectoryInfo(directory);
-        if (!di.Exists) di.Create();
+        if (!di.Exists)
+            di.Create();
 
         // Write the file.
         return WriteFileInternalAsync(targetPath, content);
     }
 
-    string IFileSystemAccess.BrowseForFile(string extension,
-                                           string filter)
+    string? IFileSystemAccess.BrowseForFile(string extension,
+        string filter)
     {
-        if (extension == null)
-            throw new ArgumentNullException(nameof(extension));
-        if (filter == null)
-            throw new ArgumentNullException(nameof(filter));
-
         var ofd = new OpenFileDialog
         {
             CheckFileExists = true,
@@ -118,7 +107,7 @@ public class FileSystemAccess : IFileSystemAccess
         return File.Exists(filePath);
     }
 
-    string IFileSystemAccess.EnsureDirectoryExists(string path)
+    string? IFileSystemAccess.EnsureDirectoryExists(string path)
     {
         if (string.IsNullOrWhiteSpace(path))
             throw new ArgumentException("Value cannot be null or white space.", nameof(path));
@@ -146,15 +135,13 @@ public class FileSystemAccess : IFileSystemAccess
     string[] IFileSystemAccess.TryToCleanDirectory(string directoryPath,
                                                    string filter)
     {
-        if (filter == null)
-            throw new ArgumentNullException(nameof(filter));
         if (string.IsNullOrWhiteSpace(directoryPath))
             throw new ArgumentException("Value cannot be null or white space.", nameof(directoryPath));
 
         return TryToCleanDirectoryInternal(directoryPath, filter);
     }
 
-    ((string Source, string Target)[] CopiedFiles, (string File, Exception Exception)[] Errors) IFileSystemAccess.CopyFiles(string sourceDirectory,
+    ((string Source, string Target)[] CopiedFiles, (string? File, Exception Exception)[] Errors) IFileSystemAccess.CopyFiles(string sourceDirectory,
         string targetDirectory,
         string searchPattern)
     {
@@ -166,7 +153,7 @@ public class FileSystemAccess : IFileSystemAccess
             throw new ArgumentException("Value cannot be null or white space.", nameof(searchPattern));
 
         var copiedFiles = new List<(string Source, string Target)>();
-        var errors = new List<(string File, Exception Exception)>();
+        var errors = new List<(string? File, Exception Exception)>();
         string[] sourceFiles;
         try
         {
@@ -196,8 +183,8 @@ public class FileSystemAccess : IFileSystemAccess
         return (copiedFiles.ToArray(), errors.ToArray());
     }
 
-    string IFileSystemAccess.CopyFile(string source,
-                                      string target)
+    string? IFileSystemAccess.CopyFile(string source,
+        string target)
     {
         if (string.IsNullOrWhiteSpace(source))
             throw new ArgumentException("Value cannot be null or white space.", nameof(source));
@@ -217,25 +204,17 @@ public class FileSystemAccess : IFileSystemAccess
 
     string[] IFileSystemAccess.GetDirectoriesIn(string directory)
     {
-        if (directory == null)
-            throw new ArgumentNullException(nameof(directory));
-
         return Directory.Exists(directory)
             ? Directory.GetDirectories(directory, "*", SearchOption.TopDirectoryOnly)
-            : Array.Empty<string>();
+            : [];
     }
 
     string[] IFileSystemAccess.GetFilesIn(string directory,
                                           string filter)
     {
-        if (directory == null)
-            throw new ArgumentNullException(nameof(directory));
-        if (filter == null)
-            throw new ArgumentNullException(nameof(filter));
-
         return Directory.Exists(directory)
             ? Directory.GetFiles(directory, filter, SearchOption.TopDirectoryOnly)
-            : Array.Empty<string>();
+            : [];
     }
 
     void IFileSystemAccess.OpenUrl(string url)

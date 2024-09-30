@@ -1,6 +1,8 @@
 ﻿namespace SSDTLifecycleExtension.Shared.ScriptModifiers;
 
-public class ReplaceUnnamedDefaultConstraintDropsModifier : StringSearchModifierBase,
+public class ReplaceUnnamedDefaultConstraintDropsModifier(IDacAccess _dacAccess,
+                                                          ILogger _logger)
+    : StringSearchModifierBase,
     IScriptModifier
 {
     private const string DropScriptTemplate =
@@ -23,16 +25,6 @@ WHERE t.name = @table_name
 
 EXECUTE (@command)";
 
-    private readonly IDacAccess _dacAccess;
-    private readonly ILogger _logger;
-
-    public ReplaceUnnamedDefaultConstraintDropsModifier([NotNull] IDacAccess dacAccess,
-                                                        [NotNull] ILogger logger)
-    {
-        _dacAccess = dacAccess ?? throw new ArgumentNullException(nameof(dacAccess));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
-
     private async Task ModifyInternalAsync(ScriptModificationModel model)
     {
         var (errorsWhileLoading, oldDefaultConstraints, currentDefaultConstraints) = await GetDefaultConstraints(model.Paths);
@@ -54,36 +46,36 @@ EXECUTE (@command)";
         model.CurrentScript = resultText;
     }
 
-    private async Task<(bool ErrorsWhileLoading, DefaultConstraint[] OldDefaultConstraints, DefaultConstraint[] CurrentDefaultConstraints)>
+    private async Task<(bool ErrorsWhileLoading, DefaultConstraint[]? OldDefaultConstraints, DefaultConstraint[]? CurrentDefaultConstraints)>
         GetDefaultConstraints(PathCollection paths)
     {
-        var oldDefaultConstraints = await _dacAccess.GetDefaultConstraintsAsync(paths.DeploySources.PreviousDacpacPath);
-        if (oldDefaultConstraints.Errors != null)
+        var (oldDefaultConstraints, errors) = await _dacAccess.GetDefaultConstraintsAsync(paths.DeploySources.PreviousDacpacPath!);
+        if (errors is not null)
         {
             await _logger.LogErrorAsync("Failed to load the default constraints of the previous DACPAC:");
-            foreach (var error in oldDefaultConstraints.Errors)
+            foreach (var error in errors)
                 await _logger.LogErrorAsync(error);
         }
 
-        var currentDefaultConstraints = await _dacAccess.GetDefaultConstraintsAsync(paths.DeploySources.NewDacpacPath);
-        if (currentDefaultConstraints.Errors != null)
+        (var currentDefaultConstraints, errors) = await _dacAccess.GetDefaultConstraintsAsync(paths.DeploySources.NewDacpacPath);
+        if (errors is not null)
         {
             await _logger.LogErrorAsync("Failed to load the default constraints of the current DACPAC:");
-            foreach (var error in currentDefaultConstraints.Errors)
+            foreach (var error in errors)
                 await _logger.LogErrorAsync(error);
         }
 
-        return (oldDefaultConstraints.Errors != null || currentDefaultConstraints.Errors != null,
-            oldDefaultConstraints.DefaultConstraints,
-            currentDefaultConstraints.DefaultConstraints);
+        return (errors is not null || errors is not null,
+            oldDefaultConstraints,
+            currentDefaultConstraints);
     }
 
     private (string ResultText, int RegexMatchTimeouts, int FailedReplacements) ReplaceUnnamedDefaultConstraintStatements(string input,
         IDictionary<DefaultConstraint, bool> defaultConstraintsToRemove)
     {
         var tableRegex = new Regex(@"^ALTER TABLE \[(?<schemaName>\w+)\]\.\[(?<tableName>\w+)\] DROP CONSTRAINT ;$",
-                                   RegexOptions.Compiled,
-                                   TimeSpan.FromMilliseconds(10));
+            RegexOptions.Compiled,
+            TimeSpan.FromMilliseconds(10));
         var regexMatchTimeouts = 0;
         var failedReplacements = 0;
         return (ForEachMatch(input,
@@ -92,7 +84,7 @@ EXECUTE (@command)";
                              range =>
                              {
                                  var lines = range.Split(new[] {Environment.NewLine}, StringSplitOptions.None);
-                                 string replacement = null;
+                                 string? replacement = null;
                                  for (var index = 0; index < lines.Length; index++)
                                  {
                                      var line = lines[index];
@@ -102,8 +94,8 @@ EXECUTE (@command)";
                                      if (!isMatch)
                                          continue;
 
-                                     var defaultConstraintToRemove = GetDefaultConstraintToRemove(defaultConstraintsToRemove, schemaName, tableName);
-                                     if (defaultConstraintToRemove == null)
+                                     var defaultConstraintToRemove = GetDefaultConstraintToRemove(defaultConstraintsToRemove, schemaName!, tableName!);
+                                     if (defaultConstraintToRemove is null)
                                          failedReplacements++;
                                      else
                                          replacement = BuildReplacement(defaultConstraintToRemove, lines, index);
@@ -118,10 +110,10 @@ EXECUTE (@command)";
     }
 
     private static bool IsMatch(string line,
-                                Regex tableRegex,
-                                out string schemaName,
-                                out string tableName,
-                                out bool regexMatchTimeout)
+        Regex tableRegex,
+        out string? schemaName,
+        out string? tableName,
+        out bool regexMatchTimeout)
     {
         schemaName = null;
         tableName = null;
@@ -157,9 +149,9 @@ EXECUTE (@command)";
         return true;
     }
 
-    private static DefaultConstraint GetDefaultConstraintToRemove(IDictionary<DefaultConstraint, bool> defaultConstraintsToRemove,
-                                                                  string schemaName,
-                                                                  string tableName)
+    private static DefaultConstraint? GetDefaultConstraintToRemove(IDictionary<DefaultConstraint, bool> defaultConstraintsToRemove,
+        string schemaName,
+        string tableName)
     {
         var toRemove = defaultConstraintsToRemove.Where(m => m.Key.TableSchema == schemaName
                                                           && m.Key.TableName == tableName
@@ -168,7 +160,7 @@ EXECUTE (@command)";
                                                  .Select(m => m.Key)
                                                  .FirstOrDefault();
 
-        if (toRemove != null)
+        if (toRemove is not null)
             // Flag as already used for a replacement.
             defaultConstraintsToRemove[toRemove] = true;
 
@@ -176,8 +168,8 @@ EXECUTE (@command)";
     }
 
     private static string BuildReplacement(DefaultConstraint defaultConstraint,
-                                           string[] lines,
-                                           int indexOfMatchedLine)
+        string[] lines,
+        int indexOfMatchedLine)
     {
         // Prepare template
         var dropConstraint = string.Format(DropScriptTemplate,
@@ -191,8 +183,8 @@ EXECUTE (@command)";
     }
 
     private static string[] CombineLinesBeforeStatementAndLinesAfter(string[] lines,
-                                                                     int indexOfMatchedLine,
-                                                                     string dropConstraint)
+        int indexOfMatchedLine,
+        string dropConstraint)
     {
         var linesBefore = lines.Take(indexOfMatchedLine).ToArray();
         var linesAfter = lines.Skip(indexOfMatchedLine + 1).ToArray();
@@ -205,8 +197,8 @@ EXECUTE (@command)";
 
     Task IScriptModifier.ModifyAsync(ScriptModificationModel model)
     {
-        if (model == null)
-            throw new ArgumentNullException(nameof(model));
+        Guard.IsNotNullOrWhiteSpace(model.Paths.DeploySources.PreviousDacpacPath);
+        Guard.IsNotNullOrWhiteSpace(model.Paths.DeploySources.NewDacpacPath);
 
         return ModifyInternalAsync(model);
     }

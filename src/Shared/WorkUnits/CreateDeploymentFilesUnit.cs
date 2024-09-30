@@ -1,25 +1,14 @@
 ﻿namespace SSDTLifecycleExtension.Shared.WorkUnits;
 
-[UsedImplicitly]
-public class CreateDeploymentFilesUnit : IWorkUnit<ScriptCreationStateModel>
+public class CreateDeploymentFilesUnit(IDacAccess _dacAccess,
+                                       IFileSystemAccess _fileSystemAccess,
+                                       ILogger _logger)
+    : IWorkUnit<ScriptCreationStateModel>
 {
-    [NotNull] private readonly IDacAccess _dacAccess;
-    [NotNull] private readonly IFileSystemAccess _fileSystemAccess;
-    [NotNull] private readonly ILogger _logger;
-
-    public CreateDeploymentFilesUnit([NotNull] IDacAccess dacAccess,
-                                     [NotNull] IFileSystemAccess fileSystemAccess,
-                                     [NotNull] ILogger logger)
-    {
-        _dacAccess = dacAccess ?? throw new ArgumentNullException(nameof(dacAccess));
-        _fileSystemAccess = fileSystemAccess ?? throw new ArgumentNullException(nameof(fileSystemAccess));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
-
     private async Task CreateDeploymentFilesInternal(IStateModel stateModel,
-                                                     PathCollection paths,
-                                                     ConfigurationModel configuration,
-                                                     bool createDocumentationWithScriptCreation)
+        PathCollection paths,
+        ConfigurationModel configuration,
+        bool createDocumentationWithScriptCreation)
     {
         var success = await CreateAndPersistDeployFiles(paths, configuration, createDocumentationWithScriptCreation);
         if (!success)
@@ -32,23 +21,23 @@ public class CreateDeploymentFilesUnit : IWorkUnit<ScriptCreationStateModel>
     }
 
     private async Task<bool> CreateAndPersistDeployFiles(PathCollection paths,
-                                                         ConfigurationModel configuration,
-                                                         bool createDocumentation)
+        ConfigurationModel configuration,
+        bool createDocumentation)
     {
         await _logger.LogInfoAsync("Creating diff files ...");
-        var result = await CreateDeployContent(paths, configuration, createDocumentation);
-        if (!result.Success)
+        var (success, deployScriptContent, deployReportContent) = await CreateDeployContent(paths, configuration, createDocumentation);
+        if (!success)
             return false;
 
-        var success = await PersistDeployScript(paths.DeployTargets.DeployScriptPath, result.DeployScriptContent);
+        success = await PersistDeployScript(paths.DeployTargets.DeployScriptPath!, deployScriptContent!);
 
         if (!success || !createDocumentation)
             return success;
 
-        return await PersistDeployReport(paths.DeployTargets.DeployReportPath, result.DeployReportContent);
+        return await PersistDeployReport(paths.DeployTargets.DeployReportPath!, deployReportContent!);
     }
 
-    private async Task<(bool Success, string DeployScriptContent, string DeployReportContent)> CreateDeployContent(PathCollection paths,
+    private async Task<(bool Success, string? DeployScriptContent, string? DeployReportContent)> CreateDeployContent(PathCollection paths,
         ConfigurationModel configuration,
         bool createDocumentation)
     {
@@ -56,27 +45,28 @@ public class CreateDeploymentFilesUnit : IWorkUnit<ScriptCreationStateModel>
         await _logger.LogDebugAsync($"New DACPAC path: \"{paths.DeploySources.NewDacpacPath}\"");
         await _logger.LogDebugAsync($"Publish profile path: \"{paths.DeploySources.PublishProfilePath}\"");
         await _logger.LogDebugAsync($"Current working directory: \"{Environment.CurrentDirectory}\"");
-        var result = await _dacAccess.CreateDeployFilesAsync(paths.DeploySources.PreviousDacpacPath,
-                                                             paths.DeploySources.NewDacpacPath,
-                                                             paths.DeploySources.PublishProfilePath,
-                                                             true,
-                                                             createDocumentation);
 
-        if (result.Errors == null)
+        var result = await _dacAccess.CreateDeployFilesAsync(paths.DeploySources.PreviousDacpacPath!,
+            paths.DeploySources.NewDacpacPath,
+            paths.DeploySources.PublishProfilePath!,
+            true,
+            createDocumentation);
+
+        if (result.Errors is null)
         {
-            if (!string.IsNullOrEmpty(result.PreDeploymentScript) && !result.DeployScriptContent.Contains(result.PreDeploymentScript))
+            if (!string.IsNullOrEmpty(result.PreDeploymentScript) && !result.DeployScriptContent!.Contains(result.PreDeploymentScript))
             {
                 await _logger.LogErrorAsync("Failed to create complete script. Generated script is missing the pre-deployment script.");
                 return (false, null, null);
             }
 
-            if (!string.IsNullOrEmpty(result.PostDeploymentScript) && !result.DeployScriptContent.Contains(result.PostDeploymentScript))
+            if (!string.IsNullOrEmpty(result.PostDeploymentScript) && !result.DeployScriptContent!.Contains(result.PostDeploymentScript))
             {
                 await _logger.LogErrorAsync("Failed to create complete script. Generated script is missing the post-deployment script.");
                 return (false, null, null);
             }
 
-            var valid = await ValidatePublishProfileAgainstConfiguration(result.UsedPublishProfile, configuration);
+            var valid = await ValidatePublishProfileAgainstConfiguration(result.UsedPublishProfile!, configuration);
             return valid
                 ? (true, result.DeployScriptContent, result.DeployReportContent)
                 : (false, null, null);
@@ -90,7 +80,7 @@ public class CreateDeploymentFilesUnit : IWorkUnit<ScriptCreationStateModel>
     }
 
     private async Task<bool> ValidatePublishProfileAgainstConfiguration(PublishProfile publishProfile,
-                                                                        ConfigurationModel configuration)
+        ConfigurationModel configuration)
     {
         if (!configuration.RemoveSqlCmdStatements)
             return true;
@@ -128,7 +118,7 @@ public class CreateDeploymentFilesUnit : IWorkUnit<ScriptCreationStateModel>
     }
 
     private async Task<bool> PersistDeployScript(string deployScriptPath,
-                                                 string deployScriptContent)
+        string deployScriptContent)
     {
         try
         {
@@ -144,7 +134,7 @@ public class CreateDeploymentFilesUnit : IWorkUnit<ScriptCreationStateModel>
     }
 
     private async Task<bool> PersistDeployReport(string deployReportPath,
-                                                 string deployReportContent)
+        string deployReportContent)
     {
         try
         {
@@ -160,14 +150,17 @@ public class CreateDeploymentFilesUnit : IWorkUnit<ScriptCreationStateModel>
     }
 
     Task IWorkUnit<ScriptCreationStateModel>.Work(ScriptCreationStateModel stateModel,
-                                                  CancellationToken cancellationToken)
+        CancellationToken cancellationToken)
     {
-        if (stateModel == null)
-            throw new ArgumentNullException(nameof(stateModel));
+        Guard.IsNotNullOrWhiteSpace(stateModel.Paths?.DeploySources.PreviousDacpacPath);
+        Guard.IsNotNullOrWhiteSpace(stateModel.Paths?.DeploySources.NewDacpacPath);
+        Guard.IsNotNullOrWhiteSpace(stateModel.Paths?.DeploySources.PublishProfilePath);
+        Guard.IsNotNullOrWhiteSpace(stateModel.Paths?.DeployTargets.DeployScriptPath);
+        Guard.IsNotNullOrWhiteSpace(stateModel.Paths?.DeployTargets.DeployReportPath);
 
         return CreateDeploymentFilesInternal(stateModel,
-                                             stateModel.Paths,
-                                             stateModel.Configuration,
-                                             stateModel.Configuration.CreateDocumentationWithScriptCreation);
+            stateModel.Paths,
+            stateModel.Configuration,
+            stateModel.Configuration.CreateDocumentationWithScriptCreation);
     }
 }

@@ -1,28 +1,23 @@
-﻿namespace SSDTLifecycleExtension.DataAccess;
+﻿#nullable enable
 
-[UsedImplicitly]
-public class DacAccess : IDacAccess
+namespace SSDTLifecycleExtension.DataAccess;
+
+public class DacAccess(IXmlFormatService _xmlFormatService)
+    : IDacAccess
 {
-    private readonly IXmlFormatService _xmlFormatService;
-
-    public DacAccess([NotNull] IXmlFormatService xmlFormatService)
-    {
-        _xmlFormatService = xmlFormatService ?? throw new ArgumentNullException(nameof(xmlFormatService));
-    }
-
     private async Task<CreateDeployFilesResult> CreateDeployFilesInternalAsync(string previousVersionDacpacPath,
-                                                                               string newVersionDacpacPath,
-                                                                               string publishProfilePath,
-                                                                               bool createDeployScript,
-                                                                               bool createDeployReport)
+        string newVersionDacpacPath,
+        string publishProfilePath,
+        bool createDeployScript,
+        bool createDeployReport)
     {
         return
             await Task.Run(() =>
             {
-                PublishResult result;
+                PublishResult? result;
                 PublishProfile publishProfile;
-                string preDeploymentScriptContent;
-                string postDeploymentScriptContent;
+                string? preDeploymentScriptContent;
+                string? postDeploymentScriptContent;
                 try
                 {
                     // Get publish profile
@@ -38,25 +33,28 @@ public class DacAccess : IDacAccess
 
                     // Process the input
                     result = DacServices.Script(newDacpac,
-                                                previousDacpac,
-                                                "PRODUCTION",
-                                                new PublishOptions
-                                                {
-                                                    GenerateDeploymentScript = createDeployScript,
-                                                    GenerateDeploymentReport = createDeployReport,
-                                                    DeployOptions = deployOptions
-                                                });
+                        previousDacpac,
+                        "PRODUCTION",
+                        new PublishOptions
+                        {
+                            GenerateDeploymentScript = createDeployScript,
+                            GenerateDeploymentReport = createDeployReport,
+                            DeployOptions = deployOptions
+                        });
+
+                    if (result?.DeploymentReport is null)
+                        return new CreateDeployFilesResult(["Created deployment script is null."]);
                 }
                 catch (DacServicesException e)
                 {
                     return new CreateDeployFilesResult(GetErrorList(e));
                 }
 
-                return new CreateDeployFilesResult(result?.DatabaseScript,
-                                                   _xmlFormatService.FormatDeployReport(result?.DeploymentReport),
-                                                   preDeploymentScriptContent,
-                                                   postDeploymentScriptContent,
-                                                   publishProfile);
+                return new CreateDeployFilesResult(result.DatabaseScript,
+                    _xmlFormatService.FormatDeployReport(result.DeploymentReport),
+                    preDeploymentScriptContent,
+                    postDeploymentScriptContent,
+                    publishProfile);
             });
     }
 
@@ -71,23 +69,21 @@ public class DacAccess : IDacAccess
         };
     }
 
-    private static string TryToReadDeploymentScriptContent(Stream stream)
+    private static string? TryToReadDeploymentScriptContent(Stream stream)
     {
-        if (stream == null)
+        if (stream is null)
             return null;
 
         using (stream)
         {
-            using (var streamReader = new StreamReader(stream))
-            {
-                return streamReader.ReadToEnd();
-            }
+            using var streamReader = new StreamReader(stream);
+            return streamReader.ReadToEnd();
         }
     }
 
-    private async Task<(DefaultConstraint[] DefaultConstraints, string[] Errors)> GetDefaultConstraintsInternalAsync(string dacpacPath)
+    private async Task<(DefaultConstraint[]? DefaultConstraints, string[]? Errors)> GetDefaultConstraintsInternalAsync(string dacpacPath)
     {
-        var (constraints, errors) = await Task.Run<(DefaultConstraint[] Result, string[] Errors)>(() =>
+        var (constraints, errors) = await Task.Run<(DefaultConstraint[]? Result, string[]? Errors)>(() =>
         {
             try
             {
@@ -98,13 +94,13 @@ public class DacAccess : IDacAccess
             catch (DacModelException e)
             {
                 var errorMessages = new List<string> { e.GetBaseException().Message };
-                if (e.Messages != null && e.Messages.Any())
+                if (e.Messages is not null && e.Messages.Any())
                     errorMessages.AddRange(e.Messages.Select(m => m.ToString()));
-                return (null, errorMessages.ToArray());
+                return (null, [.. errorMessages]);
             }
             catch (Exception e)
             {
-                return (null, new[] { e.GetBaseException().Message });
+                return (null, [e.GetBaseException().Message]);
             }
         });
 
@@ -118,16 +114,16 @@ public class DacAccess : IDacAccess
         foreach (var defaultConstraint in defaultConstraints)
         {
             var targetColumn = defaultConstraint.GetReferenced(Microsoft.SqlServer.Dac.Model.DefaultConstraint.TargetColumn)?.SingleOrDefault();
-            if (targetColumn != null && targetColumn.Name.Parts.Count == 3)
+            if (targetColumn is not null && targetColumn.Name.Parts.Count == 3)
                 result.Add(new DefaultConstraint(targetColumn.Name.Parts[0],
-                                                 targetColumn.Name.Parts[1],
-                                                 targetColumn.Name.Parts[2],
-                                                 defaultConstraint.Name.HasName
-                                                     ? defaultConstraint.Name.Parts[1] // Part[0] is the schema of the constraint
-                                                     : null));
+                    targetColumn.Name.Parts[1],
+                    targetColumn.Name.Parts[2],
+                    defaultConstraint.Name.HasName
+                        ? defaultConstraint.Name.Parts[1] // Part[0] is the schema of the constraint
+                        : null));
         }
 
-        return result.ToArray();
+        return [.. result];
     }
 
     private static string[] GetErrorList(DacServicesException e)
@@ -137,32 +133,23 @@ public class DacAccess : IDacAccess
             e.GetBaseException().Message
         };
         errorList.AddRange(e.Messages.Select(dacMessage => dacMessage.ToString()));
-        return errorList.ToArray();
+        return [.. errorList];
     }
 
     Task<CreateDeployFilesResult> IDacAccess.CreateDeployFilesAsync(string previousVersionDacpacPath,
-                                                                    string newVersionDacpacPath,
-                                                                    string publishProfilePath,
-                                                                    bool createDeployScript,
-                                                                    bool createDeployReport)
+        string newVersionDacpacPath,
+        string publishProfilePath,
+        bool createDeployScript,
+        bool createDeployReport)
     {
-        if (previousVersionDacpacPath == null)
-            throw new ArgumentNullException(nameof(previousVersionDacpacPath));
-        if (newVersionDacpacPath == null)
-            throw new ArgumentNullException(nameof(newVersionDacpacPath));
-        if (publishProfilePath == null)
-            throw new ArgumentNullException(nameof(publishProfilePath));
         if (!createDeployScript && !createDeployReport)
             throw new InvalidOperationException($"Either {nameof(createDeployScript)} or {nameof(createDeployReport)} must be true.");
 
         return CreateDeployFilesInternalAsync(previousVersionDacpacPath, newVersionDacpacPath, publishProfilePath, createDeployScript, createDeployReport);
     }
 
-    Task<(DefaultConstraint[] DefaultConstraints, string[] Errors)> IDacAccess.GetDefaultConstraintsAsync(string dacpacPath)
+    Task<(DefaultConstraint[]? DefaultConstraints, string[]? Errors)> IDacAccess.GetDefaultConstraintsAsync(string dacpacPath)
     {
-        if (dacpacPath == null)
-            throw new ArgumentNullException(nameof(dacpacPath));
-
         return GetDefaultConstraintsInternalAsync(dacpacPath);
     }
 }

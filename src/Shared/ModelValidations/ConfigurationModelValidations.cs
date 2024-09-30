@@ -7,14 +7,9 @@ public static class ConfigurationModelValidations
     ///     errors.
     /// </summary>
     /// <param name="model">The <see cref="ConfigurationModel" /> instance to validate.</param>
-    /// <exception cref="ArgumentNullException"><paramref name="model" /> is <b>null</b>.</exception>
     /// <returns>A list of all found errors. Empty list if no errors were found.</returns>
-    [NotNull]
-    public static List<string> ValidateArtifactsPath([NotNull] ConfigurationModel model)
+    public static List<string> ValidateArtifactsPath(ConfigurationModel model)
     {
-        if (model == null)
-            throw new ArgumentNullException(nameof(model));
-
         var errors = new List<string>();
 
         if (string.IsNullOrWhiteSpace(model.ArtifactsPath))
@@ -38,14 +33,9 @@ public static class ConfigurationModelValidations
     ///     errors.
     /// </summary>
     /// <param name="model">The <see cref="ConfigurationModel" /> instance to validate.</param>
-    /// <exception cref="ArgumentNullException"><paramref name="model" /> is <b>null</b>.</exception>
     /// <returns>A list of all found errors. Empty list if no errors were found.</returns>
-    [NotNull]
-    public static List<string> ValidatePublishProfilePath([NotNull] ConfigurationModel model)
+    public static List<string> ValidatePublishProfilePath(ConfigurationModel model)
     {
-        if (model == null)
-            throw new ArgumentNullException(nameof(model));
-
         var errors = new List<string>();
 
         if (string.IsNullOrWhiteSpace(model.PublishProfilePath))
@@ -59,10 +49,12 @@ public static class ConfigurationModelValidations
     }
 
     private static void ValidateActualPublishProfilePath(ConfigurationModel model,
-                                                         List<string> errors)
+        List<string> errors)
     {
         const string publishProfileExtension = ".publish.xml";
-        if (!model.PublishProfilePath.EndsWith(publishProfileExtension) || model.PublishProfilePath.Length == publishProfileExtension.Length)
+        if (string.IsNullOrWhiteSpace(model.PublishProfilePath)
+         || !model.PublishProfilePath!.EndsWith(publishProfileExtension)
+         || model.PublishProfilePath.Length == publishProfileExtension.Length)
             errors.Add($"Profile file name must end with *{publishProfileExtension}.");
 
         try
@@ -81,14 +73,9 @@ public static class ConfigurationModelValidations
     ///     all found errors.
     /// </summary>
     /// <param name="model">The <see cref="ConfigurationModel" /> instance to validate.</param>
-    /// <exception cref="ArgumentNullException"><paramref name="model" /> is <b>null</b>.</exception>
     /// <returns>A list of all found errors. Empty list if no errors were found.</returns>
-    [NotNull]
     public static List<string> ValidateSharedDacpacRepositoryPath(ConfigurationModel model)
     {
-        if (model == null)
-            throw new ArgumentNullException(nameof(model));
-
         var errors = new List<string>();
 
         if (string.IsNullOrWhiteSpace(model.SharedDacpacRepositoryPath))
@@ -99,7 +86,7 @@ public static class ConfigurationModelValidations
             if (!Path.IsPathRooted(model.SharedDacpacRepositoryPath))
                 errors.Add("Path must be an absolute path.");
             else if (Path.GetDirectoryName(model.SharedDacpacRepositoryPath)
-                  != model.SharedDacpacRepositoryPath.Substring(0, model.SharedDacpacRepositoryPath.Length - 1))
+                  != model.SharedDacpacRepositoryPath!.Substring(0, model.SharedDacpacRepositoryPath.Length - 1))
                 errors.Add("Path must be a directory.");
         }
         catch
@@ -117,14 +104,9 @@ public static class ConfigurationModelValidations
     ///     found errors.
     /// </summary>
     /// <param name="model">The <see cref="ConfigurationModel" /> instance to validate.</param>
-    /// <exception cref="ArgumentNullException"><paramref name="model" /> is <b>null</b>.</exception>
     /// <returns>A list of all found errors. Empty list if no errors were found.</returns>
-    [NotNull]
-    public static List<string> ValidateUnnamedDefaultConstraintDropsBehavior([NotNull] ConfigurationModel model)
+    public static List<string> ValidateUnnamedDefaultConstraintDropsBehavior(ConfigurationModel model)
     {
-        if (model == null)
-            throw new ArgumentNullException(nameof(model));
-
         var errors = new List<string>();
 
         if (model.CommentOutUnnamedDefaultConstraintDrops && model.ReplaceUnnamedDefaultConstraintDrops)
@@ -138,14 +120,9 @@ public static class ConfigurationModelValidations
     ///     errors.
     /// </summary>
     /// <param name="model">The <see cref="ConfigurationModel" /> instance to validate.</param>
-    /// <exception cref="ArgumentNullException"><paramref name="model" /> is <b>null</b>.</exception>
     /// <returns>A list of all found errors. Empty list if no errors were found.</returns>
-    [NotNull]
-    public static List<string> ValidateVersionPattern([NotNull] ConfigurationModel model)
+    public static List<string> ValidateVersionPattern(ConfigurationModel model)
     {
-        if (model == null)
-            throw new ArgumentNullException(nameof(model));
-
         var errors = new List<string>();
 
         if (string.IsNullOrWhiteSpace(model.VersionPattern))
@@ -154,7 +131,7 @@ public static class ConfigurationModelValidations
         }
         else
         {
-            var split = model.VersionPattern.Split(new[] {'.'}, StringSplitOptions.None);
+            var split = model.VersionPattern!.Split(new[] {'.'}, StringSplitOptions.None);
             if (split.Length < 2) errors.Add("Pattern doesn't contain enough parts.");
             if (split.Length > 4) errors.Add("Pattern contains too many parts.");
             for (var position = 0; position < split.Length; position++)

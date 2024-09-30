@@ -1,21 +1,12 @@
 ﻿namespace SSDTLifecycleExtension.Shared.Services;
 
-[UsedImplicitly]
-public class ScaffoldingService : AsyncExecutorBase<ScaffoldingStateModel>, IScaffoldingService
+public class ScaffoldingService(IWorkUnitFactory _workUnitFactory,
+                                IVisualStudioAccess _visualStudioAccess,
+                                ILogger logger)
+    : AsyncExecutorBase<ScaffoldingStateModel>(logger),
+    IScaffoldingService
 {
-    [NotNull] private readonly IWorkUnitFactory _workUnitFactory;
-    [NotNull] private readonly IVisualStudioAccess _visualStudioAccess;
-
     private bool _isScaffolding;
-
-    public ScaffoldingService([NotNull] IWorkUnitFactory workUnitFactory,
-                              [NotNull] IVisualStudioAccess visualStudioAccess,
-                              [NotNull] ILogger logger)
-        : base(logger)
-    {
-        _workUnitFactory = workUnitFactory ?? throw new ArgumentNullException(nameof(workUnitFactory));
-        _visualStudioAccess = visualStudioAccess ?? throw new ArgumentNullException(nameof(visualStudioAccess));
-    }
 
     private async Task<bool> ScaffoldInternalAsync(SqlProject project,
                                                    ConfigurationModel configuration,
@@ -42,7 +33,7 @@ public class ScaffoldingService : AsyncExecutorBase<ScaffoldingStateModel>, ISca
         return "DACPAC scaffolding failed.";
     }
 
-    protected override IWorkUnit<ScaffoldingStateModel> GetNextWorkUnitForStateModel(ScaffoldingStateModel stateModel)
+    protected override IWorkUnit<ScaffoldingStateModel>? GetNextWorkUnitForStateModel(ScaffoldingStateModel stateModel)
     {
         return _workUnitFactory.GetNextWorkUnit(stateModel);
     }
@@ -68,14 +59,15 @@ public class ScaffoldingService : AsyncExecutorBase<ScaffoldingStateModel>, ISca
         }
     }
 
-    public event EventHandler IsScaffoldingChanged;
+    public event EventHandler? IsScaffoldingChanged;
 
     private bool IsScaffolding
     {
         get => _isScaffolding;
         set
         {
-            if (value == _isScaffolding) return;
+            if (value == _isScaffolding)
+                return;
             _isScaffolding = value;
             IsScaffoldingChanged?.Invoke(this, EventArgs.Empty);
         }
@@ -84,16 +76,10 @@ public class ScaffoldingService : AsyncExecutorBase<ScaffoldingStateModel>, ISca
     bool IScaffoldingService.IsScaffolding => IsScaffolding;
 
     Task<bool> IScaffoldingService.ScaffoldAsync(SqlProject project,
-                                                 ConfigurationModel configuration,
-                                                 Version targetVersion,
-                                                 CancellationToken cancellationToken)
+        ConfigurationModel configuration,
+        Version targetVersion,
+        CancellationToken cancellationToken)
     {
-        if (project == null)
-            throw new ArgumentNullException(nameof(project));
-        if (configuration == null)
-            throw new ArgumentNullException(nameof(configuration));
-        if (targetVersion == null)
-            throw new ArgumentNullException(nameof(targetVersion));
         if (IsScaffolding)
             throw new InvalidOperationException($"Service is already running a {nameof(IScriptCreationService.CreateAsync)} task.");
 

@@ -1,6 +1,7 @@
-﻿namespace SSDTLifecycleExtension.Commands;
+﻿#nullable enable
 
-[UsedImplicitly]
+namespace SSDTLifecycleExtension.Commands;
+
 [ExcludeFromCodeCoverage] // Test would require a Visual Studio shell.
 internal sealed class ScriptCreationWindowCommand : WindowBaseCommand<ScriptCreationWindow, ScriptCreationViewModel>
 {
@@ -11,19 +12,19 @@ internal sealed class ScriptCreationWindowCommand : WindowBaseCommand<ScriptCrea
     public static readonly Guid CommandSet = new(Constants.CommandSetGuid);
 
     public ScriptCreationWindowCommand(SSDTLifecycleExtensionPackage package,
-                                       OleMenuCommandService commandService,
-                                       ICommandAvailabilityService commandAvailabilityService,
-                                       ToolWindowInitializer toolWindowInitializer)
+            OleMenuCommandService commandService,
+            ICommandAvailabilityService commandAvailabilityService,
+            ToolWindowInitializer toolWindowInitializer)
         : base(package,
-               commandService,
-               commandAvailabilityService,
-               CommandId,
-               CommandSet,
-               toolWindowInitializer)
+            commandService,
+            commandAvailabilityService,
+            CommandId,
+            CommandSet,
+            toolWindowInitializer)
     {
     }
 
-    public static ScriptCreationWindowCommand Instance
+    public static ScriptCreationWindowCommand? Instance
     {
         get;
         private set;

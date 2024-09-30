@@ -129,7 +129,7 @@ public class ConfigurationModelTests
     public void BuildBeforeScriptCreation_Get_Set_PropertyChanged()
     {
         // Arrange
-        const bool testValue = true;
+        const bool testValue = false;
         var model = new ConfigurationModel();
         object invokedPropertyChangedSender = null;
         string invokedPropertyChangedProperty = null;
@@ -162,7 +162,7 @@ public class ConfigurationModelTests
     public void CreateDocumentationWithScriptCreation_Get_Set_PropertyChanged()
     {
         // Arrange
-        const bool testValue = true;
+        const bool testValue = false;
         var model = new ConfigurationModel();
         object invokedPropertyChangedSender = null;
         string invokedPropertyChangedProperty = null;
@@ -471,7 +471,7 @@ public class ConfigurationModelTests
     public void DeleteLatestAfterVersionedScriptGeneration_Get_Set_PropertyChanged()
     {
         // Arrange
-        const bool testValue = true;
+        const bool testValue = false;
         var model = new ConfigurationModel();
         object invokedPropertyChangedSender = null;
         string invokedPropertyChangedProperty = null;

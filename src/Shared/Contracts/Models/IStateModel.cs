@@ -2,7 +2,7 @@
 
 public interface IStateModel : IBaseModel
 {
-    [NotNull] Func<bool, Task> HandleWorkInProgressChanged { get; }
+    Func<bool, Task> HandleWorkInProgressChanged { get; }
 
     StateModelState CurrentState { get; set; }
 

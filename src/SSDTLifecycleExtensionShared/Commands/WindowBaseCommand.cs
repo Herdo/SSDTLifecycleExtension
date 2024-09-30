@@ -1,4 +1,6 @@
-﻿namespace SSDTLifecycleExtension.Commands;
+﻿#nullable enable
+
+namespace SSDTLifecycleExtension.Commands;
 
 [ExcludeFromCodeCoverage] // Test would require a Visual Studio shell.
 internal abstract class WindowBaseCommand<TWindow, TViewModel> : BaseCommand
@@ -42,7 +44,7 @@ internal abstract class WindowBaseCommand<TWindow, TViewModel> : BaseCommand
 
             // Show the frame
             var windowFrame = (IVsWindowFrame) window.Frame;
-            _package.RegisterWindowFrame(fullProjectPath, windowFrame);
+            _package.RegisterWindowFrame(fullProjectPath!, windowFrame);
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
         });
     }

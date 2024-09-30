@@ -1,22 +1,13 @@
 ﻿namespace SSDTLifecycleExtension.Shared.WorkUnits;
 
-[UsedImplicitly]
-public class CopyDacpacToSharedDacpacRepositoryUnit : IWorkUnit<ScaffoldingStateModel>,
+public class CopyDacpacToSharedDacpacRepositoryUnit(IFileSystemAccess _fileSystemAccess,
+                                                    ILogger _logger)
+    : IWorkUnit<ScaffoldingStateModel>,
     IWorkUnit<ScriptCreationStateModel>
 {
-    [NotNull] private readonly IFileSystemAccess _fileSystemAccess;
-    [NotNull] private readonly ILogger _logger;
-
-    public CopyDacpacToSharedDacpacRepositoryUnit([NotNull] IFileSystemAccess fileSystemAccess,
-                                                  [NotNull] ILogger logger)
-    {
-        _fileSystemAccess = fileSystemAccess ?? throw new ArgumentNullException(nameof(fileSystemAccess));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
-
-    private async Task TryCopyInternal([NotNull] IStateModel stateModel,
-                                       [NotNull] string newDacpacPath,
-                                       [NotNull] string sharedDacpacRepositoryPath)
+    private async Task TryCopyInternal(IStateModel stateModel,
+        string newDacpacPath,
+        string? sharedDacpacRepositoryPath)
     {
         if (string.IsNullOrWhiteSpace(sharedDacpacRepositoryPath))
         {
@@ -29,8 +20,8 @@ public class CopyDacpacToSharedDacpacRepositoryUnit : IWorkUnit<ScaffoldingState
         {
             var fileName = Path.GetFileName(newDacpacPath);
             var targetFile = Path.Combine(sharedDacpacRepositoryPath, fileName);
-            var directoryError = _fileSystemAccess.EnsureDirectoryExists(sharedDacpacRepositoryPath);
-            if (directoryError != null)
+            var directoryError = _fileSystemAccess.EnsureDirectoryExists(sharedDacpacRepositoryPath!);
+            if (directoryError is not null)
             {
                 await _logger.LogErrorAsync($"Failed to ensure that the directory '{sharedDacpacRepositoryPath}' exists: {directoryError}");
                 stateModel.CurrentState = StateModelState.TriedToCopyDacpacToSharedDacpacRepository;
@@ -55,24 +46,22 @@ public class CopyDacpacToSharedDacpacRepositoryUnit : IWorkUnit<ScaffoldingState
     }
 
     Task IWorkUnit<ScaffoldingStateModel>.Work(ScaffoldingStateModel stateModel,
-                                               CancellationToken cancellationToken)
+        CancellationToken cancellationToken)
     {
-        if (stateModel == null)
-            throw new ArgumentNullException(nameof(stateModel));
+        Guard.IsNotNullOrWhiteSpace(stateModel.Paths?.DeploySources.NewDacpacPath);
 
         return TryCopyInternal(stateModel,
-                               stateModel.Paths.DeploySources.NewDacpacPath,
-                               stateModel.Configuration.SharedDacpacRepositoryPath);
+            stateModel.Paths.DeploySources.NewDacpacPath,
+            stateModel.Configuration.SharedDacpacRepositoryPath);
     }
 
     Task IWorkUnit<ScriptCreationStateModel>.Work(ScriptCreationStateModel stateModel,
-                                                  CancellationToken cancellationToken)
+        CancellationToken cancellationToken)
     {
-        if (stateModel == null)
-            throw new ArgumentNullException(nameof(stateModel));
+        Guard.IsNotNullOrWhiteSpace(stateModel.Paths?.DeploySources.NewDacpacPath);
 
         return TryCopyInternal(stateModel,
-                               stateModel.Paths.DeploySources.NewDacpacPath,
-                               stateModel.Configuration.SharedDacpacRepositoryPath);
+            stateModel.Paths.DeploySources.NewDacpacPath,
+            stateModel.Configuration.SharedDacpacRepositoryPath);
     }
 }

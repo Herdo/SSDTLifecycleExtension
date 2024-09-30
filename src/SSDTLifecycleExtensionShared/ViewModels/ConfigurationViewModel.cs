@@ -1,6 +1,7 @@
-﻿namespace SSDTLifecycleExtension.ViewModels;
+﻿#nullable enable
 
-[UsedImplicitly]
+namespace SSDTLifecycleExtension.ViewModels;
+
 public class ConfigurationViewModel : ViewModelBase,
     IErrorHandler
 {
@@ -11,16 +12,17 @@ public class ConfigurationViewModel : ViewModelBase,
     private readonly IScriptCreationService _scriptCreationService;
     private readonly ILogger _logger;
 
-    private ConfigurationModel _lastSavedModel;
-    private ConfigurationModel _model;
+    private ConfigurationModel? _lastSavedModel;
+    private ConfigurationModel? _model;
     private bool _isModelDirty;
 
-    public ConfigurationModel Model
+    public ConfigurationModel? Model
     {
         get => _model;
         set
         {
-            if (Equals(value, _model)) return;
+            if (ReferenceEquals(value, _model))
+                return;
             if (_model != null)
             {
                 _model.PropertyChanged -= Model_PropertyChanged;
@@ -42,7 +44,8 @@ public class ConfigurationViewModel : ViewModelBase,
         get => _isModelDirty;
         private set
         {
-            if (value == _isModelDirty) return;
+            if (value == _isModelDirty)
+                return;
             _isModelDirty = value;
             OnPropertyChanged();
             SaveConfigurationCommand.RaiseCanExecuteChanged();
@@ -55,19 +58,19 @@ public class ConfigurationViewModel : ViewModelBase,
     public ICommand OpenDocumentationCommand { get; }
     public IAsyncCommand ImportConfigurationCommand { get; }
 
-    public ConfigurationViewModel([NotNull] SqlProject project,
-                                  [NotNull] IConfigurationService configurationService,
-                                  [NotNull] IFileSystemAccess fileSystemAccess,
-                                  [NotNull] IScaffoldingService scaffoldingService,
-                                  [NotNull] IScriptCreationService scriptCreationService,
-                                  [NotNull] ILogger logger)
+    public ConfigurationViewModel(SqlProject project,
+        IConfigurationService configurationService,
+        IFileSystemAccess fileSystemAccess,
+        IScaffoldingService scaffoldingService,
+        IScriptCreationService scriptCreationService,
+        ILogger logger)
     {
-        _project = project ?? throw new ArgumentNullException(nameof(project));
-        _configurationService = configurationService ?? throw new ArgumentNullException(nameof(configurationService));
-        _fileSystemAccess = fileSystemAccess ?? throw new ArgumentNullException(nameof(fileSystemAccess));
-        _scaffoldingService = scaffoldingService ?? throw new ArgumentNullException(nameof(scaffoldingService));
-        _scriptCreationService = scriptCreationService ?? throw new ArgumentNullException(nameof(scriptCreationService));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _project = project;
+        _configurationService = configurationService;
+        _fileSystemAccess = fileSystemAccess;
+        _scaffoldingService = scaffoldingService;
+        _scriptCreationService = scriptCreationService;
+        _logger = logger;
         _scaffoldingService.IsScaffoldingChanged += ScaffoldingService_IsScaffoldingChanged;
         _scriptCreationService.IsCreatingChanged += ScriptCreationService_IsCreatingChanged;
 
@@ -78,7 +81,7 @@ public class ConfigurationViewModel : ViewModelBase,
         ImportConfigurationCommand = new AsyncCommand(ImportConfiguration_ExecutedAsync, ImportConfiguration_CanExecute, this);
     }
 
-    private bool BrowsePublishProfile_CanExecute() => Model != null;
+    private bool BrowsePublishProfile_CanExecute() => Model is not null;
 
     private void BrowsePublishProfile_Executed()
     {
@@ -89,7 +92,7 @@ public class ConfigurationViewModel : ViewModelBase,
         var projectPath = new Uri(_project.FullName, UriKind.Absolute);
         var profilePath = new Uri(browsedPath, UriKind.Absolute);
         var relativePath = projectPath.MakeRelativeUri(profilePath).ToString();
-        Model.PublishProfilePath = relativePath;
+        Model!.PublishProfilePath = relativePath;
     }
 
     private void ResetConfigurationToDefault_Executed()
@@ -100,7 +103,7 @@ public class ConfigurationViewModel : ViewModelBase,
 
     private bool SaveConfiguration_CanExecute()
     {
-        return Model != null
+        return Model is not null
             && !Model.HasErrors
             && IsModelDirty
             && !_scaffoldingService.IsScaffolding
@@ -109,7 +112,7 @@ public class ConfigurationViewModel : ViewModelBase,
 
     private async Task SaveConfiguration_ExecutedAsync()
     {
-        var copy = Model.Copy();
+        var copy = Model!.Copy();
         var saved = await _configurationService.SaveConfigurationAsync(_project, copy);
         if (!saved)
             return;
@@ -142,20 +145,20 @@ public class ConfigurationViewModel : ViewModelBase,
 
     private void CheckIfModelIsDirty()
     {
-        if (Model == null)
+        if (Model is null)
         {
             IsModelDirty = false;
             return;
         }
 
-        if (Model != null && _lastSavedModel == null)
+        if (Model is not null && _lastSavedModel is null)
         {
             IsModelDirty = true;
             return;
         }
 
         // Check by properties
-        IsModelDirty = !Model.Equals(_lastSavedModel);
+        IsModelDirty = !Model!.Equals(_lastSavedModel);
     }
 
     private void UpdateAsyncCommandsCanExecuteState()

@@ -1,47 +1,33 @@
 ﻿namespace SSDTLifecycleExtension.Shared.Services;
 
-[UsedImplicitly]
-public class ArtifactsService : IArtifactsService
+public class ArtifactsService(IVisualStudioAccess _visualStudioAccess,
+                              IFileSystemAccess _fileSystemAccess)
+    : IArtifactsService
 {
-    private readonly IVisualStudioAccess _visualStudioAccess;
-    private readonly IFileSystemAccess _fileSystemAccess;
-
-    public ArtifactsService([NotNull] IVisualStudioAccess visualStudioAccess,
-                            [NotNull] IFileSystemAccess fileSystemAccess)
-    {
-        _visualStudioAccess = visualStudioAccess ?? throw new ArgumentNullException(nameof(visualStudioAccess));
-        _fileSystemAccess = fileSystemAccess ?? throw new ArgumentNullException(nameof(fileSystemAccess));
-    }
-
     VersionModel[] IArtifactsService.GetExistingArtifactVersions(SqlProject project,
-                                                                 ConfigurationModel configuration)
+        ConfigurationModel configuration)
     {
-        if (project == null)
-            throw new ArgumentNullException(nameof(project));
-        if (configuration == null)
-            throw new ArgumentNullException(nameof(configuration));
-
         return GetExistingArtifactVersionsInternal(project, configuration);
     }
 
     private VersionModel[] GetExistingArtifactVersionsInternal(SqlProject project,
-                                                               ConfigurationModel configuration)
+        ConfigurationModel configuration)
     {
         if (!TryGetArtifactsBaseDirectory(project, configuration, out var artifactsBaseDirectory))
-            return Array.Empty<VersionModel>();
+            return [];
 
-        if (!TryGetArtifactDirectories(artifactsBaseDirectory, out var artifactDirectories))
-            return Array.Empty<VersionModel>();
+        if (!TryGetArtifactDirectories(artifactsBaseDirectory!, out var artifactDirectories))
+            return [];
 
-        var existingVersions = ParseExistingDirectories(artifactDirectories);
+        var existingVersions = ParseExistingDirectories(artifactDirectories!);
         var versionModels = CreateModels(existingVersions);
         DetermineHighestExistingVersion(versionModels);
         return versionModels;
     }
 
     private bool TryGetArtifactsBaseDirectory(SqlProject project,
-                                              ConfigurationModel configuration,
-                                              out string artifactsBaseDirectory)
+        ConfigurationModel configuration,
+        out string? artifactsBaseDirectory)
     {
         var projectPath = project.FullName;
         var projectDirectory = Path.GetDirectoryName(projectPath);
@@ -65,7 +51,7 @@ public class ArtifactsService : IArtifactsService
     }
 
     private bool TryGetArtifactDirectories(string artifactsBaseDirectory,
-                                           out string[] artifactDirectories)
+        out string[]? artifactDirectories)
     {
         try
         {

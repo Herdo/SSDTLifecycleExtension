@@ -20,7 +20,6 @@ global using System.Windows.Input;
 global using System.Windows.Media;
 global using EnvDTE80;
 global using EnvDTE;
-global using JetBrains.Annotations;
 global using Microsoft.SqlServer.Dac;
 global using Microsoft.SqlServer.Dac.Model;
 global using Microsoft.VisualStudio.PlatformUI;

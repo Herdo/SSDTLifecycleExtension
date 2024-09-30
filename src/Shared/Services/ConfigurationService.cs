@@ -1,20 +1,16 @@
-﻿namespace SSDTLifecycleExtension.Shared.Services;
+﻿using System.Text.Json;
 
-[UsedImplicitly]
-public class ConfigurationService : DefaultContractResolver, IConfigurationService
+namespace SSDTLifecycleExtension.Shared.Services;
+
+public class ConfigurationService(IFileSystemAccess _fileSystemAccess,
+                                  IVisualStudioAccess _visualStudioAccess,
+                                  ILogger _logger)
+    : IConfigurationService
 {
-    private readonly IFileSystemAccess _fileSystemAccess;
-    private readonly IVisualStudioAccess _visualStudioAccess;
-    private readonly ILogger _logger;
-
-    public ConfigurationService(IFileSystemAccess fileSystemAccess,
-                                IVisualStudioAccess visualStudioAccess,
-                                ILogger logger)
+    private static readonly JsonSerializerOptions _jsonSerializerOptions = new()
     {
-        _fileSystemAccess = fileSystemAccess ?? throw new ArgumentNullException(nameof(fileSystemAccess));
-        _visualStudioAccess = visualStudioAccess ?? throw new ArgumentNullException(nameof(visualStudioAccess));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
+        WriteIndented = true
+    };
 
     private static string GetConfigurationPath(SqlProject project)
     {
@@ -31,10 +27,10 @@ public class ConfigurationService : DefaultContractResolver, IConfigurationServi
         return defaultInstance;
     }
 
-    private async Task<ConfigurationModel> GetConfigurationOrDefaultInternalAsync(SqlProject project,
-                                                                                  string path)
+    private async Task<ConfigurationModel> GetConfigurationOrDefaultInternalAsync(SqlProject? project,
+                                                                                  string? path)
     {
-        var sourcePath = path ?? GetConfigurationPath(project);
+        var sourcePath = path ?? GetConfigurationPath(project!);
         string serialized;
         try
         {
@@ -52,11 +48,15 @@ public class ConfigurationService : DefaultContractResolver, IConfigurationServi
             return GetValidatedDefaultInstance();
         }
 
-        var settings = new JsonSerializerSettings
+        var deserialized = JsonSerializer.Deserialize<ConfigurationModel>(serialized, _jsonSerializerOptions);
+        if (deserialized is null)
         {
-            ContractResolver = this
-        };
-        var deserialized = JsonConvert.DeserializeObject<ConfigurationModel>(serialized, settings);
+            await _logger.LogErrorAsync($"Failed to deserialize the configuration from file '{sourcePath}' - falling back to default configuration");
+            _visualStudioAccess.ShowModalError("Deserializing the configuration file failed. "
+                                             + "Please check the SSDT Lifecycle output window for more details. "
+                                             + "Falling back to default configuration.");
+            return GetValidatedDefaultInstance();
+        }
         deserialized.ValidateAll();
         return deserialized;
     }
@@ -65,7 +65,7 @@ public class ConfigurationService : DefaultContractResolver, IConfigurationServi
                                                             ConfigurationModel model)
     {
         var targetPath = GetConfigurationPath(project);
-        var serialized = JsonConvert.SerializeObject(model, Newtonsoft.Json.Formatting.Indented);
+        var serialized = JsonSerializer.Serialize(model, _jsonSerializerOptions);
 
         try
         {
@@ -88,47 +88,21 @@ public class ConfigurationService : DefaultContractResolver, IConfigurationServi
         return true;
     }
 
-    protected override JsonProperty CreateProperty(MemberInfo member,
-                                                   MemberSerialization memberSerialization)
-    {
-        var defaultInstance = ConfigurationModel.GetDefault();
-        var property = base.CreateProperty(member, memberSerialization);
-        var defaultValue = typeof(ConfigurationModel).GetProperty(member.Name)?.GetValue(defaultInstance);
-        if (defaultValue != null)
-        {
-            property.DefaultValueHandling = DefaultValueHandling.Populate;
-            property.DefaultValue = defaultValue;
-        }
-
-        return property;
-    }
-
-    public event EventHandler<ProjectConfigurationChangedEventArgs> ConfigurationChanged;
+    public event EventHandler<ProjectConfigurationChangedEventArgs>? ConfigurationChanged;
 
     Task<ConfigurationModel> IConfigurationService.GetConfigurationOrDefaultAsync(SqlProject project)
     {
-        if (project == null)
-            throw new ArgumentNullException(nameof(project));
-
         return GetConfigurationOrDefaultInternalAsync(project, null);
     }
 
     Task<ConfigurationModel> IConfigurationService.GetConfigurationOrDefaultAsync(string path)
     {
-        if (path == null)
-            throw new ArgumentNullException(nameof(path));
-
         return GetConfigurationOrDefaultInternalAsync(null, path);
     }
 
     Task<bool> IConfigurationService.SaveConfigurationAsync(SqlProject project,
                                                             ConfigurationModel model)
     {
-        if (project == null)
-            throw new ArgumentNullException(nameof(project));
-        if (model == null)
-            throw new ArgumentNullException(nameof(model));
-
         return SaveConfigurationInternalAsync(project, model);
     }
 }

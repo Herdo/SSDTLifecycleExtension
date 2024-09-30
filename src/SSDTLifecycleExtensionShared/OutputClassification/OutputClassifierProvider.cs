@@ -1,15 +1,17 @@
-﻿namespace SSDTLifecycleExtension.OutputClassification;
+﻿#nullable enable
+
+namespace SSDTLifecycleExtension.OutputClassification;
 
 [ContentType("output")]
 [Export(typeof(IClassifierProvider))]
 public class OutputClassifierProvider : IClassifierProvider
 {
-    [Import] internal IClassificationTypeRegistryService ClassificationTypeRegistryService;
+    [Import] internal IClassificationTypeRegistryService ClassificationTypeRegistryService = default!;
 
-    private OutputClassifier _outputClassifier;
+    private OutputClassifier? _outputClassifier;
 
     IClassifier IClassifierProvider.GetClassifier(ITextBuffer textBuffer)
     {
-        return _outputClassifier ?? (_outputClassifier = new OutputClassifier(ClassificationTypeRegistryService));
+        return _outputClassifier ??= new OutputClassifier(ClassificationTypeRegistryService);
     }
 }

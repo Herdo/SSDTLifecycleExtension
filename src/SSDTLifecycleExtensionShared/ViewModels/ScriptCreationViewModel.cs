@@ -1,6 +1,7 @@
-﻿namespace SSDTLifecycleExtension.ViewModels;
+﻿#nullable enable
 
-[UsedImplicitly]
+namespace SSDTLifecycleExtension.ViewModels;
+
 public class ScriptCreationViewModel : ViewModelBase,
     IErrorHandler
 {
@@ -11,14 +12,14 @@ public class ScriptCreationViewModel : ViewModelBase,
     private readonly IArtifactsService _artifactsService;
     private readonly ILogger _logger;
 
-    private ConfigurationModel _configuration;
+    private ConfigurationModel? _configuration;
 
-    private VersionModel _selectedBaseVersion;
+    private VersionModel? _selectedBaseVersion;
     private bool _scaffoldingMode;
     private bool _isCreatingScript;
     private bool _initializedOnce;
 
-    public VersionModel SelectedBaseVersion
+    public VersionModel? SelectedBaseVersion
     {
         get => _selectedBaseVersion;
         set
@@ -27,6 +28,7 @@ public class ScriptCreationViewModel : ViewModelBase,
                 return;
             _selectedBaseVersion = value;
             OnPropertyChanged();
+            EvaluateCommands();
         }
     }
 
@@ -74,26 +76,26 @@ public class ScriptCreationViewModel : ViewModelBase,
 
     public IAsyncCommand StartVersionedCreationCommand { get; }
 
-    public ScriptCreationViewModel([NotNull] SqlProject project,
-                                   [NotNull] IConfigurationService configurationService,
-                                   [NotNull] IScaffoldingService scaffoldingService,
-                                   [NotNull] IScriptCreationService scriptCreationService,
-                                   [NotNull] IArtifactsService artifactsService,
-                                   [NotNull] ILogger logger)
+    public ScriptCreationViewModel(SqlProject project,
+        IConfigurationService configurationService,
+        IScaffoldingService scaffoldingService,
+        IScriptCreationService scriptCreationService,
+        IArtifactsService artifactsService,
+        ILogger logger)
     {
-        _project = project ?? throw new ArgumentNullException(nameof(project));
-        _configurationService = configurationService ?? throw new ArgumentNullException(nameof(configurationService));
-        _scaffoldingService = scaffoldingService ?? throw new ArgumentNullException(nameof(scaffoldingService));
-        _scriptCreationService = scriptCreationService ?? throw new ArgumentNullException(nameof(scriptCreationService));
-        _artifactsService = artifactsService ?? throw new ArgumentNullException(nameof(artifactsService));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _project = project;
+        _configurationService = configurationService;
+        _scaffoldingService = scaffoldingService;
+        _scriptCreationService = scriptCreationService;
+        _artifactsService = artifactsService;
+        _logger = logger;
 
         ExistingVersions = new ObservableCollection<VersionModel>();
 
-        ScaffoldDevelopmentVersionCommand = new AsyncCommand(ScaffoldDevelopmentVersion_ExecutedAsync, ArtifactCommands_CanExecute, this);
-        ScaffoldCurrentProductionVersionCommand = new AsyncCommand(ScaffoldCurrentProductionVersion_ExecutedAsync, ArtifactCommands_CanExecute, this);
-        StartLatestCreationCommand = new AsyncCommand(StartLatestCreation_ExecutedAsync, ArtifactCommands_CanExecute, this);
-        StartVersionedCreationCommand = new AsyncCommand(StartVersionedCreation_ExecutedAsync, ArtifactCommands_CanExecute, this);
+        ScaffoldDevelopmentVersionCommand = new AsyncCommand(ScaffoldDevelopmentVersion_ExecutedAsync, ScaffoldCommands_CanExecute, this);
+        ScaffoldCurrentProductionVersionCommand = new AsyncCommand(ScaffoldCurrentProductionVersion_ExecutedAsync, ScaffoldCommands_CanExecute, this);
+        StartLatestCreationCommand = new AsyncCommand(StartLatestCreation_ExecutedAsync, ScriptCommands_CanExecute, this);
+        StartVersionedCreationCommand = new AsyncCommand(StartVersionedCreation_ExecutedAsync, ScriptCommands_CanExecute, this);
 
         _configurationService.ConfigurationChanged += ConfigurationService_ConfigurationChanged;
         _scaffoldingService.IsScaffoldingChanged += ScaffoldingService_IsScaffoldingChanged;
@@ -102,7 +104,7 @@ public class ScriptCreationViewModel : ViewModelBase,
 
     private async Task ScaffoldInternalAsync(Version targetVersion)
     {
-        var successful = await _scaffoldingService.ScaffoldAsync(_project, _configuration, targetVersion, CancellationToken.None);
+        var successful = await _scaffoldingService.ScaffoldAsync(_project, _configuration!, targetVersion, CancellationToken.None);
         if (successful)
             await InitializeAsync();
         else
@@ -114,7 +116,7 @@ public class ScriptCreationViewModel : ViewModelBase,
         IsCreatingScript = true;
         try
         {
-            var successful = await _scriptCreationService.CreateAsync(_project, _configuration, SelectedBaseVersion.UnderlyingVersion, latest, CancellationToken.None);
+            var successful = await _scriptCreationService.CreateAsync(_project, _configuration!, SelectedBaseVersion!.UnderlyingVersion, latest, CancellationToken.None);
             if (successful)
                 await InitializeAsync();
             else
@@ -126,9 +128,18 @@ public class ScriptCreationViewModel : ViewModelBase,
         }
     }
 
-    private bool ArtifactCommands_CanExecute()
+    private bool ScaffoldCommands_CanExecute()
     {
-        return _configuration != null
+        return _configuration is not null
+            && !_configuration.HasErrors
+            && !_scaffoldingService.IsScaffolding
+            && !_scriptCreationService.IsCreating;
+    }
+
+    private bool ScriptCommands_CanExecute()
+    {
+        return _configuration is not null
+            && SelectedBaseVersion is not null
             && !_configuration.HasErrors
             && !_scaffoldingService.IsScaffolding
             && !_scriptCreationService.IsCreating;
@@ -163,7 +174,7 @@ public class ScriptCreationViewModel : ViewModelBase,
         _configuration = await _configurationService.GetConfigurationOrDefaultAsync(_project);
 
         // Check for existing versions
-        ResetExistingVersionsAndSelection();
+        ExistingVersions.Clear();
         var existingVersions = _artifactsService.GetExistingArtifactVersions(_project, _configuration);
         if (existingVersions.Any())
         {
@@ -171,21 +182,16 @@ public class ScriptCreationViewModel : ViewModelBase,
                 ExistingVersions.Add(existingVersion);
             SelectedBaseVersion = existingVersions.Single(m => m.IsNewestVersion);
         }
+        else
+        {
+            SelectedBaseVersion = null;
+        }
 
         // Check for scaffolding or creation mode
         ScaffoldingMode = ExistingVersions.Count == 0;
 
-        // Evaluate commands
-        EvaluateCommands();
-
         InitializedOnce = true;
         return true;
-    }
-
-    private void ResetExistingVersionsAndSelection()
-    {
-        SelectedBaseVersion = null;
-        ExistingVersions.Clear();
     }
 
     private void EvaluateCommands()

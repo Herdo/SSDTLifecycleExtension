@@ -23,13 +23,13 @@ public interface IVisualStudioAccess
     ///     Gets the selected SQL project.
     /// </summary>
     /// <returns>The currently selected SQL project, or <b>null</b>, if the selected item is no SQL project.</returns>
-    SqlProject GetSelectedSqlProject();
+    SqlProject? GetSelectedSqlProject();
 
     Task ClearSSDTLifecycleOutputAsync();
 
-    void ShowModalError([NotNull] string error);
+    void ShowModalError(string error);
 
-    void BuildProject([NotNull] SqlProject project);
+    void BuildProject(SqlProject project);
 
     Task StartLongRunningTaskIndicatorAsync();
 
@@ -41,17 +41,16 @@ public interface IVisualStudioAccess
     /// </summary>
     /// <param name="project">The project to add the item to.</param>
     /// <param name="targetPath">The full path of the item to add to the properties.</param>
-    void AddItemToProjectProperties([NotNull] SqlProject project,
-                                    [NotNull] string targetPath);
+    void AddItemToProjectProperties(SqlProject project,
+        string targetPath);
 
     /// <summary>
     ///     Removes the <paramref name="item" /> from the <paramref name="project" />, if it exists within the project.
     /// </summary>
     /// <param name="project">The project to remove the <paramref name="item" /> from.</param>
     /// <param name="item">The file name of the file to remove on the root level.</param>
-    /// <exception cref="ArgumentNullException"><paramref name="project" /> or <paramref name="item" /> are <b>null</b>.</exception>
-    void RemoveItemFromProjectRoot([NotNull] SqlProject project,
-                                   [NotNull] string item);
+    void RemoveItemFromProjectRoot(SqlProject project,
+        string item);
 
-    Task LogToOutputPanelAsync([NotNull] string message);
+    Task LogToOutputPanelAsync(string message);
 }

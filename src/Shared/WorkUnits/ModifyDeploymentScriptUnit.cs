@@ -1,27 +1,16 @@
 ﻿namespace SSDTLifecycleExtension.Shared.WorkUnits;
 
-[UsedImplicitly]
-public class ModifyDeploymentScriptUnit : IWorkUnit<ScriptCreationStateModel>
+public class ModifyDeploymentScriptUnit(IScriptModifierProviderService _scriptModifierProviderService,
+                                        IFileSystemAccess _fileSystemAccess,
+                                        ILogger _logger)
+    : IWorkUnit<ScriptCreationStateModel>
 {
-    [NotNull] private readonly IScriptModifierProviderService _scriptModifierProviderService;
-    [NotNull] private readonly IFileSystemAccess _fileSystemAccess;
-    [NotNull] private readonly ILogger _logger;
-
-    public ModifyDeploymentScriptUnit([NotNull] IScriptModifierProviderService scriptModifierProviderService,
-                                      [NotNull] IFileSystemAccess fileSystemAccess,
-                                      [NotNull] ILogger logger)
-    {
-        _scriptModifierProviderService = scriptModifierProviderService ?? throw new ArgumentNullException(nameof(scriptModifierProviderService));
-        _fileSystemAccess = fileSystemAccess ?? throw new ArgumentNullException(nameof(fileSystemAccess));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
-
     private async Task ModifyCreatedScriptInternal(IStateModel stateModel,
-                                                   SqlProject project,
-                                                   ConfigurationModel configuration,
-                                                   PathCollection paths,
-                                                   Version previousVersion,
-                                                   bool createLatest)
+        SqlProject project,
+        ConfigurationModel configuration,
+        PathCollection paths,
+        Version previousVersion,
+        bool createLatest)
     {
         var modifiers = _scriptModifierProviderService.GetScriptModifiers(configuration);
         if (!modifiers.Any())
@@ -37,16 +26,16 @@ public class ModifyDeploymentScriptUnit : IWorkUnit<ScriptCreationStateModel>
     }
 
     private async Task<bool> ApplyAllModifiers(SqlProject project,
-                                               ConfigurationModel configuration,
-                                               PathCollection paths,
-                                               Version previousVersion,
-                                               bool createLatest,
-                                               IReadOnlyDictionary<ScriptModifier, IScriptModifier> modifiers)
+        ConfigurationModel configuration,
+        PathCollection paths,
+        Version previousVersion,
+        bool createLatest,
+        IReadOnlyDictionary<ScriptModifier, IScriptModifier> modifiers)
     {
         string initialScript;
         try
         {
-            initialScript = await _fileSystemAccess.ReadFileAsync(paths.DeployTargets.DeployScriptPath);
+            initialScript = await _fileSystemAccess.ReadFileAsync(paths.DeployTargets.DeployScriptPath!);
         }
         catch (Exception e)
         {
@@ -64,7 +53,7 @@ public class ModifyDeploymentScriptUnit : IWorkUnit<ScriptCreationStateModel>
 
         try
         {
-            await _fileSystemAccess.WriteFileAsync(paths.DeployTargets.DeployScriptPath, model.CurrentScript);
+            await _fileSystemAccess.WriteFileAsync(paths.DeployTargets.DeployScriptPath!, model.CurrentScript);
         }
         catch (Exception e)
         {
@@ -76,16 +65,15 @@ public class ModifyDeploymentScriptUnit : IWorkUnit<ScriptCreationStateModel>
     }
 
     Task IWorkUnit<ScriptCreationStateModel>.Work(ScriptCreationStateModel stateModel,
-                                                  CancellationToken cancellationToken)
+        CancellationToken cancellationToken)
     {
-        if (stateModel == null)
-            throw new ArgumentNullException(nameof(stateModel));
+        Guard.IsNotNullOrWhiteSpace(stateModel.Paths?.DeployTargets.DeployScriptPath);
 
         return ModifyCreatedScriptInternal(stateModel,
-                                           stateModel.Project,
-                                           stateModel.Configuration,
-                                           stateModel.Paths,
-                                           stateModel.PreviousVersion,
-                                           stateModel.CreateLatest);
+            stateModel.Project,
+            stateModel.Configuration,
+            stateModel.Paths,
+            stateModel.PreviousVersion,
+            stateModel.CreateLatest);
     }
 }

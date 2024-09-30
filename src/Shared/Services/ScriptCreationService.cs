@@ -1,21 +1,12 @@
 ﻿namespace SSDTLifecycleExtension.Shared.Services;
 
-[UsedImplicitly]
-public class ScriptCreationService : AsyncExecutorBase<ScriptCreationStateModel>, IScriptCreationService
+public class ScriptCreationService(IWorkUnitFactory _workUnitFactory,
+                                   IVisualStudioAccess _visualStudioAccess,
+                                   ILogger logger)
+    : AsyncExecutorBase<ScriptCreationStateModel>(logger),
+    IScriptCreationService
 {
-    [NotNull] private readonly IWorkUnitFactory _workUnitFactory;
-    [NotNull] private readonly IVisualStudioAccess _visualStudioAccess;
-
     private bool _isCreating;
-
-    public ScriptCreationService([NotNull] IWorkUnitFactory workUnitFactory,
-                                 [NotNull] IVisualStudioAccess visualStudioAccess,
-                                 [NotNull] ILogger logger)
-        : base(logger)
-    {
-        _workUnitFactory = workUnitFactory ?? throw new ArgumentNullException(nameof(workUnitFactory));
-        _visualStudioAccess = visualStudioAccess ?? throw new ArgumentNullException(nameof(visualStudioAccess));
-    }
 
     private async Task<bool> CreateInternalAsync(SqlProject project,
                                                  ConfigurationModel configuration,
@@ -43,7 +34,7 @@ public class ScriptCreationService : AsyncExecutorBase<ScriptCreationStateModel>
         return "Script creation failed.";
     }
 
-    protected override IWorkUnit<ScriptCreationStateModel> GetNextWorkUnitForStateModel(ScriptCreationStateModel stateModel)
+    protected override IWorkUnit<ScriptCreationStateModel>? GetNextWorkUnitForStateModel(ScriptCreationStateModel stateModel)
     {
         return _workUnitFactory.GetNextWorkUnit(stateModel);
     }
@@ -69,14 +60,15 @@ public class ScriptCreationService : AsyncExecutorBase<ScriptCreationStateModel>
         }
     }
 
-    public event EventHandler IsCreatingChanged;
+    public event EventHandler? IsCreatingChanged;
 
     private bool IsCreating
     {
         get => _isCreating;
         set
         {
-            if (value == _isCreating) return;
+            if (value == _isCreating)
+                return;
             _isCreating = value;
             IsCreatingChanged?.Invoke(this, EventArgs.Empty);
         }
@@ -85,17 +77,11 @@ public class ScriptCreationService : AsyncExecutorBase<ScriptCreationStateModel>
     bool IScriptCreationService.IsCreating => IsCreating;
 
     Task<bool> IScriptCreationService.CreateAsync(SqlProject project,
-                                                  ConfigurationModel configuration,
-                                                  Version previousVersion,
-                                                  bool latest,
-                                                  CancellationToken cancellationToken)
+        ConfigurationModel configuration,
+        Version previousVersion,
+        bool latest,
+        CancellationToken cancellationToken)
     {
-        if (project == null)
-            throw new ArgumentNullException(nameof(project));
-        if (configuration == null)
-            throw new ArgumentNullException(nameof(configuration));
-        if (previousVersion == null)
-            throw new ArgumentNullException(nameof(previousVersion));
         if (IsCreating)
             throw new InvalidOperationException($"Service is already running a {nameof(IScriptCreationService.CreateAsync)} task.");
 
