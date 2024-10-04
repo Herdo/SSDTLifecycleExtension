@@ -66,7 +66,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Shared\WorkUnits\CleanLatestArtifactsDirectoryUnitTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Shared\WorkUnits\CleanNewArtifactsDirectoryUnitTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Shared\WorkUnits\CopyBuildResultUnitTests.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Shared\WorkUnits\CopyDacpacToSharedDacpacRepositoryUnitTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\WorkUnits\CopyDacpacToSharedDacpacRepositoriesUnitTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Shared\WorkUnits\CreateDeploymentFilesUnitTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Shared\WorkUnits\DeleteRefactorLogUnitTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Shared\WorkUnits\FormatTargetVersionUnitTests.cs" />

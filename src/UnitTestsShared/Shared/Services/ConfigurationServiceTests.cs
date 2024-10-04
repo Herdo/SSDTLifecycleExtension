@@ -52,7 +52,7 @@ public class ConfigurationServiceTests
 
         // Assert
         configuration.Should().Be(defaultConfiguration);
-        vsaMock.Verify(m => m.ShowModalError(It.IsAny<string>()), Times.Never);
+        vsaMock.Verify(m => m.ShowModalErrorAsync(It.IsAny<string>()), Times.Never);
         loggerMock.Verify(m => m.LogErrorAsync(exception, It.IsAny<string>()), Times.Never);
     }
 
@@ -77,7 +77,7 @@ public class ConfigurationServiceTests
 
         // Assert
         configuration.Should().Be(defaultConfiguration);
-        vsaMock.Verify(m => m.ShowModalError(It.Is<string>(s => s.Contains("Accessing the configuration file failed."))), Times.Once);
+        vsaMock.Verify(m => m.ShowModalErrorAsync(It.Is<string>(s => s.Contains("Accessing the configuration file failed."))), Times.Once);
         loggerMock.Verify(m => m.LogErrorAsync(exception, It.Is<string>(s => s.Contains("Failed to read the configuration from file"))), Times.Once);
     }
 
@@ -109,7 +109,7 @@ public class ConfigurationServiceTests
         configuration.Should().NotBe(defaultConfiguration);
         configuration.ArtifactsPath.Should().Be("__Deployment");
         configuration.PublishProfilePath.Should().Be("Test.publish.xml");
-        configuration.SharedDacpacRepositoryPath.Should().Be("C:\\Temp\\Repository\\");
+        configuration.SharedDacpacRepositoryPaths.Should().Be("C:\\Temp\\Repository\\");
         configuration.BuildBeforeScriptCreation.Should().BeFalse();
         configuration.CreateDocumentationWithScriptCreation.Should().BeTrue();
         configuration.CommentOutUnnamedDefaultConstraintDrops.Should().BeTrue();   // This must be true to cause an validation error for the last assert.
@@ -149,7 +149,7 @@ public class ConfigurationServiceTests
         configuration.Should().NotBe(defaultConfiguration);
         configuration.ArtifactsPath.Should().Be("__Deployment");
         configuration.PublishProfilePath.Should().Be(defaultConfiguration.PublishProfilePath);
-        configuration.SharedDacpacRepositoryPath.Should().Be(defaultConfiguration.SharedDacpacRepositoryPath);
+        configuration.SharedDacpacRepositoryPaths.Should().Be(defaultConfiguration.SharedDacpacRepositoryPaths);
         configuration.BuildBeforeScriptCreation.Should().BeFalse();
         configuration.CreateDocumentationWithScriptCreation.Should().BeTrue();
         configuration.CommentOutUnnamedDefaultConstraintDrops.Should().BeTrue();   // This must be true to cause an validation error for the last assert.
@@ -182,7 +182,7 @@ public class ConfigurationServiceTests
 
         // Assert
         configuration.Should().Be(defaultConfiguration);
-        vsaMock.Verify(m => m.ShowModalError(It.Is<string>(s => s.Contains("Accessing the configuration file failed."))), Times.Once);
+        vsaMock.Verify(m => m.ShowModalErrorAsync(It.Is<string>(s => s.Contains("Accessing the configuration file failed."))), Times.Once);
         loggerMock.Verify(m => m.LogErrorAsync(exception, It.Is<string>(s => s.Contains("Failed to read the configuration from file"))), Times.Once);
     }
 
@@ -204,7 +204,7 @@ public class ConfigurationServiceTests
 
         // Assert
         configuration.Should().Be(defaultConfiguration);
-        vsaMock.Verify(m => m.ShowModalError(It.IsAny<string>()), Times.Never);
+        vsaMock.Verify(m => m.ShowModalErrorAsync(It.IsAny<string>()), Times.Never);
         loggerMock.Verify(m => m.LogErrorAsync(exception, It.IsAny<string>()), Times.Never);
     }
 
@@ -235,7 +235,7 @@ public class ConfigurationServiceTests
         configuration.Should().NotBe(defaultConfiguration);
         configuration.ArtifactsPath.Should().Be("__Deployment");
         configuration.PublishProfilePath.Should().Be("Test.publish.xml");
-        configuration.SharedDacpacRepositoryPath.Should().Be("C:\\Temp\\Repository\\");
+        configuration.SharedDacpacRepositoryPaths.Should().Be("C:\\Temp\\Repository\\");
         configuration.BuildBeforeScriptCreation.Should().BeFalse();
         configuration.CreateDocumentationWithScriptCreation.Should().BeTrue();
         configuration.CommentOutUnnamedDefaultConstraintDrops.Should().BeTrue();   // This must be true to cause an validation error for the last assert.
@@ -274,7 +274,7 @@ public class ConfigurationServiceTests
         configuration.Should().NotBe(defaultConfiguration);
         configuration.ArtifactsPath.Should().Be("__Deployment");
         configuration.PublishProfilePath.Should().Be(defaultConfiguration.PublishProfilePath);
-        configuration.SharedDacpacRepositoryPath.Should().Be(defaultConfiguration.SharedDacpacRepositoryPath);
+        configuration.SharedDacpacRepositoryPaths.Should().Be(defaultConfiguration.SharedDacpacRepositoryPaths);
         configuration.BuildBeforeScriptCreation.Should().BeFalse();
         configuration.CreateDocumentationWithScriptCreation.Should().BeTrue();
         configuration.CommentOutUnnamedDefaultConstraintDrops.Should().BeTrue();   // This must be true to cause an validation error for the last assert.
@@ -343,9 +343,9 @@ public class ConfigurationServiceTests
         result.Should().BeFalse();
         fsaMock.Verify(m => m.WriteFileAsync("C:\\Temp\\Test\\Properties\\ssdtlifecycle.json", It.IsNotNull<string>()), Times.Once);
         configurationChangedProject.Should().BeNull();
-        vsaMock.Verify(m => m.AddItemToProjectProperties(It.IsAny<SqlProject>(), It.IsAny<string>()), Times.Never);
+        vsaMock.Verify(m => m.AddConfigFileToProjectPropertiesAsync(It.IsAny<SqlProject>(), It.IsAny<string>()), Times.Never);
         loggerMock.Verify(m => m.LogErrorAsync(exception, "Failed to save the configuration"), Times.Once);
-        vsaMock.Verify(m => m.ShowModalError("Failed to save the configuration. Please check the SSDT Lifecycle output window for details."), Times.Once);
+        vsaMock.Verify(m => m.ShowModalErrorAsync("Failed to save the configuration. Please check the SSDT Lifecycle output window for details."), Times.Once);
     }
 
     [Test]
@@ -371,6 +371,6 @@ public class ConfigurationServiceTests
         result.Should().BeTrue();
         fsaMock.Verify(m => m.WriteFileAsync("C:\\Temp\\Test\\Properties\\ssdtlifecycle.json", It.IsNotNull<string>()), Times.Once);
         configurationChangedProject.Should().BeSameAs(project);
-        vsaMock.Verify(m => m.AddItemToProjectProperties(project, "C:\\Temp\\Test\\Properties\\ssdtlifecycle.json"), Times.Once);
+        vsaMock.Verify(m => m.AddConfigFileToProjectPropertiesAsync(project, "C:\\Temp\\Test\\Properties\\ssdtlifecycle.json"), Times.Once);
     }
 }

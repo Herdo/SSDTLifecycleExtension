@@ -8,28 +8,25 @@ public interface IVisualStudioAccess
     event EventHandler SolutionClosed;
 
     /// <summary>
-    ///     Gets the kind of the selected project.
+    ///     Checks if the selected project is of the specified <paramref name="kind" />.
     /// </summary>
+    /// <param name="kind">The kind to check for.</param>
     /// <returns>
-    ///     The kind of the currently selected project, or
-    ///     <b>
-    ///         <see cref="Guid.Empty" />
-    ///     </b>
-    ///     , if none is selected.
+    ///     <b>True</b>, if the selected project is of the specified <paramref name="kind" />, otherwise <b>false</b>.
     /// </returns>
-    Guid GetSelectedProjectKind();
+    Task<bool> IsSelectedProjectOfKindAsync(string kind);
 
     /// <summary>
     ///     Gets the selected SQL project.
     /// </summary>
     /// <returns>The currently selected SQL project, or <b>null</b>, if the selected item is no SQL project.</returns>
-    SqlProject? GetSelectedSqlProject();
+    Task<SqlProject?> GetSelectedSqlProjectAsync();
 
     Task ClearSSDTLifecycleOutputAsync();
 
-    void ShowModalError(string error);
+    Task ShowModalErrorAsync(string error);
 
-    void BuildProject(SqlProject project);
+    Task BuildProjectAsync(SqlProject project);
 
     Task StartLongRunningTaskIndicatorAsync();
 
@@ -41,16 +38,16 @@ public interface IVisualStudioAccess
     /// </summary>
     /// <param name="project">The project to add the item to.</param>
     /// <param name="targetPath">The full path of the item to add to the properties.</param>
-    void AddItemToProjectProperties(SqlProject project,
+    Task AddConfigFileToProjectPropertiesAsync(SqlProject project,
         string targetPath);
 
     /// <summary>
-    ///     Removes the <paramref name="item" /> from the <paramref name="project" />, if it exists within the project.
+    ///     Removes the <paramref name="path" /> from the <paramref name="project" />, if it exists within the project.
     /// </summary>
-    /// <param name="project">The project to remove the <paramref name="item" /> from.</param>
-    /// <param name="item">The file name of the file to remove on the root level.</param>
-    void RemoveItemFromProjectRoot(SqlProject project,
-        string item);
+    /// <param name="project">The project to remove the <paramref name="path" /> from.</param>
+    /// <param name="path">The file path of the file to remove.</param>
+    Task RemoveItemFromProjectRootAsync(SqlProject project,
+        string path);
 
     Task LogToOutputPanelAsync(string message);
 }

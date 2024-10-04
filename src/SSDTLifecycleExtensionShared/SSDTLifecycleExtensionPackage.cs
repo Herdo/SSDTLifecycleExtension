@@ -40,7 +40,6 @@ public sealed class SSDTLifecycleExtensionPackage : AsyncPackage, IAsyncPackage
     private readonly Dictionary<string, List<IVsWindowFrame>> _openedWindowFrames;
 
     private DependencyResolver? _dependencyResolver;
-    private DTE2? _dte2;
 
     public SSDTLifecycleExtensionPackage()
     {
@@ -51,22 +50,19 @@ public sealed class SSDTLifecycleExtensionPackage : AsyncPackage, IAsyncPackage
     {
         if (!(await GetServiceAsync(typeof(IMenuCommandService)) is OleMenuCommandService commandService))
             throw new InvalidOperationException($"Cannot initialize {nameof(SSDTLifecycleExtensionPackage)} without the {nameof(OleMenuCommandService)}.");
-        if (_dte2 is null)
-            throw new InvalidOperationException("Missing DTE2 to initialize dependency resolver.");
 
-        var visualStudioAccess = new VisualStudioAccess(_dte2, this);
+        var visualStudioAccess = new VisualStudioAccess();
         var visualStudioLogger = new VisualStudioLogger(visualStudioAccess, Constants.DocumentationBaseUrl);
         return new DependencyResolver(visualStudioAccess, visualStudioLogger, commandService);
     }
 
-    private void AttachToDte2Events()
+    private void AttachToEvents()
     {
         ThreadHelper.ThrowIfNotOnUIThread();
-        if (_dte2 is null)
-            return;
-        _dte2.Events.SolutionEvents.AfterClosing += SolutionEvents_AfterClosing;
-        _dte2.Events.SolutionEvents.ProjectRemoved += SolutionEvents_ProjectRemoved;
-        _dte2.Events.SolutionEvents.ProjectRenamed += SolutionEvents_ProjectRenamed;
+
+        Community.VisualStudio.Toolkit.VS.Events.SolutionEvents.OnAfterCloseSolution += SolutionEvents_AfterClosing;
+        Community.VisualStudio.Toolkit.VS.Events.ProjectItemsEvents.AfterRemoveProjectItems += ProjectItemsEvents_AfterRemoveProjectItems;
+        Community.VisualStudio.Toolkit.VS.Events.ProjectItemsEvents.AfterRenameProjectItems += ProjectItemsEvents_AfterRenameProjectItems;
     }
 
     private void SolutionEvents_AfterClosing()
@@ -75,16 +71,24 @@ public sealed class SSDTLifecycleExtensionPackage : AsyncPackage, IAsyncPackage
         CloseOpenFrames(null);
     }
 
-    private void SolutionEvents_ProjectRemoved(Project project)
+    private void ProjectItemsEvents_AfterRemoveProjectItems(Community.VisualStudio.Toolkit.AfterRemoveProjectItemEventArgs? args)
     {
         ThreadHelper.ThrowIfNotOnUIThread();
-        CloseOpenFrames(project.FullName);
+
+        if (args?.ProjectItemRemoves is null)
+            return;
+        foreach(var project in args.ProjectItemRemoves.Where(m => m.Project?.FullPath is not null))
+            CloseOpenFrames(project.Project!.FullPath);
     }
 
-    private void SolutionEvents_ProjectRenamed(Project project, string oldName)
+    private void ProjectItemsEvents_AfterRenameProjectItems(Community.VisualStudio.Toolkit.AfterRenameProjectItemEventArgs? args)
     {
         ThreadHelper.ThrowIfNotOnUIThread();
-        CloseOpenFrames(oldName);
+
+        if (args?.ProjectItemRenames is null)
+            return;
+        foreach(var project in args.ProjectItemRenames.Where(m => m.SolutionItem?.FullPath is not null))
+            CloseOpenFrames(project.SolutionItem!.FullPath);
     }
 
     private void CloseOpenFrames(string? filter)
@@ -119,16 +123,12 @@ public sealed class SSDTLifecycleExtensionPackage : AsyncPackage, IAsyncPackage
         // Do any initialization that requires the UI thread after switching to the UI thread.
         await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
-        if (!(await GetServiceAsync(typeof(DTE)) is DTE2 dte2))
-            return;
-        _dte2 = dte2;
-
         // Initialize DependencyResolver
         _dependencyResolver = await GetDependencyResolverAsync();
         _dependencyResolver.RegisterPackage(this);
 
         // Initialize DTE event handlers
-        AttachToDte2Events();
+        AttachToEvents();
 
         // Initialize commands
         ScriptCreationWindowCommand.Initialize(_dependencyResolver.Get<ScriptCreationWindowCommand>());

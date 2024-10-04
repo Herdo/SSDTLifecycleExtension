@@ -175,7 +175,7 @@ public class ScriptCreationViewModel : ViewModelBase,
 
         // Check for existing versions
         ExistingVersions.Clear();
-        var existingVersions = _artifactsService.GetExistingArtifactVersions(_project, _configuration);
+        var existingVersions = await _artifactsService.GetExistingArtifactVersionsAsync(_project, _configuration);
         if (existingVersions.Any())
         {
             foreach (var existingVersion in existingVersions)
@@ -204,7 +204,7 @@ public class ScriptCreationViewModel : ViewModelBase,
 
     private async void ConfigurationService_ConfigurationChanged(object sender, ProjectConfigurationChangedEventArgs e)
     {
-        if (e.Project.UniqueName != _project.UniqueName)
+        if (e.Project.FullName != _project.FullName)
             return;
 
         _configuration = await _configurationService.GetConfigurationOrDefaultAsync(_project);

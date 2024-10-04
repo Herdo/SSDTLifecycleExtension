@@ -35,8 +35,8 @@ public class ScriptCreationViewModelTests
         _scaffoldingService = new();
         _scriptCreationService = new();
         _artifactsService = new();
-        _artifactsService.Setup(m => m.GetExistingArtifactVersions(_sqlProject, _configurationModel))
-            .Returns(() =>
+        _artifactsService.Setup(m => m.GetExistingArtifactVersionsAsync(_sqlProject, _configurationModel))
+            .ReturnsAsync(() =>
             [
                 new VersionModel()
                 {
@@ -283,8 +283,8 @@ public class ScriptCreationViewModelTests
     public async Task InitializeAsync_NoExistingVersions_Async()
     {
         // Arrange
-        _artifactsService.Setup(m => m.GetExistingArtifactVersions(_sqlProject, _configurationModel))
-            .Returns([]);
+        _artifactsService.Setup(m => m.GetExistingArtifactVersionsAsync(_sqlProject, _configurationModel))
+            .ReturnsAsync([]);
 
         // Act
         var initialized = await _viewModel.InitializeAsync();
@@ -301,8 +301,8 @@ public class ScriptCreationViewModelTests
     public async Task InitializeAsync_ValidDirectories_SelectHighest_Async()
     {
         // Arrange
-        _artifactsService.Setup(m => m.GetExistingArtifactVersions(_sqlProject, _configurationModel))
-            .Returns(() =>
+        _artifactsService.Setup(m => m.GetExistingArtifactVersionsAsync(_sqlProject, _configurationModel))
+            .ReturnsAsync(() =>
             [
                 new VersionModel
                 {
@@ -447,8 +447,8 @@ public class ScriptCreationViewModelTests
               .ReturnsAsync(success);
         var scsMock = new Mock<IScriptCreationService>();
         var asMock = new Mock<IArtifactsService>();
-        asMock.Setup(m => m.GetExistingArtifactVersions(project, config))
-              .Returns(() =>
+        asMock.Setup(m => m.GetExistingArtifactVersionsAsync(project, config))
+              .ReturnsAsync(() =>
               [
                   new VersionModel
                   {
@@ -510,8 +510,8 @@ public class ScriptCreationViewModelTests
         var ssMock = new Mock<IScaffoldingService>();
         var scsMock = new Mock<IScriptCreationService>();
         var asMock = new Mock<IArtifactsService>();
-        asMock.Setup(m => m.GetExistingArtifactVersions(project, config))
-              .Returns(() =>
+        asMock.Setup(m => m.GetExistingArtifactVersionsAsync(project, config))
+              .ReturnsAsync(() =>
               [
                   new VersionModel
                   {
@@ -588,8 +588,8 @@ public class ScriptCreationViewModelTests
         var ssMock = new Mock<IScaffoldingService>();
         var scsMock = new Mock<IScriptCreationService>();
         var asMock = new Mock<IArtifactsService>();
-        asMock.Setup(m => m.GetExistingArtifactVersions(project, config))
-              .Returns(() =>
+        asMock.Setup(m => m.GetExistingArtifactVersionsAsync(project, config))
+              .ReturnsAsync(() =>
               [
                   new VersionModel
                   {
@@ -669,8 +669,8 @@ public class ScriptCreationViewModelTests
               .ThrowsAsync(testException);
         var scsMock = new Mock<IScriptCreationService>();
         var asMock = new Mock<IArtifactsService>();
-        asMock.Setup(m => m.GetExistingArtifactVersions(project, config))
-              .Returns(new[]
+        asMock.Setup(m => m.GetExistingArtifactVersionsAsync(project, config))
+              .ReturnsAsync(new[]
               {
                   new VersionModel
                   {
@@ -742,8 +742,8 @@ public class ScriptCreationViewModelTests
               .ThrowsAsync(testException);
         var scsMock = new Mock<IScriptCreationService>();
         var asMock = new Mock<IArtifactsService>();
-        asMock.Setup(m => m.GetExistingArtifactVersions(project, config))
-              .Returns(new[]
+        asMock.Setup(m => m.GetExistingArtifactVersionsAsync(project, config))
+              .ReturnsAsync(new[]
               {
                   new VersionModel
                   {
@@ -813,8 +813,8 @@ public class ScriptCreationViewModelTests
         var ssMock = new Mock<IScaffoldingService>();
         var scsMock = new Mock<IScriptCreationService>();
         var asMock = new Mock<IArtifactsService>();
-        asMock.Setup(m => m.GetExistingArtifactVersions(project, config))
-              .Returns(new[]
+        asMock.Setup(m => m.GetExistingArtifactVersionsAsync(project, config))
+              .ReturnsAsync(new[]
               {
                   new VersionModel
                   {
@@ -899,8 +899,8 @@ public class ScriptCreationViewModelTests
         var ssMock = new Mock<IScaffoldingService>();
         var scsMock = new Mock<IScriptCreationService>();
         var asMock = new Mock<IArtifactsService>();
-        asMock.Setup(m => m.GetExistingArtifactVersions(project, config))
-              .Returns(new[]
+        asMock.Setup(m => m.GetExistingArtifactVersionsAsync(project, config))
+              .ReturnsAsync(new[]
               {
                   new VersionModel
                   {

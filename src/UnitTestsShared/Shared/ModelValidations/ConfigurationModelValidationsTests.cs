@@ -170,15 +170,15 @@ public class ConfigurationModelValidationsTests
         // Arrange
         var model = new ConfigurationModel
         {
-            SharedDacpacRepositoryPath = "C:\\" + new string(Path.GetInvalidPathChars()) + "\\Test\\"
+            SharedDacpacRepositoryPaths = "C:\\" + new string(Path.GetInvalidPathChars()) + "\\Test\\"
         };
 
         // Act
-        var errors = ConfigurationModelValidations.ValidateSharedDacpacRepositoryPath(model);
+        var errors = ConfigurationModelValidations.ValidateSharedDacpacRepositoryPaths(model);
 
         // Assert
         errors.Should().ContainSingle()
-            .Which.Should().Be("Path contains invalid characters.");
+            .Which.Should().Contain("is invalid");
     }
 
     [Test]
@@ -190,32 +190,15 @@ public class ConfigurationModelValidationsTests
         // Arrange
         var model = new ConfigurationModel
         {
-            SharedDacpacRepositoryPath = path
+            SharedDacpacRepositoryPaths = path
         };
 
         // Act
-        var errors = ConfigurationModelValidations.ValidateSharedDacpacRepositoryPath(model);
+        var errors = ConfigurationModelValidations.ValidateSharedDacpacRepositoryPaths(model);
 
         // Assert
         errors.Should().ContainSingle()
-            .Which.Should().Be("Path must be a directory.");
-    }
-
-    [Test]
-    public void ValidateSharedDacpacRepositoryPath_Errors_NoAbsolutePath()
-    {
-        // Arrange
-        var model = new ConfigurationModel
-        {
-            SharedDacpacRepositoryPath = @"..\Repository"
-        };
-
-        // Act
-        var errors = ConfigurationModelValidations.ValidateSharedDacpacRepositoryPath(model);
-
-        // Assert
-        errors.Should().ContainSingle()
-            .Which.Should().Be("Path must be an absolute path.");
+            .Which.Should().Be($"Path '{path}' must be a directory.");
     }
 
     [Test]
@@ -227,27 +210,27 @@ public class ConfigurationModelValidationsTests
         // Arrange
         var model = new ConfigurationModel
         {
-            SharedDacpacRepositoryPath = path
+            SharedDacpacRepositoryPaths = path
         };
 
         // Act
-        var errors = ConfigurationModelValidations.ValidateSharedDacpacRepositoryPath(model);
+        var errors = ConfigurationModelValidations.ValidateSharedDacpacRepositoryPaths(model);
 
         // Assert
         errors.Should().BeEmpty();
     }
 
     [Test]
-    public void ValidateSharedDacpacRepositoryPath_NoErrors()
+    public void ValidateSharedDacpacRepositoryPaths_NoErrors()
     {
         // Arrange
         var model = new ConfigurationModel
         {
-            SharedDacpacRepositoryPath = @"C:\Test\Repository\"
+            SharedDacpacRepositoryPaths = @"C:\Test\Repository\;.\_Deployment\;..\Repository\;_Current\;\foo\"
         };
 
         // Act
-        var errors = ConfigurationModelValidations.ValidateSharedDacpacRepositoryPath(model);
+        var errors = ConfigurationModelValidations.ValidateSharedDacpacRepositoryPaths(model);
 
         // Assert
         errors.Should().BeEmpty();

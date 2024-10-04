@@ -93,7 +93,7 @@ public class ConfigurationModelTests
     }
 
     [Test]
-    public void SharedDacpacRepositoryPath_Get_Set_PropertyChanged_ErrorsChanged()
+    public void SharedDacpacRepositoryPaths_Get_Set_PropertyChanged_ErrorsChanged()
     {
         // Arrange
         const string testValue = "C:\\Test\\Repository\\";
@@ -114,15 +114,15 @@ public class ConfigurationModelTests
         };
 
         // Act
-        model.SharedDacpacRepositoryPath = testValue;
-        var returnedValue = model.SharedDacpacRepositoryPath;
+        model.SharedDacpacRepositoryPaths = testValue;
+        var returnedValue = model.SharedDacpacRepositoryPaths;
 
         // Assert
         returnedValue.Should().Be(testValue);
         invokedPropertyChangedSender.Should().BeSameAs(model);
-        invokedPropertyChangedProperty.Should().Be(nameof(ConfigurationModel.SharedDacpacRepositoryPath));
+        invokedPropertyChangedProperty.Should().Be(nameof(ConfigurationModel.SharedDacpacRepositoryPaths));
         invokedErrorsChangedSender.Should().BeSameAs(model);
-        invokedErrorsChangedProperty.Should().Be(nameof(ConfigurationModel.SharedDacpacRepositoryPath));
+        invokedErrorsChangedProperty.Should().Be(nameof(ConfigurationModel.SharedDacpacRepositoryPaths));
     }
 
     [Test]
@@ -508,7 +508,7 @@ public class ConfigurationModelTests
         {
             ArtifactsPath = "TestPath1",
             PublishProfilePath = "TestPath2",
-            SharedDacpacRepositoryPath = "C:\\Temp\\Repository\\",
+            SharedDacpacRepositoryPaths = "C:\\Temp\\Repository\\",
             ReplaceUnnamedDefaultConstraintDrops = true,
             VersionPattern = "TestPattern",
             CommentOutUnnamedDefaultConstraintDrops = true,
@@ -530,7 +530,7 @@ public class ConfigurationModelTests
         copy.Should().NotBeSameAs(model);
         copy.ArtifactsPath.Should().Be(model.ArtifactsPath);
         copy.PublishProfilePath.Should().Be(model.PublishProfilePath);
-        copy.SharedDacpacRepositoryPath.Should().Be(model.SharedDacpacRepositoryPath);
+        copy.SharedDacpacRepositoryPaths.Should().Be(model.SharedDacpacRepositoryPaths);
         copy.ReplaceUnnamedDefaultConstraintDrops.Should().Be(model.ReplaceUnnamedDefaultConstraintDrops);
         copy.VersionPattern.Should().Be(model.VersionPattern);
         copy.CommentOutUnnamedDefaultConstraintDrops.Should().Be(model.CommentOutUnnamedDefaultConstraintDrops);
@@ -552,7 +552,7 @@ public class ConfigurationModelTests
         {
             ArtifactsPath = "TestPath1",
             PublishProfilePath = "TestPath2",
-            SharedDacpacRepositoryPath = "C:\\Temp\\Repository\\",
+            SharedDacpacRepositoryPaths = "C:\\Temp\\Repository\\",
             ReplaceUnnamedDefaultConstraintDrops = true,
             VersionPattern = "TestPattern",
             CommentOutUnnamedDefaultConstraintDrops = true,
@@ -581,7 +581,7 @@ public class ConfigurationModelTests
         {
             ArtifactsPath = "TestPath1",
             PublishProfilePath = "TestPath2",
-            SharedDacpacRepositoryPath = "C:\\Temp\\Repository\\",
+            SharedDacpacRepositoryPaths = "C:\\Temp\\Repository\\",
             ReplaceUnnamedDefaultConstraintDrops = true,
             VersionPattern = "TestPattern",
             CommentOutUnnamedDefaultConstraintDrops = true,
@@ -610,7 +610,7 @@ public class ConfigurationModelTests
         {
             ArtifactsPath = "TestPath1",
             PublishProfilePath = "TestPath2",
-            SharedDacpacRepositoryPath = "C:\\Temp\\Repository\\",
+            SharedDacpacRepositoryPaths = "C:\\Temp\\Repository\\",
             ReplaceUnnamedDefaultConstraintDrops = true,
             VersionPattern = "TestPattern",
             CommentOutUnnamedDefaultConstraintDrops = true,
@@ -627,7 +627,7 @@ public class ConfigurationModelTests
         {
             ArtifactsPath = "TestPath1",
             PublishProfilePath = "TestPath2",
-            SharedDacpacRepositoryPath = "C:\\Temp\\Repository\\",
+            SharedDacpacRepositoryPaths = "C:\\Temp\\Repository\\",
             ReplaceUnnamedDefaultConstraintDrops = true,
             VersionPattern = "TestPattern",
             CommentOutUnnamedDefaultConstraintDrops = true,
@@ -656,7 +656,7 @@ public class ConfigurationModelTests
         {
             ArtifactsPath = "TestPath1",
             PublishProfilePath = "TestPath2",
-            SharedDacpacRepositoryPath = "C:\\Temp\\Repository\\",
+            SharedDacpacRepositoryPaths = "C:\\Temp\\Repository\\",
             ReplaceUnnamedDefaultConstraintDrops = true,
             VersionPattern = "TestPattern",
             CommentOutUnnamedDefaultConstraintDrops = true,
@@ -673,7 +673,7 @@ public class ConfigurationModelTests
         {
             ArtifactsPath = "TestPath1",
             PublishProfilePath = "TestPath2",
-            SharedDacpacRepositoryPath = "C:\\Temp\\Repository\\",
+            SharedDacpacRepositoryPaths = "C:\\Temp\\Repository\\",
             ReplaceUnnamedDefaultConstraintDrops = true,
             VersionPattern = "TestPattern",
             CommentOutUnnamedDefaultConstraintDrops = true,

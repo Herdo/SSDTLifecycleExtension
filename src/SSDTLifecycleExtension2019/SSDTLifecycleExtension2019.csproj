@@ -45,7 +45,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DeployExtension>True</DeployExtension>
-    <WarningsAsErrors>NU1605;CS8602;CS8603;CS8604;CS8618;CS8625</WarningsAsErrors>
+    <WarningsAsErrors>NU1605;CS8602;CS8603;CS8604;CS8618;CS8625;CS4014</WarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -75,6 +75,14 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Community.VisualStudio.Toolkit.16">
+      <Version>16.0.527</Version>
+    </PackageReference>
+    <PackageReference Include="Community.VisualStudio.Toolkit.Analyzers">
+      <Version>1.0.527</Version>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.SqlServer.DacFx">
       <Version>162.3.566</Version>
     </PackageReference>

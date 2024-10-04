@@ -18,7 +18,7 @@ internal class ToolWindowInitializer
     private async Task<(bool Success, string? FullProjectPath)> TryInitializeToolWindowInternalAsync<TViewModel>(IVisualStudioToolWindow window) where TViewModel : IViewModel
     {
         // Set caption
-        var project = _visualStudioAccess.GetSelectedSqlProject();
+        var project = await _visualStudioAccess.GetSelectedSqlProjectAsync();
         if (project is null)
             return (false, null);
         window.SetCaption(project.Name);

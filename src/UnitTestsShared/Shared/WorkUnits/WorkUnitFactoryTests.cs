@@ -219,9 +219,9 @@ public class WorkUnitFactoryTests
         // Arrange
         var fsaMock = Mock.Of<IFileSystemAccess>();
         var loggerMock = Mock.Of<ILogger>();
-        var expectedWorkUnit = new CopyDacpacToSharedDacpacRepositoryUnit(fsaMock, loggerMock);
+        var expectedWorkUnit = new CopyDacpacToSharedDacpacRepositoriesUnit(fsaMock, loggerMock);
         var drMock = new Mock<IDependencyResolver>();
-        drMock.Setup(m => m.Get<CopyDacpacToSharedDacpacRepositoryUnit>()).Returns(expectedWorkUnit);
+        drMock.Setup(m => m.Get<CopyDacpacToSharedDacpacRepositoriesUnit>()).Returns(expectedWorkUnit);
         IWorkUnitFactory wuf = new WorkUnitFactory(drMock.Object);
         var project = new SqlProject("a", "b", "c");
         var configuration = ConfigurationModel.GetDefault();
@@ -237,7 +237,7 @@ public class WorkUnitFactoryTests
 
         // Assert
         workUnit.Should().BeSameAs(expectedWorkUnit);
-        drMock.Verify(m => m.Get<CopyDacpacToSharedDacpacRepositoryUnit>(), Times.Once);
+        drMock.Verify(m => m.Get<CopyDacpacToSharedDacpacRepositoriesUnit>(), Times.Once);
     }
 
     [Test]
@@ -500,9 +500,9 @@ public class WorkUnitFactoryTests
         // Arrange
         var fsaMock = Mock.Of<IFileSystemAccess>();
         var loggerMock = Mock.Of<ILogger>();
-        var expectedWorkUnit = new CopyDacpacToSharedDacpacRepositoryUnit(fsaMock, loggerMock);
+        var expectedWorkUnit = new CopyDacpacToSharedDacpacRepositoriesUnit(fsaMock, loggerMock);
         var drMock = new Mock<IDependencyResolver>();
-        drMock.Setup(m => m.Get<CopyDacpacToSharedDacpacRepositoryUnit>()).Returns(expectedWorkUnit);
+        drMock.Setup(m => m.Get<CopyDacpacToSharedDacpacRepositoriesUnit>()).Returns(expectedWorkUnit);
         IWorkUnitFactory wuf = new WorkUnitFactory(drMock.Object);
         var project = new SqlProject("a", "b", "c");
         var configuration = ConfigurationModel.GetDefault();
@@ -518,7 +518,7 @@ public class WorkUnitFactoryTests
 
         // Assert
         workUnit.Should().BeSameAs(expectedWorkUnit);
-        drMock.Verify(m => m.Get<CopyDacpacToSharedDacpacRepositoryUnit>(), Times.Once);
+        drMock.Verify(m => m.Get<CopyDacpacToSharedDacpacRepositoriesUnit>(), Times.Once);
     }
 
     [Test]

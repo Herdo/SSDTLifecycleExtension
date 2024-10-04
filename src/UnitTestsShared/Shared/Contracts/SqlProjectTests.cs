@@ -9,15 +9,15 @@ public class SqlProjectTests
         // Arrange
         const string name = "name";
         const string fullName = "fullName";
-        const string uniqueName = "uniqueName";
+        var solutionItem = new object();
 
         // Act
-        var p = new SqlProject(name, fullName, uniqueName);
+        var p = new SqlProject(name, fullName, solutionItem);
 
         // Assert
         p.Name.Should().Be(name);
         p.FullName.Should().Be(fullName);
-        p.UniqueName.Should().Be(uniqueName);
+        p.SolutionItem.Should().BeSameAs(solutionItem);
         p.ProjectProperties.Should().NotBeNull();
         // Project properties should not be filled from within the constructor.
         p.ProjectProperties.SqlTargetName.Should().BeNull();

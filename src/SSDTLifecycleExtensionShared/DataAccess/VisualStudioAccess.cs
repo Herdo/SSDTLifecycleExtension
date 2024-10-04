@@ -1,49 +1,45 @@
 ﻿#nullable enable
 
+using System.Text.RegularExpressions;
+using Community.VisualStudio.Toolkit;
+using CommunityToolkit.Diagnostics;
+
 namespace SSDTLifecycleExtension.DataAccess;
 
 [ExcludeFromCodeCoverage] // Test would require a Visual Studio shell.
 public class VisualStudioAccess : IVisualStudioAccess
 {
-    private readonly DTE2 _dte2;
-    private readonly AsyncPackage _package;
-    private Guid _paneGuid;
+    private readonly Guid _outputWindowId = Guid.ParseExact(WindowGuids.OutputWindow, "B");
+    private Guid? _paneGuid = null;
+    private OutputWindowPane? _outputPane = null;
 
-    public VisualStudioAccess(DTE2 dte2,
-        AsyncPackage package)
+    public VisualStudioAccess()
     {
         ThreadHelper.ThrowIfNotOnUIThread();
-        _dte2 = dte2;
-        _dte2.Events.SolutionEvents.AfterClosing += () => SolutionClosed?.Invoke(this, EventArgs.Empty);
-        _package = package;
-        _paneGuid = new Guid(Constants.CreationProgressPaneGuid);
+        VS.Events.SolutionEvents.OnAfterCloseSolution += () => SolutionClosed?.Invoke(this, EventArgs.Empty);
     }
 
-    private async System.Threading.Tasks.Task<IVsOutputWindowPane> GetOrCreateSSDTOutputPaneAsync()
+    private async Task<OutputWindowPane> GetOrCreateSSDTOutputPaneAsync()
     {
         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-        if (!(await _package.GetServiceAsync(typeof(SVsOutputWindow)) is IVsOutputWindow outputWindow))
-            throw new InvalidOperationException($"Cannot get {nameof(IVsOutputWindow)}.");
-
-        var getPaneResult = outputWindow.GetPane(ref _paneGuid, out var outputPane);
-        if (getPaneResult == Microsoft.VisualStudio.VSConstants.S_OK)
+        if (_outputPane is null)
         {
-            outputPane.Activate();
-            return outputPane;
+            if (_paneGuid is not null)
+            {
+                _outputPane = await VS.Windows.GetOutputWindowPaneAsync(_paneGuid.Value);
+            }
+
+            if (_outputPane is null)
+            {
+                _outputPane = await VS.Windows.CreateOutputWindowPaneAsync("SSDT Lifecycle", false);
+                _paneGuid = _outputPane.Guid;
+            }
         }
 
-        var createPaneResult = outputWindow.CreatePane(ref _paneGuid, "SSDT Lifecycle", 1, 1);
-        if (createPaneResult != Microsoft.VisualStudio.VSConstants.S_OK)
-            throw new InvalidOperationException("Failed to get or create SSDT Lifecycle output pane.");
-        getPaneResult = outputWindow.GetPane(ref _paneGuid, out outputPane);
-        if (getPaneResult == Microsoft.VisualStudio.VSConstants.S_OK)
-        {
-            outputPane.Activate();
-            return outputPane;
-        }
-
-        throw new InvalidOperationException("Failed to get or create SSDT Lifecycle output pane.");
+        await _outputPane.ActivateAsync();
+        await VS.Windows.ShowToolWindowAsync(_outputWindowId);
+        return _outputPane;
     }
 
     private async Task LogToOutputPanelInternalAsync(string message)
@@ -51,37 +47,62 @@ public class VisualStudioAccess : IVisualStudioAccess
         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
         var outputPane = await GetOrCreateSSDTOutputPaneAsync();
-        outputPane.OutputStringThreadSafe(message);
-        outputPane.OutputStringThreadSafe(Environment.NewLine);
+        await outputPane.WriteLineAsync(message);
+    }
+
+    private async Task<Project?> GetSelectedProjectAsync()
+    {
+        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+        var solutionExplorer = await VS.Windows.GetSolutionExplorerWindowAsync();
+        if (solutionExplorer is null)
+            return null;
+
+        var solutionItems = await solutionExplorer.GetSelectionAsync();
+        if (solutionItems is null)
+            return null;
+
+        Project? selectedProject = null;
+        foreach (var solutionItem in solutionItems)
+        {
+            if (selectedProject is not null)
+                return null; // There are multiple items selected.
+
+            if (solutionItem.Type != SolutionItemType.Project)
+                return null;
+
+            selectedProject = (Project)solutionItem;
+        }
+
+        return selectedProject;
     }
 
     public event EventHandler? SolutionClosed;
 
-    Guid IVisualStudioAccess.GetSelectedProjectKind()
+    async Task<bool> IVisualStudioAccess.IsSelectedProjectOfKindAsync(string kind)
     {
-        ThreadHelper.ThrowIfNotOnUIThread();
+        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-        return _dte2.SelectedItems.Count == 1
-            ? Guid.Parse(_dte2.SelectedItems.Item(1).Project.Kind)
-            : Guid.Empty;
+        var selectedProject = await GetSelectedProjectAsync();
+        if (selectedProject is null)
+            return false;
+
+        return await selectedProject.IsKindAsync(kind);
     }
 
-    SqlProject? IVisualStudioAccess.GetSelectedSqlProject()
+    async Task<SqlProject?> IVisualStudioAccess.GetSelectedSqlProjectAsync()
     {
-        ThreadHelper.ThrowIfNotOnUIThread();
+        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-        if (_dte2.SelectedItems.Count != 1)
+        var selectedProject = await GetSelectedProjectAsync();
+        if (selectedProject?.FullPath is null)
             return null;
-
-        var selectedProject = _dte2.SelectedItems.Item(1).Project;
-        var selectedProjectKindGuid = Guid.Parse(selectedProject.Kind);
-        var sqlProjectKindGuid = Guid.Parse(Shared.Constants.SqlProjectKindGuid);
-        if (selectedProjectKindGuid != sqlProjectKindGuid)
+        if (await selectedProject.IsKindAsync(Shared.Constants.SqlProjectKindGuid) == false)
             return null;
 
         return new SqlProject(selectedProject.Name,
-                              selectedProject.FullName,
-                              selectedProject.UniqueName);
+                              selectedProject.FullPath,
+                              selectedProject);
     }
 
     async Task IVisualStudioAccess.ClearSSDTLifecycleOutputAsync()
@@ -89,117 +110,76 @@ public class VisualStudioAccess : IVisualStudioAccess
         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
         var outputPane = await GetOrCreateSSDTOutputPaneAsync();
-        outputPane.Clear();
+        await outputPane.ClearAsync();
     }
 
-    void IVisualStudioAccess.ShowModalError(string error)
+    async Task IVisualStudioAccess.ShowModalErrorAsync(string error)
     {
-        if (error == null)
-            throw new ArgumentNullException(nameof(error));
-        MessageBox.Show(error, "SSDT Lifecycle error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+        Guard.IsNotNull(error);
+        await VS.MessageBox.ShowErrorAsync("SSDT Lifecycle error", error);
     }
 
-    void IVisualStudioAccess.BuildProject(SqlProject project)
+    async Task IVisualStudioAccess.BuildProjectAsync(SqlProject project)
     {
-        ThreadHelper.ThrowIfNotOnUIThread();
+        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-        if (project == null)
-            throw new ArgumentNullException(nameof(project));
+        Guard.IsNotNull(project);
 
-        var sb = _dte2.Solution.SolutionBuild;
-        sb.BuildProject("Release",
-                        project.UniqueName,
-                        true);
+        await VS.Build.BuildProjectAsync((SolutionItem)project.SolutionItem, BuildAction.Rebuild);
     }
 
     async Task IVisualStudioAccess.StartLongRunningTaskIndicatorAsync()
     {
         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-        if (!(await _package.GetServiceAsync(typeof(SVsStatusbar)) is IVsStatusbar statusBar))
-            throw new InvalidOperationException($"Cannot get {nameof(IVsStatusbar)}.");
-
-        // Use the standard Visual Studio icon for building.
-        object icon = (short)Microsoft.VisualStudio.Shell.Interop.Constants.SBAI_Deploy;
-
-        // Display the icon in the Animation region.
-        statusBar.Animation(1, ref icon);
+        await VS.StatusBar.StartAnimationAsync(StatusAnimation.Deploy);
     }
 
     async Task IVisualStudioAccess.StopLongRunningTaskIndicatorAsync()
     {
         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-        if (!(await _package.GetServiceAsync(typeof(SVsStatusbar)) is IVsStatusbar statusBar))
-            throw new InvalidOperationException($"Cannot get {nameof(IVsStatusbar)}.");
-
-        // Use the standard Visual Studio icon for building.
-        object icon = (short)Microsoft.VisualStudio.Shell.Interop.Constants.SBAI_Deploy;
-
-        // Stop the animation.
-        statusBar.Animation(0, ref icon);
+        await VS.StatusBar.EndAnimationAsync(StatusAnimation.Deploy);
     }
 
-    void IVisualStudioAccess.AddItemToProjectProperties(SqlProject project,
-                                                        string targetPath)
+    async Task IVisualStudioAccess.AddConfigFileToProjectPropertiesAsync(SqlProject project,
+        string targetPath)
     {
-        if (project == null)
-            throw new ArgumentNullException(nameof(project));
-        if (targetPath == null)
-            throw new ArgumentNullException(nameof(targetPath));
+        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-        ThreadHelper.ThrowIfNotOnUIThread();
-        var p = _dte2.Solution.Projects.OfType<Project>().SingleOrDefault(m =>
-        {
-            ThreadHelper.ThrowIfNotOnUIThread();
-            return m.UniqueName == project.UniqueName;
-        });
+        Guard.IsNotNull(project);
+        Guard.IsNotNull(targetPath);
 
-        var properties = p?.ProjectItems.OfType<ProjectItem>().SingleOrDefault(m =>
+        var projectItem = (Project)project.SolutionItem;
+        var addedFiles = await projectItem.AddExistingFilesAsync(targetPath);
+        foreach (var addedFile in addedFiles)
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
-            return m.Name == "Properties";
-        });
-        if (properties == null)
+            await addedFile.TrySetAttributeAsync("BuildAction", "None");
+        }
+    }
+
+    async Task IVisualStudioAccess.RemoveItemFromProjectRootAsync(SqlProject project,
+        string path)
+    {
+        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+        Guard.IsNotNull(project);
+        Guard.IsNotNull(path);
+
+        var physicalFile = await PhysicalFile.FromFileAsync(path);
+        if (physicalFile is null)
             return;
 
-        var fileName = Path.GetFileName(targetPath);
-        if (properties.ProjectItems.OfType<ProjectItem>().All(m =>
-            {
-                ThreadHelper.ThrowIfNotOnUIThread();
-                return m.Name != fileName;
-            })) properties.ProjectItems.AddFromFile(targetPath);
-    }
-
-    void IVisualStudioAccess.RemoveItemFromProjectRoot(SqlProject project,
-                                                       string item)
-    {
-        if (project == null)
-            throw new ArgumentNullException(nameof(project));
-        if (item == null)
-            throw new ArgumentNullException(nameof(item));
-
-        ThreadHelper.ThrowIfNotOnUIThread();
-        var p = _dte2.Solution.Projects.OfType<Project>().SingleOrDefault(m =>
-        {
-            ThreadHelper.ThrowIfNotOnUIThread();
-            return m.UniqueName == project.UniqueName;
-        });
-
-        var matchingItem = p?.ProjectItems.OfType<ProjectItem>().SingleOrDefault(m =>
-        {
-            ThreadHelper.ThrowIfNotOnUIThread();
-            return m.Name == item;
-        });
-
-        matchingItem?.Remove();
+        var removed = await physicalFile.TryRemoveAsync();
+        if (removed)
+            await LogToOutputPanelInternalAsync($"Removed file {path} from project {project.FullName} ...");
+        else
+            await LogToOutputPanelInternalAsync($"Failed to remove file {path} from project {project.FullName} ...");
     }
 
     Task IVisualStudioAccess.LogToOutputPanelAsync(string message)
     {
-        if (message == null)
-            throw new ArgumentNullException(nameof(message));
-
+        Guard.IsNotNull(message);
         return LogToOutputPanelInternalAsync(message);
     }
 }

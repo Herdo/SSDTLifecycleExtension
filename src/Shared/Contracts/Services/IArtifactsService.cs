@@ -2,6 +2,6 @@
 
 public interface IArtifactsService
 {
-    VersionModel[] GetExistingArtifactVersions(SqlProject project,
+    Task<VersionModel[]> GetExistingArtifactVersionsAsync(SqlProject project,
         ConfigurationModel configuration);
 }

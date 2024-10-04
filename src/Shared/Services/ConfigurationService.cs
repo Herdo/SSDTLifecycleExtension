@@ -42,9 +42,9 @@ public class ConfigurationService(IFileSystemAccess _fileSystemAccess,
         catch (Exception e)
         {
             await _logger.LogErrorAsync(e, $"Failed to read the configuration from file '{sourcePath}' - please ensure you have access to the file");
-            _visualStudioAccess.ShowModalError("Accessing the configuration file failed. "
-                                             + "Please check the SSDT Lifecycle output window for more details. "
-                                             + "Falling back to default configuration.");
+            await _visualStudioAccess.ShowModalErrorAsync("Accessing the configuration file failed. "
+                + "Please check the SSDT Lifecycle output window for more details. "
+                + "Falling back to default configuration.");
             return GetValidatedDefaultInstance();
         }
 
@@ -52,17 +52,24 @@ public class ConfigurationService(IFileSystemAccess _fileSystemAccess,
         if (deserialized is null)
         {
             await _logger.LogErrorAsync($"Failed to deserialize the configuration from file '{sourcePath}' - falling back to default configuration");
-            _visualStudioAccess.ShowModalError("Deserializing the configuration file failed. "
-                                             + "Please check the SSDT Lifecycle output window for more details. "
-                                             + "Falling back to default configuration.");
+            await _visualStudioAccess.ShowModalErrorAsync("Deserializing the configuration file failed. "
+                + "Please check the SSDT Lifecycle output window for more details. "
+                + "Falling back to default configuration.");
             return GetValidatedDefaultInstance();
         }
         deserialized.ValidateAll();
+
+        if (!deserialized.HasErrors && deserialized.WasUpgraded)
+        {
+            await SaveConfigurationInternalAsync(project!, deserialized, false);
+        }
+
         return deserialized;
     }
 
     private async Task<bool> SaveConfigurationInternalAsync(SqlProject project,
-                                                            ConfigurationModel model)
+        ConfigurationModel model,
+        bool notifyChanged)
     {
         var targetPath = GetConfigurationPath(project);
         var serialized = JsonSerializer.Serialize(model, _jsonSerializerOptions);
@@ -75,15 +82,15 @@ public class ConfigurationService(IFileSystemAccess _fileSystemAccess,
         catch (Exception e)
         {
             await _logger.LogErrorAsync(e, "Failed to save the configuration");
-            _visualStudioAccess.ShowModalError("Failed to save the configuration. Please check the SSDT Lifecycle output window for details.");
+            await _visualStudioAccess.ShowModalErrorAsync("Failed to save the configuration. Please check the SSDT Lifecycle output window for details.");
             return false;
         }
 
-        // Notify about changes
-        ConfigurationChanged?.Invoke(this, new ProjectConfigurationChangedEventArgs(project));
+        if (notifyChanged)
+            ConfigurationChanged?.Invoke(this, new ProjectConfigurationChangedEventArgs(project));
 
         // Add configuration to the project, if it hasn't been added before.
-        _visualStudioAccess.AddItemToProjectProperties(project, targetPath);
+        await _visualStudioAccess.AddConfigFileToProjectPropertiesAsync(project, targetPath);
 
         return true;
     }
@@ -103,6 +110,6 @@ public class ConfigurationService(IFileSystemAccess _fileSystemAccess,
     Task<bool> IConfigurationService.SaveConfigurationAsync(SqlProject project,
                                                             ConfigurationModel model)
     {
-        return SaveConfigurationInternalAsync(project, model);
+        return SaveConfigurationInternalAsync(project, model, true);
     }
 }

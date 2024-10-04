@@ -14,7 +14,7 @@ public class WorkUnitFactory(IDependencyResolver _dependencyResolver)
             StateModelState.PathsLoaded => _dependencyResolver.Get<BuildProjectUnit>(),
             StateModelState.TriedToBuildProject => _dependencyResolver.Get<CleanNewArtifactsDirectoryUnit>(),
             StateModelState.TriedToCleanArtifactsDirectory => _dependencyResolver.Get<CopyBuildResultUnit>(),
-            StateModelState.TriedToCopyBuildResult => _dependencyResolver.Get<CopyDacpacToSharedDacpacRepositoryUnit>(),
+            StateModelState.TriedToCopyBuildResult => _dependencyResolver.Get<CopyDacpacToSharedDacpacRepositoriesUnit>(),
             StateModelState.TriedToCopyDacpacToSharedDacpacRepository => null,
             _ => throw new ArgumentOutOfRangeException(nameof(stateModel) + '.' + nameof(IStateModel.CurrentState)),
         };
@@ -32,7 +32,7 @@ public class WorkUnitFactory(IDependencyResolver _dependencyResolver)
             StateModelState.PathsVerified => _dependencyResolver.Get<BuildProjectUnit>(),
             StateModelState.TriedToBuildProject => _dependencyResolver.Get<CleanNewArtifactsDirectoryUnit>(),
             StateModelState.TriedToCleanArtifactsDirectory => _dependencyResolver.Get<CopyBuildResultUnit>(),
-            StateModelState.TriedToCopyBuildResult => _dependencyResolver.Get<CopyDacpacToSharedDacpacRepositoryUnit>(),
+            StateModelState.TriedToCopyBuildResult => _dependencyResolver.Get<CopyDacpacToSharedDacpacRepositoriesUnit>(),
             StateModelState.TriedToCopyDacpacToSharedDacpacRepository => _dependencyResolver.Get<CreateDeploymentFilesUnit>(),
             StateModelState.TriedToCreateDeploymentFiles => _dependencyResolver.Get<ModifyDeploymentScriptUnit>(),
             StateModelState.ModifiedDeploymentScript => stateModel.CreateLatest
