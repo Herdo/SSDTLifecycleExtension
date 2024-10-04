@@ -74,24 +74,29 @@ public static class ConfigurationModelValidations
     /// </summary>
     /// <param name="model">The <see cref="ConfigurationModel" /> instance to validate.</param>
     /// <returns>A list of all found errors. Empty list if no errors were found.</returns>
-    public static List<string> ValidateSharedDacpacRepositoryPath(ConfigurationModel model)
+    public static List<string> ValidateSharedDacpacRepositoryPaths(ConfigurationModel model)
     {
         var errors = new List<string>();
 
-        if (string.IsNullOrWhiteSpace(model.SharedDacpacRepositoryPath))
+        if (string.IsNullOrWhiteSpace(model.SharedDacpacRepositoryPaths))
             return errors;
 
-        try
+        var paths = model.SharedDacpacRepositoryPaths!.Split([';'], StringSplitOptions.RemoveEmptyEntries);
+        foreach (var path in paths)
         {
-            if (!Path.IsPathRooted(model.SharedDacpacRepositoryPath))
-                errors.Add("Path must be an absolute path.");
-            else if (Path.GetDirectoryName(model.SharedDacpacRepositoryPath)
-                  != model.SharedDacpacRepositoryPath!.Substring(0, model.SharedDacpacRepositoryPath.Length - 1))
-                errors.Add("Path must be a directory.");
-        }
-        catch
-        {
-            errors.Add("Path contains invalid characters.");
+            try
+            {
+                var directoryName = Path.GetDirectoryName(path);
+                var pathWithLastCharacterRemoved = path.Substring(0, path.Length - 1);
+                if (directoryName != pathWithLastCharacterRemoved)
+                {
+                    errors.Add($"Path '{path}' must be a directory.");
+                }
+            }
+            catch (Exception e)
+            {
+                errors.Add($"Path '{path}' is invalid: {e.Message}");
+            }
         }
 
         return errors;

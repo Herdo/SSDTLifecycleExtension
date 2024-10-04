@@ -12,7 +12,7 @@ public sealed class ConfigurationModel : BaseModel,
 
     private string? _artifactsPath = "_Deployment";
     private string? _publishProfilePath = UseSinglePublishProfileSpecialKeyword;
-    private string? _sharedDacpacRepositoryPath = null;
+    private string? _sharedDacpacRepositoryPaths = null;
     private bool _buildBeforeScriptCreation = true;
     private bool _createDocumentationWithScriptCreation = true;
     private bool _commentOutUnnamedDefaultConstraintDrops = false;
@@ -24,6 +24,11 @@ public sealed class ConfigurationModel : BaseModel,
     private bool _trackDacpacVersion = false;
     private string? _customHeader = null;
     private string? _customFooter = null;
+
+    /// <summary>
+    /// Gets if the instance was upgraded from an older JSON version.
+    /// </summary>
+    internal bool WasUpgraded { get; private set; }
 
     /// <summary>
     ///     Gets or sets the relative artifacts path.
@@ -59,19 +64,29 @@ public sealed class ConfigurationModel : BaseModel,
         }
     }
 
-    /// <summary>
-    ///     Gets or sets the absolute path for the shared DACPAC repository.
-    /// </summary>
+    [Obsolete("Only used for migrating old JSON files.", true)]
     public string? SharedDacpacRepositoryPath
     {
-        get => _sharedDacpacRepositoryPath;
         set
         {
-            if (value == _sharedDacpacRepositoryPath)
+            _sharedDacpacRepositoryPaths = value;
+            WasUpgraded = true;
+        }
+    }
+
+    /// <summary>
+    ///     Gets or sets the paths for the shared DACPAC repositories.
+    /// </summary>
+    public string? SharedDacpacRepositoryPaths
+    {
+        get => _sharedDacpacRepositoryPaths;
+        set
+        {
+            if (value == _sharedDacpacRepositoryPaths)
                 return;
-            _sharedDacpacRepositoryPath = value;
+            _sharedDacpacRepositoryPaths = value;
             OnPropertyChanged();
-            SetValidationErrors(ConfigurationModelValidations.ValidateSharedDacpacRepositoryPath(this));
+            SetValidationErrors(ConfigurationModelValidations.ValidateSharedDacpacRepositoryPaths(this));
         }
     }
 
@@ -257,7 +272,7 @@ public sealed class ConfigurationModel : BaseModel,
     {
         SetValidationErrors(ConfigurationModelValidations.ValidateArtifactsPath(this), nameof(ArtifactsPath));
         SetValidationErrors(ConfigurationModelValidations.ValidatePublishProfilePath(this), nameof(PublishProfilePath));
-        SetValidationErrors(ConfigurationModelValidations.ValidateSharedDacpacRepositoryPath(this), nameof(SharedDacpacRepositoryPath));
+        SetValidationErrors(ConfigurationModelValidations.ValidateSharedDacpacRepositoryPaths(this), nameof(SharedDacpacRepositoryPaths));
 
         var unnamedDefaultConstraintDropsErrors = ConfigurationModelValidations.ValidateUnnamedDefaultConstraintDropsBehavior(this);
         SetValidationErrors(unnamedDefaultConstraintDropsErrors, nameof(CommentOutUnnamedDefaultConstraintDrops));
@@ -272,7 +287,7 @@ public sealed class ConfigurationModel : BaseModel,
         {
             ArtifactsPath = ArtifactsPath,
             PublishProfilePath = PublishProfilePath,
-            SharedDacpacRepositoryPath = SharedDacpacRepositoryPath,
+            SharedDacpacRepositoryPaths = SharedDacpacRepositoryPaths,
             BuildBeforeScriptCreation = BuildBeforeScriptCreation,
             CreateDocumentationWithScriptCreation = CreateDocumentationWithScriptCreation,
             CommentOutUnnamedDefaultConstraintDrops = CommentOutUnnamedDefaultConstraintDrops,
@@ -303,7 +318,7 @@ public sealed class ConfigurationModel : BaseModel,
             return true;
         return string.Equals(_artifactsPath, other._artifactsPath)
             && string.Equals(_publishProfilePath, other._publishProfilePath)
-            && string.Equals(_sharedDacpacRepositoryPath, other._sharedDacpacRepositoryPath)
+            && string.Equals(_sharedDacpacRepositoryPaths, other._sharedDacpacRepositoryPaths)
             && _buildBeforeScriptCreation == other._buildBeforeScriptCreation
             && _createDocumentationWithScriptCreation == other._createDocumentationWithScriptCreation
             && _commentOutUnnamedDefaultConstraintDrops == other._commentOutUnnamedDefaultConstraintDrops
@@ -322,7 +337,7 @@ public sealed class ConfigurationModel : BaseModel,
         var hashCode = 1762349303;
         hashCode = hashCode * -1521134295 + EqualityComparer<string?>.Default.GetHashCode(_artifactsPath);
         hashCode = hashCode * -1521134295 + EqualityComparer<string?>.Default.GetHashCode(_publishProfilePath);
-        hashCode = hashCode * -1521134295 + EqualityComparer<string?>.Default.GetHashCode(_sharedDacpacRepositoryPath);
+        hashCode = hashCode * -1521134295 + EqualityComparer<string?>.Default.GetHashCode(_sharedDacpacRepositoryPaths);
         hashCode = hashCode * -1521134295 + _buildBeforeScriptCreation.GetHashCode();
         hashCode = hashCode * -1521134295 + _createDocumentationWithScriptCreation.GetHashCode();
         hashCode = hashCode * -1521134295 + _commentOutUnnamedDefaultConstraintDrops.GetHashCode();

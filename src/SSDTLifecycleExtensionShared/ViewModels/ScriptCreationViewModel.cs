@@ -175,7 +175,7 @@ public class ScriptCreationViewModel : ViewModelBase,
 
         // Check for existing versions
         ExistingVersions.Clear();
-        var existingVersions = _artifactsService.GetExistingArtifactVersions(_project, _configuration);
+        var existingVersions = await _artifactsService.GetExistingArtifactVersionsAsync(_project, _configuration);
         if (existingVersions.Any())
         {
             foreach (var existingVersion in existingVersions)

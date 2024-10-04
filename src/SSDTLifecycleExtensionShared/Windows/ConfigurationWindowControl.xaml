@@ -370,36 +370,39 @@
                                         ToolTip="Browse..."/>
                             </Grid>
 
-                            <!-- Shared DACPAC repository path -->
+                            <!-- Shared DACPAC repository paths -->
                             <TextBlock Grid.Row="2"
                                        Grid.Column="0"
                                        Style="{StaticResource ConfigurationDescriptionTextBlockStyle}">
-                                    <Run Text="Shared DACPAC repository path"
+                                    <Run Text="Shared DACPAC repository paths"
                                          Style="{StaticResource HeaderRunStyle}"/>
                                     <Button Style="{StaticResource HelpButtonStyle}"
                                             Command="{Binding OpenDocumentationCommand}"
-                                            CommandParameter="shared-dacpac-repository-path"/>
+                                            CommandParameter="shared-dacpac-repository-paths"/>
                                     <LineBreak/>
-                                    <Run Text="The path of the shared DACPAC"
+                                    <Run Text="The paths of one or multiple"
                                          FontStyle="Italic"/>
                                     <LineBreak/>
-                                    <Run Text="repository where the DACPAC will"
+                                    <Run Text="shared DACPAC repositories where"
                                          FontStyle="Italic"/>
                                     <LineBreak/>
-                                    <Run Text="be copied to, if set."
+                                    <Run Text="the DACPAC will be copied to, if set."
                                          FontStyle="Italic"/>
                                     <LineBreak/>
                                     <LineBreak/>
-                                    <Run Text="Must be an absolute path and"
+                                    <Run Text="Must end with a backslash."
                                          FontStyle="Italic"/>
                                     <LineBreak/>
-                                    <Run Text="end with a backslash."
+                                    <Run Text="Absolute paths are allowed."
+                                         FontStyle="Italic"/>
+                                    <LineBreak/>
+                                    <Run Text="Relative paths resolve to project directory."
                                          FontStyle="Italic"/>
                             </TextBlock>
                             <TextBox Grid.Row="2"
                                      Grid.Column="1"
                                      Style="{StaticResource DefaultTextTextBoxStyle}"
-                                     Text="{Binding Model.SharedDacpacRepositoryPath, Mode=TwoWay}"/>
+                                     Text="{Binding Model.SharedDacpacRepositoryPaths, Mode=TwoWay}"/>
                         </Grid>
                     </GroupBox>
                     <!-- Script creation options -->
@@ -432,7 +435,7 @@
                                       Grid.Column="1"
                                       Style="{StaticResource ConfigurationCheckBoxStyle}"
                                       IsChecked="{Binding Model.BuildBeforeScriptCreation, Mode=TwoWay}"/>
-                            
+
                             <!-- Create documentation with script creation -->
                             <TextBlock Grid.Row="1"
                                        Grid.Column="0"
