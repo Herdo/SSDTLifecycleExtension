@@ -6,17 +6,17 @@ public class SqlProject
 
     public string FullName { get; }
 
-    public string UniqueName { get; }
+    public object SolutionItem { get; }
 
     public SqlProjectProperties ProjectProperties { get; }
 
     public SqlProject(string name,
                       string fullName,
-                      string uniqueName)
+                      object solutionItem)
     {
         Name = name;
         FullName = fullName;
-        UniqueName = uniqueName;
+        SolutionItem = solutionItem;
         ProjectProperties = new SqlProjectProperties();
     }
 }

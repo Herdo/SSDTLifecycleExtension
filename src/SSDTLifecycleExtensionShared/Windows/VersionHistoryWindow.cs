@@ -12,6 +12,10 @@ public class VersionHistoryWindow : ToolWindowPane, IVisualStudioToolWindow
         Content = new VersionHistoryWindowControl();
     }
 
+    public VersionHistoryWindow(object context) : this()
+    {
+    }
+
     public void SetCaption(string? projectName)
     {
         Caption = projectName == null

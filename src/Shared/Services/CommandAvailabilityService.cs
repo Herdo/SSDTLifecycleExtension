@@ -8,11 +8,8 @@ public class CommandAvailabilityService(IVisualStudioAccess _visualStudioAccess,
     void ICommandAvailabilityService.HandleCommandAvailability(Action<bool> setVisible,
         Action<bool> setEnabled)
     {
-        var projectKind = _visualStudioAccess.GetSelectedProjectKind();
-        if (projectKind == Guid.Empty)
-            return;
-
-        var visible = projectKind == Guid.Parse(Constants.SqlProjectKindGuid);
+        var isSqlProject = _visualStudioAccess.IsSelectedProjectOfKindAsync(Constants.SqlProjectKindGuid).Result;
+        var visible = isSqlProject;
         var enabled = visible && !_scaffoldingService.IsScaffolding && !_scriptCreationService.IsCreating;
 
         setVisible(visible);

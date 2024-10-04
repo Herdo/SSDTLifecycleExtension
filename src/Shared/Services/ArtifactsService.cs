@@ -4,19 +4,21 @@ public class ArtifactsService(IVisualStudioAccess _visualStudioAccess,
                               IFileSystemAccess _fileSystemAccess)
     : IArtifactsService
 {
-    VersionModel[] IArtifactsService.GetExistingArtifactVersions(SqlProject project,
+    async Task<VersionModel[]> IArtifactsService.GetExistingArtifactVersionsAsync(SqlProject project,
         ConfigurationModel configuration)
     {
-        return GetExistingArtifactVersionsInternal(project, configuration);
+        return await GetExistingArtifactVersionsInternalAsync(project, configuration);
     }
 
-    private VersionModel[] GetExistingArtifactVersionsInternal(SqlProject project,
+    private async Task<VersionModel[]> GetExistingArtifactVersionsInternalAsync(SqlProject project,
         ConfigurationModel configuration)
     {
-        if (!TryGetArtifactsBaseDirectory(project, configuration, out var artifactsBaseDirectory))
+        var artifactsBaseDirectory = await TryGetArtifactsBaseDirectoryAsync(project, configuration);
+        if (artifactsBaseDirectory is null)
             return [];
 
-        if (!TryGetArtifactDirectories(artifactsBaseDirectory!, out var artifactDirectories))
+        var artifactDirectories = await TryGetArtifactDirectoriesAsync(artifactsBaseDirectory);
+        if (artifactDirectories is null)
             return [];
 
         var existingVersions = ParseExistingDirectories(artifactDirectories!);
@@ -25,46 +27,38 @@ public class ArtifactsService(IVisualStudioAccess _visualStudioAccess,
         return versionModels;
     }
 
-    private bool TryGetArtifactsBaseDirectory(SqlProject project,
-        ConfigurationModel configuration,
-        out string? artifactsBaseDirectory)
+    private async Task<string?> TryGetArtifactsBaseDirectoryAsync(SqlProject project,
+        ConfigurationModel configuration)
     {
         var projectPath = project.FullName;
         var projectDirectory = Path.GetDirectoryName(projectPath);
         if (projectDirectory == null)
         {
-            _visualStudioAccess.ShowModalError("ERROR: Cannot determine project directory.");
-            artifactsBaseDirectory = null;
-            return false;
+            await _visualStudioAccess.ShowModalErrorAsync("ERROR: Cannot determine project directory.");
+            return null;
         }
 
         var artifactPathErrors = ConfigurationModelValidations.ValidateArtifactsPath(configuration);
         if (artifactPathErrors.Any())
         {
-            _visualStudioAccess.ShowModalError("ERROR: The configured artifacts path is not valid. Please ensure that the configuration is correct.");
-            artifactsBaseDirectory = null;
-            return false;
+            await _visualStudioAccess.ShowModalErrorAsync("ERROR: The configured artifacts path is not valid. Please ensure that the configuration is correct.");
+            return null;
         }
 
-        artifactsBaseDirectory = Path.Combine(projectDirectory, configuration.ArtifactsPath);
-        return true;
+        return Path.Combine(projectDirectory, configuration.ArtifactsPath);
     }
 
-    private bool TryGetArtifactDirectories(string artifactsBaseDirectory,
-        out string[]? artifactDirectories)
+    private async Task<string[]?> TryGetArtifactDirectoriesAsync(string artifactsBaseDirectory)
     {
         try
         {
-            artifactDirectories = _fileSystemAccess.GetDirectoriesIn(artifactsBaseDirectory);
+            return _fileSystemAccess.GetDirectoriesIn(artifactsBaseDirectory);
         }
         catch (Exception e)
         {
-            _visualStudioAccess.ShowModalError($"ERROR: Failed to open script creation window: {e.Message}");
-            artifactDirectories = null;
-            return false;
+            await _visualStudioAccess.ShowModalErrorAsync($"ERROR: Failed to open script creation window: {e.Message}");
+            return null;
         }
-
-        return true;
     }
 
     private static IEnumerable<Version> ParseExistingDirectories(IEnumerable<string> artifactDirectories)

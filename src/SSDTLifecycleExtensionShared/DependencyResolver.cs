@@ -86,7 +86,7 @@ internal sealed class DependencyResolver : IDependencyResolver
 
         // Check for an existing view model registered with the project.
         if (_viewModels.TryGetValue(typeof(TViewModel), out var instances)
-         && instances.TryGetValue(project.UniqueName, out var instance)
+         && instances.TryGetValue(project.FullName, out var instance)
          && instance is TViewModel existingViewModel)
             return existingViewModel;
 
@@ -97,7 +97,7 @@ internal sealed class DependencyResolver : IDependencyResolver
             instances = new Dictionary<string, object>();
             _viewModels.Add(typeof(TViewModel), instances);
         }
-        instances[project.UniqueName] = newViewModel;
+        instances[project.FullName] = newViewModel;
 
         return newViewModel;
     }

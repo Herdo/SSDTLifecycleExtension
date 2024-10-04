@@ -20,7 +20,7 @@ public class ValidateTargetVersionUnit(IVisualStudioAccess _visualStudioAccess,
         stateModel.Result = false;
         stateModel.CurrentState = StateModelState.FormattedTargetVersionValidated;
         await _logger.LogErrorAsync(getLogMessage(stateModel));
-        _visualStudioAccess.ShowModalError("Please change the DAC version in the SQL project settings (see output window).");
+        await _visualStudioAccess.ShowModalErrorAsync("Please change the DAC version in the SQL project settings (see output window).");
     }
 
     Task IWorkUnit<ScaffoldingStateModel>.Work(ScaffoldingStateModel stateModel,

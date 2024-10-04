@@ -96,8 +96,8 @@ public class DependencyResolverTests
         var loggerMock = Mock.Of<ILogger>();
         var spMock = Mock.Of<IServiceProvider>();
         var cs = new OleMenuCommandService(spMock);
-        var p1 = new SqlProject("", "", "1");
-        var p2 = new SqlProject("", "", "2");
+        var p1 = new SqlProject("", "Project1", "1");
+        var p2 = new SqlProject("", "Project2", "2");
         ViewModelTestImplementation vm1;
         ViewModelTestImplementation vm2;
         using (var dr = new DependencyResolver(vsaMock, loggerMock, cs))

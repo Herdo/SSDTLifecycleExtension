@@ -10,7 +10,7 @@ public class BuildService(IVisualStudioAccess _visualStudioAccess,
         await _logger.LogInfoAsync("Building project ...");
         try
         {
-            _visualStudioAccess.BuildProject(project);
+            await _visualStudioAccess.BuildProjectAsync(project);
             return true;
         }
         catch (Exception e)

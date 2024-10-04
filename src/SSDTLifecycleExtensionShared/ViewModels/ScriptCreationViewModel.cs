@@ -204,7 +204,7 @@ public class ScriptCreationViewModel : ViewModelBase,
 
     private async void ConfigurationService_ConfigurationChanged(object sender, ProjectConfigurationChangedEventArgs e)
     {
-        if (e.Project.UniqueName != _project.UniqueName)
+        if (e.Project.FullName != _project.FullName)
             return;
 
         _configuration = await _configurationService.GetConfigurationOrDefaultAsync(_project);

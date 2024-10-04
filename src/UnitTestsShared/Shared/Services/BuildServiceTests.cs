@@ -10,7 +10,7 @@ public class BuildServiceTests
         var testException = new InvalidOperationException("test exception");
         var project = new SqlProject("a", @"C:\TestProject\TestProject.sqlproj", "c");
         var vsaMock = new Mock<IVisualStudioAccess>();
-        vsaMock.Setup(m => m.BuildProject(project))
+        vsaMock.Setup(m => m.BuildProjectAsync(project))
                .Throws(testException);
         var fsaMock = Mock.Of<IFileSystemAccess>();
         var loggerMock = new Mock<ILogger>();
@@ -21,7 +21,7 @@ public class BuildServiceTests
 
         // Assert
         result.Should().BeFalse();
-        vsaMock.Verify(m => m.BuildProject(project), Times.Once);
+        vsaMock.Verify(m => m.BuildProjectAsync(project), Times.Once);
         loggerMock.Verify(m => m.LogErrorAsync(testException, @"Failed to build C:\TestProject\TestProject.sqlproj"), Times.Once);
     }
 
@@ -40,7 +40,7 @@ public class BuildServiceTests
 
         // Assert
         result.Should().BeTrue();
-        vsaMock.Verify(m => m.BuildProject(project), Times.Once);
+        vsaMock.Verify(m => m.BuildProjectAsync(project), Times.Once);
     }
 
     [Test]

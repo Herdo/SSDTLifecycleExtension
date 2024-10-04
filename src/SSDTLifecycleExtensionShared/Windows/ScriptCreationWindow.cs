@@ -12,6 +12,10 @@ public class ScriptCreationWindow : ToolWindowPane, IVisualStudioToolWindow
         Content = new ScriptCreationWindowControl();
     }
 
+    public ScriptCreationWindow(object context) : this()
+    {
+    }
+
     public void SetCaption(string? projectName)
     {
         Caption = projectName is null

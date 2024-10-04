@@ -8,7 +8,7 @@ public class CommandAvailabilityServiceTests
     {
         // Arrange
         var vsaMock = new Mock<IVisualStudioAccess>();
-        vsaMock.Setup(m => m.GetSelectedProjectKind()).Returns(Guid.Empty);
+        vsaMock.Setup(m => m.IsSelectedProjectOfKindAsync(It.IsAny<string>())).ReturnsAsync(false);
         var scaffoldingMock = Mock.Of<IScaffoldingService>();
         var scriptCreationMock = Mock.Of<IScriptCreationService>();
         ICommandAvailabilityService service = new CommandAvailabilityService(vsaMock.Object, scaffoldingMock, scriptCreationMock);
@@ -19,8 +19,8 @@ public class CommandAvailabilityServiceTests
         service.HandleCommandAvailability(b => visible = b, b => enabled = b);
 
         // Assert
-        visible.Should().BeNull();
-        enabled.Should().BeNull();
+        visible.Should().BeFalse();
+        enabled.Should().BeFalse();
     }
 
     [Test]
@@ -28,7 +28,7 @@ public class CommandAvailabilityServiceTests
     {
         // Arrange
         var vsaMock = new Mock<IVisualStudioAccess>();
-        vsaMock.Setup(m => m.GetSelectedProjectKind()).Returns(Guid.Parse("{250BC36C-9B42-4736-BBAB-C3B938A26F8A}"));
+        vsaMock.Setup(m => m.IsSelectedProjectOfKindAsync("250BC36C-9B42-4736-BBAB-C3B938A26F8A")).ReturnsAsync(false);
         var scaffoldingMock = Mock.Of<IScaffoldingService>();
         var scriptCreationMock = Mock.Of<IScriptCreationService>();
         ICommandAvailabilityService service = new CommandAvailabilityService(vsaMock.Object, scaffoldingMock, scriptCreationMock);
@@ -52,7 +52,7 @@ public class CommandAvailabilityServiceTests
     {
         // Arrange
         var vsaMock = new Mock<IVisualStudioAccess>();
-        vsaMock.Setup(m => m.GetSelectedProjectKind()).Returns(Guid.Parse("{00d1a9c2-b5f0-4af3-8072-f6c62b433612}"));
+        vsaMock.Setup(m => m.IsSelectedProjectOfKindAsync("00d1a9c2-b5f0-4af3-8072-f6c62b433612")).ReturnsAsync(true);
         var scaffoldingMock = new Mock<IScaffoldingService>();
         scaffoldingMock.SetupGet(m => m.IsScaffolding).Returns(isScaffolding);
         var scriptCreationMock = new Mock<IScriptCreationService>();

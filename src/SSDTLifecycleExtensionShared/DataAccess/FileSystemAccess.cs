@@ -47,7 +47,7 @@ public class FileSystemAccess : IFileSystemAccess
                 try
                 {
                     child.Delete();
-                    deletedFiles.Add(child.Name);
+                    deletedFiles.Add(child.FullName);
                 }
                 catch
                 {

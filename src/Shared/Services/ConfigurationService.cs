@@ -42,7 +42,7 @@ public class ConfigurationService(IFileSystemAccess _fileSystemAccess,
         catch (Exception e)
         {
             await _logger.LogErrorAsync(e, $"Failed to read the configuration from file '{sourcePath}' - please ensure you have access to the file");
-            _visualStudioAccess.ShowModalError("Accessing the configuration file failed. "
+            await _visualStudioAccess.ShowModalErrorAsync("Accessing the configuration file failed. "
                                              + "Please check the SSDT Lifecycle output window for more details. "
                                              + "Falling back to default configuration.");
             return GetValidatedDefaultInstance();
@@ -52,7 +52,7 @@ public class ConfigurationService(IFileSystemAccess _fileSystemAccess,
         if (deserialized is null)
         {
             await _logger.LogErrorAsync($"Failed to deserialize the configuration from file '{sourcePath}' - falling back to default configuration");
-            _visualStudioAccess.ShowModalError("Deserializing the configuration file failed. "
+            await _visualStudioAccess.ShowModalErrorAsync("Deserializing the configuration file failed. "
                                              + "Please check the SSDT Lifecycle output window for more details. "
                                              + "Falling back to default configuration.");
             return GetValidatedDefaultInstance();
@@ -75,7 +75,7 @@ public class ConfigurationService(IFileSystemAccess _fileSystemAccess,
         catch (Exception e)
         {
             await _logger.LogErrorAsync(e, "Failed to save the configuration");
-            _visualStudioAccess.ShowModalError("Failed to save the configuration. Please check the SSDT Lifecycle output window for details.");
+            await _visualStudioAccess.ShowModalErrorAsync("Failed to save the configuration. Please check the SSDT Lifecycle output window for details.");
             return false;
         }
 
@@ -83,7 +83,7 @@ public class ConfigurationService(IFileSystemAccess _fileSystemAccess,
         ConfigurationChanged?.Invoke(this, new ProjectConfigurationChangedEventArgs(project));
 
         // Add configuration to the project, if it hasn't been added before.
-        _visualStudioAccess.AddItemToProjectProperties(project, targetPath);
+        await _visualStudioAccess.AddConfigFileToProjectPropertiesAsync(project, targetPath);
 
         return true;
     }

@@ -4,7 +4,7 @@
 public class ArtifactsServiceTests
 {
     [Test]
-    public void GetExistingArtifactVersions_ShowError_CannotDetermineProjectDirectory()
+    public async Task GetExistingArtifactVersionsAsync_ShowError_CannotDetermineProjectDirectory()
     {
         // Arrange
         var project = new SqlProject("a", @"C:\", "c");
@@ -26,15 +26,15 @@ public class ArtifactsServiceTests
         IArtifactsService service = new ArtifactsService(vsaMock.Object, fsaMock.Object);
 
         // Act
-        var result = service.GetExistingArtifactVersions(project, config);
+        var result = await service.GetExistingArtifactVersionsAsync(project, config);
 
         // Assert
         result.Should().BeEmpty();
-        vsaMock.Verify(m => m.ShowModalError("ERROR: Cannot determine project directory."), Times.Once);
+        vsaMock.Verify(m => m.ShowModalErrorAsync("ERROR: Cannot determine project directory."), Times.Once);
     }
 
     [Test]
-    public void GetExistingArtifactVersions_ShowError_InvalidArtifactsPathConfiguration()
+    public async Task GetExistingArtifactVersionsAsync_ShowError_InvalidArtifactsPathConfiguration()
     {
         // Arrange
         var project = new SqlProject("a", @"C:\TestProject\TestProject.sqlproj", "c");
@@ -56,15 +56,15 @@ public class ArtifactsServiceTests
         IArtifactsService service = new ArtifactsService(vsaMock.Object, fsaMock.Object);
 
         // Act
-        var result = service.GetExistingArtifactVersions(project, config);
+        var result = await service.GetExistingArtifactVersionsAsync(project, config);
 
         // Assert
         result.Should().BeEmpty();
-        vsaMock.Verify(m => m.ShowModalError("ERROR: The configured artifacts path is not valid. Please ensure that the configuration is correct."), Times.Once);
+        vsaMock.Verify(m => m.ShowModalErrorAsync("ERROR: The configured artifacts path is not valid. Please ensure that the configuration is correct."), Times.Once);
     }
 
     [Test]
-    public void GetExistingArtifactVersions_ShowError_ExceptionDuringFileSystemAccess()
+    public async Task GetExistingArtifactVersionsAsync_ShowError_ExceptionDuringFileSystemAccess()
     {
         // Arrange
         var project = new SqlProject("a", @"C:\TestProject\TestProject.sqlproj", "c");
@@ -88,15 +88,15 @@ public class ArtifactsServiceTests
         IArtifactsService service = new ArtifactsService(vsaMock.Object, fsaMock.Object);
 
         // Act
-        var result = service.GetExistingArtifactVersions(project, config);
+        var result = await service.GetExistingArtifactVersionsAsync(project, config);
 
         // Assert
         result.Should().BeEmpty();
-        vsaMock.Verify(m => m.ShowModalError("ERROR: Failed to open script creation window: test exception"), Times.Once);
+        vsaMock.Verify(m => m.ShowModalErrorAsync("ERROR: Failed to open script creation window: test exception"), Times.Once);
     }
 
     [Test]
-    public void GetExistingArtifactVersions_NoDirectories()
+    public async Task GetExistingArtifactVersionsAsync_NoDirectories()
     {
         // Arrange
         var project = new SqlProject("a", @"C:\TestProject\TestProject.sqlproj", "c");
@@ -120,15 +120,15 @@ public class ArtifactsServiceTests
         IArtifactsService service = new ArtifactsService(vsaMock.Object, fsaMock.Object);
 
         // Act
-        var result = service.GetExistingArtifactVersions(project, config);
+        var result = await service.GetExistingArtifactVersionsAsync(project, config);
 
         // Assert
         result.Should().BeEmpty();
-        vsaMock.Verify(m => m.ShowModalError(It.IsAny<string>()), Times.Never);
+        vsaMock.Verify(m => m.ShowModalErrorAsync(It.IsAny<string>()), Times.Never);
     }
 
     [Test]
-    public void GetExistingArtifactVersions_NoValidDirectories()
+    public async Task GetExistingArtifactVersionsAsync_NoValidDirectories()
     {
         // Arrange
         var project = new SqlProject("a", @"C:\TestProject\TestProject.sqlproj", "c");
@@ -155,15 +155,15 @@ public class ArtifactsServiceTests
         IArtifactsService service = new ArtifactsService(vsaMock.Object, fsaMock.Object);
 
         // Act
-        var result = service.GetExistingArtifactVersions(project, config);
+        var result = await service.GetExistingArtifactVersionsAsync(project, config);
 
         // Assert
         result.Should().BeEmpty();
-        vsaMock.Verify(m => m.ShowModalError(It.IsAny<string>()), Times.Never);
+        vsaMock.Verify(m => m.ShowModalErrorAsync(It.IsAny<string>()), Times.Never);
     }
 
     [Test]
-    public void GetExistingArtifactVersions_SuccessfullyParseAndFlagHighestVersion()
+    public async Task GetExistingArtifactVersionsAsync_SuccessfullyParseAndFlagHighestVersion()
     {
         // Arrange
         var project = new SqlProject("a", @"C:\TestProject\TestProject.sqlproj", "c");
@@ -191,7 +191,7 @@ public class ArtifactsServiceTests
         IArtifactsService service = new ArtifactsService(vsaMock.Object, fsaMock.Object);
 
         // Act
-        var result = service.GetExistingArtifactVersions(project, config);
+        var result = await service.GetExistingArtifactVersionsAsync(project, config);
 
         // Assert
         result.Should().HaveCount(2);
@@ -199,6 +199,6 @@ public class ArtifactsServiceTests
         result[0].UnderlyingVersion.Should().Be(new Version(5, 0));
         result[1].IsNewestVersion.Should().BeFalse();
         result[1].UnderlyingVersion.Should().Be(new Version(4, 0, 0));
-        vsaMock.Verify(m => m.ShowModalError(It.IsAny<string>()), Times.Never);
+        vsaMock.Verify(m => m.ShowModalErrorAsync(It.IsAny<string>()), Times.Never);
     }
 }

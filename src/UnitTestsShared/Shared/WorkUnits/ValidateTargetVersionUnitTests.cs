@@ -28,7 +28,7 @@ public class ValidateTargetVersionUnitTests
         // Assert
         model.CurrentState.Should().Be(StateModelState.FormattedTargetVersionValidated);
         model.Result.Should().BeNull();
-        vsaMock.Verify(m => m.ShowModalError(It.IsAny<string>()), Times.Never);
+        vsaMock.Verify(m => m.ShowModalErrorAsync(It.IsAny<string>()), Times.Never);
         loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);
     }
 
@@ -59,7 +59,7 @@ public class ValidateTargetVersionUnitTests
         // Assert
         model.CurrentState.Should().Be(StateModelState.FormattedTargetVersionValidated);
         model.Result.Should().BeFalse();
-        vsaMock.Verify(m => m.ShowModalError("Please change the DAC version in the SQL project settings (see output window)."), Times.Once);
+        vsaMock.Verify(m => m.ShowModalErrorAsync("Please change the DAC version in the SQL project settings (see output window)."), Times.Once);
         loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Once);
     }
 
@@ -86,7 +86,7 @@ public class ValidateTargetVersionUnitTests
         // Assert
         model.CurrentState.Should().Be(StateModelState.FormattedTargetVersionValidated);
         model.Result.Should().BeNull();
-        vsaMock.Verify(m => m.ShowModalError(It.IsAny<string>()), Times.Never);
+        vsaMock.Verify(m => m.ShowModalErrorAsync(It.IsAny<string>()), Times.Never);
         loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);
     }
 
@@ -112,7 +112,7 @@ public class ValidateTargetVersionUnitTests
         // Assert
         model.CurrentState.Should().Be(StateModelState.FormattedTargetVersionValidated);
         model.Result.Should().BeNull();
-        vsaMock.Verify(m => m.ShowModalError(It.IsAny<string>()), Times.Never);
+        vsaMock.Verify(m => m.ShowModalErrorAsync(It.IsAny<string>()), Times.Never);
         loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Never);
     }
 
@@ -141,7 +141,7 @@ public class ValidateTargetVersionUnitTests
         // Assert
         model.CurrentState.Should().Be(StateModelState.FormattedTargetVersionValidated);
         model.Result.Should().BeFalse();
-        vsaMock.Verify(m => m.ShowModalError("Please change the DAC version in the SQL project settings (see output window)."), Times.Once);
+        vsaMock.Verify(m => m.ShowModalErrorAsync("Please change the DAC version in the SQL project settings (see output window)."), Times.Once);
         loggerMock.Verify(m => m.LogErrorAsync(It.IsAny<string>()), Times.Once);
     }
 }

@@ -8,7 +8,7 @@ public class ToolWindowInitializerTests
     {
         // Arrange
         var vsaMock = new Mock<IVisualStudioAccess>();
-        vsaMock.Setup(m => m.GetSelectedSqlProject()).Returns(null as SqlProject);
+        vsaMock.Setup(m => m.GetSelectedSqlProjectAsync()).ReturnsAsync(null as SqlProject);
         var loggerMock = Mock.Of<ILogger>();
         var spMock = Mock.Of<IServiceProvider>();
         var cs = new OleMenuCommandService(spMock);
@@ -30,7 +30,7 @@ public class ToolWindowInitializerTests
         // Arrange
         var project = new SqlProject("a", "b", "c");
         var vsaMock = new Mock<IVisualStudioAccess>();
-        vsaMock.Setup(m => m.GetSelectedSqlProject()).Returns(project);
+        vsaMock.Setup(m => m.GetSelectedSqlProjectAsync()).ReturnsAsync(project);
         var loggerMock = Mock.Of<ILogger>();
         var spMock = Mock.Of<IServiceProvider>();
         var cs = new OleMenuCommandService(spMock);
@@ -53,7 +53,7 @@ public class ToolWindowInitializerTests
         // Arrange
         var project = new SqlProject("a", "b", "c");
         var vsaMock = new Mock<IVisualStudioAccess>();
-        vsaMock.Setup(m => m.GetSelectedSqlProject()).Returns(project);
+        vsaMock.Setup(m => m.GetSelectedSqlProjectAsync()).ReturnsAsync(project);
         var loggerMock = Mock.Of<ILogger>();
         var spMock = Mock.Of<IServiceProvider>();
         var cs = new OleMenuCommandService(spMock);
@@ -77,7 +77,7 @@ public class ToolWindowInitializerTests
         // Arrange
         var project = new SqlProject("a", "b", "c");
         var vsaMock = new Mock<IVisualStudioAccess>();
-        vsaMock.Setup(m => m.GetSelectedSqlProject()).Returns(project);
+        vsaMock.Setup(m => m.GetSelectedSqlProjectAsync()).ReturnsAsync(project);
         var loggerMock = Mock.Of<ILogger>();
         var spMock = Mock.Of<IServiceProvider>();
         var cs = new OleMenuCommandService(spMock);

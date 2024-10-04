@@ -12,6 +12,10 @@ public class ConfigurationWindow : ToolWindowPane, IVisualStudioToolWindow
         Content = new ConfigurationWindowControl();
     }
 
+    public ConfigurationWindow(object context) : this()
+    {
+    }
+
     public void SetCaption(string? projectName)
     {
         Caption = projectName == null
