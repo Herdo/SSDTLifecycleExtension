@@ -1,0 +1,16 @@
+{
+  "ArtifactsPath": "_Deployment",
+  "PublishProfilePath": "{SINGLE_PROFILE}",
+  "SharedDacpacRepositoryPaths": "C:\\Temp\\DACPACs\\;.\\_Deployment\\",
+  "BuildBeforeScriptCreation": true,
+  "CreateDocumentationWithScriptCreation": true,
+  "CommentOutUnnamedDefaultConstraintDrops": false,
+  "ReplaceUnnamedDefaultConstraintDrops": false,
+  "RemoveSqlCmdStatements": false,
+  "DeleteRefactorlogAfterVersionedScriptGeneration": false,
+  "DeleteLatestAfterVersionedScriptGeneration": true,
+  "VersionPattern": "{MAJOR}.{MINOR}.{BUILD}",
+  "TrackDacpacVersion": false,
+  "CustomHeader": null,
+  "CustomFooter": null
+}

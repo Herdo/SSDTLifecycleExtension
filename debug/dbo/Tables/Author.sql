@@ -1,0 +1,8 @@
+﻿CREATE TABLE [dbo].[Author]
+(
+	[AuthorID]	INT				NOT NULL	IDENTITY(1, 1),
+	[LastName]	NVARCHAR(200)	NOT NULL,
+	[FirstName]	NVARCHAR(200)	NOT NULL,
+	[Birthday]	DATE			NOT NULL	CONSTRAINT DF_Birthday_Today DEFAULT GETDATE(),
+	CONSTRAINT PK_Author_AuthorID PRIMARY KEY (AuthorID)
+)
