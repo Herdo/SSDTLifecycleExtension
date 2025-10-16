@@ -1,0 +1,21 @@
+<Solution>
+  <Folder Name="/Deployment/">
+    <File Path="../deployment/extension-manifest2019.json" />
+    <File Path="../deployment/extension-manifest2022.json" />
+    <File Path="../deployment/publish-2019-vsix.ps1" />
+    <File Path="../deployment/publish-2022-vsix.ps1" />
+  </Folder>
+  <Project Path="Shared/Shared.csproj" />
+  <Project Path="SSDTLifecycleExtension2019/SSDTLifecycleExtension2019.csproj" Id="33f67b86-f86e-4788-9a94-8e680cf36938" />
+  <Project Path="SSDTLifecycleExtension2022/SSDTLifecycleExtension2022.csproj" Id="8d06921f-ca4d-4abd-89fd-5228df996f60" />
+  <Project Path="SSDTLifecycleExtension2026/SSDTLifecycleExtension2026.csproj" Id="0dcb1a4c-b2d8-4f4d-8789-c116cd0459e0" />
+  <Project Path="SSDTLifecycleExtensionShared/SSDTLifecycleExtensionShared.shproj" />
+  <Project Path="TestDatabase/TestDatabase.sqlproj" Id="75dbdf92-497e-4fd9-801d-f54171507d29">
+    <Build />
+    <Deploy />
+  </Project>
+  <Project Path="UnitTests2019/UnitTests2019.csproj" Id="bf5937a9-8e34-4e88-9b7d-3ada04c5d1b6" />
+  <Project Path="UnitTests2022/UnitTests2022.csproj" Id="bf5937a9-8e34-4e88-9b7d-3ada04c5d1b7" />
+  <Project Path="UnitTests2026/UnitTests2026.csproj" Id="6a6d71d2-8550-4a86-9c3c-321d8f911aa1" />
+  <Project Path="UnitTestsShared/UnitTestsShared.shproj" />
+</Solution>
