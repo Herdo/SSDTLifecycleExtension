@@ -89,6 +89,7 @@ public class DacAccessTests
         var result = await da.CreateDeployFilesAsync(tempPreviousVersionDacpacPath, tempNewVersionDacpacPath, tempPublishProfilePath, true, true);
 
         // Assert
+        result.Errors.Should().BeNullOrEmpty();
         result.DeployScriptContent.Should().NotBeNull();
         result.DeployReportContent.Should().NotBeNull();
         result.Errors.Should().BeNull();
@@ -125,6 +126,7 @@ public class DacAccessTests
         var result = await da.CreateDeployFilesAsync(tempPreviousVersionDacpacPath, tempNewVersionDacpacPath, tempPublishProfilePath, true, true);
 
         // Assert
+        result.Errors.Should().BeNullOrEmpty();
         result.DeployScriptContent.Should().NotBeNull();
         result.DeployReportContent.Should().NotBeNull();
         result.PreDeploymentScript.Should().Be("-- Pre-deployment script content goes here\r\nGO\r\n");

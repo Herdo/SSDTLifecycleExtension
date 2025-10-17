@@ -1,6 +1,6 @@
 ﻿namespace SSDTLifecycleExtension.Shared.ScriptModifiers;
 
-internal class AddCustomHeaderModifier : IScriptModifier
+public class AddCustomHeaderModifier : IScriptModifier
 {
     Task IScriptModifier.ModifyAsync(ScriptModificationModel model)
     {

@@ -1,6 +1,6 @@
 ﻿namespace SSDTLifecycleExtension.Shared.ScriptModifiers;
 
-internal class TrackDacpacVersionModifier : StringSearchModifierBase, IScriptModifier
+public class TrackDacpacVersionModifier : StringSearchModifierBase, IScriptModifier
 {
     private const string CreateAndInsertScriptTemplate =
         @"IF OBJECT_ID(N'[dbo].[__DacpacVersion]', N'U') IS NULL

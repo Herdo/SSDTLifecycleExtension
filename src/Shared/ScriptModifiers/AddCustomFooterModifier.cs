@@ -1,6 +1,6 @@
 ﻿namespace SSDTLifecycleExtension.Shared.ScriptModifiers;
 
-internal class AddCustomFooterModifier : IScriptModifier
+public class AddCustomFooterModifier : IScriptModifier
 {
     Task IScriptModifier.ModifyAsync(ScriptModificationModel model)
     {
