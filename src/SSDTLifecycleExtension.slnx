@@ -2,8 +2,10 @@
   <Folder Name="/Deployment/">
     <File Path="../deployment/extension-manifest2019.json" />
     <File Path="../deployment/extension-manifest2022.json" />
+    <File Path="../deployment/extension-manifest2026.json" />
     <File Path="../deployment/publish-2019-vsix.ps1" />
     <File Path="../deployment/publish-2022-vsix.ps1" />
+    <File Path="../deployment/publish-2026-vsix.ps1" />
   </Folder>
   <Project Path="Shared/Shared.csproj" />
   <Project Path="SSDTLifecycleExtension2019/SSDTLifecycleExtension2019.csproj" Id="33f67b86-f86e-4788-9a94-8e680cf36938" />
